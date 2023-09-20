@@ -13,7 +13,6 @@ export default async function TagPage({
   params: { type: string }
   searchParams: Partial<ApiParameters>
 }) {
-  console.log(`🚀 ~ params:`, params)
   const supabaseClient = createServerComponentClient<Database>({ cookies })
   const { data } = await getBookmarks({
     supabaseClient,

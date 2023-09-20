@@ -48,7 +48,7 @@ export default async function Index() {
   return (
     <div className="w-full flex flex-col items-center">
       <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm text-foreground">
+        <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
           <div />
           <div>
             {user ? (
@@ -68,7 +68,7 @@ export default async function Index() {
         </div>
       </nav>
 
-      <div className="animate-in flex flex-col gap-14 opacity-0 max-w-4xl px-3 py-16 lg:py-24 text-foreground">
+      <div className="animate-in flex flex-col gap-14 opacity-0 max-w-4xl px-3 py-16 lg:py-24">
         <div className="flex flex-col items-center mb-4 lg:mb-12">
           <div className="flex gap-8 justify-center items-center">
             <Link href="https://supabase.com/" target="_blank">
@@ -89,7 +89,7 @@ export default async function Index() {
 
         <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
 
-        <div className="flex flex-col gap-8 text-foreground">
+        <div className="flex flex-col gap-8">
           <h2 className="text-lg font-bold text-center">
             Everything you need to get started
           </h2>
@@ -146,7 +146,7 @@ export default async function Index() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-8 text-foreground">
+        <div className="flex flex-col gap-8">
           <div className="grid gap-2 justify-center mx-auto text-center">
             <h2 className="text-lg font-bold text-center">Examples</h2>
             <p className="text-sm">
