@@ -1,11 +1,12 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import Link from 'next/link'
-import LogoutButton from '../src/components/LogoutButton'
-import SupabaseLogo from '../src/components/SupabaseLogo'
-import NextJsLogo from '../src/components/NextJsLogo'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import Link from 'next/link';
 
-export const dynamic = 'force-dynamic'
+import LogoutButton from '../src/components/LogoutButton';
+import NextJsLogo from '../src/components/NextJsLogo';
+import SupabaseLogo from '../src/components/SupabaseLogo';
+
+export const dynamic = 'force-dynamic';
 
 const resources = [
   {
@@ -29,21 +30,21 @@ const resources = [
     url: 'https://supabase.com/docs/guides/auth/auth-helpers/nextjs',
     icon: 'M12 6.25278V19.2528M12 6.25278C10.8321 5.47686 9.24649 5 7.5 5C5.75351 5 4.16789 5.47686 3 6.25278V19.2528C4.16789 18.4769 5.75351 18 7.5 18C9.24649 18 10.8321 18.4769 12 19.2528M12 6.25278C13.1679 5.47686 14.7535 5 16.5 5C18.2465 5 19.8321 5.47686 21 6.25278V19.2528C19.8321 18.4769 18.2465 18 16.5 18C14.7535 18 13.1679 18.4769 12 19.2528',
   },
-]
+];
 
 const examples = [
   { type: 'Client Components', src: 'app/_examples/client-component/page.tsx' },
   { type: 'Server Components', src: 'app/_examples/server-component/page.tsx' },
   { type: 'Server Actions', src: 'app/_examples/server-action/page.tsx' },
   { type: 'Route Handlers', src: 'app/_examples/route-handler.ts' },
-]
+];
 
 export default async function Index() {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = createServerComponentClient({ cookies });
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -185,5 +186,5 @@ export default async function Index() {
         </div>
       </div>
     </div>
-  )
+  );
 }

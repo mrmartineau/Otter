@@ -1,14 +1,14 @@
-import './globals.css'
+import './globals.css';
 
 export const metadata = {
   title: 'Otter',
   description: 'Bookmarking on your own terms',
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
@@ -16,5 +16,5 @@ export default function RootLayout({
         <main className="min-h-screen bg-background">{children}</main>
       </body>
     </html>
-  )
+  );
 }

@@ -4,6 +4,9 @@
     "dev": "next dev -p 5678",
     "build": "next build",
     "start": "next start",
+    "lint": "next lint",
+    "format": "npx prettier --write . -l",
+    "type-check": "tsc --noEmit",
     "supabase": "supabase",
     "supabase:types": "npm run supabase:types:app",
     "supabase:types:app": "npx supabase gen types typescript --project-id \"ffpbylcvwtyozyrplqic\" --schema public > src/types/supabase.ts",
@@ -41,6 +44,7 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "@types/node": "20.3.1",
     "@types/proper-url-join": "^2.1.1",
     "@types/react": "18.2.12",
