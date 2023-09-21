@@ -1,0 +1,45 @@
+/* Typography */
+@layer base {
+  /* @link https://utopia.fyi/type/calculator?c=320,16,1.2,1350,20,1.25,10,3,400&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+  :root {
+    --step--3: clamp(0.58rem, 0.56rem + 0.1vw, 0.64rem);
+    --step--2: clamp(0.69rem, 0.66rem + 0.16vw, 0.8rem);
+    --step--1: clamp(0.83rem, 0.78rem + 0.26vw, 1rem);
+    --step-0: clamp(1rem, 0.92rem + 0.39vw, 1.25rem);
+    --step-1: clamp(1.2rem, 1.09rem + 0.56vw, 1.56rem);
+    --step-2: clamp(1.44rem, 1.28rem + 0.8vw, 1.95rem);
+    --step-3: clamp(1.73rem, 1.51rem + 1.11vw, 2.44rem);
+    --step-4: clamp(2.07rem, 1.77rem + 1.52vw, 3.05rem);
+    --step-5: clamp(2.49rem, 2.08rem + 2.06vw, 3.82rem);
+    --step-6: clamp(2.99rem, 2.43rem + 2.77vw, 4.77rem);
+    --step-7: clamp(3.58rem, 2.84rem + 3.69vw, 5.96rem);
+    --step-8: clamp(4.3rem, 3.32rem + 4.89vw, 7.45rem);
+    --step-9: clamp(5.16rem, 3.87rem + 6.45vw, 9.31rem);
+    --step-10: clamp(6.19rem, 4.5rem + 8.47vw, 11.64rem);
+
+    /* Spacing */
+    /* @link https://utopia.fyi/space/calculator?c=320,16,1.2,1350,20,1.25,10,3,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+    --space-3xs: clamp(0.25rem, 0.23rem + 0.1vw, 0.31rem);
+    --space-2xs: clamp(0.5rem, 0.46rem + 0.19vw, 0.63rem);
+    --space-xs: clamp(0.75rem, 0.69rem + 0.29vw, 0.94rem);
+    --space-s: clamp(1rem, 0.92rem + 0.39vw, 1.25rem);
+    --space-m: clamp(1.5rem, 1.38rem + 0.58vw, 1.88rem);
+    --space-l: clamp(2rem, 1.84rem + 0.78vw, 2.5rem);
+    --space-xl: clamp(3rem, 2.77rem + 1.17vw, 3.75rem);
+    --space-2xl: clamp(4rem, 3.69rem + 1.55vw, 5rem);
+    --space-3xl: clamp(6rem, 5.53rem + 2.33vw, 7.5rem);
+
+    /* One-up pairs */
+    --space-3xs-2xs: clamp(0.25rem, 0.13rem + 0.58vw, 0.63rem);
+    --space-2xs-xs: clamp(0.5rem, 0.36rem + 0.68vw, 0.94rem);
+    --space-xs-s: clamp(0.75rem, 0.59rem + 0.78vw, 1.25rem);
+    --space-s-m: clamp(1rem, 0.73rem + 1.36vw, 1.88rem);
+    --space-m-l: clamp(1.5rem, 1.19rem + 1.55vw, 2.5rem);
+    --space-l-xl: clamp(2rem, 1.46rem + 2.72vw, 3.75rem);
+    --space-xl-2xl: clamp(3rem, 2.38rem + 3.11vw, 5rem);
+    --space-2xl-3xl: clamp(4rem, 2.91rem + 5.44vw, 7.5rem);
+
+    /* Custom pairs */
+    --space-s-l: clamp(1rem, 0.53rem + 2.33vw, 2.5rem);
+  }
+}

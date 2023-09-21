@@ -1,0 +1,14 @@
+.sidebar-top {
+  column-gap: var(--space-xs);
+  flex-direction: column;
+  margin-bottom: var(--space-xs);
+  display: none;
+
+  @media (--bp2) {
+    display: flex;
+  }
+
+  .link-logo {
+    align-self: flex-start;
+  }
+}

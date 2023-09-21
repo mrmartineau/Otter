@@ -1,0 +1,57 @@
+@layer base {
+  :root {
+    --violet-1: hsl(255 65% 99.4%);
+    --violet-2: hsl(252 100% 99%);
+    --violet-3: hsl(252 96.9% 97.4%);
+    --violet-4: hsl(252 91.5% 95.5%);
+    --violet-5: hsl(252 85.1% 93%);
+    --violet-6: hsl(252 77.8% 89.4%);
+    --violet-7: hsl(252 71% 83.7%);
+    --violet-8: hsl(252 68.6% 76.3%);
+    --violet-9: hsl(252 56% 57.5%);
+    --violet-10: hsl(251 48.1% 53.5%);
+    --violet-11: hsl(250 43% 48%);
+    --violet-12: hsl(250 43% 26%);
+    --sand-1: hsl(50 20% 99%);
+    --sand-2: hsl(60 7.7% 97.5%);
+    --sand-3: hsl(59 5.8% 94.5%);
+    --sand-4: hsl(58 5.3% 91.8%);
+    --sand-5: hsl(57 5.1% 89%);
+    --sand-6: hsl(56 5% 86%);
+    --sand-7: hsl(54 4.9% 81.8%);
+    --sand-8: hsl(51 5% 72.4%);
+    --sand-9: hsl(60 3% 53.9%);
+    --sand-10: hsl(60 2.6% 49%);
+    --sand-11: hsl(50 2.5% 38%);
+    --sand-12: hsl(50 8% 12%);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --violet-1: hsl(250 20% 10.2%);
+      --violet-2: hsl(255 30.3% 12.9%);
+      --violet-3: hsl(254 33.3% 18.4%);
+      --violet-4: hsl(253 34.6% 22.1%);
+      --violet-5: hsl(253 35.5% 25.5%);
+      --violet-6: hsl(252 36.6% 30.5%);
+      --violet-7: hsl(251 37.8% 39%);
+      --violet-8: hsl(250 46.2% 54.1%);
+      --violet-9: hsl(252 56% 57.5%);
+      --violet-10: hsl(253 63.2% 64.1%);
+      --violet-11: hsl(255 100% 80%);
+      --violet-12: hsl(250 93% 93%);
+      --sand-1: hsl(60 6% 9%);
+      --sand-2: hsl(60 1.9% 10.4%);
+      --sand-3: hsl(56 2.4% 15.4%);
+      --sand-4: hsl(53 2.7% 18.4%);
+      --sand-5: hsl(51 2.9% 21.2%);
+      --sand-6: hsl(49 3.1% 24.3%);
+      --sand-7: hsl(47 3.3% 28.7%);
+      --sand-8: hsl(43 3.7% 37.1%);
+      --sand-9: hsl(50 4% 41.8%);
+      --sand-10: hsl(48 3.5% 49.5%);
+      --sand-11: hsl(50 5% 68.3%);
+      --sand-12: hsl(56 7% 93%);
+    }
+  }
+}

@@ -1,0 +1,77 @@
+@layer base {
+  :root {
+    /* Sizes */
+    --sidebar-width: 250px;
+    --header-height: 60px;
+    --container: 1200px;
+
+    /* Fonts */
+    --font-sans: Mona Sans, system-ui, sans-serif;
+    --font-mono: JetBrains Mono, SF Mono, Menlo, Monaco, Courier New, monospace;
+    --font-headings: var(--font-sans);
+    --font-body: var(--font-sans);
+
+    /* Line heights */
+    --line-height-none: 1;
+    --line-height-tight: 1.25;
+    --line-height-snug: 1.375;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.625;
+    --line-height-loose: 2;
+    --line-height-body: 1.625;
+    --line-height-heading: 1.1;
+
+    /* z-indices */
+    --z-1: 100;
+    --z-2: 200;
+    --z-3: 300;
+    --z-4: 400;
+    --z-max: 999;
+
+    /* Transitions */
+    --transition: 0.2s var(--ease-in-out-4);
+
+    /* Radii */
+    --radii-none: 0;
+    --radii-sm: 0.125rem;
+    --radii-default: 0.25rem;
+    --radii-m: 0.3rem;
+    --radii-lg: 0.625rem;
+    --radii-xl: 1rem;
+    --radii-full: 9999px;
+    --radii-round: 50%;
+    --radii-pill: 9999px;
+
+    /* Colors */
+    --theme1: var(--sand-1);
+    --theme2: var(--sand-2);
+    --theme3: var(--sand-3);
+    --theme4: var(--sand-4);
+    --theme5: var(--sand-5);
+    --theme6: var(--sand-6);
+    --theme7: var(--sand-7);
+    --theme8: var(--sand-8);
+    --theme9: var(--sand-9);
+    --theme10: var(--sand-10);
+    --theme11: var(--sand-11);
+    --theme12: #f5f5f0;
+    /* theme12: var(--sand12); */
+
+    --accent1: var(--violet-1);
+    --accent2: var(--violet-2);
+    --accent3: var(--violet-3);
+    --accent4: var(--violet-4);
+    --accent5: var(--violet-5);
+    --accent6: var(--violet-6);
+    --accent7: var(--violet-7);
+    --accent8: var(--violet-8);
+    --accent9: var(--violet-9);
+    --accent10: var(--violet-10);
+    --accent11: var(--violet-11);
+    --accent12: var(--violet-12);
+
+    --text: var(--theme10);
+    /* --background: var(--theme1); */
+    --focus: var(--theme9);
+  }
+}
