@@ -6,8 +6,6 @@ import LogoutButton from '../src/components/LogoutButton';
 import NextJsLogo from '../src/components/NextJsLogo';
 import SupabaseLogo from '../src/components/SupabaseLogo';
 
-export const dynamic = 'force-dynamic';
-
 const resources = [
   {
     title: 'Cookie-based Auth and the Next.js App Router',

@@ -7,7 +7,6 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Metadata } from 'next';
 import { cookies } from 'next/headers';
 
-export const dynamic = 'force-dynamic';
 type Props = {
   params: { name: string };
   searchParams: Partial<ApiParameters>;

@@ -6,7 +6,6 @@ import { getBookmarks } from '@/src/utils/fetching/bookmarks';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
-export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Trash',
 };

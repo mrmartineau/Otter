@@ -7,8 +7,6 @@ import { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import title from 'title';
 
-export const dynamic = 'force-dynamic';
-
 type Props = {
   params: { type: string };
   searchParams: Partial<ApiParameters>;
