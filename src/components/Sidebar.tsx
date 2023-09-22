@@ -78,11 +78,7 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
         </Flex>
       </div>
 
-      <Flex
-        gapY="3xs"
-        direction="column"
-        style={{ marginTop: 'var(--space-sm)' }}
-      >
+      <Flex gapY="3xs" direction="column" className="mt-s">
         <SidebarLink href={ROUTE_TRASH} count={dbMeta?.trash}>
           <Trash aria-label="Trash" size={18} weight="duotone" />
           {CONTENT.trashNav}

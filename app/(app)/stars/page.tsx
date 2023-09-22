@@ -1,3 +1,5 @@
+import { Feed } from '@/src/components/Feed';
+import { CONTENT } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
@@ -11,14 +13,22 @@ export default async function StarsPage({
 }: {
   searchParams: Partial<ApiParameters>;
 }) {
+  const { limit, offset } = searchParams;
   const supabaseClient = createServerComponentClient<Database>({ cookies });
-  const { data } = await getBookmarks({
+  const { data, count } = await getBookmarks({
     supabaseClient,
     params: { ...searchParams, star: true },
   });
   return (
-    <div>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-    </div>
+    <Feed
+      items={data}
+      count={count || 0}
+      limit={limit}
+      offset={offset}
+      allowGroupByDate={true}
+      title={CONTENT.starsTitle}
+      // icon={<ListBullets />}
+      feedType="bookmarks"
+    />
   );
 }

@@ -1,0 +1,5 @@
+.paragraph {
+  box-sizing: border-box;
+  color: var(--text);
+  margin-top: 0;
+}

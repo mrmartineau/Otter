@@ -1,0 +1,17 @@
+.pre {
+  border: 1px solid var(--theme5);
+  border-radius: var(--radii-m);
+  word-break: break-all;
+  white-space: break-spaces;
+  font-family: var(--font-mono);
+  font-weight: normal;
+  font-size: var(--step--1);
+  padding: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-weight: normal;
+  font-size: var(--step--1);
+}

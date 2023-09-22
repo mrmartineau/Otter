@@ -12,7 +12,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    /* --background: 0 0% 100%; */
     --foreground: 20 14.3% 4.1%;
 
     --card: 0 0% 100%;
@@ -45,7 +45,7 @@
   @media (prefers-color-scheme: dark) {
     /* .dark { */
     :root {
-      --background: 20 14.3% 4.1%;
+      /* --background: 20 14.3% 4.1%; */
       --foreground: 60 9.1% 97.8%;
 
       --card: 20 14.3% 4.1%;
@@ -83,6 +83,7 @@
     @apply bg-background text-foreground;
     font-family: var(--font-body);
     font-size: var(--step-0);
+    color: var(--text);
   }
 }
 

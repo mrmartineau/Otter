@@ -54,9 +54,7 @@
     --theme9: var(--sand-9);
     --theme10: var(--sand-10);
     --theme11: var(--sand-11);
-    --theme12: #f5f5f0;
-    /* theme12: var(--sand12); */
-
+    --theme12: var(--sand-12);
     --accent1: var(--violet-1);
     --accent2: var(--violet-2);
     --accent3: var(--violet-3);
@@ -71,7 +69,7 @@
     --accent12: var(--violet-12);
 
     --text: var(--theme10);
-    /* --background: var(--theme1); */
+    --background: var(--theme1);
     --focus: var(--theme9);
   }
 }

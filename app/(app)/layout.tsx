@@ -1,3 +1,4 @@
+import { Container } from '@/src/components/Container';
 import { Link, linkVariants } from '@/src/components/Link';
 import { Sidebar } from '@/src/components/Sidebar';
 import { ROUTE_FEED_HOME } from '@/src/constants';
@@ -31,7 +32,9 @@ export default async function AppLayout({ children }: LayoutProps) {
           <Sidebar dbMeta={data} />
         </div>
         <div className="otter-content-pane">
-          <div className="otter-content-pane-inner">{children}</div>
+          <div className="otter-content-pane-inner">
+            <Container>{children}</Container>
+          </div>
         </div>
       </div>
     </div>

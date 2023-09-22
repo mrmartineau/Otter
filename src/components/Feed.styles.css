@@ -1,0 +1,32 @@
+.feed-wrapper {
+  display: grid;
+  gap: var(--space-2xs);
+  position: relative;
+  padding: var(--space-s);
+  border-radius: var(--radii-lg);
+  overflow: hidden;
+  transition: all var(--ease);
+  background-color: var(--theme2);
+  border: 1px solid var(--theme4);
+  color: var(--theme10);
+
+  &:hover,
+  &:focus-within {
+    .feedItem__actions {
+      visibility: visible;
+      opacity: 1;
+    }
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  @extend .focus;
+
+  @media (--fine) {
+    .feedItem__actions {
+      visibility: hidden;
+      opacity: 0px;
+    }
+  }
+}
