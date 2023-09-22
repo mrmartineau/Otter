@@ -52,7 +52,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
 
   return (
     <TooltipProvider delayDuration={800} skipDelayDuration={500}>
-      <div className="grid gap-1 text-step--2">
+      <div className="grid gap-1 text-step--2 font-mono">
         <Flex align="center" gapX="m" wrap="wrap">
           {tags?.length ? (
             <Flex align="center" gap="xs">
@@ -87,7 +87,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                 <TooltipTrigger>
                   <Flex align="center">
                     <Link href={urlJoin('/type', type)}>
-                      <TypeToIcon type={type} width="16" />
+                      <TypeToIcon type={type} size="16" />
                     </Link>
                   </Flex>
                 </TooltipTrigger>
@@ -98,8 +98,8 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
             {click_count > MINIMUM_CLICK_COUNT ? (
               <Tooltip>
                 <TooltipTrigger>
-                  <Flex align="center" gap="2xs" className="text-step--1">
-                    <NavigationArrow weight="duotone" width="16" />
+                  <Flex align="center" gap="3xs">
+                    <NavigationArrow weight="duotone" size="16" />
                     {click_count}
                   </Flex>
                 </TooltipTrigger>
@@ -111,7 +111,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               <Tooltip>
                 <TooltipTrigger>
                   <Flex align="center" gap="3xs">
-                    <Calendar weight="duotone" width="16" />
+                    <Calendar weight="duotone" size="16" className="shrink-0" />
                     <time dateTime={created_at}>
                       {createdDate.ago < 8
                         ? createdDate.relative

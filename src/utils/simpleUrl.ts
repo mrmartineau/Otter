@@ -1,20 +1,9 @@
 import memoizeOne from 'memoize-one';
+import tldjs from 'tldjs';
 
-export const simpleUrlSource = (url: string, withPath?: boolean): string => {
-  const urlString = url;
-  try {
-    if ('URL' in window) {
-      const urlObject = new URL(url);
-      const hostname = urlObject.hostname.replace('www.', '');
-      if (withPath) {
-        return hostname + urlObject.pathname;
-      }
-      return hostname;
-    }
-    return urlString;
-  } catch (err) {
-    return urlString;
-  }
+export const simpleUrlSource = (url: string): string => {
+  const parsedUrl = tldjs.parse(url);
+  return parsedUrl.hostname?.replace('www.', '') || url;
 };
 
 export const simpleUrl = memoizeOne(simpleUrlSource);

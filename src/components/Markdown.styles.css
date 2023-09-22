@@ -1,0 +1,25 @@
+.markdown {
+  ul {
+    list-style-type: disc;
+  }
+  ol,
+  ul {
+    padding-inline-start: 1em;
+  }
+}
+
+/* .markdown > * {
+} */
+
+.markdown > * + * {
+  margin-block-start: var(--flow-space, 1em);
+}
+
+:is(h1, h2, h3, blockquote) {
+  --flow-space: var(--space-xl);
+  color: var(--colour-text-bright);
+}
+
+:is(h1, h2, h3) + * {
+  --flow-space: var(--space-xs);
+}

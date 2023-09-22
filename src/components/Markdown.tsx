@@ -7,6 +7,7 @@ import { remarkTruncateLinks } from 'remark-truncate-links';
 
 import { Code, CodeBlock } from './CodeBlock';
 import { Link } from './Link';
+import './Markdown.styles.css';
 import { Paragraph } from './Paragraph';
 
 interface MarkdownProps {
@@ -14,7 +15,7 @@ interface MarkdownProps {
 }
 
 export const Markdown = ({ children }: MarkdownProps) => (
-  <div className="last:mb-0 text-step--1">
+  <div className="markdown last:mb-0 text-step--1">
     <ReactMarkdown
       remarkPlugins={[
         remarkSqueezeParagraphs,

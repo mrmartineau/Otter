@@ -71,5 +71,8 @@
     --text: var(--theme10);
     --background: var(--theme1);
     --focus: var(--theme9);
+
+    /* Other */
+    --flow-space: var(--space-m);
   }
 }

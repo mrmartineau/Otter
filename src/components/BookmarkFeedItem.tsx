@@ -13,7 +13,6 @@ import { Markdown } from './Markdown';
 
 export interface BookmarkFeedItemProps extends Bookmark {
   allowDeletion?: boolean;
-  id: string;
 }
 
 export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
@@ -39,7 +38,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
       {note ? (
         <Flex gap="2xs">
           <div className="shrink-0 text-theme10">
-            <Note aria-label="Note" weight="duotone" />
+            <Note aria-label="Note" weight="duotone" size={16} />
           </div>
           <div>
             <Markdown>{note}</Markdown>

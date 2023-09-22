@@ -1,3 +1,4 @@
+import { BookmarkFeedItem } from '@/src/components/BookmarkFeedItem';
 import { Database } from '@/src/types/supabase';
 import { getBookmark } from '@/src/utils/fetching/bookmarks';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -12,9 +13,7 @@ export default async function BookmarkPage({
 }) {
   const supabaseClient = createServerComponentClient<Database>({ cookies });
   const { data } = await getBookmark({ supabaseClient, id: params.id });
-  return (
-    <div>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-    </div>
-  );
+  console.log(`🚀 ~ data:`, data);
+  // const { click_count, ...rest } = data;
+  return <BookmarkFeedItem {...data} />;
 }

@@ -1,17 +1,30 @@
-.pre {
-  border: 1px solid var(--theme5);
-  border-radius: var(--radii-m);
-  word-break: break-all;
-  white-space: break-spaces;
+.code-base {
   font-family: var(--font-mono);
   font-weight: normal;
   font-size: var(--step--1);
-  padding: var(--space-sm);
-  margin-top: var(--space-xs);
+}
+
+.pre {
+  @extend .code-base;
+  background-color: var(--theme5);
+  border-radius: var(--radii-lg);
+  word-break: break-all;
+  white-space: break-spaces;
+  padding: var(--space-s);
+  margin-y: var(--space-xs);
+  color: var(--theme11);
+
+  .code {
+    &::before,
+    &::after {
+      content: '';
+    }
+  }
 }
 
 .code {
-  font-family: var(--font-mono);
-  font-weight: normal;
-  font-size: var(--step--1);
+  &::before,
+  &::after {
+    content: '`';
+  }
 }
