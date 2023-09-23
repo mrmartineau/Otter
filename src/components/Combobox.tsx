@@ -1,0 +1,80 @@
+import type { Props } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
+
+export const comboboxStyles: Props['styles'] = {
+  control: (provided, state) => ({
+    ...provided,
+    borderRadius: 'var(--radii-m)',
+    boxShadow: state.isFocused
+      ? '0 0 0 2px var(--focus)'
+      : '0 0 0 2px transparent',
+    borderColor: state.isFocused ? 'var(--focus)' : 'transparent',
+    ':hover': {
+      borderColor: 'transparent',
+    },
+    // minHeight: '3.6rem',
+    // paddingLeft: '0.3rem',
+  }),
+  valueContainer: (provided) => ({
+    ...provided,
+    padding: '0.2em 0.2em',
+  }),
+  multiValue: (provided) => ({
+    ...provided,
+    borderRadius: 'var(--radii-default)',
+    fontSize: 'var(--step-0)',
+    padding: '0.2em',
+    ':hover': {
+      backgroundColor: 'var(--accent6)',
+    },
+  }),
+  multiValueRemove: (provided) => ({
+    ...provided,
+    borderRadius: 'var(--radii-default)',
+    marginLeft: '0.2em',
+    cursor: 'pointer',
+    ':hover': {
+      backgroundColor: 'var(--accent8)',
+    },
+  }),
+  // option: (provided, state) => ({
+  //   ...provided,
+  //   color: state.isSelected ? stitchesTheme.colors.text.value : 'inherit',
+  //   backgroundColor: state.isSelected
+  //     ? stitchesTheme.colors.accent7.value
+  //     : 'inherit',
+  // }),
+};
+
+export const comboboxTheme: Props['theme'] = (theme) => ({
+  ...theme,
+  colors: {
+    ...theme.colors,
+    primary: 'var(--accent3)',
+    primary25: 'var(--accent4)',
+    primary50: 'var(--accent5)',
+    primary75: 'var(--accent6)',
+    neutral0: 'var(--theme3)',
+    neutral5: 'var(--theme4)',
+    neutral10: 'var(--theme6)',
+    neutral20: 'var(--theme7)',
+    neutral30: 'var(--theme8)',
+    neutral40: 'var(--theme9)',
+    neutral50: 'var(--theme10)',
+    neutral60: 'var(--theme11)',
+    neutral70: 'var(--theme12)',
+    neutral80: 'var(--theme12)',
+    neutral90: 'var(--theme12)',
+  },
+});
+
+export const Combobox = ({ value, options, ...rest }: Props) => (
+  <CreatableSelect
+    isMulti
+    value={value}
+    options={options}
+    theme={comboboxTheme}
+    styles={comboboxStyles}
+    {...rest}
+  />
+);

@@ -101,3 +101,7 @@
     transform: translateY(0);
   }
 }
+
+::placeholder {
+  color: var(--theme8);
+}

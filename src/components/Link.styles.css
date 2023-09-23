@@ -100,3 +100,26 @@
     'ital' 10;
   color: var(--theme11);
 }
+
+.link-fab {
+  --color: var(--theme12);
+  position: fixed;
+  bottom: var(--space-m);
+  right: var(--space-m);
+  z-index: var(--z-max);
+  border-radius: 50%;
+  height: 50px;
+  width: 50px;
+  background-color: var(--accent8);
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  justify-content: center;
+  box-shadow: 0 2px 10px var(--theme3);
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--accent6);
+    color: var(--color);
+  }
+}

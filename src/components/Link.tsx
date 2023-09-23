@@ -15,6 +15,7 @@ const linkVariants = cva(['link-base', 'focus'], {
       logo: 'link-logo',
       add: 'link-add',
       feedTitle: 'link-feed-title',
+      fab: 'link-fab',
     },
   },
   defaultVariants: {

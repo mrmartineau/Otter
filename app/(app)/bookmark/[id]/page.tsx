@@ -11,7 +11,6 @@ export default async function BookmarkPage({
 }) {
   const supabaseClient = createServerComponentClient<Database>({ cookies });
   const { data } = await getBookmark({ supabaseClient, id: params.id });
-  console.log(`🚀 ~ data:`, data);
-  // const { click_count, ...rest } = data;
+  // @ts-ignore
   return <BookmarkFeedItem {...data} />;
 }

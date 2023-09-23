@@ -1,9 +1,11 @@
 import { Container } from '@/src/components/Container';
-import { Link, linkVariants } from '@/src/components/Link';
+import { FabAdd } from '@/src/components/FabAdd';
+import { Link } from '@/src/components/Link';
 import { Sidebar } from '@/src/components/Sidebar';
-import { ROUTE_FEED_HOME } from '@/src/constants';
+import { ROUTE_FEED_HOME, ROUTE_NEW_BOOKMARK } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
+import { Plus } from '@phosphor-icons/react';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
@@ -37,6 +39,7 @@ export default async function AppLayout({ children }: LayoutProps) {
           </div>
         </div>
       </div>
+      <FabAdd />
     </div>
   );
 }
