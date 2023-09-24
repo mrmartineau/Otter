@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-// import './BookmarkForm.styles.css';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
 import {
@@ -225,10 +224,10 @@ export const BookmarkForm = ({
               value={transformTagsForCombobox(watchTags)}
               maxMenuHeight={100}
             />
-            {/* {possibleMatchingTags.length ? (
+            {possibleMatchingTags.length ? (
               <Flex
-                css={{ mt: '$2', fontSize: '$2' }}
-                gapX="1"
+                className="mt-2 text-sm"
+                gapX="xs"
                 align="center"
                 wrap="wrap"
               >
@@ -237,7 +236,7 @@ export const BookmarkForm = ({
                   <Button
                     key={`possibleTagMatch-${tag}`}
                     variant="ghost"
-                    size="small"
+                    size="sm"
                     onClick={() => {
                       const existingTags = watchTags?.length ? watchTags : [];
                       setValue('tags', [...existingTags, tag]);
@@ -252,7 +251,7 @@ export const BookmarkForm = ({
                   </Button>
                 ))}
               </Flex>
-            ) : null} */}
+            ) : null}
           </FormGroup>
         ) : null}
 

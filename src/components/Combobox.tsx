@@ -17,24 +17,27 @@ export const comboboxStyles: Props['styles'] = {
   }),
   valueContainer: (provided) => ({
     ...provided,
-    padding: '0.2em 0.2em',
+    padding: 'var(--space-3xs) var(--space-2xs)',
+    fontSize: 'var(--step-0)',
   }),
   multiValue: (provided) => ({
     ...provided,
     borderRadius: 'var(--radii-default)',
     fontSize: 'var(--step-0)',
-    padding: '0.2em',
-    ':hover': {
-      backgroundColor: 'var(--accent6)',
-    },
+    padding: 'var(--space-3xs)',
+    alignItems: 'center',
   }),
   multiValueRemove: (provided) => ({
     ...provided,
-    borderRadius: 'var(--radii-default)',
+    borderRadius: 'var(--radii-full)',
     marginLeft: '0.2em',
     cursor: 'pointer',
+    height: '1em',
+    width: '1em',
+    flexShrink: 0,
     ':hover': {
       backgroundColor: 'var(--accent8)',
+      color: 'var(--accent1)',
     },
   }),
   // option: (provided, state) => ({

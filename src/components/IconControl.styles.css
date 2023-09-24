@@ -61,7 +61,7 @@
     display: block;
     width: 1rem;
     height: 1rem;
-    border: 2px solid var(--theme9);
+    border: 2px solid var(--activeColor);
     background-color: var(--background);
     border-radius: 50%;
     top: -0.25rem;
@@ -69,10 +69,11 @@
     opacity: 0px;
     transform: scale(0);
     transition: 0.25s ease;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' fill='%23000000' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'%3E%3C/rect%3E%3Cpolyline points='216 72.005 104 184 48 128.005' fill='none' stroke='%23000000' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'%3E%3C/polyline%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' fill='var(--accentColor)' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'%3E%3C/rect%3E%3Cpolyline points='216 72.005 104 184 48 128.005' fill='none' stroke='var(--accentColor)' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'%3E%3C/polyline%3E%3C/svg%3E");
     background-size: 10px;
     background-repeat: no-repeat;
     background-position: 50% 50%;
+    color: red;
   }
 
   &:hover {
