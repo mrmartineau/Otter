@@ -30,12 +30,11 @@
   --text-decoration-color: var(--theme5);
 }
 .link-sidebar {
-  --color: var(--theme11);
+  --color: var(--theme10);
   font-size: var(--step--2);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: var(--theme11);
   padding: var(--space-3xs) var(--space-2xs);
   column-gap: var(--space-m);
   border-radius: var(--radii-m);
@@ -57,13 +56,13 @@
 }
 
 .link-logo {
+  --color: var(--theme10);
   font-size: 30px;
   font-variation-settings:
     'wght' 900,
     'wdth' 125,
     'ital' 10;
   gap: var(--space-xs);
-  color: var(--theme10);
 
   &:hover {
     text-decoration: none;
