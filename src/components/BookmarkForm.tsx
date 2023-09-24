@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/use-toast';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 // import './BookmarkForm.styles.css';
 import { clsx } from 'clsx';
@@ -88,7 +89,7 @@ export const BookmarkForm = ({
     setValue,
     formState: { errors },
     watch,
-  } = useForm({
+  } = useForm<BookmarkFormValues>({
     defaultValues: {
       type: 'link',
       ...initialValues,
@@ -99,32 +100,38 @@ export const BookmarkForm = ({
   const watchDescription = watch('description');
   const watchNote = watch('note');
   const watchTags = watch('tags');
+  const { toast } = useToast();
 
   const handleSubmitForm = async (formData: BookmarkFormValues) => {
     setFormSubmitting(true);
     setFormError('');
-    console.log(`🚀 ~ handleSubmitForm ~ formData:`, formData);
 
     try {
       if (isNew) {
-        const response = await supabaseClient
-          .from('bookmarks')
-          .insert([{ ...formData }], {
-            defaultToNull: true,
-          });
-        console.log(`🚀 ~ addBookmark ~ response:`, response);
+        await supabaseClient.from('bookmarks').insert([{ ...formData }], {
+          defaultToNull: true,
+        });
+        toast({
+          title: 'Bookmark added',
+        });
         router.push('/feed');
       } else {
-        const response = await supabaseClient
+        await supabaseClient
           .from('bookmarks')
           .update({ ...formData, modified_at: new Date() })
           .match({ id });
-        console.log(`🚀 ~ editBookmark ~ response:`, response);
+        toast({
+          title: 'Bookmark edited',
+        });
         router.push(`/bookmark/${id}`);
       }
       onSubmit?.(); // TODO: toast?
     } catch (err) {
       console.error(err);
+      toast({
+        title: 'Uh oh! Something went wrong.',
+        description: 'There was a problem with your request. Please try again.',
+      });
     }
   };
 

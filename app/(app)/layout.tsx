@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/toaster';
 import { Container } from '@/src/components/Container';
 import { FabAdd } from '@/src/components/FabAdd';
 import { Link } from '@/src/components/Link';
@@ -40,6 +41,7 @@ export default async function AppLayout({ children }: LayoutProps) {
         </div>
       </div>
       <FabAdd />
+      <Toaster />
     </div>
   );
 }
