@@ -53,17 +53,17 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
           <Markdown>{note}</Markdown>
         </div>
       ) : null}
-      {/* {tweet?.text ? (
+      {tweet?.text ? (
         <Flex gap="2xs">
-          <Box css={{ flexShrink: 0, color: '$theme10' }}>
+          <div className="shrink-0 text-theme10">
             <TwitterLogo size={18} weight="duotone" />
-          </Box>{' '}
-          <Box css={{ fs: '$1', lineHeight: '$tight' }}>
+          </div>
+          <div className="shrink-0 text-step--1 tracking-tight">
             <Link href={tweet.url}>@{tweet.username}</Link>
             <Markdown>{tweet.text}</Markdown>
-          </Box>
+          </div>
         </Flex>
-      ) : null} */}
+      ) : null}
       <FeedItemFooter {...props} key={`footer-${id}`} />
     </div>
   );
