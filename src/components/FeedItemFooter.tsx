@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { MINIMUM_CLICK_COUNT } from '@/src/constants';
-import { Calendar, NavigationArrow, Rss, Star } from '@phosphor-icons/react';
+import { Calendar, NavigationArrow, Star } from '@phosphor-icons/react';
 import { usePathname } from 'next/navigation';
 import urlJoin from 'proper-url-join';
 import title from 'title';
@@ -19,7 +19,7 @@ import { Favicon } from './Favicon';
 // import { FeedItemActions } from './FeedItemActions';
 import { Flex } from './Flex';
 import { Link } from './Link';
-import { Paragraph } from './Paragraph';
+// import { Paragraph } from './Paragraph';
 import { TypeToIcon } from './TypeToIcon';
 
 // import { RssFeed } from './RssFeed';
@@ -96,7 +96,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                     </Link>
                   </Flex>
                 </TooltipTrigger>
-                <TooltipContent>Type: ${title(type)}</TooltipContent>
+                <TooltipContent>Type: {title(type)}</TooltipContent>
               </Tooltip>
             ) : null}
 
