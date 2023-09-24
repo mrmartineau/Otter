@@ -36,14 +36,22 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
       ) : null}
       {description ? <Markdown>{description}</Markdown> : null}
       {note ? (
-        <Flex gap="2xs">
-          <div className="shrink-0 text-theme10">
-            <Note aria-label="Note" weight="duotone" size={16} />
-          </div>
-          <div>
-            <Markdown>{note}</Markdown>
-          </div>
-        </Flex>
+        <div className="bg-theme4 rounded p-xs">
+          <Flex
+            gap="2xs"
+            align="center"
+            className="text-step--1 mb-s border-solid border-b-2 border-theme7 pb-3xs"
+          >
+            <Note
+              aria-label="Note"
+              weight="duotone"
+              size={20}
+              className="shrink-0 text-theme10"
+            />
+            Note
+          </Flex>
+          <Markdown>{note}</Markdown>
+        </div>
       ) : null}
       {/* {tweet?.text ? (
         <Flex gap="2xs">
