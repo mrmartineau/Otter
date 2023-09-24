@@ -27,13 +27,13 @@ import { Flex } from './Flex';
 import { Link } from './Link';
 import './Sidebar.styles.css';
 import { SidebarLink } from './SidebarLink';
+import { TypeList } from './TypeList';
 
 interface SidebarProps {
   dbMeta: DbMetaResponse;
 }
 
 export const Sidebar = ({ dbMeta }: SidebarProps) => {
-  console.log(`🚀 ~ Sidebar ~ dbMeta:`, dbMeta);
   return (
     <>
       <div>
@@ -73,8 +73,8 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
               {CONTENT.tweetsMineNav}
             </SidebarLink>
           ) : null}
-          {/* <TypeList types={dbMeta?.types} />
-          <AllTags tags={dbMeta?.tags} /> */}
+          <TypeList types={dbMeta.types} />
+          {/* <AllTags tags={dbMeta?.tags} /> */}
         </Flex>
       </div>
 
