@@ -2,7 +2,7 @@ import urlJoin from 'proper-url-join';
 
 import { RequestOrder } from './types/api';
 
-export const CONTENT: Record<string, string> = {
+export const CONTENT = {
   appName: 'Otter',
   titleSeparator: ' — ',
   feedTitle: 'Feed',
@@ -50,6 +50,7 @@ export const CONTENT: Record<string, string> = {
 };
 
 export const createTitle = (pageName?: string) => {
+  // @ts-ignore
   const theTitle = pageName ? CONTENT[pageName] || pageName : '';
   return `${theTitle ? `${theTitle}${CONTENT.titleSeparator}` : ''}${
     CONTENT.appName
@@ -94,3 +95,5 @@ export const RESP_USER_GUEST = {
 export const DEFAULT_API_RESPONSE_LIMIT = 20;
 export const DEFAULT_API_RESPONSE_ORDER: RequestOrder = 'desc';
 export const MINIMUM_CLICK_COUNT = 1;
+
+export const DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER = 'https://zander.wtf';

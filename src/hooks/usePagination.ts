@@ -12,7 +12,6 @@ interface UsePaginationModel {
 export const usePagination = ({ offset, limit, count }: UsePaginationModel) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  console.log(`🚀 ~ usePagination ~ searchParams:`, searchParams);
   const handleUpdateOffset = (newOffset: number) => {
     router.push(
       urlJoin(window.location.href, {

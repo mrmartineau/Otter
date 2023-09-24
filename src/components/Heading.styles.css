@@ -5,4 +5,5 @@
   margin-top: var(--space-m);
   margin-bottom: var(--space-s);
   color: var(--text);
+  font-variation-settings: unset;
 }

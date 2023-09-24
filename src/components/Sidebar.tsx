@@ -13,15 +13,6 @@ import {
 } from '@/src/constants';
 // import { AllTags, Flex, Link, SidebarIcon, SidebarLink, TypeList } from '..';
 import {
-  list,
-  settings,
-  signout,
-  star,
-  top,
-  trash,
-  twitter,
-} from '@/src/icons';
-import {
   ArrowFatLinesUp,
   Gear,
   ListBullets,

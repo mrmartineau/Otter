@@ -8,10 +8,10 @@ interface CodeBlockProps extends ComponentPropsWithoutRef<'pre'> {
 }
 
 export const CodeBlock = ({ className, children, ...rest }: CodeBlockProps) => {
-  const ParagraphClass = clsx(className, 'pre');
+  const CodeBlockClass = clsx(className, 'pre');
 
   return (
-    <pre className={ParagraphClass} {...rest}>
+    <pre className={CodeBlockClass} {...rest}>
       {children}
     </pre>
   );
@@ -22,10 +22,10 @@ interface CodeProps extends ComponentPropsWithoutRef<'code'> {
 }
 
 export const Code = ({ className, children, ...rest }: CodeProps) => {
-  const ParagraphClass = clsx(className, 'code');
+  const CodeClass = clsx(className, 'code');
 
   return (
-    <code className={ParagraphClass} {...rest}>
+    <code className={CodeClass} {...rest}>
       {children}
     </code>
   );

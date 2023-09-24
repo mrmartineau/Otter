@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/tooltip';
 import { MINIMUM_CLICK_COUNT } from '@/src/constants';
 import { Calendar, NavigationArrow, Rss, Star } from '@phosphor-icons/react';
+import { usePathname } from 'next/navigation';
 import urlJoin from 'proper-url-join';
 import title from 'title';
 
@@ -43,12 +44,16 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
     feed,
   } = props;
   // const handleClickRegister = useClickBookmark(id);
+  const pathname = usePathname();
   const createdDate = getRelativeDate(created_at);
   const modifiedDate = getRelativeDate(modified_at);
   const dateTooltip =
     created_at !== modified_at
       ? `Created on ${createdDate.formatted}, modified on ${modifiedDate.formatted}`
       : `Created on ${createdDate.formatted}`;
+
+  const href = `/bookmark/${id}`;
+  const isActive = pathname === href;
 
   return (
     <TooltipProvider delayDuration={800} skipDelayDuration={500}>
@@ -144,6 +149,10 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               </Popover>
             ) : null} */}
           </Flex>
+          <div className="flex gap-s">
+            {!isActive ? <Link href={`/bookmark/${id}`}>Deep link</Link> : null}
+            <Link href={`/bookmark/${id}/edit`}>Edit</Link>
+          </div>
           {/* <FeedItemActions
             {...props}
             // handleClickRegister={handleClickRegister}

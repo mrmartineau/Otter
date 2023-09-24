@@ -15,7 +15,7 @@ interface MarkdownProps {
 }
 
 export const Markdown = ({ children }: MarkdownProps) => (
-  <div className="markdown last:mb-0 text-step--1">
+  <article className="markdown last:mb-0 text-step--1 flow">
     <ReactMarkdown
       remarkPlugins={[
         remarkSqueezeParagraphs,
@@ -33,5 +33,5 @@ export const Markdown = ({ children }: MarkdownProps) => (
     >
       {children}
     </ReactMarkdown>
-  </div>
+  </article>
 );

@@ -1,15 +1,17 @@
 import { cn } from '@/lib/utils';
 import * as React from 'react';
+import TextareaAutosize, {
+  TextareaAutosizeProps,
+} from 'react-textarea-autosize';
 
 import { sharedInputStyles } from './input';
 
-export interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+export interface TextareaProps extends TextareaAutosizeProps {}
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...props }, ref) => {
     return (
-      <textarea
+      <TextareaAutosize
         className={cn('flex min-h-[80px]', sharedInputStyles, className)}
         ref={ref}
         {...props}

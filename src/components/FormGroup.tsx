@@ -25,7 +25,7 @@ export const FormGroup = ({
   className,
   ...rest
 }: FormGroupProps): JSX.Element => {
-  const formGroupClass = cn('bookmark-form', className);
+  const formGroupClass = cn('form-group', className);
   const labelClass = clsx({ 'mb-2': true, hidden: !labelIsVisible });
   return (
     <div className={formGroupClass} {...rest}>

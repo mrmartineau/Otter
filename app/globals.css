@@ -6,6 +6,7 @@
 @import '../src/styles/easings.css';
 @import '../src/styles/utopia.css';
 @import '../src/styles/fonts.css';
+@import '../src/styles/typography.css';
 
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -80,10 +81,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-body);
-    font-size: var(--step-0);
-    color: var(--text);
+    @apply bg-background;
   }
 }
 

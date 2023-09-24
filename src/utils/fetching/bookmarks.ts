@@ -56,7 +56,6 @@ export const getBookmark = async ({
     .select('*')
     .match({ id })
     .single();
-  console.log(`🚀 ~ supabaseResponse:`, supabaseResponse);
 
   return supabaseResponse;
 };
