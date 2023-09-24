@@ -79,7 +79,6 @@ export const BookmarkForm = ({
   );
   // const [isScraping, , setIsScraping] = useToggle(false);
   // const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>();
-  console.log(`🚀 ~ initialValues:`, initialValues);
 
   const {
     getValues,
