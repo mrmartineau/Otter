@@ -18,7 +18,7 @@ interface LayoutProps extends ComponentPropsWithoutRef<'div'> {
 
 export default async function AppLayout({ children }: LayoutProps) {
   const supabaseClient = createServerComponentClient<Database>({ cookies });
-  const data = await getDbMetadata(supabaseClient);
+  const dbMeta = await getDbMetadata(supabaseClient);
 
   return (
     <div className="otter-app-container">
@@ -31,7 +31,7 @@ export default async function AppLayout({ children }: LayoutProps) {
       </header>
       <div className="otter-primary-pane">
         <div className="otter-sidebar-pane">
-          <Sidebar dbMeta={data} />
+          <Sidebar dbMeta={dbMeta} />
         </div>
         <div className="otter-content-pane">
           <div className="otter-content-pane-inner">

@@ -1,12 +1,14 @@
 import { Database } from '@/src/types/supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-export interface MetaResponse {
+export interface DbMetaResponse {
   all: number;
   stars: number;
   trash: number;
   types: MetaType[];
   tags: MetaTag[];
+  tweets: number;
+  likedTweets: number;
 }
 export type MetaTag = {
   count: number | null;
@@ -19,7 +21,7 @@ export type MetaType = {
 
 export const getDbMetadata = async (
   supabaseClient: SupabaseClient<Database>,
-): Promise<MetaResponse> => {
+): Promise<DbMetaResponse> => {
   const all = await supabaseClient
     .from('bookmarks')
     .select('id', { count: 'exact' })
@@ -34,6 +36,14 @@ export const getDbMetadata = async (
     .match({ star: true, status: 'active' });
   const types = await supabaseClient.from('types_count').select('*');
   const tags = await supabaseClient.from('tags_count').select('*');
+  const tweets = await supabaseClient
+    .from('tweets')
+    .select('id', { count: 'exact' })
+    .match({ liked_tweet: false });
+  const likedTweets = await supabaseClient
+    .from('tweets')
+    .select('id', { count: 'exact' })
+    .match({ liked_tweet: true });
 
   return {
     all: all.count || 0,
@@ -41,5 +51,7 @@ export const getDbMetadata = async (
     stars: stars.count || 0,
     types: types.data || [],
     tags: tags.data || [],
+    tweets: tweets.count || 0,
+    likedTweets: likedTweets.count || 0,
   };
 };

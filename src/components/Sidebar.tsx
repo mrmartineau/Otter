@@ -22,17 +22,18 @@ import {
   TwitterLogo,
 } from '@phosphor-icons/react';
 
-import { MetaResponse } from '../utils/fetching/meta';
+import { DbMetaResponse } from '../utils/fetching/meta';
 import { Flex } from './Flex';
 import { Link } from './Link';
 import './Sidebar.styles.css';
 import { SidebarLink } from './SidebarLink';
 
 interface SidebarProps {
-  dbMeta: MetaResponse;
+  dbMeta: DbMetaResponse;
 }
 
 export const Sidebar = ({ dbMeta }: SidebarProps) => {
+  console.log(`🚀 ~ Sidebar ~ dbMeta:`, dbMeta);
   return (
     <>
       <div>
@@ -46,7 +47,7 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
             <ListBullets aria-label="All" size={18} weight="duotone" />
             {CONTENT.feedNav}
           </SidebarLink>
-          {dbMeta?.stars ? (
+          {dbMeta.stars > 0 ? (
             <SidebarLink href={ROUTE_STARS} count={dbMeta.stars}>
               <Star aria-label="Stars" size={18} weight="duotone" />
               {CONTENT.starsNav}
@@ -56,14 +57,22 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
             <ArrowFatLinesUp aria-label="Top" size={18} weight="duotone" />
             {CONTENT.topLinksNav}
           </SidebarLink>
-          <SidebarLink href={ROUTE_TWEETS_LIKES}>
-            <TwitterLogo aria-label="Liked tweets" size={18} weight="duotone" />
-            {CONTENT.tweetsLikeNav}
-          </SidebarLink>
-          <SidebarLink href={ROUTE_TWEETS_MINE}>
-            <TwitterLogo aria-label="My tweets" size={18} weight="duotone" />
-            {CONTENT.tweetsMineNav}
-          </SidebarLink>
+          {dbMeta.tweets > 0 ? (
+            <SidebarLink href={ROUTE_TWEETS_LIKES} count={dbMeta.tweets}>
+              <TwitterLogo
+                aria-label="Liked tweets"
+                size={18}
+                weight="duotone"
+              />
+              {CONTENT.tweetsLikeNav}
+            </SidebarLink>
+          ) : null}
+          {dbMeta.likedTweets > 0 ? (
+            <SidebarLink href={ROUTE_TWEETS_MINE} count={dbMeta.likedTweets}>
+              <TwitterLogo aria-label="My tweets" size={18} weight="duotone" />
+              {CONTENT.tweetsMineNav}
+            </SidebarLink>
+          ) : null}
           {/* <TypeList types={dbMeta?.types} />
           <AllTags tags={dbMeta?.tags} /> */}
         </Flex>
