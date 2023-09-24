@@ -47,10 +47,11 @@
 
   &.is-active {
     background-color: var(--theme7);
+    --color: var(--theme11);
 
     &:hover {
       background-color: var(--theme7);
-      --color: var(--theme6);
+      --color: var(--theme11);
     }
   }
 }
