@@ -5,7 +5,7 @@ import {
   useUpdateUISettings,
 } from '@/src/hooks/useUpdateUISettings';
 import { MetaTag } from '@/src/utils/fetching/meta';
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   Collapsible,
@@ -22,7 +22,7 @@ interface AllTagsProps {
   // handleUpdateUISettings: UseUpdateReturn[1];
 }
 
-export const AllTags = memo(({ tags }: AllTagsProps) => {
+export const AllTags = ({ tags }: AllTagsProps) => {
   const [settings, handleUpdateUISettings] = useUpdateUISettings();
   const [theTags, setTheTags] = useState<MetaTag[] | undefined>(tags);
   const isViewingTopTags = settings.uiState.topTags;
@@ -149,4 +149,4 @@ export const AllTags = memo(({ tags }: AllTagsProps) => {
       </CollapsibleContent>
     </Collapsible>
   );
-});
+};

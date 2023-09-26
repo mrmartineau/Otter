@@ -99,7 +99,7 @@ export const useUpdateUISettings = (): UseUpdateReturn => {
   const { id, profile } = useUser();
   const supabaseClient = createClientComponentClient();
   const initialState = profile?.settings || emptyState;
-  const [settings, dispatch] = useReducer(UIStateReducer, initialState);
+  const [settings, setSettings] = useState(initialState);
   console.log(
     `🚀 ~ useUpdateUISettings ~ settings:`,
     settings.uiState.pinnedTags,
@@ -107,28 +107,16 @@ export const useUpdateUISettings = (): UseUpdateReturn => {
 
   const handleUpdateUISettings = useCallback(
     async (action: UIStateAction) => {
-      dispatch(action);
+      const newSettings = UIStateReducer(settings, action);
+      setSettings(newSettings);
       await supabaseClient
         .from('profiles')
-        .update({ settings })
+        .update({ settings: newSettings })
         .match({ id })
         .single();
     },
-    [dispatch],
+    [settings, id],
   );
-
-  // useEffect(() => {
-  //   const updateSettings = async () => {
-  //     await supabaseClient
-  //       .from('profiles')
-  //       .update({ settings })
-  //       .match({ id })
-  //       .single();
-  //   };
-  //   if (settings) {
-  //     updateSettings();
-  //   }
-  // }, [settings]);
 
   return [settings, handleUpdateUISettings];
 };
