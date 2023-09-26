@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import * as React from 'react';
 
 export const sharedInputStyles =
-  'w-full rounded-md border-0 bg-theme3 px-2xs py-3xs text-step-0 text-theme10 ring-offset-background placeholder:text-theme7 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
+  'w-full rounded-m border-0 bg-theme3 px-2xs py-3xs text-step-0 text-theme10 ring-offset-background placeholder:text-theme7 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {}

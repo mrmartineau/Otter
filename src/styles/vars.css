@@ -33,10 +33,10 @@
 
     /* Radii */
     --radii-none: 0;
-    --radii-sm: 0.125rem;
+    --radii-s: 0.125rem;
     --radii-default: 0.25rem;
     --radii-m: 0.3rem;
-    --radii-lg: 0.625rem;
+    --radii-l: 0.625rem;
     --radii-xl: 1rem;
     --radii-full: 9999px;
     --radii-round: 50%;

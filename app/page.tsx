@@ -58,7 +58,7 @@ export default async function Index() {
             ) : (
               <Link
                 href="/login"
-                className="py-2 px-4 rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
+                className="py-2 px-4 rounded-m no-underline bg-btn-background hover:bg-btn-background-hover"
               >
                 Login
               </Link>
@@ -81,7 +81,7 @@ export default async function Index() {
             The fastest way to start building apps with{' '}
             <strong>Supabase</strong> and <strong>Next.js</strong>
           </p>
-          <div className="bg-foreground py-3 px-6 rounded-lg font-mono text-sm text-background">
+          <div className="bg-foreground py-3 px-6 rounded-l font-mono text-sm text-background">
             Get started by editing <strong>app/page.tsx</strong>
           </div>
         </div>
@@ -96,7 +96,7 @@ export default async function Index() {
             {resources.map(({ title, subtitle, url, icon }) => (
               <a
                 key={title}
-                className="relative flex flex-col group rounded-lg border p-6 hover:border-foreground"
+                className="relative flex flex-col group rounded-l border p-6 hover:border-foreground"
                 href={url}
                 target="_blank"
                 rel="noreferrer"
@@ -153,7 +153,7 @@ export default async function Index() {
               Supabase client in all the different contexts.
             </p>
           </div>
-          <div className="w-full justify-center border rounded-lg overflow-hidden">
+          <div className="w-full justify-center border rounded-l overflow-hidden">
             {examples.map(({ type, src }) => (
               <div
                 key={type}

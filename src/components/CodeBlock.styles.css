@@ -7,7 +7,7 @@
 .pre {
   @extend .code-base;
   background-color: var(--theme5);
-  border-radius: var(--radii-lg);
+  border-radius: var(--radii-l);
   word-break: break-all;
   white-space: break-spaces;
   padding: var(--space-s);
