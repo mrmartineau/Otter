@@ -23,7 +23,7 @@ export const TypeList = ({ types }: TypeListProps) => (
   <Collapsible stateKey="types">
     <CollapsibleTrigger asChild>
       <Button variant="ghost" className="justify-between w-full">
-        <div className="grow-1">{CONTENT.typesNav}</div>
+        <div>{CONTENT.typesNav}</div>
         <CaretUpDown weight="duotone" />
       </Button>
     </CollapsibleTrigger>

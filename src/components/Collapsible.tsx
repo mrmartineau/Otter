@@ -5,7 +5,7 @@ import {
   CollapsibleTrigger,
   CollapsibleContent as Content,
 } from '@radix-ui/react-collapsible';
-import { forwardRef } from 'react';
+import { forwardRef, useCallback } from 'react';
 
 import { useUpdateUISettings } from '../hooks/useUpdateUISettings';
 
@@ -16,12 +16,11 @@ interface CollapsibleProps1 extends CollapsibleProps {
 export const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps1>(
   ({ children, stateKey, ...props }, ref) => {
     const [settings, handleUpdateUISettings] = useUpdateUISettings();
-    const handleOpenChange = () => {
-      console.log(`🚀 ~ handleOpenChange ~ stateKey:`, stateKey);
+    const handleOpenChange = useCallback(() => {
       if (stateKey) {
         handleUpdateUISettings({ type: stateKey });
       }
-    };
+    }, []);
 
     return (
       <CollapsibleRoot

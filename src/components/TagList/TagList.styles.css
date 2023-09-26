@@ -1,0 +1,23 @@
+.tagListItem {
+  position: relative;
+
+  &:hover {
+    border-radius: var(--radii-m);
+    background-color: var(--theme3);
+
+    .icon {
+      visibility: hidden;
+    }
+    .pinButton {
+      display: inline-flex;
+    }
+  }
+}
+
+.pinButton {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  display: none;
+  transform: translateY(-50%);
+}

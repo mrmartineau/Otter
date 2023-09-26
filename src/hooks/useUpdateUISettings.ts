@@ -1,23 +1,12 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useEffect, useState } from 'react';
+'use client';
 
-export type ProfileResponse = {
-  username: string;
-  id: string;
-  avatar_url: string;
-  updated_at: string;
-  settings: {
-    uiState: {
-      tags: boolean;
-      types: boolean;
-      groupByDate: boolean;
-      pinnedTags: string[];
-      topTags: boolean;
-      topTagsLimit: number;
-    };
-  };
-};
-type UIState = ProfileResponse['settings'];
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useCallback, useState } from 'react';
+
+import { useUser } from '../components/UserProvider';
+import { UserProfile } from '../types/db';
+
+type UIState = UserProfile['settings'];
 const emptyState: UIState = {
   uiState: {
     tags: false,
@@ -101,48 +90,33 @@ const UIStateReducer = (state: UIState, action: UIStateAction): UIState => {
   }
 };
 
+type UseUpdateReturn = [
+  settings: UIState,
+  handleUpdateState: (action: UIStateAction) => void,
+];
+
 /**
  * @name useUpdateUISettings
  * @description update UI settings
  */
-export const useUpdateUISettings = (): [
-  settings: ProfileResponse['settings'],
-  handleUpdateState: (action: UIStateAction) => void,
-] => {
+export const useUpdateUISettings = (): UseUpdateReturn => {
+  const { id, profile } = useUser();
   const supabaseClient = createClientComponentClient();
-  const [profileData, setProfileData] = useState<ProfileResponse>();
-  const profileId = profileData?.id;
-  const initialState = profileData?.settings || emptyState;
-  const [state, setState] = useState<ProfileResponse['settings']>(initialState);
+  const profileId = id;
+  const initialState = profile?.settings || emptyState;
+  const [settings, setSettings] = useState<UIState>(initialState);
 
-  useEffect(() => {
-    const getInfo = async () => {
-      const {
-        data: { user },
-      } = await supabaseClient.auth.getUser();
-      const userProfile = await supabaseClient
-        .from('profiles')
-        .select('*')
-        .match({ id: user?.id })
-        .single();
-      if (userProfile.data) {
-        setProfileData(userProfile.data);
-      }
-    };
-    getInfo();
-  }, []);
-
-  const handleUpdateUISettings = async (action: UIStateAction) => {
-    const newState = UIStateReducer(state, action);
-    setState(newState);
+  const handleUpdateUISettings = useCallback(async (action: UIStateAction) => {
+    const newSettings = UIStateReducer(settings, action);
+    setSettings(newSettings);
     await supabaseClient
       .from('profiles')
-      .update({ settings: newState })
+      .update({ settings: newSettings })
       .match({ id: profileId })
       .single();
 
-    return newState;
-  };
+    return newSettings;
+  }, []);
 
-  return [state, handleUpdateUISettings];
+  return [settings, handleUpdateUISettings];
 };

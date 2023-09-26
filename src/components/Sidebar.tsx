@@ -27,6 +27,7 @@ import { Flex } from './Flex';
 import { Link } from './Link';
 import './Sidebar.styles.css';
 import { SidebarLink } from './SidebarLink';
+import { AllTags } from './TagList';
 import { TypeList } from './TypeList';
 
 interface SidebarProps {
@@ -74,7 +75,7 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
             </SidebarLink>
           ) : null}
           <TypeList types={dbMeta.types} />
-          {/* <AllTags tags={dbMeta?.tags} /> */}
+          <AllTags tags={dbMeta.tags} />
         </Flex>
       </div>
 
