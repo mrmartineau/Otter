@@ -11,7 +11,6 @@ import {
   ROUTE_TWEETS_LIKES,
   ROUTE_TWEETS_MINE,
 } from '@/src/constants';
-// import { AllTags, Flex, Link, SidebarIcon, SidebarLink, TypeList } from '..';
 import {
   ArrowFatLinesUp,
   Gear,
@@ -22,6 +21,7 @@ import {
   TwitterLogo,
 } from '@phosphor-icons/react';
 
+import { useUpdateUISettings } from '../hooks/useUpdateUISettings';
 import { DbMetaResponse } from '../utils/fetching/meta';
 import { Flex } from './Flex';
 import { Link } from './Link';
@@ -35,6 +35,11 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ dbMeta }: SidebarProps) => {
+  // const [settings, handleUpdateUISettings] = useUpdateUISettings();
+  // console.log(
+  //   `🚀 ~ Sidebar ~ settings.uiState.pinnedTags:`,
+  //   settings.uiState.pinnedTags,
+  // );
   return (
     <>
       <div>
@@ -75,7 +80,11 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
             </SidebarLink>
           ) : null}
           <TypeList types={dbMeta.types} />
-          <AllTags tags={dbMeta.tags} />
+          <AllTags
+            tags={dbMeta.tags}
+            // settings={settings}
+            // handleUpdateUISettings={handleUpdateUISettings}
+          />
         </Flex>
       </div>
 

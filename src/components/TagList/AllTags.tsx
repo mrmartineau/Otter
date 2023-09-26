@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { CONTENT } from '@/src/constants';
-import { useUpdateUISettings } from '@/src/hooks/useUpdateUISettings';
+import {
+  UseUpdateReturn,
+  useUpdateUISettings,
+} from '@/src/hooks/useUpdateUISettings';
 import { MetaTag } from '@/src/utils/fetching/meta';
-import { CaretUpDown } from '@phosphor-icons/react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import {
   Collapsible,
@@ -12,24 +14,38 @@ import {
 } from '../Collapsible';
 import { Flex } from '../Flex';
 import { Text } from '../Text';
-import { PinnedTags } from './PinnedTags';
 import { TagListItem } from './TagListItem';
 
 interface AllTagsProps {
   tags?: MetaTag[];
+  // settings: UseUpdateReturn[0];
+  // handleUpdateUISettings: UseUpdateReturn[1];
 }
 
-export const AllTags = ({ tags }: AllTagsProps) => {
+export const AllTags = memo(({ tags }: AllTagsProps) => {
   const [settings, handleUpdateUISettings] = useUpdateUISettings();
+  const [theTags, setTheTags] = useState<MetaTag[] | undefined>(tags);
   const isViewingTopTags = settings.uiState.topTags;
+  console.log(
+    `🚀 ~ settings.uiState:`,
+    JSON.stringify(settings.uiState, null, 2),
+  );
   const topTagsLimit = settings.uiState.topTagsLimit;
+  const pinnedTagss = settings.uiState.pinnedTags;
+
+  const pinnedTags = tags
+    ?.filter(({ tag }) => {
+      return tag && settings.uiState.pinnedTags.indexOf(tag) !== -1;
+    })
+    .sort((one, two) => two.count! - one.count!);
+
   const handleViewTopNTags = (viewTopTags: boolean, limit = 0) => {
     handleUpdateUISettings({
       type: 'topTags',
       payload: { active: viewTopTags, limit },
     });
   };
-  const [theTags, setTheTags] = useState<MetaTag[] | undefined>([]);
+
   useEffect(() => {
     const topTags = (tags: MetaTag[], limit: number): MetaTag[] => {
       return tags
@@ -50,15 +66,10 @@ export const AllTags = ({ tags }: AllTagsProps) => {
   return (
     <Collapsible stateKey="tags">
       <CollapsibleTrigger asChild>
-        <Button variant="ghost" className="justify-between w-full gap-xs">
-          <Flex justify="between" align="center" className="grow">
-            {CONTENT.tagsNav} <Text variant="count">{tags?.length}</Text>
-          </Flex>
-          <CaretUpDown weight="duotone" />
-        </Button>
+        {CONTENT.tagsNav} <Text variant="count">{tags?.length}</Text>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <Flex gapX="2xs" className="pr-2xs mb-3xs" justify="end">
+        <Flex gapX="2xs" className="mb-3xs" justify="center">
           {tags.length > 5 ? (
             <Button
               variant="ghost"
@@ -99,26 +110,43 @@ export const AllTags = ({ tags }: AllTagsProps) => {
           </Button>
         </Flex>
 
-        <PinnedTags allTags={tags} />
+        {/* Pinned tags */}
+        <Flex gapY="2xs" direction="column">
+          {pinnedTags?.length ? (
+            <div className="mb-3xs">
+              {pinnedTags.map(({ tag, count }) => (
+                <TagListItem
+                  tag={tag}
+                  count={count}
+                  key={`pinned-tag-${tag}`}
+                  pinned={true}
+                />
+              ))}
+            </div>
+          ) : null}
+        </Flex>
 
+        {/* All other tags */}
         <Flex gapY="3xs" direction="column">
-          {theTags?.length
-            ? theTags.map(({ tag, count }) => {
-                if (tag && settings.uiState.pinnedTags.indexOf(tag) === -1) {
-                  return (
-                    <TagListItem
-                      tag={tag}
-                      count={count}
-                      key={tag}
-                      pinned={false}
-                    />
-                  );
-                }
-                return null;
-              })
-            : 'No tags'}
+          {theTags?.length ? (
+            theTags.map(({ tag, count }) => {
+              if (tag && settings.uiState.pinnedTags.indexOf(tag) === -1) {
+                return (
+                  <TagListItem
+                    tag={tag}
+                    count={count}
+                    key={tag}
+                    pinned={false}
+                  />
+                );
+              }
+              return null;
+            })
+          ) : (
+            <div className="text-center text-step--2">No tags</div>
+          )}
         </Flex>
       </CollapsibleContent>
     </Collapsible>
   );
-};
+});

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useUpdateUISettings } from '@/src/hooks/useUpdateUISettings';
 import { MetaTag } from '@/src/utils/fetching/meta';
-import { CheckCircle, Hash } from '@phosphor-icons/react';
+import { CheckCircle, Hash, XCircle } from '@phosphor-icons/react';
 
 import { SidebarLink } from '../SidebarLink';
 import './TagList.styles.css';
@@ -26,12 +26,16 @@ const PinUnpinTag = ({ tag, pinned }: PinUnpinTagProps) => {
   };
   return (
     <Button
-      variant="ghost"
-      size="icon"
+      variant="icon"
+      size="collapsible"
       onClick={handleTogglePinnedTag}
       className="pinButton"
     >
-      <CheckCircle aria-label="pin" weight="duotone" />
+      {pinned ? (
+        <XCircle aria-label="pin" weight="duotone" size={18} />
+      ) : (
+        <CheckCircle aria-label="pin" weight="duotone" size={18} />
+      )}
     </Button>
   );
 };
@@ -51,7 +55,7 @@ export const TagListItem = ({ tag, count, pinned }: TagListItemProps) => {
         {pinned ? (
           <CheckCircle aria-label="Pinned" size={18} weight="fill" />
         ) : (
-          <Hash aria-label="tag" size={18} weight="duotone" className="ml-xs" />
+          <Hash aria-label="tag" size={18} weight="duotone" />
         )}
         {tag}
       </SidebarLink>

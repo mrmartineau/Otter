@@ -1,0 +1,7 @@
+.button-ghost {
+  @apply hover:bg-theme6 hover:text-theme10;
+
+  &[aria-pressed='true'] {
+    @apply bg-theme6 text-theme10;
+  }
+}

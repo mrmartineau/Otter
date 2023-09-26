@@ -21,9 +21,9 @@
 
   &:checked + .icon-control-tile {
     border-color: var(--activeColor);
-    /* color: var(--activeColor); */
-    background-color: $accent3;
-    /* .iconControl-icon, .iconControl-label {
+    background-color: var(--accent3);
+    /* color: var(--activeColor);
+       svg {
       color: var(--activeColor);
     } */
     &::before {
@@ -47,7 +47,6 @@
   padding: var(--space-2xs);
   text-align: center;
   border-radius: var(--radii-m);
-
   --activeColor: var(--accent9);
 
   svg {
@@ -66,21 +65,20 @@
     border-radius: 50%;
     top: -0.25rem;
     right: -0.25rem;
-    opacity: 0px;
+    opacity: 0;
     transform: scale(0);
     transition: 0.25s ease;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' fill='var(--accentColor)' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'%3E%3C/rect%3E%3Cpolyline points='216 72.005 104 184 48 128.005' fill='none' stroke='var(--accentColor)' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'%3E%3C/polyline%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml, %3Csvg%20xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width='192'%20height='192'%20viewBox='0%200%20256%20256'%3E%3Cpolyline%20points='216%2072.005%20104%20184%2048%20128.005'%20fill='none'%20stroke='white'%20stroke-linecap='round'%20stroke-linejoin='round'%20stroke-width='32'%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
     background-size: 10px;
     background-repeat: no-repeat;
     background-position: 50% 50%;
-    color: red;
   }
 
   &:hover {
     border-color: var(--activeColor);
     &::before {
       transform: scale(1);
-      opacity: 1px;
+      opacity: 1;
     }
   }
 }

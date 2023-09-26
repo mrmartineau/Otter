@@ -17,7 +17,11 @@
 .pinButton {
   position: absolute;
   top: 50%;
-  left: 5px;
+  left: 7px;
   display: none;
   transform: translateY(-50%);
+  z-index: 1;
+  background-color: var(--theme8);
+  color: var(--theme11);
+  border-radius: var(--radii-full);
 }

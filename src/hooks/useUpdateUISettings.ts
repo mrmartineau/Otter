@@ -1,7 +1,7 @@
 'use client';
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 
 import { useUser } from '../components/UserProvider';
 import { UserProfile } from '../types/db';
@@ -90,33 +90,45 @@ const UIStateReducer = (state: UIState, action: UIStateAction): UIState => {
   }
 };
 
-type UseUpdateReturn = [
+export type UseUpdateReturn = [
   settings: UIState,
-  handleUpdateState: (action: UIStateAction) => void,
+  handleUpdateUISettings: (action: UIStateAction) => void,
 ];
 
-/**
- * @name useUpdateUISettings
- * @description update UI settings
- */
 export const useUpdateUISettings = (): UseUpdateReturn => {
   const { id, profile } = useUser();
   const supabaseClient = createClientComponentClient();
-  const profileId = id;
   const initialState = profile?.settings || emptyState;
-  const [settings, setSettings] = useState<UIState>(initialState);
+  const [settings, dispatch] = useReducer(UIStateReducer, initialState);
+  console.log(
+    `🚀 ~ useUpdateUISettings ~ settings:`,
+    settings.uiState.pinnedTags,
+  );
 
-  const handleUpdateUISettings = useCallback(async (action: UIStateAction) => {
-    const newSettings = UIStateReducer(settings, action);
-    setSettings(newSettings);
-    await supabaseClient
-      .from('profiles')
-      .update({ settings: newSettings })
-      .match({ id: profileId })
-      .single();
+  const handleUpdateUISettings = useCallback(
+    async (action: UIStateAction) => {
+      dispatch(action);
+      await supabaseClient
+        .from('profiles')
+        .update({ settings })
+        .match({ id })
+        .single();
+    },
+    [dispatch],
+  );
 
-    return newSettings;
-  }, []);
+  // useEffect(() => {
+  //   const updateSettings = async () => {
+  //     await supabaseClient
+  //       .from('profiles')
+  //       .update({ settings })
+  //       .match({ id })
+  //       .single();
+  //   };
+  //   if (settings) {
+  //     updateSettings();
+  //   }
+  // }, [settings]);
 
   return [settings, handleUpdateUISettings];
 };

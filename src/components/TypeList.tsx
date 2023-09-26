@@ -21,12 +21,7 @@ interface TypeListProps {
 }
 export const TypeList = ({ types }: TypeListProps) => (
   <Collapsible stateKey="types">
-    <CollapsibleTrigger asChild>
-      <Button variant="ghost" className="justify-between w-full">
-        <div>{CONTENT.typesNav}</div>
-        <CaretUpDown weight="duotone" />
-      </Button>
-    </CollapsibleTrigger>
+    <CollapsibleTrigger asChild>{CONTENT.typesNav}</CollapsibleTrigger>
     <CollapsibleContent>
       <Flex gapY="3xs" direction="column">
         {types?.length
