@@ -1,5 +1,9 @@
 .otter-app-container {
+  position: fixed;
+  inset: 0px;
+  display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .otter-top-bar {
@@ -79,5 +83,6 @@
 
 .otter-content-pane-inner {
   overflow-y: scroll;
+  padding-top: var(--space-m);
   padding-bottom: var(--space-xl);
 }

@@ -85,7 +85,6 @@ export const CmdK = ({ dbMeta }: CmdKProps) => {
 
   const throttledMutate = throttle(async (value: string) => {
     await fetchSearch(value).then((data) => {
-      console.log(`🚀 ~ fetchSearch ~ data:`, data);
       setBookmarkItems(data?.bookmarksSearch?.data ?? []);
       setTweetItems(data?.tweetsSearch?.data ?? []);
     });
