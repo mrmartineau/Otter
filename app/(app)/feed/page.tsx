@@ -3,7 +3,7 @@ import { CONTENT } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
-import { ListBullets } from '@phosphor-icons/react';
+import { ListBullets } from '@phosphor-icons/react/dist/ssr';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
@@ -30,7 +30,7 @@ export default async function FeedPage({
       offset={offset}
       allowGroupByDate={true}
       title={CONTENT.feedTitle}
-      // icon={<ListBullets />}
+      icon={<ListBullets weight="duotone" size={24} />}
       feedType="bookmarks"
     />
   );

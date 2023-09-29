@@ -1,3 +1,4 @@
+import { type IconProps } from '@phosphor-icons/react';
 import {
   Barbell,
   CalendarX,
@@ -5,13 +6,12 @@ import {
   GameController,
   Hamburger,
   Headphones,
-  type IconProps,
   ImageSquare,
   LinkSimpleHorizontal,
   NewspaperClipping,
   Notepad,
   VideoCamera,
-} from '@phosphor-icons/react';
+} from '@phosphor-icons/react/dist/ssr';
 
 import { BookmarkType } from '../types/db';
 

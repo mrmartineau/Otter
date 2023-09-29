@@ -3,6 +3,7 @@ import { CONTENT } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
+import { Hash } from '@phosphor-icons/react/dist/ssr';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Metadata } from 'next';
 import { cookies } from 'next/headers';
@@ -33,8 +34,8 @@ export default async function TagPage({ params, searchParams }: Props) {
       limit={limit}
       offset={offset}
       allowGroupByDate={true}
-      title={`#${tag}`}
-      // icon={<ListBullets />}
+      title={tag}
+      icon={<Hash weight="duotone" size={24} />}
       feedType="bookmarks"
     />
   );

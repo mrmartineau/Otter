@@ -1,4 +1,5 @@
 import { Feed } from '@/src/components/Feed';
+import { TypeToIcon } from '@/src/components/TypeToIcon';
 import { Database } from '@/src/types/supabase';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
@@ -34,7 +35,7 @@ export default async function TagPage({ params, searchParams }: Props) {
       offset={offset}
       allowGroupByDate={true}
       title={title(type)}
-      // icon={<ListBullets />}
+      icon={<TypeToIcon size={24} type={type} />}
       feedType="bookmarks"
     />
   );
