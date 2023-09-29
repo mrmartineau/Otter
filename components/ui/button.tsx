@@ -6,7 +6,7 @@ import * as React from 'react';
 import './button.css';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-m text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center gap-xs justify-center rounded-m text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
@@ -22,7 +22,10 @@ const buttonVariants = cva(
           'hover:bg-theme6 hover:text-theme10 px-2xs py-3xs font-normal',
         link: 'text-primary underline-offset-4 hover:underline',
         icon: 'h-10 w-10 hover:bg-theme6 hover:text-theme10',
+        nav: 'h-[42px] w-[42px] text-text hover:bg-theme3 rounded-l',
+        cmdk: 'button-cmdk',
       },
+
       size: {
         default: 'h-10 px-4 py-2',
         tiny: 'h-5 rounded-s px-2 text-step--2',

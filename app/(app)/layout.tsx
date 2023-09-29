@@ -1,6 +1,9 @@
+import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
+import { CmdK } from '@/src/components/CmdK';
 import { Container } from '@/src/components/Container';
 import { FabAdd } from '@/src/components/FabAdd';
+import { Flex } from '@/src/components/Flex';
 import { Link } from '@/src/components/Link';
 import { Sidebar } from '@/src/components/Sidebar';
 import { UserProvider } from '@/src/components/UserProvider';
@@ -34,11 +37,28 @@ export default async function AppLayout({ children }: LayoutProps) {
     <UserProvider profile={userProfile?.data as UserProfile} id={user?.id}>
       <div className="otter-app-container">
         <header className="otter-top-bar">
-          <div className="flex">
+          <Flex align="center" gap="m" className="bp2:hidden">
+            <Button
+              variant="nav"
+              aria-label="View navigation"
+              data-testid="navButton"
+              // onClick={toggleSidebarLocked}
+              // ref={navButtonRef}
+              // css={{
+              //   flexShrink: 0,
+              //   '*': {
+              //     pointerEvents: 'none',
+              //   },
+              // }}
+            >
+              {/* <List weight="duotone" size={30} /> */}
+            </Button>
+
             <Link href={ROUTE_FEED_HOME} variant="logo">
               🦦 <span>Otter</span>
             </Link>
-          </div>
+          </Flex>
+          <CmdK dbMeta={dbMeta} />
         </header>
         <div className="otter-primary-pane">
           <div className="otter-sidebar-pane">

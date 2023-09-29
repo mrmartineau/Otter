@@ -14,8 +14,9 @@
   margin-left: auto;
   padding-left: var(--space-xs);
   padding-right: var(--space-xs);
+  position: relative;
   z-index: var(--z-2);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--theme4);
 
   @media (--bp2) {
     margin-left: var(--sidebar-width);
