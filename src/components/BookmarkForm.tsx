@@ -3,11 +3,21 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useToast } from '@/components/ui/use-toast';
+import { MagicWand } from '@phosphor-icons/react/dist/ssr';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import axios from 'axios';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
+import urlJoin from 'proper-url-join';
 import {
+  ChangeEvent,
   ComponentPropsWithoutRef,
   DispatchWithoutAction,
   useCallback,
@@ -19,12 +29,16 @@ import { useForm } from 'react-hook-form';
 
 import { CONTENT, DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER } from '../constants';
 import { useToggle } from '../hooks/useToggle';
-import { Bookmark, BookmarkFormValues } from '../types/db';
+import { MetadataResponse } from '../types/api';
+import { type Bookmark, type BookmarkFormValues } from '../types/db';
 import { MetaTag } from '../utils/fetching/meta';
+import { getErrorMessage } from '../utils/get-error-message';
 import { MatchTagsProps, matchTags } from '../utils/matchTags';
 import { Combobox } from './Combobox';
+import { FieldValueSuggestion } from './FieldValueSuggestion';
 import { Flex } from './Flex';
 import { FormGroup } from './FormGroup';
+import { PossibleMatchingItems } from './PossibleMatchingItems';
 import { TypeRadio } from './TypeRadio';
 
 export interface ComboOption {
@@ -68,7 +82,6 @@ export const BookmarkForm = ({
     'bookmark-form flex flex-col gap-s',
   );
   const supabaseClient = createClientComponentClient();
-  const [formTags, setFormTags] = useState<string[]>();
   const [formError, setFormError] = useState<string>('');
   const [formSubmitting, , setFormSubmitting] = useToggle(false);
   const [possibleMatchingItems, setPossibleMatchingItems] = useState<
@@ -77,8 +90,8 @@ export const BookmarkForm = ({
   const [possibleMatchingTags, setPossibleMatchingTags] = useState<string[]>(
     [],
   );
-  // const [isScraping, , setIsScraping] = useToggle(false);
-  // const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>();
+  const [isScraping, , setIsScraping] = useToggle(false);
+  const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>();
 
   const {
     getValues,
@@ -147,6 +160,80 @@ export const BookmarkForm = ({
     [tags],
   );
 
+  const handleScrape = useCallback(
+    async (value: string) => {
+      setIsScraping(true);
+      try {
+        const url = new URL(value);
+        const { data } = await axios.get<MetadataResponse>(
+          urlJoin('https://zm-scraper.zanderwtf.workers.dev/', {
+            query: { url: url.toString() },
+          }),
+        );
+
+        const values = getValues();
+        if (!values.title) {
+          setValue('title', data.title);
+        }
+        if (!values.description) {
+          setValue('description', data?.description);
+        }
+        if (data.url !== data.image) {
+          setValue('image', data.image as string);
+        }
+        if (data.url !== value) {
+          setValue('url', data.url);
+        }
+        setValue('type', data.urlType);
+        setScrapeResponse(data);
+        handleMatchTags({
+          title: data?.title ?? '',
+          description: data.description as string,
+        });
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          console.error(error.response);
+        } else {
+          const errorMessage = getErrorMessage(error);
+          console.error(errorMessage);
+        }
+      } finally {
+        setIsScraping(false);
+      }
+    },
+    [getValues, handleMatchTags, setIsScraping, setValue],
+  );
+
+  useEffect(() => {
+    const urlQueryParam = initialValues?.url;
+    if (urlQueryParam && isNew) {
+      setValue('url', urlQueryParam);
+      handleScrape(urlQueryParam);
+      // checkMatchingItems(urlQueryParam);
+    }
+  }, [handleScrape, isNew, setValue, initialValues]);
+
+  const handleUrlBlur = async (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    if (value && isNew) {
+      await checkMatchingItems(value);
+    } else {
+      setPossibleMatchingItems(null);
+    }
+  };
+
+  const checkMatchingItems = async (link: string): Promise<void> => {
+    try {
+      const url = new URL(link);
+      const { data } = await supabaseClient.rpc('check_url', {
+        url_input: url.hostname,
+      });
+      setPossibleMatchingItems(data);
+    } catch (err) {
+      setPossibleMatchingItems(null);
+    }
+  };
+
   // check for matching tags when content changes
   useEffect(() => {
     if (watchTitle || watchDescription || watchNote) {
@@ -175,28 +262,60 @@ export const BookmarkForm = ({
 
         {/* URL */}
         <FormGroup label="URL" name="url">
-          <Input
-            id="url"
-            placeholder={DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER}
-            // defaultValue={initialValues?.url || ''}
-            {...register('url')}
-            autoFocus
-          />
+          <Flex gapX="s" align="center">
+            <Input
+              id="url"
+              placeholder={DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER}
+              {...register('url')}
+              onBlur={handleUrlBlur}
+              autoFocus
+            />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button
+                    variant="icon"
+                    size="s"
+                    type="button"
+                    disabled={!watchUrl || isScraping}
+                    onClick={() => {
+                      if (watchUrl) {
+                        handleScrape(watchUrl);
+                      }
+                    }}
+                  >
+                    <MagicWand weight="duotone" size="18" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{CONTENT.scrapeThisUrl}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Flex>
+          <PossibleMatchingItems items={possibleMatchingItems} />
         </FormGroup>
 
         {/* TITLE */}
         <FormGroup label="Title" name="title">
-          <Input
-            id="title"
-            placeholder="Title"
-            // defaultValue={initialValues?.title || ''}
-            {...register('title')}
-          />
+          <Input id="title" placeholder="Title" {...register('title')} />
+          {watchTitle !== scrapeResponse?.title ? (
+            <FieldValueSuggestion
+              id="title"
+              setValue={setValue}
+              suggestion={scrapeResponse?.title as string}
+            />
+          ) : null}
         </FormGroup>
 
         {/* DESCRIPTION */}
         <FormGroup label="Description" name="description">
           <Textarea id="description" {...register('description')}></Textarea>
+          {watchDescription !== scrapeResponse?.description ? (
+            <FieldValueSuggestion
+              id="description"
+              setValue={setValue}
+              suggestion={scrapeResponse?.description as string}
+            />
+          ) : null}
         </FormGroup>
 
         {/* NOTE */}
@@ -235,7 +354,7 @@ export const BookmarkForm = ({
                   <Button
                     key={`possibleTagMatch-${tag}`}
                     variant="ghost"
-		    size="s"
+                    size="s"
                     onClick={() => {
                       const existingTags = watchTags?.length ? watchTags : [];
                       setValue('tags', [...existingTags, tag]);

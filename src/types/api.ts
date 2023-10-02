@@ -1,4 +1,5 @@
 // import { BookmarkType } from './bookmark'
+import { BookmarkType } from './db';
 
 export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
 
@@ -42,8 +43,5 @@ export interface MetadataResponse {
   iframe: isNullable<string>;
   lang: isNullable<string>;
   feed: isNullable<string>;
-}
-
-export interface ScrapeResponse extends MetadataResponse {
-  // urlType: BookmarkType
+  urlType: BookmarkType;
 }

@@ -86,6 +86,9 @@
     ul {
       list-style-type: disc;
     }
+    ol {
+      list-style-type: decimal;
+    }
 
     iframe {
       aspect-ratio: 16 / 9;
