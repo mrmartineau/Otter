@@ -20,7 +20,10 @@ import {
   Trash,
   TwitterLogo,
 } from '@phosphor-icons/react';
+import { useRef } from 'react';
+import { useClickAway } from 'use-click-away';
 
+import { useSidebar } from '../hooks/useSidebar';
 import { useUpdateUISettings } from '../hooks/useUpdateUISettings';
 import { DbMetaResponse } from '../utils/fetching/meta';
 import { Flex } from './Flex';
@@ -35,13 +38,19 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ dbMeta }: SidebarProps) => {
+  const { handleCloseSidebar } = useSidebar();
   // const [settings, handleUpdateUISettings] = useUpdateUISettings();
-  // console.log(
-  //   `🚀 ~ Sidebar ~ settings.uiState.pinnedTags:`,
-  //   settings.uiState.pinnedTags,
-  // );
+
+  const sidebarRef = useRef(null);
+  useClickAway(sidebarRef, (event: Event) => {
+    const navButton = document.querySelector('[data-testid="navButton"]');
+    if (event.target !== navButton) {
+      handleCloseSidebar();
+    }
+  });
+
   return (
-    <>
+    <div className="otter-sidebar-pane" ref={sidebarRef}>
       <div>
         <div className="sidebar-top">
           <Link href={ROUTE_FEED_HOME} variant="logo">
@@ -102,6 +111,6 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
           {CONTENT.signOutNav}
         </SidebarLink>
       </Flex>
-    </>
+    </div>
   );
 };

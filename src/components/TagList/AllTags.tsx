@@ -26,10 +26,10 @@ export const AllTags = ({ tags }: AllTagsProps) => {
   const [settings, handleUpdateUISettings] = useUpdateUISettings();
   const [theTags, setTheTags] = useState<MetaTag[] | undefined>(tags);
   const isViewingTopTags = settings.uiState.topTags;
-  console.log(
-    `🚀 ~ settings.uiState:`,
-    JSON.stringify(settings.uiState, null, 2),
-  );
+  // console.log(
+  //   `🚀 ~ settings.uiState:`,
+  //   JSON.stringify(settings.uiState, null, 2),
+  // );
   const topTagsLimit = settings.uiState.topTagsLimit;
   const pinnedTagss = settings.uiState.pinnedTags;
 

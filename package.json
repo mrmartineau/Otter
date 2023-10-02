@@ -61,6 +61,7 @@
     "title": "^3.5.3",
     "tldjs": "^2.3.1",
     "typescript": "5.2.2",
+    "use-click-away": "^0.0.1",
     "zod": "^3.22.2"
   },
   "devDependencies": {

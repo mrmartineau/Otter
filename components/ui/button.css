@@ -39,3 +39,9 @@
       0 0 0 1px var(--theme4);
   }
 }
+
+.button-icon {
+  svg {
+    pointer-events: none;
+  }
+}

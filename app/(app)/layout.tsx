@@ -6,6 +6,7 @@ import { FabAdd } from '@/src/components/FabAdd';
 import { Flex } from '@/src/components/Flex';
 import { Link } from '@/src/components/Link';
 import { Sidebar } from '@/src/components/Sidebar';
+import { TopBar } from '@/src/components/TopBar';
 import { UserProvider } from '@/src/components/UserProvider';
 import { ROUTE_FEED_HOME } from '@/src/constants';
 import { UserProfile } from '@/src/types/db';
@@ -36,34 +37,10 @@ export default async function AppLayout({ children }: LayoutProps) {
   return (
     <UserProvider profile={userProfile?.data as UserProfile} id={user?.id}>
       <div className="otter-app-container">
-        <header className="otter-top-bar">
-          <Flex align="center" gap="m" className="bp2:hidden">
-            <Button
-              variant="nav"
-              aria-label="View navigation"
-              data-testid="navButton"
-              // onClick={toggleSidebarLocked}
-              // ref={navButtonRef}
-              // css={{
-              //   flexShrink: 0,
-              //   '*': {
-              //     pointerEvents: 'none',
-              //   },
-              // }}
-            >
-              {/* <List weight="duotone" size={30} /> */}
-            </Button>
-
-            <Link href={ROUTE_FEED_HOME} variant="logo">
-              🦦 <span>Otter</span>
-            </Link>
-          </Flex>
-          <CmdK dbMeta={dbMeta} />
-        </header>
+        <TopBar dbMeta={dbMeta} />
         <div className="otter-primary-pane">
-          <div className="otter-sidebar-pane">
-            <Sidebar dbMeta={dbMeta} />
-          </div>
+          <Sidebar dbMeta={dbMeta} />
+          <div className="otter-sidebar-pane-overlay" />
           <div className="otter-content-pane">
             <div className="otter-content-pane-inner">
               <Container>{children}</Container>
