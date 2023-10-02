@@ -132,7 +132,6 @@ export const CmdK = ({ dbMeta }: CmdKProps) => {
           className="cmdk-input"
           value={searchTerm}
           onValueChange={(value) => {
-            console.log(`🚀 ~ CmdK ~ value:`, value);
             setSearchTerm(value);
             throttledMutate(value);
           }}
