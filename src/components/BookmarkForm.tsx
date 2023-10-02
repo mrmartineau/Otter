@@ -235,7 +235,7 @@ export const BookmarkForm = ({
                   <Button
                     key={`possibleTagMatch-${tag}`}
                     variant="ghost"
-                    size="sm"
+		    size="s"
                     onClick={() => {
                       const existingTags = watchTags?.length ? watchTags : [];
                       setValue('tags', [...existingTags, tag]);

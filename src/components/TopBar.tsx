@@ -32,7 +32,7 @@ export const TopBar = ({
       <Flex align="center" gap="2xs" className="top-bar-buttons">
         <Button
           variant="icon"
-          size="sm"
+          size="s"
           aria-label="View navigation"
           data-testid="navButton"
           onClick={handleToggleSidebar}

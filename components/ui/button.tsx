@@ -28,9 +28,9 @@ const buttonVariants = cva(
 
       size: {
         default: 'h-10 px-4 py-2',
-        tiny: 'h-5 rounded-s px-2 text-step--2',
-        sm: 'h-9 rounded-m px-2xs py-3xs',
-        lg: 'h-11 rounded-m px-8',
+        xs: 'h-5 rounded-s px-2 text-step--2',
+        s: 'h-9 rounded-m px-2xs py-3xs',
+        l: 'h-11 rounded-m px-8',
         collapsible: 'h-6 w-6',
       },
     },

@@ -73,7 +73,7 @@ export const AllTags = ({ tags }: AllTagsProps) => {
           {tags.length > 5 ? (
             <Button
               variant="ghost"
-              size="tiny"
+              size="xs"
               aria-pressed={isViewingTopTags && topTagsLimit === 5}
               onClick={() => handleViewTopNTags(true, 5)}
             >
@@ -83,7 +83,7 @@ export const AllTags = ({ tags }: AllTagsProps) => {
           {tags.length > 10 ? (
             <Button
               variant="ghost"
-              size="tiny"
+              size="xs"
               aria-pressed={isViewingTopTags && topTagsLimit === 10}
               onClick={() => handleViewTopNTags(true, 10)}
             >
@@ -93,7 +93,7 @@ export const AllTags = ({ tags }: AllTagsProps) => {
           {tags.length > 20 ? (
             <Button
               variant="ghost"
-              size="tiny"
+              size="xs"
               aria-pressed={isViewingTopTags && topTagsLimit === 20}
               onClick={() => handleViewTopNTags(true, 20)}
             >
@@ -102,7 +102,7 @@ export const AllTags = ({ tags }: AllTagsProps) => {
           ) : null}
           <Button
             variant="ghost"
-            size="tiny"
+            size="xs"
             aria-pressed={!isViewingTopTags}
             onClick={() => handleViewTopNTags(false)}
           >
