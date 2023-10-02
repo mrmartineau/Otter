@@ -4,7 +4,6 @@ import {
   CONTENT,
   ROUTE_FEED_HOME,
   ROUTE_SETTINGS_ACCOUNT,
-  ROUTE_SIGNOUT,
   ROUTE_STARS,
   ROUTE_STATS,
   ROUTE_TRASH,
@@ -15,7 +14,6 @@ import {
   ArrowFatLinesUp,
   Gear,
   ListBullets,
-  SignOut,
   Star,
   Trash,
   TwitterLogo,
@@ -24,10 +22,11 @@ import { useRef } from 'react';
 import { useClickAway } from 'use-click-away';
 
 import { useSidebar } from '../hooks/useSidebar';
-import { useUpdateUISettings } from '../hooks/useUpdateUISettings';
+// import { useUpdateUISettings } from '../hooks/useUpdateUISettings';
 import { DbMetaResponse } from '../utils/fetching/meta';
 import { Flex } from './Flex';
 import { Link } from './Link';
+import LogoutButton from './LogoutButton';
 import './Sidebar.styles.css';
 import { SidebarLink } from './SidebarLink';
 import { AllTags } from './TagList';
@@ -106,10 +105,7 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
           <Gear aria-label="Settings" size={18} weight="duotone" />
           {CONTENT.settingsNav}
         </SidebarLink>
-        <SidebarLink href={ROUTE_SIGNOUT}>
-          <SignOut aria-label="Sign out" size={18} weight="duotone" />
-          {CONTENT.signOutNav}
-        </SidebarLink>
+        <LogoutButton />
       </Flex>
     </div>
   );

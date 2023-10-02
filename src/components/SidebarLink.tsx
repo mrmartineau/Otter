@@ -24,19 +24,15 @@ export const SidebarLink = ({
 
   const { handleCloseSidebar } = useSidebar();
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    handleCloseSidebar();
-  };
-
   return (
     <Link
       href={href}
       variant="sidebar"
       {...rest}
       isActive={isActive}
-      onClick={handleLinkClick}
+      onClick={handleCloseSidebar}
     >
-      <Flex display="inline" gapX="s" align="center">
+      <Flex display="inline" gapX="xs" align="center">
         {children}
       </Flex>
       {count ? <Text variant="count">{count}</Text> : null}
