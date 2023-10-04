@@ -39,9 +39,10 @@ export interface MetadataResponse {
   publisher: isNullable<string>;
   title: isNullable<string>;
   url: string;
+  cleaned_url?: string;
   video: isNullable<string>;
   iframe: isNullable<string>;
   lang: isNullable<string>;
-  feed: isNullable<string>;
+  feeds: isNullable<string>;
   urlType: BookmarkType;
 }

@@ -21,6 +21,7 @@ export async function POST(request: Request) {
     const authHeader = request.headers.get('authorization');
     const bearerToken = authHeader?.split(' ')[1];
     const supabaseClient = createClient(
+      // @ts-ignore
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       bearerToken,
     );
@@ -31,22 +32,20 @@ export async function POST(request: Request) {
       url,
       ...rest
     }: Bookmark & { scrape: boolean }) => {
-      // if there's a `scrape` query param, scrape the page and use the info
+      // if there are `scrape` & `url` query params, scrape the page and use the info
       if (url && scrape) {
         const metadata = await getScrapeData(url);
-        console.log(`🚀 ~ POST ~ metadata:`, metadata);
-        // TODO: get page content another way
-        // const { isReaderable } = await readability(html)
         const tags = rest.tags || [];
         // scrape the url and use the result for the title and description
         return {
           ...rest,
           title: metadata.title,
-          url: metadata.url,
           description: metadata.description,
           image: metadata.image,
+          url: metadata.cleaned_url || metadata.url,
+          type: metadata.urlType,
+          feed: metadata.feeds,
           tags: [...matchTags(metadata, dbMeta.tags), ...tags],
-          feed: metadata.feed,
         };
       }
 
@@ -82,147 +81,71 @@ export async function POST(request: Request) {
   }
 }
 
-/*
-import type { NextApiRequest, NextApiResponse } from 'next';
-import pMap from 'p-map';
+export async function GET(request: Request) {
+  const searchParams = new URL(request.url).searchParams;
+  const url = searchParams.get('url');
 
-import { getMetaData } from '../../../server-utils';
-import { Bookmark } from '../../../types/bookmark';
-import {
-  getErrorMessage,
-  linkType,
-  matchTags,
-  setAuthHeaders,
-  supabaseClient,
-} from '../../../utils';
-import { Database } from '@/src/types/supabase'
-
-export default async function handler(
-  request: NextApiRequest,
-  response: NextApiResponse,
-) {
-  if (request.method?.toLowerCase() === 'options') {
-    return response.status(200).json({});
+  if (!url) {
+    return new Response(
+      JSON.stringify({
+        reason: 'Please provide a url parameter',
+        error: null,
+        data: null,
+      }),
+      {
+        status: 400,
+        headers,
+      },
+    );
   }
 
   try {
-    setAuthHeaders(request);
-  } catch (error: unknown) {
-    const errorMessage = getErrorMessage(error);
-    return response.status(401).json({
-      reason: 'Not authorised',
-      error: errorMessage,
-      data: null,
+    const authHeader = request.headers.get('authorization');
+    const bearerToken = authHeader?.split(' ')[1];
+    const supabaseClient = createClient(
+      // @ts-ignore
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      bearerToken,
+    );
+
+    const dbMeta = await getDbMetadata(supabaseClient);
+    const metadata = await getScrapeData(url);
+    const supabaseResponse = await supabaseClient
+      .from('bookmarks')
+      .insert([
+        // @ts-ignore
+        {
+          title: metadata.title,
+          description: metadata.description,
+          image: metadata.image,
+          url: metadata.cleaned_url || metadata.url,
+          type: metadata.urlType,
+          feed: metadata.feeds,
+          tags: matchTags(metadata, dbMeta.tags),
+        },
+      ])
+      .select();
+
+    if (supabaseResponse.error) {
+      throw supabaseResponse.error;
+    }
+
+    return new Response(JSON.stringify(supabaseResponse.data), {
+      status: 200,
+      headers,
     });
+  } catch (error) {
+    const errorMessage = getErrorMessage(error);
+    return new Response(
+      JSON.stringify({
+        reason: 'Problem adding new bookmark',
+        error: errorMessage,
+        data: null,
+      }),
+      {
+        status: 400,
+        headers,
+      },
+    );
   }
-
-  switch (request.method) {
-    // quick save bookmark
-    case 'GET': {
-      try {
-        if (!request.query.url) {
-          throw 'Please provide a url parameter';
-        }
-        const url = request.query.url as string;
-        const dbMeta = await getDbMetadata();
-        const metadata = await getMetaData(url);
-        // TODO: get page content another way
-        // const { isReaderable } = await readability(html)
-        let urlType = 'link';
-        try {
-          urlType = linkType(metadata.url, false);
-        } catch (err) {
-          console.error('Problem fetching the link type');
-        }
-        const supabaseResponse = await supabaseClient
-          .from<Bookmark[]>('bookmarks')
-          .insert([
-            // @ts-ignore
-            {
-              title: metadata.title,
-              url: metadata.url,
-              description: metadata.description,
-              type: urlType,
-              image: metadata.image,
-              tags: matchTags(metadata, dbMeta.tags),
-              feed: metadata.feed,
-            },
-          ]);
-
-        if (supabaseResponse.error) {
-          throw supabaseResponse.error;
-        }
-        return response.status(200).json(supabaseResponse.data);
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        return response
-          .status(400)
-          .json({ reason: 'Problem adding new bookmark', error: errorMessage });
-      }
-    }
-    case 'POST': {
-      try {
-        const mapper = async ({
-          scrape,
-          url,
-          ...rest
-        }: Bookmark & { scrape: boolean }) => {
-          if (url) {
-            // if there's a `scrape` query param, scrape the page and use the info
-            if (scrape) {
-              const dbMeta = await fetchDbMeta();
-              const metadata = await getMetaData(url);
-              // TODO: get page content another way
-              // const { isReaderable } = await readability(html)
-              let urlType = 'link';
-              try {
-                urlType = linkType(metadata.url, false);
-              } catch (err) {
-                console.error('Problem fetching the link type');
-              }
-              const tags = rest.tags || [];
-              // scrape the url and use the result for the title and description
-              return {
-                ...rest,
-                title: metadata.title,
-                url: metadata.url,
-                description: metadata.description,
-                type: urlType,
-                image: metadata.image,
-                tags: [...matchTags(metadata, dbMeta.tags), ...tags],
-                feed: metadata.feed,
-              };
-            }
-            // if scrape disabled, use what is sent and add feed
-            return {
-              url,
-              ...rest,
-            };
-          }
-          // this is always used when no url is added
-          return rest;
-        };
-        const payload = await pMap(request.body, mapper, { concurrency: 2 });
-        const supabaseResponse = await supabaseClient
-          .from<Bookmark[]>('bookmarks')
-          .insert(payload as Bookmark[]);
-
-        if (supabaseResponse.error) {
-          throw supabaseResponse.error;
-        }
-        return response.status(200).json(supabaseResponse.data);
-      } catch (error) {
-        const errorMessage = getErrorMessage(error);
-        return response.status(400).json({
-          reason: 'Problem adding new bookmark',
-          error: errorMessage,
-          data: null,
-        });
-      }
-    }
-    default: {
-      response.setHeader('Allow', ['GET', 'POST']);
-      response.status(405).end(`Method ${request.method} Not Allowed`);
-    }
-  }
-}*/
+}
