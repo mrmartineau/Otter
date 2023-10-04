@@ -32,6 +32,7 @@ import { useToggle } from '../hooks/useToggle';
 import { MetadataResponse } from '../types/api';
 import { type Bookmark, type BookmarkFormValues } from '../types/db';
 import { MetaTag } from '../utils/fetching/meta';
+import { getScrapeData } from '../utils/fetching/scrape';
 import { getErrorMessage } from '../utils/get-error-message';
 import { MatchTagsProps, matchTags } from '../utils/matchTags';
 import { Combobox } from './Combobox';
@@ -165,11 +166,7 @@ export const BookmarkForm = ({
       setIsScraping(true);
       try {
         const url = new URL(value);
-        const { data } = await axios.get<MetadataResponse>(
-          urlJoin('https://zm-scraper.zanderwtf.workers.dev/', {
-            query: { url: url.toString() },
-          }),
-        );
+        const data = await getScrapeData(url.toString());
 
         const values = getValues();
         if (!values.title) {
@@ -272,7 +269,7 @@ export const BookmarkForm = ({
             />
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger asChild>
                   <Button
                     variant="icon"
                     size="s"

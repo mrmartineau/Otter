@@ -95,6 +95,9 @@ dependencies:
   next:
     specifier: ^13.5.2
     version: 13.5.2(react-dom@18.2.0)(react@18.2.0)
+  p-map:
+    specifier: ^6.0.0
+    version: 6.0.0
   postcss:
     specifier: 8.4.30
     version: 8.4.30
@@ -5264,6 +5267,11 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       p-limit: 3.1.0
+    dev: false
+
+  /p-map@6.0.0:
+    resolution: {integrity: sha512-T8BatKGY+k5rU+Q/GTYgrEf2r4xRMevAN5mtXc2aPc4rS1j3s+vWTaO2Wag94neXuCAUAs8cxBL9EeB5EA6diw==}
+    engines: {node: '>=16'}
     dev: false
 
   /pac-proxy-agent@7.0.1:
