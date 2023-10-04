@@ -1,0 +1,15 @@
+{
+  "name": "🦦 Otter",
+  "short_name": "Otter",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "hsl(60 6% 9%)",
+  "description": "Bookmarking app",
+  "icons": [
+    {
+      "src": "apple-icon.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    }
+  ]
+}
