@@ -1,14 +1,9 @@
-import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
-import { CmdK } from '@/src/components/CmdK';
 import { Container } from '@/src/components/Container';
 import { FabAdd } from '@/src/components/FabAdd';
-import { Flex } from '@/src/components/Flex';
-import { Link } from '@/src/components/Link';
 import { Sidebar } from '@/src/components/Sidebar';
 import { TopBar } from '@/src/components/TopBar';
 import { UserProvider } from '@/src/components/UserProvider';
-import { ROUTE_FEED_HOME } from '@/src/constants';
 import { UserProfile } from '@/src/types/db';
 import { Database } from '@/src/types/supabase';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
