@@ -87,6 +87,11 @@ export const API_RSS = '/api/rss';
 export const API_TWEETS = '/api/tweets';
 export const API_TWEETS_SEARCH = '/api/search/tweets';
 
+export const API_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
 // Default payload/responses
 export const RESP_USER_GUEST = {
   guest: true,

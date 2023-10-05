@@ -1,3 +1,4 @@
+import { API_HEADERS } from '@/src/constants';
 import { Bookmark } from '@/src/types/db';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { getScrapeData } from '@/src/utils/fetching/scrape';
@@ -6,11 +7,6 @@ import { matchTags } from '@/src/utils/matchTags';
 import { createClient } from '@supabase/supabase-js';
 import pMap from 'p-map';
 
-const headers = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
@@ -63,7 +59,7 @@ export async function POST(request: Request) {
 
     return new Response(JSON.stringify(supabaseResponse.data), {
       status: 200,
-      headers,
+      headers: API_HEADERS,
     });
   } catch (error) {
     const errorMessage = getErrorMessage(error);
@@ -75,7 +71,7 @@ export async function POST(request: Request) {
       }),
       {
         status: 400,
-        headers,
+        headers: API_HEADERS,
       },
     );
   }
@@ -94,7 +90,7 @@ export async function GET(request: Request) {
       }),
       {
         status: 400,
-        headers,
+        headers: API_HEADERS,
       },
     );
   }
@@ -132,7 +128,6 @@ export async function GET(request: Request) {
 
     return new Response(JSON.stringify(supabaseResponse.data), {
       status: 200,
-      headers,
     });
   } catch (error) {
     const errorMessage = getErrorMessage(error);
@@ -144,7 +139,7 @@ export async function GET(request: Request) {
       }),
       {
         status: 400,
-        headers,
+        headers: API_HEADERS,
       },
     );
   }
