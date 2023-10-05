@@ -3,6 +3,7 @@ import { CONTENT } from '@/src/constants';
 import { Bookmark } from '@/src/types/db';
 import { Database } from '@/src/types/supabase';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
+import { getSearchBookmarks } from '@/src/utils/fetching/search';
 import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Metadata } from 'next';
@@ -29,15 +30,11 @@ export async function generateMetadata({
 export default async function SearchPage({ searchParams }: Props) {
   const { limit, offset, searchTerm } = searchParams;
   const supabaseClient = createServerComponentClient<Database>({ cookies });
-  const { data, count } = await supabaseClient
-    .from('bookmarks')
-    .select('*', { count: 'exact' })
-    .or(
-      `title.ilike.*${searchTerm}*,url.ilike.*${searchTerm}*,description.ilike.*${searchTerm}*,note.ilike.*${searchTerm}*,tags.cs.{${searchTerm}}`,
-    )
-    .match({ status: 'active' })
-    .order('created_at', { ascending: false })
-    .limit(20);
+  const { data, count } = await getSearchBookmarks({
+    supabaseClient,
+    params: searchParams,
+    searchTerm: searchTerm || '',
+  });
 
   return (
     <Feed
