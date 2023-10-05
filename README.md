@@ -1,48 +1,75 @@
-# Supabase Starter
+<div align="center">
 
-This starter configures Supabase Auth to use cookies, making the user's session available throughout the entire Next.js app - Client Components, Server Components, Route Handlers, Server Actions and Middleware.
+  <h1>🦦<br/>Otter</h1>
 
-## Deploy your own
+> Otter is a simple bookmark manager made with [Next.js](https://nextjs.org)
 
-The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀
+  <p>
+    <a
+      href="https://github.com/MrMartineau/otter/blob/master/LICENSE"
+    >
+      <img
+        src="https://img.shields.io/badge/license-MIT-blue.svg"
+        alt="otter is released under the MIT license."
+      />
+    </a>
+    <img
+      src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"
+      alt="PRs welcome!"
+    />
+    <a href="https://twitter.com/intent/follow?screen_name=MrMartineau">
+      <img
+        src="https://img.shields.io/twitter/follow/MrMartineau.svg?label=Follow%20@MrMartineau"
+        alt="Follow @MrMartineau"
+      />
+    </a>
+  </p>
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&integration-ids=oac_jUduyjQgOyzev1fjrW83NYOv)
+  <p>
+    <a href="#getting-started">Getting started</a> •
+    <a href="#docs">Docs</a>
+  </p>
+</div>
 
-## How to use
+## Getting started
 
-1. Create a [new Supabase project](https://database.new)
-1. Run `npx create-next-app -e with-supabase` to create a Next.js app using the Supabase Starter template
-1. Use `cd` to change into the app's directory
-1. Run `npm install` to install dependencies
-1. Rename `.env.local.example` to `.env.local` and update the values for `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
-1. Run `npm run dev` to start the local development server
+1. Install dependencies with [pnpm](https://pnpm.io): `pnpm install`
+2. Setup env vars (see below)
+3. Run the app locally using `pnpm dev`
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+### Env vars
 
-### Create a Supabase client
+Set up the fillowing env vars. For local development you can set them in a `.env.local` file. See an example [here](../../examples/nextjs/.env.local.example)).
 
-Check out the [`/app/_examples`](./app/_examples/) folder for an example of creating a Supabase client in:
+```bash
+# Find these in your Supabase project settings > API
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
 
-- [Client Components](./app/_examples/client-component/page.tsx)
-- [Server Components](./app/_examples/server-component/page.tsx)
-- [Route Handlers](./app/_examples/route-handler/route.ts)
-- [Server Actions](./app/_examples/server-action/page.tsx)
+## Docs
 
-### Create `todo` table and seed with data (optional)
+### API Endpoints
 
-Navigate to [your project's SQL Editor](https://app.supabase.com/project/_/sql), click `New query`, paste the contents of the [init.sql](./supabase/migrations/20230618024722_init.sql) file and click `RUN`.
+- `POST /api/new` - create new item in Otter
+- `GET /api/new?url=https://example.com` - quick create new item in Otter. Pass in a `url` query param and it will create a new item with that URL and includes its metadata too
+- `GET /api/bookmarks` - returns all bookmarks
+<!-- - `GET /api/bookmarks/:id` - returns a single bookmark -->
+- `GET /api/search?searchTerm=zander` - search bookmark
 
-This will create a basic `todos` table, enable Row Level Security (RLS), and write RLS policies enabling `select` and `insert` actions for `authenticated` users.
+### Bookmarks
 
-To seed your `todos` table with some dummy data, run the contents of the [seed.sql](./supabase/seed.sql) file.
+#### Adding new bookmark types
 
-## Feedback and issues
+1. Add the new type to the types enum `ALTER TYPE type ADD VALUE '???';`
+2. Add a new `case` to the `TypeToIcon` component
+3. Add a new `TypeRadio` component to the `BookmarkForm` component
+4. Add a new value to `BookmarkType` type
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+---
 
-## More Supabase examples
+## License
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
-- [Next.js Auth Helpers Docs](https://supabase.com/docs/guides/auth/auth-helpers/nextjs)
+[MIT](https://choosealicense.com/licenses/mit/) © [Zander Martineau](https://zander.wtf)
+
+> Made by Zander • [zander.wtf](https://zander.wtf) • [GitHub](https://github.com/mrmartineau/) • [Twitter](https://twitter.com/mrmartineau/)
