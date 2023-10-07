@@ -51,6 +51,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 ### API Endpoints
 
+Interactive API docs can be found in the various `*.rest` files in the `/app/api` directory.
+
 - `POST /api/new` - create new item in Otter
 - `GET /api/new?url=https://example.com` - quick create new item in Otter. Pass in a `url` query param and it will create a new item with that URL and includes its metadata too
 - `GET /api/bookmarks` - returns all bookmarks

@@ -6,10 +6,11 @@ import { FeedItemModel, useGroupByDate } from '@/src/hooks/useGroupByDate';
 import { usePagination } from '@/src/hooks/usePagination';
 import { ReactNode, memo } from 'react';
 
-import { Bookmark, Tweet } from '../types/db';
+import { Bookmark, Toot, Tweet } from '../types/db';
 import { BookmarkFeedItem } from './BookmarkFeedItem';
 import { Flex } from './Flex';
 import { headingVariants } from './Heading';
+import { TootFeedItem } from './TootFeedItem';
 
 // import { TweetFeedItem } from './TweetFeedItem';
 
@@ -22,14 +23,17 @@ interface FeedProps {
   count: number;
   limit?: number;
   allowGroupByDate?: boolean;
-  feedType?: 'tweets' | 'bookmarks';
+  feedType?: 'tweets' | 'bookmarks' | 'toots';
 }
 
 export function isBookmark(item: FeedItemModel): item is Bookmark {
   return 'title' in item;
 }
 export function isTweet(item: FeedItemModel): item is Tweet {
-  return 'text' in item;
+  return 'tweet_id' in item;
+}
+export function isToot(item: FeedItemModel): item is Toot {
+  return 'toot_id' in item;
 }
 
 export const Feed = memo(
@@ -74,9 +78,13 @@ export const Feed = memo(
                   </h3>
                   <div className="grid gap-m">
                     {groupedItem?.items?.map((item) => {
-                      // if (isTweet(item)) {
-                      //   return <TweetFeedItem {...item} key={item.id} />;
-                      // }
+                      if (isTweet(item)) {
+                        return null;
+                        //   return <TweetFeedItem {...item} key={item.id} />;
+                      }
+                      if (isToot(item)) {
+                        return <TootFeedItem {...item} key={item.id} />;
+                      }
 
                       return (
                         <BookmarkFeedItem
@@ -97,9 +105,13 @@ export const Feed = memo(
           <div className="grid gap-sm bp1:gap-md">
             {items?.length ? (
               items.map((item) => {
-                // if (isTweet(item)) {
-                //   return <TweetFeedItem {...item} key={item.id} />;
-                // }
+                if (isTweet(item)) {
+                  return null;
+                  // return <TweetFeedItem {...item} key={item.id} />;
+                }
+                if (isToot(item)) {
+                  return <TootFeedItem {...item} key={item.id} />;
+                }
                 return (
                   <BookmarkFeedItem
                     {...item}

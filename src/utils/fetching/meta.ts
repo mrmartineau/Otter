@@ -7,6 +7,8 @@ export interface DbMetaResponse {
   trash: number;
   types: MetaType[];
   tags: MetaTag[];
+  toots: number;
+  likedToots: number;
   tweets: number;
   likedTweets: number;
 }
@@ -36,6 +38,14 @@ export const getDbMetadata = async (
     .match({ star: true, status: 'active' });
   const types = await supabaseClient.from('types_count').select('*');
   const tags = await supabaseClient.from('tags_count').select('*');
+  const toots = await supabaseClient
+    .from('toots')
+    .select('id', { count: 'exact' })
+    .match({ liked_toot: false });
+  const likedToots = await supabaseClient
+    .from('toots')
+    .select('id', { count: 'exact' })
+    .match({ liked_toot: true });
   const tweets = await supabaseClient
     .from('tweets')
     .select('id', { count: 'exact' })
@@ -51,6 +61,8 @@ export const getDbMetadata = async (
     stars: stars.count || 0,
     types: types.data || [],
     tags: tags.data || [],
+    toots: toots.count || 0,
+    likedToots: likedToots.count || 0,
     tweets: tweets.count || 0,
     likedTweets: likedTweets.count || 0,
   };

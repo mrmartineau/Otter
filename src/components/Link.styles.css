@@ -84,14 +84,14 @@
 .link-add {
   background-color: var(--theme4);
   color: var(--theme11);
-  border-radius: var(--pill);
-  padding-x: var(--space-xs);
-  padding-y: var(--space-2xs);
-  font-size: var(--step--1);
+  border-radius: var(--radii-pill);
+  padding-x: var(--space-2xs);
+  padding-y: var(--space-3xs);
+  font-size: var(--step--2);
   fontfamily: var(--font-mono);
   text-transform: uppercase;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-3xs);
 
   &:hover {
     text-decoration: none;

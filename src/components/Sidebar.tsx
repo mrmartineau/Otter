@@ -6,6 +6,8 @@ import {
   ROUTE_SETTINGS_ACCOUNT,
   ROUTE_STARS,
   ROUTE_STATS,
+  ROUTE_TOOTS_LIKES,
+  ROUTE_TOOTS_MINE,
   ROUTE_TRASH,
   ROUTE_TWEETS_LIKES,
   ROUTE_TWEETS_MINE,
@@ -71,6 +73,30 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
             <ArrowFatLinesUp aria-label="Top" size={18} weight="duotone" />
             {CONTENT.topLinksNav}
           </SidebarLink>
+          {dbMeta.toots > 0 ? (
+            <SidebarLink href={ROUTE_TOOTS_LIKES} count={dbMeta.toots}>
+              <img
+                src="/mastodon-logo.svg"
+                alt="Mastodon"
+                className="mr-xs"
+                width="18"
+                height="18"
+              />
+              {CONTENT.tootsLikeNav}
+            </SidebarLink>
+          ) : null}
+          {dbMeta.likedToots > 0 ? (
+            <SidebarLink href={ROUTE_TOOTS_MINE} count={dbMeta.likedToots}>
+              <img
+                src="/mastodon-logo.svg"
+                alt="Mastodon"
+                className="mr-xs"
+                width="18"
+                height="18"
+              />
+              {CONTENT.tootsMineNav}
+            </SidebarLink>
+          ) : null}
           {dbMeta.tweets > 0 ? (
             <SidebarLink href={ROUTE_TWEETS_LIKES} count={dbMeta.tweets}>
               <TwitterLogo

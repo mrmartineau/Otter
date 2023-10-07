@@ -13,6 +13,14 @@ export type Bookmark = Omit<
 export type BookmarkType = Database['public']['Enums']['type'];
 export type BookmarkStatus = Database['public']['Enums']['status'];
 export type Tweet = Database['public']['Tables']['tweets']['Row'];
+export type Toot = Database['public']['Tables']['toots']['Row'];
+export type TootUrls = {
+  type: string;
+  isLink: boolean;
+  href: string;
+  end: number;
+  start: number;
+}[];
 
 export interface BookmarkFormValues
   extends Omit<

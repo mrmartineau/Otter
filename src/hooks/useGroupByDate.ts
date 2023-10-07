@@ -1,14 +1,13 @@
 import { useMemo } from 'react';
 
-import { useUpdateUISettings } from '../../hooks';
-import { Bookmark } from '../../types/bookmark';
-import { Tweet } from '../../types/tweet';
+// import { useUpdateUISettings } from '../../hooks';
+import { Bookmark, Toot, Tweet } from '../types/db';
 
-export type FeedItemModel = Tweet | Bookmark;
+export type FeedItemModel = Tweet | Bookmark | Toot;
 export const groupItemsByDate = (items: FeedItemModel[]) => {
   const groupedItems = items.reduce<Record<string, FeedItemModel[]>>(
     (acc, item) => {
-      const date = new Date(item.created_at);
+      const date = new Date(item.created_at as string | number | Date);
       const dateString = date.toLocaleDateString('en-US', {
         day: 'numeric',
         month: 'long',

@@ -25,6 +25,10 @@ export const CONTENT = {
   signOutNav: 'Sign out',
   typesNav: 'Types',
   tagsNav: 'Tags',
+  tootsLikeNav: 'Liked toots',
+  tootsLikeTitle: 'Liked toots',
+  tootsMineNav: 'My toots',
+  tootsMineTitle: 'My toots',
   tweetsLikeNav: 'Liked tweets',
   tweetsLikeTitle: 'Liked tweets',
   tweetsMineNav: 'My tweets',
@@ -68,6 +72,8 @@ export const ROUTE_STARS = '/stars';
 export const ROUTE_STATS = '/top';
 export const ROUTE_TRASH = '/trash';
 export const ROUTE_SETTINGS_ACCOUNT = '/settings/account';
+export const ROUTE_TOOTS_LIKES = '/toots/likes';
+export const ROUTE_TOOTS_MINE = '/toots/mine';
 export const ROUTE_TWEETS_LIKES = '/tweets/likes';
 export const ROUTE_TWEETS_MINE = '/tweets/mine';
 
