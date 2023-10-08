@@ -76,13 +76,13 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
           </SidebarLink>
           {dbMeta.toots > 0 ? (
             <SidebarLink href={ROUTE_TOOTS_LIKES} count={dbMeta.toots}>
-              <MastodonLogo className="mr-xs" size={18} />
+              <MastodonLogo size={18} />
               {CONTENT.tootsLikeNav}
             </SidebarLink>
           ) : null}
           {dbMeta.likedToots > 0 ? (
             <SidebarLink href={ROUTE_TOOTS_MINE} count={dbMeta.likedToots}>
-              <MastodonLogo className="mr-xs" size={18} />
+              <MastodonLogo size={18} />
               {CONTENT.tootsMineNav}
             </SidebarLink>
           ) : null}
