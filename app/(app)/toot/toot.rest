@@ -1,0 +1,83 @@
+# This file can be used to test the API locally in conjunction with the REST Client VS Code extension.
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+# Variables
+@token = {{$dotenv BOT_MASTODON_ACCESS_TOKEN}}
+
+# POST https://otter.zander.wtf/api/toot
+POST http://localhost:5678/api/toot
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "type": "UPDATE",
+  "table": "bookmarks",
+  "record": {
+    "id": "36e8b3ef-3344-445f-a3a0-4db60b75c3d1",
+    "url": "https://lynnandtonic.com/thoughts/entries/unordered-incomplete-list-of-things-i-want-from-a-job",
+    "feed": null,
+    "note": "",
+    "star": false,
+    "tags": ["public", "interesting", "work"],
+    "type": "article",
+    "image": "https://lynnandtonic.com/assets/images/OG/comfy-spot.jpg",
+    "title": "Unordered, incomplete list of things I want from a job",
+    "tweet": null,
+    "status": "active",
+    "created_at": "2023-02-16T22:31:33.026453+00:00",
+    "click_count": 1,
+    "description": "If I have to have to a job, this is what I want it to offer me.",
+    "modified_at": "2023-02-16T23:23:06.105+00:00"
+  },
+  "schema": "public",
+  "old_record": {
+    "id": "36e8b3ef-3344-445f-a3a0-4db60b75c3d1",
+    "url": "https://lynnandtonic.com/thoughts/entries/unordered-incomplete-list-of-things-i-want-from-a-job",
+    "feed": null,
+    "note": "",
+    "star": false,
+    "tags": ["public"],
+    "type": "article",
+    "image": "https://lynnandtonic.com/assets/images/OG/comfy-spot.jpg",
+    "title": "Unordered, incomplete list of things I want from a job",
+    "tweet": null,
+    "status": "active",
+    "created_at": "2023-02-16T22:31:33.026453+00:00",
+    "click_count": 1,
+    "description": "If I have to have to a job, this is what I want it to offer me.",
+    "modified_at": "2023-02-16T22:31:33.026453+00:00"
+  }
+}
+
+###
+
+# POST https://otter.zander.wtf/api/toot
+POST http://localhost:5678/api/toot
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "type": "INSERT",
+  "table": "bookmarks",
+  "record": {
+    "id": "6cee3667-48ed-4564-8662-df1c9a241e30",
+    "url": "https://zander.wtf/",
+    "feed": "https://zander.wtf/atom.xml",
+    "note": "",
+    "star": false,
+    "tags": [
+      "public"
+    ],
+    "type": "event",
+    "image": "https://zander.wtf/opengraph/home.jpg",
+    "title": "Hello, my name is Zander. I make websites",
+    "tweet": null,
+    "status": "active",
+    "created_at": "2023-02-16T23:42:59.734238+00:00",
+    "click_count": 0,
+    "description": "I am a contract product engineer based in London.",
+    "modified_at": "2023-02-16T23:42:59.734238+00:00"
+  },
+  "schema": "public",
+  "old_record": null
+}

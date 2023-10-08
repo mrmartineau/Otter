@@ -2,7 +2,7 @@
 
   <h1>🦦<br/>Otter</h1>
 
-> Otter is a simple bookmark manager made with [Next.js](https://nextjs.org)
+> Otter is a simple bookmark manager made with [Next.js](https://nextjs.org) with Mastodon integration.
 
   <p>
     <a
@@ -39,12 +39,14 @@
 
 ### Env vars
 
-Set up the fillowing env vars. For local development you can set them in a `.env.local` file. See an example [here](../../examples/nextjs/.env.local.example)).
+Set up the following env vars. For local development you can set them in a `.env.local` file. See an example [here](.env.local.example)).
 
 ```bash
 # Find these in your Supabase project settings > API
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+PERSONAL_MASTODON_ACCESS_TOKEN=your-personal-app-mastodon-access-token
+BOT_MASTODON_ACCESS_TOKEN=your-bot-app-mastodon-access-token
 ```
 
 ## Docs
@@ -58,6 +60,11 @@ Interactive API docs can be found in the various `*.rest` files in the `/app/api
 - `GET /api/bookmarks` - returns all bookmarks
 <!-- - `GET /api/bookmarks/:id` - returns a single bookmark -->
 - `GET /api/search?searchTerm=zander` - search bookmark
+- `POST /api/toot` - A PostgreSQL trigger function calls this endpoint anytime a bookmark is created or edited which then creates a new toot on two of my Mastodon accounts ([@otterbot@botsin.space](https://botsin.space/@otterbot) & [@zander@toot.cafe](https://toot.cafe/@zander)). It only sends a toot if the bookmark is tagged as `public`.
+
+### Mastodon integration
+
+TODO: document the PostgreSQL trigger function that calls the `/api/toot` endpoint
 
 ### Bookmarks
 

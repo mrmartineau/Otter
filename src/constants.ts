@@ -108,3 +108,5 @@ export const DEFAULT_API_RESPONSE_ORDER: RequestOrder = 'desc';
 export const MINIMUM_CLICK_COUNT = 1;
 
 export const DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER = 'https://zander.wtf';
+
+export const TAG_FOR_AUTO_TOOT = 'public';
