@@ -52,9 +52,7 @@ export const TootFeedItem = (props: Toot) => {
 
       {tootUrls?.length ? (
         <div>
-          <h3 className={headingVariants({ variant: 'date' }) + ' mt-0'}>
-            URLs
-          </h3>
+          <h3 className={headingVariants({ variant: 'date' })}>URLs</h3>
           <ul className="flex flex-col gap-2xs">
             {tootUrls.map((item) => {
               return (

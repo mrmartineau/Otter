@@ -3,22 +3,22 @@ import { type SupabaseClient } from '@supabase/supabase-js';
 
 import { type ApiParameters, apiParameters } from './apiParameters';
 
-interface TootFetchingOptions {
+interface TweetFetchingOptions {
   supabaseClient: SupabaseClient<Database>;
   params: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
   likes: boolean;
 }
-export const getToots = async ({
+export const getTweets = async ({
   supabaseClient,
   params,
   likes,
-}: TootFetchingOptions) => {
+}: TweetFetchingOptions) => {
   const { limit, offset, order } = apiParameters(params);
 
   const supabaseResponse = await supabaseClient
-    .from('toots')
+    .from('tweets')
     .select('*', { count: 'exact' })
-    .match({ liked_toot: likes })
+    .match({ liked_tweet: likes })
     .order('created_at', { ascending: order === 'asc' })
     .range(offset, offset + limit - 1);
 

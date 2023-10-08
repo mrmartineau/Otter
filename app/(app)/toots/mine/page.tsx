@@ -1,4 +1,5 @@
 import { Feed } from '@/src/components/Feed';
+import { MastodonLogo } from '@/src/components/MastodonLogo';
 import { CONTENT } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
@@ -11,7 +12,7 @@ export const metadata = {
   title: 'Toots',
 };
 
-export default async function FeedPage({
+export default async function MyTootsPage({
   searchParams,
 }: {
   searchParams: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
@@ -31,7 +32,7 @@ export default async function FeedPage({
       offset={offset}
       allowGroupByDate={true}
       title={CONTENT.tootsMineTitle}
-      icon={<ListBullets weight="duotone" size={24} />}
+      icon={<MastodonLogo size={24} />}
       feedType="toots"
     />
   );

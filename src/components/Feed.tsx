@@ -11,8 +11,7 @@ import { BookmarkFeedItem } from './BookmarkFeedItem';
 import { Flex } from './Flex';
 import { headingVariants } from './Heading';
 import { TootFeedItem } from './TootFeedItem';
-
-// import { TweetFeedItem } from './TweetFeedItem';
+import { TweetFeedItem } from './TweetFeedItem';
 
 interface FeedProps {
   title?: ReactNode;
@@ -79,8 +78,7 @@ export const Feed = memo(
                   <div className="grid gap-m">
                     {groupedItem?.items?.map((item) => {
                       if (isTweet(item)) {
-                        return null;
-                        //   return <TweetFeedItem {...item} key={item.id} />;
+                        return <TweetFeedItem {...item} key={item.id} />;
                       }
                       if (isToot(item)) {
                         return <TootFeedItem {...item} key={item.id} />;
@@ -106,8 +104,7 @@ export const Feed = memo(
             {items?.length ? (
               items.map((item) => {
                 if (isTweet(item)) {
-                  return null;
-                  // return <TweetFeedItem {...item} key={item.id} />;
+                  return <TweetFeedItem {...item} key={item.id} />;
                 }
                 if (isToot(item)) {
                   return <TootFeedItem {...item} key={item.id} />;

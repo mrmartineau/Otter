@@ -29,6 +29,7 @@ import { DbMetaResponse } from '../utils/fetching/meta';
 import { Flex } from './Flex';
 import { Link } from './Link';
 import LogoutButton from './LogoutButton';
+import { MastodonLogo } from './MastodonLogo';
 import './Sidebar.styles.css';
 import { SidebarLink } from './SidebarLink';
 import { AllTags } from './TagList';
@@ -75,25 +76,13 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
           </SidebarLink>
           {dbMeta.toots > 0 ? (
             <SidebarLink href={ROUTE_TOOTS_LIKES} count={dbMeta.toots}>
-              <img
-                src="/mastodon-logo.svg"
-                alt="Mastodon"
-                className="mr-xs"
-                width="18"
-                height="18"
-              />
+              <MastodonLogo className="mr-xs" size={18} />
               {CONTENT.tootsLikeNav}
             </SidebarLink>
           ) : null}
           {dbMeta.likedToots > 0 ? (
             <SidebarLink href={ROUTE_TOOTS_MINE} count={dbMeta.likedToots}>
-              <img
-                src="/mastodon-logo.svg"
-                alt="Mastodon"
-                className="mr-xs"
-                width="18"
-                height="18"
-              />
+              <MastodonLogo className="mr-xs" size={18} />
               {CONTENT.tootsMineNav}
             </SidebarLink>
           ) : null}

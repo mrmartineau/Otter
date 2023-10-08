@@ -1,28 +1,27 @@
 import { Feed } from '@/src/components/Feed';
-import { MastodonLogo } from '@/src/components/MastodonLogo';
 import { CONTENT } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
-import { getToots } from '@/src/utils/fetching/toots';
-import { ListBullets } from '@phosphor-icons/react/dist/ssr';
+import { getTweets } from '@/src/utils/fetching/tweets';
+import { TwitterLogo } from '@phosphor-icons/react/dist/ssr';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
 export const metadata = {
-  title: 'Toots',
+  title: CONTENT.tweetsMineTitle,
 };
 
-export default async function LikedTootsPage({
+export default async function MyTweetsage({
   searchParams,
 }: {
   searchParams: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
 }) {
   const { limit, offset } = searchParams;
   const supabaseClient = createServerComponentClient<Database>({ cookies });
-  const { data, count } = await getToots({
+  const { data, count } = await getTweets({
     supabaseClient,
     params: searchParams,
-    likes: true,
+    likes: false,
   });
   return (
     <Feed
@@ -31,9 +30,9 @@ export default async function LikedTootsPage({
       limit={limit}
       offset={offset}
       allowGroupByDate={true}
-      title={CONTENT.tootsMineTitle}
-      icon={<MastodonLogo size={24} />}
-      feedType="toots"
+      title={CONTENT.tweetsMineTitle}
+      icon={<TwitterLogo aria-label="My tweets" size={24} weight="duotone" />}
+      feedType="tweets"
     />
   );
 }
