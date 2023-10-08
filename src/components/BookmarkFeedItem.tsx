@@ -36,11 +36,11 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
       ) : null}
       {description ? <Markdown>{description}</Markdown> : null}
       {note ? (
-        <div className="bg-theme4 rounded p-xs">
+        <div className="rounded bg-theme4 p-xs">
           <Flex
             gap="2xs"
             align="center"
-            className="text-step--1 mb-s border-solid border-b-2 border-theme7 pb-3xs"
+            className="mb-s border-b-2 border-solid border-theme7 pb-3xs text-step--1"
           >
             <Note
               aria-label="Note"

@@ -48,7 +48,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
         <Flex
           gap="2xs"
           align="center"
-          className="text-theme9 text-sm text-right"
+          className="text-right text-sm text-theme9"
         >
           {accessories?.length ? (
             <>

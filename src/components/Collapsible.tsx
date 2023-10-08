@@ -53,7 +53,7 @@ export const CollapsibleTrigger = ({
       <Button
         variant="collapsible"
         size="s"
-        className="w-full gap-s align-middle justify-start h-7"
+        className="h-7 w-full justify-start gap-s align-middle"
       >
         <CaretUpDown weight="duotone" size={18} />
         <Flex justify="between" align="center" className="grow text-step--2">

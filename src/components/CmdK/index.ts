@@ -1,1 +1,1 @@
-export { CmdK } from './CmdK'
+export { CmdK } from './CmdK';

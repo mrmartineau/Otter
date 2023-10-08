@@ -17,11 +17,11 @@ export const PossibleMatchingItems = ({
   }
 
   return (
-    <div className="flow text-step--2 my-2xs bg-theme2 border-solid border border-theme3 rounded-m p-2xs">
+    <div className="flow my-2xs rounded-m border border-solid border-theme3 bg-theme2 p-2xs text-step--2">
       <h5 className="my-0 text-step--1 font-medium">
         Do you already have this item saved?
       </h5>
-      <ol className="list-decimal list-inside">
+      <ol className="list-inside list-decimal">
         {items?.slice(0, 3).map((item) => (
           <li key={item.id} className="text-theme10">
             <Link href={urlJoin('/bookmark', item.id)}>View in Otter</Link>

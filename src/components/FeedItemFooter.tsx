@@ -57,11 +57,11 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
 
   return (
     <TooltipProvider delayDuration={800} skipDelayDuration={500}>
-      <div className="grid gap-1 text-step--2 font-mono">
+      <div className="grid gap-1 font-mono text-step--2">
         <Flex align="center" gapX="m" wrap="wrap">
           {tags?.length ? (
             <Flex align="center" gap="xs">
-              <ul className="list-none p-0 m-0 flex gap-xs flex-wrap">
+              <ul className="m-0 flex list-none flex-wrap gap-xs p-0">
                 {tags.map((tag) => (
                   <li id={tag} key={tag}>
                     <Link href={urlJoin('/tag', tag)}>#{tag}</Link>

@@ -22,7 +22,7 @@ export const FieldValueSuggestion = ({
     return null;
   }
   return (
-    <Flex direction="column" gap="2xs" className="text-step--2 mt-2xs px-2xs">
+    <Flex direction="column" gap="2xs" className="mt-2xs px-2xs text-step--2">
       <span>Suggestion:</span>
       <div>{suggestion}</div>
       <div>

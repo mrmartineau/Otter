@@ -58,7 +58,7 @@ export const TweetFeedItem = (props: Tweet) => {
           <Link
             rel="external"
             href={tweet_url}
-            className="flex gap-2xs items-center text-step--1"
+            className="flex items-center gap-2xs text-step--1"
           >
             <LinkSimpleHorizontal weight="duotone" size="14" /> Tweet
           </Link>
@@ -75,7 +75,7 @@ export const TweetFeedItem = (props: Tweet) => {
               return (
                 <li
                   key={item.expanded_url}
-                  className="flex items-center flex-wrap gap-2xs text-step--1"
+                  className="flex flex-wrap items-center gap-2xs text-step--1"
                 >
                   <Link
                     href={urlJoin(ROUTE_NEW_BOOKMARK, {

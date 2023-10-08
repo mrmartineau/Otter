@@ -43,7 +43,7 @@ export const TootFeedItem = (props: Toot) => {
           <Link
             rel="external"
             href={toot_url}
-            className="flex gap-2xs items-center text-step--1"
+            className="flex items-center gap-2xs text-step--1"
           >
             <LinkSimpleHorizontal weight="duotone" size="14" /> Toot
           </Link>
@@ -58,7 +58,7 @@ export const TootFeedItem = (props: Toot) => {
               return (
                 <li
                   key={item.href}
-                  className="flex items-center flex-wrap gap-2xs text-step--1"
+                  className="flex flex-wrap items-center gap-2xs text-step--1"
                 >
                   <Link
                     href={urlJoin(ROUTE_NEW_BOOKMARK, {

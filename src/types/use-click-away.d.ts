@@ -1,1 +1,1 @@
-declare module 'use-click-away'
+declare module 'use-click-away';

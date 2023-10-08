@@ -59,7 +59,7 @@ export const Feed = memo(
         <Flex gapX="2xs" wrap="wrap" justify="between">
           <div>
             {title ? (
-              <h3 className="mt-0 flex gap-2xs items-center">
+              <h3 className="mt-0 flex items-center gap-2xs">
                 {icon}
                 {title}
               </h3>
@@ -68,7 +68,7 @@ export const Feed = memo(
         </Flex>
 
         {allowGroupByDate && groupByDate ? (
-          <div className="grid gap-sm bp2:gap-md">
+          <div className="gap-sm bp2:gap-md grid">
             {groupedItems?.length ? (
               groupedItems.map((groupedItem) => (
                 <div key={groupedItem.date}>
@@ -100,7 +100,7 @@ export const Feed = memo(
             )}
           </div>
         ) : (
-          <div className="grid gap-sm bp1:gap-md">
+          <div className="gap-sm bp1:gap-md grid">
             {items?.length ? (
               items.map((item) => {
                 if (isTweet(item)) {

@@ -84,6 +84,7 @@
     "postcss-import": "^15.1.0",
     "postcss-nested": "^6.0.1",
     "postcss-preset-env": "^9.1.4",
+    "prettier-plugin-tailwindcss": "^0.5.5",
     "supabase": "^1.99.5"
   }
 }

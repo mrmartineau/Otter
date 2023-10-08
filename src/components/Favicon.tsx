@@ -21,7 +21,7 @@ export const Favicon = ({ url }: FaviconProps) => {
       width="20"
       height="20"
       loading="lazy"
-      className="rounded-full shrink-0 block overflow-hidden"
+      className="block shrink-0 overflow-hidden rounded-full"
       onError={(event) => {
         event.currentTarget.onerror = null; // prevents looping
         event.currentTarget.src =
