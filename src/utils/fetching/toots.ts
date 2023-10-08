@@ -29,11 +29,14 @@ export const getToots = async ({
   return supabaseResponse;
 };
 
-interface TootFetchingOptions {
+interface SingleTootFetchingOptions {
   supabaseClient: SupabaseClient<Database>;
   id: string;
 }
-export const getToot = async ({ supabaseClient, id }: TootFetchingOptions) => {
+export const getToot = async ({
+  supabaseClient,
+  id,
+}: SingleTootFetchingOptions) => {
   const supabaseResponse = await supabaseClient
     .from('toots')
     .select('*')

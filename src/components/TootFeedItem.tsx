@@ -1,10 +1,9 @@
 'use client';
 
-import { LinkSimpleHorizontal, Note, PlusCircle } from '@phosphor-icons/react';
+import { LinkSimpleHorizontal, PlusCircle } from '@phosphor-icons/react';
 import urlJoin from 'proper-url-join';
 
 import { ROUTE_NEW_BOOKMARK } from '../constants';
-// import { useClickBookmark } from '../../hooks';
 import { Toot, TootUrls } from '../types/db';
 import { Favicon } from './Favicon';
 import './Feed.styles.css';
@@ -12,12 +11,19 @@ import { Flex } from './Flex';
 import { headingVariants } from './Heading';
 import { Link } from './Link';
 import { Markdown } from './Markdown';
+import './TootFeedItem.css';
 
 export const TootFeedItem = (props: Toot) => {
-  const { text, user_avatar, user_id, user_name, urls, toot_url } = props;
-  // const handleClickRegister = useClickBookmark(id);
-  const tootUrls = urls as TootUrls;
-  console.log(`🚀 ~ TootFeedItem ~ tootUrls:`, tootUrls);
+  const { text, user_avatar, user_id, user_name, urls, toot_url, media } =
+    props;
+  const tootUrls = (urls as TootUrls).filter((item) => {
+    const isHashTag = item.href.includes('/tags/');
+    const isDodgyLink = item.href.includes('</span>');
+    const isMention = item.href.includes('/@');
+    if (isHashTag || isDodgyLink || isMention) return false;
+    return true;
+  });
+  const tootMedia = media as any[];
 
   return (
     <div className="feed-wrapper">
@@ -46,40 +52,56 @@ export const TootFeedItem = (props: Toot) => {
 
       {tootUrls?.length ? (
         <div>
-          <h3 className={headingVariants({ variant: 'date' })}>URLs</h3>
-          <ul className="flex flex-col gap-xs">
-            {tootUrls
-              .filter((item) => {
-                const isHashTag = item.href.includes('/tags/');
-                const isDodgyLink = item.href.includes('</span>');
-                const isMention = item.href.includes('/@');
-                if (isHashTag || isDodgyLink || isMention) return false;
-                return true;
-              })
-              .map((item) => {
-                return (
-                  <li
-                    key={item.href}
-                    className="flex items-center flex-wrap gap-2xs text-step--1"
+          <h3 className={headingVariants({ variant: 'date' }) + ' mt-0'}>
+            URLs
+          </h3>
+          <ul className="flex flex-col gap-2xs">
+            {tootUrls.map((item) => {
+              return (
+                <li
+                  key={item.href}
+                  className="flex items-center flex-wrap gap-2xs text-step--1"
+                >
+                  <Link
+                    href={urlJoin(ROUTE_NEW_BOOKMARK, {
+                      query: {
+                        url: item.href,
+                      },
+                    })}
+                    variant="add"
                   >
-                    <Link
-                      href={urlJoin(ROUTE_NEW_BOOKMARK, {
-                        query: {
-                          url: item.href,
-                        },
-                      })}
-                      variant="add"
-                    >
-                      <PlusCircle weight="duotone" size={14} /> Add
-                    </Link>
-                    <Favicon url={item.href} />
-		    <Link href={item.href} className="break-all">
-                      {item.href}
-                    </Link>
-                  </li>
-                );
-              })}
+                    <PlusCircle weight="duotone" size={14} /> Add
+                  </Link>
+                  <Favicon url={item.href} />
+                  <Link href={item.href} className="break-all">
+                    {item.href}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
+        </div>
+      ) : null}
+
+      {tootMedia?.length ? (
+        <div className="toot-media-grid">
+          {tootMedia.map((item) => {
+            const isVideoType = item.type === 'gifv' || item.type === 'video';
+            const isPhotoType = item.type === 'image';
+            return (
+              <div key={item.id}>
+                {isVideoType ? (
+                  <video src={item.url} controls className="max-w-full" />
+                ) : isPhotoType ? (
+                  <img
+                    src={item.url}
+                    alt={item?.description}
+                    className="max-w-full rounded-m"
+                  />
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       ) : null}
     </div>
