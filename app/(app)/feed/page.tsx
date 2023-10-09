@@ -1,5 +1,6 @@
 import { Feed } from '@/src/components/Feed';
 import { CONTENT } from '@/src/constants';
+import { Bookmark } from '@/src/types/db';
 import { Database } from '@/src/types/supabase';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
@@ -24,7 +25,7 @@ export default async function FeedPage({
   });
   return (
     <Feed
-      items={data}
+      items={data as Bookmark[]}
       count={count || 0}
       limit={limit}
       offset={offset}
