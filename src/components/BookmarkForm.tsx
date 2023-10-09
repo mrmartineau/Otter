@@ -12,10 +12,8 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { MagicWand } from '@phosphor-icons/react/dist/ssr';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import axios from 'axios';
 import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
-import urlJoin from 'proper-url-join';
 import {
   ChangeEvent,
   ComponentPropsWithoutRef,
@@ -188,12 +186,8 @@ export const BookmarkForm = ({
           description: data.description as string,
         });
       } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
-          console.error(error.response);
-        } else {
-          const errorMessage = getErrorMessage(error);
-          console.error(errorMessage);
-        }
+        const errorMessage = getErrorMessage(error);
+        console.error(errorMessage);
       } finally {
         setIsScraping(false);
       }
