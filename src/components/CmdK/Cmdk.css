@@ -1,6 +1,5 @@
 [cmdk-overlay] {
-  --overlay-bg: hsla(0, 0%, 0%, 0.22);
-  background-color: var(--overlay-bg);
+  background-color: var(--overlay);
   position: fixed;
   height: 100dvh;
   width: 100vw;

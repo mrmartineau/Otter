@@ -71,6 +71,7 @@
     --text: var(--theme10);
     --background: var(--theme1);
     --focus: var(--theme9);
+    --overlay: var(--overlayAlpha);
 
     /* Other */
     --flow-space: var(--space-m);

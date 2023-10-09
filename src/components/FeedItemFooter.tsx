@@ -1,4 +1,3 @@
-// import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
@@ -11,12 +10,12 @@ import { usePathname } from 'next/navigation';
 import urlJoin from 'proper-url-join';
 import title from 'title';
 
-// import { useClickBookmark } from '../../hooks';
+import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
 import { getRelativeDate } from '../utils/dates';
 import { simpleUrl } from '../utils/simpleUrl';
 import { Favicon } from './Favicon';
-// import { FeedItemActions } from './FeedItemActions';
+import { FeedItemActions } from './FeedItemActions';
 import { Flex } from './Flex';
 import { Link } from './Link';
 // import { Paragraph } from './Paragraph';
@@ -43,7 +42,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
     isInFeed,
     feed,
   } = props;
-  // const handleClickRegister = useClickBookmark(id);
+  const handleClickRegister = useClickBookmark();
   const pathname = usePathname();
   const createdDate = getRelativeDate(created_at);
   const modifiedDate = getRelativeDate(modified_at);
@@ -78,14 +77,19 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                 <Favicon url={url} />
                 <Link
                   rel="external"
-                  href={url} /* onClick={handleClickRegister} */
+                  href={url}
+                  onClick={() => handleClickRegister(id)}
                 >
                   {simpleUrl(url)}
                 </Link>
               </>
             ) : null}
 
-            {star ? <Star size={16} /> : <Star size={16} weight="duotone" />}
+            {star ? (
+              <Star size={16} weight="fill" />
+            ) : (
+              <Star size={16} weight="duotone" />
+            )}
 
             {type !== null ? (
               <Tooltip>
@@ -149,16 +153,12 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               </Popover>
             ) : null} */}
           </Flex>
-          <div className="flex gap-s">
-            {!isActive ? <Link href={`/bookmark/${id}`}>Deep link</Link> : null}
-            <Link href={`/bookmark/${id}/edit`}>Edit</Link>
-          </div>
-          {/* <FeedItemActions
+
+          <FeedItemActions
             {...props}
-            // handleClickRegister={handleClickRegister}
             key={`actions-${id}`}
             isInFeed={isInFeed}
-          /> */}
+          />
         </Flex>
       </div>
     </TooltipProvider>

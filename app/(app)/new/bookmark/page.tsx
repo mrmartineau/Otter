@@ -9,13 +9,9 @@ export default async function NewPage({
 }: {
   searchParams: { url: string };
 }) {
-  const supabaseClient = createServerComponentClient<Database>({ cookies });
-  const data = await getDbMetadata(supabaseClient);
-
   return (
     <BookmarkForm
       type="new"
-      tags={data.tags}
       initialValues={{
         url: searchParams.url,
       }}

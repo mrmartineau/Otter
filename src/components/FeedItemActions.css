@@ -1,0 +1,8 @@
+.feedItemActions {
+  transition: all 0.2s ease-in-out;
+
+  @media (--coarse) {
+    margin-left: -7px;
+    margin-bottom: -8px;
+  }
+}

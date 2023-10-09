@@ -29,7 +29,7 @@ import { CONTENT, DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER } from '../constants';
 import { useToggle } from '../hooks/useToggle';
 import { MetadataResponse } from '../types/api';
 import { type Bookmark, type BookmarkFormValues } from '../types/db';
-import { MetaTag } from '../utils/fetching/meta';
+import { MetaTag, getDbMetadata } from '../utils/fetching/meta';
 import { getScrapeData } from '../utils/fetching/scrape';
 import { getErrorMessage } from '../utils/get-error-message';
 import { MatchTagsProps, matchTags } from '../utils/matchTags';
@@ -62,7 +62,6 @@ interface BookmarkFormProps extends ComponentPropsWithoutRef<'div'> {
   initialValues?: Partial<BookmarkFormValues>;
   onSubmit?: DispatchWithoutAction;
   id?: string;
-  tags: MetaTag[];
 }
 
 export const BookmarkForm = ({
@@ -70,7 +69,6 @@ export const BookmarkForm = ({
   type,
   initialValues,
   onSubmit,
-  tags,
   id,
   ...rest
 }: BookmarkFormProps) => {
@@ -81,8 +79,9 @@ export const BookmarkForm = ({
     'bookmark-form flex flex-col gap-s',
   );
   const supabaseClient = createClientComponentClient();
-  const [formError, setFormError] = useState<string>('');
   const [formSubmitting, , setFormSubmitting] = useToggle(false);
+  const [bookmarkTags, setBookmarkTags] = useState<MetaTag[]>([]);
+  const [formError, setFormError] = useState<string>('');
   const [possibleMatchingItems, setPossibleMatchingItems] = useState<
     Bookmark[] | null
   >(null);
@@ -91,6 +90,15 @@ export const BookmarkForm = ({
   );
   const [isScraping, , setIsScraping] = useToggle(false);
   const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>();
+
+  useEffect(() => {
+    const getMetaData = async () => {
+      const { tags } = await getDbMetadata(supabaseClient);
+      setBookmarkTags(tags);
+    };
+
+    getMetaData();
+  }, []);
 
   const {
     getValues,
@@ -146,17 +154,17 @@ export const BookmarkForm = ({
   };
 
   const transformedTagsForCombobox = useMemo(() => {
-    return tags.map((item) => ({
+    return bookmarkTags?.map((item) => ({
       label: item.tag,
       value: item.tag,
     }));
-  }, [tags]);
+  }, [bookmarkTags]);
 
   const handleMatchTags = useCallback(
     (data: MatchTagsProps) => {
-      setPossibleMatchingTags(matchTags(data, tags));
+      setPossibleMatchingTags(matchTags(data, bookmarkTags));
     },
-    [tags],
+    [bookmarkTags],
   );
 
   const handleScrape = useCallback(

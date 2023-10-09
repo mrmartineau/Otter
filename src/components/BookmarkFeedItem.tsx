@@ -2,7 +2,7 @@
 
 import { Note, TwitterLogo } from '@phosphor-icons/react';
 
-// import { useClickBookmark } from '../../hooks';
+import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
 import './Feed.styles.css';
 import { FeedItemFooter } from './FeedItemFooter';
@@ -17,7 +17,7 @@ export interface BookmarkFeedItemProps extends Bookmark {
 
 export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
   const { title, url, description, note, id, tweet } = props;
-  // const handleClickRegister = useClickBookmark(id);
+  const handleClickRegister = useClickBookmark();
 
   return (
     <div className="feed-wrapper">
@@ -26,7 +26,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
           <Link
             href={url}
             variant="feedTitle"
-            // onClick={handleClickRegister} // TODO: add this back
+            onClick={() => handleClickRegister(id)}
           >
             {title}
           </Link>
