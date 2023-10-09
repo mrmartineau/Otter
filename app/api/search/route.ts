@@ -1,5 +1,6 @@
 import { API_HEADERS } from '@/src/constants';
 import { apiResponseGenerator } from '@/src/utils/fetching/apiResponse';
+import { errorResponse } from '@/src/utils/fetching/errorResponse';
 import {
   getSearchBookmarks,
   getSearchTweets,
@@ -11,10 +12,15 @@ import { createClient } from '@supabase/supabase-js';
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
+/**
+ * /api/search/url=https://example.com
+ * This endpoint searches bookmarks and tweets
+ * It uses the Supabase service key environment variable to authenticate via an Authorization header (Bearer token)
+ */
 export async function GET(request: Request) {
   try {
     const { searchTerm, ...searchParams } = searchParamsToObject(request.url);
-    const authHeader = request.headers.get('authorization');
+    const authHeader = request.headers.get('Authorization');
     const bearerToken = authHeader?.split(' ')[1];
     const supabaseClient = createClient(
       // @ts-ignore
@@ -49,16 +55,10 @@ export async function GET(request: Request) {
     );
   } catch (error) {
     const errorMessage = getErrorMessage(error);
-    return new Response(
-      JSON.stringify({
-        reason: 'Problem searching bookmarks',
-        error: errorMessage,
-        data: null,
-      }),
-      {
-        status: 400,
-        headers: API_HEADERS,
-      },
-    );
+    return errorResponse({
+      reason: 'Problem searching bookmarks',
+      error: errorMessage,
+      status: 400,
+    });
   }
 }

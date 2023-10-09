@@ -1,5 +1,6 @@
 import { API_HEADERS } from '@/src/constants';
 import { Bookmark } from '@/src/types/db';
+import { errorResponse } from '@/src/utils/fetching/errorResponse';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { getScrapeData } from '@/src/utils/fetching/scrape';
 import { getErrorMessage } from '@/src/utils/get-error-message';
@@ -10,11 +11,16 @@ import pMap from 'p-map';
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
+/**
+ * POST /api/new
+ * This endpoint adds new bookmarks
+ * It uses the Supabase service key environment variable to authenticate via an Authorization header (Bearer token)
+ */
 export async function POST(request: Request) {
   const requestBody = await request.json();
 
   try {
-    const authHeader = request.headers.get('authorization');
+    const authHeader = request.headers.get('Authorization');
     const bearerToken = authHeader?.split(' ')[1];
     const supabaseClient = createClient(
       // @ts-ignore
@@ -77,26 +83,24 @@ export async function POST(request: Request) {
   }
 }
 
+/**
+ * GET /api/new?url=https://example.com
+ * This endpoint adds new bookmarks
+ * It uses the Supabase service key environment variable to authenticate via an Authorization header (Bearer token)
+ */
 export async function GET(request: Request) {
   const searchParams = new URL(request.url).searchParams;
   const url = searchParams.get('url');
 
   if (!url) {
-    return new Response(
-      JSON.stringify({
-        reason: 'Please provide a url parameter',
-        error: null,
-        data: null,
-      }),
-      {
-        status: 400,
-        headers: API_HEADERS,
-      },
-    );
+    return errorResponse({
+      reason: 'Please provide a url parameter',
+      status: 400,
+    });
   }
 
   try {
-    const authHeader = request.headers.get('authorization');
+    const authHeader = request.headers.get('Authorization');
     const bearerToken = authHeader?.split(' ')[1];
     const supabaseClient = createClient(
       // @ts-ignore
@@ -131,16 +135,10 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     const errorMessage = getErrorMessage(error);
-    return new Response(
-      JSON.stringify({
-        reason: 'Problem adding new bookmark',
-        error: errorMessage,
-        data: null,
-      }),
-      {
-        status: 400,
-        headers: API_HEADERS,
-      },
-    );
+    return errorResponse({
+      reason: 'Problem adding new bookmark',
+      error: errorMessage,
+      status: 400,
+    });
   }
 }

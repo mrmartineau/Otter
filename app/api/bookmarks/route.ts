@@ -1,4 +1,4 @@
-import { API_HEADERS } from '@/src/constants';
+import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/src/constants';
 import { apiResponseGenerator } from '@/src/utils/fetching/apiResponse';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
 import { getErrorMessage } from '@/src/utils/get-error-message';
@@ -8,10 +8,15 @@ import { createClient } from '@supabase/supabase-js';
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
+/**
+ * POST /api/bookmarks
+ * This endpoint gets bookmarks
+ * It uses the Supabase service key environment variable to authenticate via an Authorization header (Bearer token)
+ */
 export async function GET(request: Request) {
   try {
     const searchParams = searchParamsToObject(request.url);
-    const authHeader = request.headers.get('authorization');
+    const authHeader = request.headers.get('Authorization');
     const bearerToken = authHeader?.split(' ')[1];
     const supabaseClient = createClient(
       // @ts-ignore
@@ -32,8 +37,8 @@ export async function GET(request: Request) {
       JSON.stringify(
         apiResponseGenerator({
           data: data || [],
-          limit: Number(searchParams.limit),
-          offset: Number(searchParams.offset),
+          limit: Number(searchParams.limit) || DEFAULT_API_RESPONSE_LIMIT,
+          offset: Number(searchParams.offset) || 0,
           count: count ?? 0,
           path: request.url as string,
         }),
