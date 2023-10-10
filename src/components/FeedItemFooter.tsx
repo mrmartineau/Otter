@@ -104,7 +104,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               </Tooltip>
             ) : null}
 
-            {click_count > MINIMUM_CLICK_COUNT ? (
+            {click_count >= MINIMUM_CLICK_COUNT ? (
               <Tooltip>
                 <TooltipTrigger>
                   <Flex align="center" gap="3xs">

@@ -56,6 +56,15 @@ export const FeedItemActions = ({
         .match({ id });
     }
   };
+  const handleUnArchiveBookmark = async () => {
+    await supabaseClient
+      .from('bookmarks')
+      .update({
+        status: 'active',
+        modified_at: new Date(),
+      })
+      .match({ id });
+  };
   const handleDeleteBookmark = async () => {
     if (window.confirm('Do you really want to delete this bookmark forever?')) {
       await supabaseClient.from('bookmarks').delete().match({ id });
@@ -189,15 +198,26 @@ export const FeedItemActions = ({
             </DropdownMenu.Item>
           ) : null}
           {allowDeletion ? (
-            <DropdownMenu.Item
-              className="DropdownMenuItem"
-              onClick={handleDeleteBookmark}
-            >
-              Permanently delete
-              <div className="DropdownMenuItem-rightSlot">
-                <Trash weight="duotone" />
-              </div>
-            </DropdownMenu.Item>
+            <>
+              <DropdownMenu.Item
+                className="DropdownMenuItem"
+                onClick={handleDeleteBookmark}
+              >
+                Permanently delete
+                <div className="DropdownMenuItem-rightSlot">
+                  <Trash weight="duotone" />
+                </div>
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                className="DropdownMenuItem"
+                onClick={handleUnArchiveBookmark}
+              >
+                Un-Archive
+                <div className="DropdownMenuItem-rightSlot">
+                  <Archive weight="duotone" />
+                </div>
+              </DropdownMenu.Item>
+            </>
           ) : (
             <DropdownMenu.Item
               className="DropdownMenuItem"

@@ -32,9 +32,9 @@ export default async function AppLayout({ children }: LayoutProps) {
   return (
     <UserProvider profile={userProfile?.data as UserProfile} id={user?.id}>
       <div className="otter-app-container">
-        <TopBar dbMeta={dbMeta} />
+        <TopBar serverDbMeta={dbMeta} />
         <div className="otter-primary-pane">
-          <Sidebar dbMeta={dbMeta} />
+          <Sidebar serverDbMeta={dbMeta} />
           <div className="otter-sidebar-pane-overlay" />
           <div className="otter-content-pane">
             <div className="otter-content-pane-inner">

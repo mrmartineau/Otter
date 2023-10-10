@@ -6,6 +6,7 @@ import { FeedItemModel, useGroupByDate } from '@/src/hooks/useGroupByDate';
 import { usePagination } from '@/src/hooks/usePagination';
 import { ReactNode, memo } from 'react';
 
+import { useRealtimeFeed } from '../hooks/useRealtime';
 import { Bookmark, Toot, Tweet } from '../types/db';
 import { BookmarkFeedItem } from './BookmarkFeedItem';
 import { Flex } from './Flex';
@@ -46,8 +47,11 @@ export const Feed = memo(
     offset = 0,
     allowGroupByDate = false,
   }: FeedProps) => {
-    const { groupByDate, groupedItems } = useGroupByDate(items);
-
+    const realtimeItems = useRealtimeFeed({
+      initialData: items,
+      isTrash: allowDeletion,
+    });
+    const { groupByDate, groupedItems } = useGroupByDate(realtimeItems);
     const { handleUpdateOffset, hasOldItems, hasNewItems } = usePagination({
       offset,
       limit,
@@ -101,8 +105,8 @@ export const Feed = memo(
           </div>
         ) : (
           <div className="gap-sm bp1:gap-md grid">
-            {items?.length ? (
-              items.map((item) => {
+            {realtimeItems?.length ? (
+              realtimeItems.map((item) => {
                 if (isTweet(item)) {
                   return <TweetFeedItem {...item} key={item.id} />;
                 }
@@ -123,6 +127,7 @@ export const Feed = memo(
           </div>
         )}
 
+        {/* Next/previos navigation */}
         {hasOldItems || hasNewItems ? (
           <Flex align="center" justify="center" gap="m" className="mt-m">
             {hasNewItems ? (

@@ -33,6 +33,7 @@ export default async function TrashPage({
       title={CONTENT.trashTitle}
       icon={<Trash weight="duotone" size={24} />}
       feedType="bookmarks"
+      allowDeletion
     />
   );
 }
