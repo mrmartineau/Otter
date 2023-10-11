@@ -34,7 +34,7 @@ export default async function MyTweetsage({
       limit={limit}
       offset={offset}
       allowGroupByDate={true}
-      title={CONTENT.tweetsMineTitle}
+      title={CONTENT.tweetsTitle}
       icon={<TwitterLogo aria-label="My tweets" size={24} weight="duotone" />}
       feedType="tweets"
       subNav={[

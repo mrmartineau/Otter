@@ -34,12 +34,20 @@ export default async function LikedTweetsPage({
       limit={limit}
       offset={offset}
       allowGroupByDate={true}
-      title={CONTENT.tweetsLikeTitle}
+      title={CONTENT.tweetsTitle}
       icon={<TwitterLogo aria-label="My tweets" size={24} weight="duotone" />}
       feedType="tweets"
       subNav={[
-        { text: 'My tweets', href: ROUTE_TWEETS_MINE, isActive: false },
-        { text: 'My liked tweets', href: ROUTE_TWEETS_LIKES, isActive: true },
+        {
+          text: CONTENT.tweetsMineTitle,
+          href: ROUTE_TWEETS_MINE,
+          isActive: false,
+        },
+        {
+          text: CONTENT.tweetsLikeTitle,
+          href: ROUTE_TWEETS_LIKES,
+          isActive: true,
+        },
       ]}
     />
   );

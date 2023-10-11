@@ -8,7 +8,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
 export const metadata = {
-  title: 'Toots',
+  title: CONTENT.tootsMineTitle,
 };
 
 export default async function MyTootsPage({
@@ -30,12 +30,20 @@ export default async function MyTootsPage({
       limit={limit}
       offset={offset}
       allowGroupByDate={true}
-      title={CONTENT.tootsMineTitle}
+      title={CONTENT.tootsTitle}
       icon={<MastodonLogo size={24} />}
       feedType="toots"
       subNav={[
-        { text: 'My toots', href: ROUTE_TOOTS_MINE, isActive: true },
-        { text: 'My liked toots', href: ROUTE_TOOTS_LIKES, isActive: false },
+        {
+          text: CONTENT.tootsMineTitle,
+          href: ROUTE_TOOTS_MINE,
+          isActive: true,
+        },
+        {
+          text: CONTENT.tootsLikeTitle,
+          href: ROUTE_TOOTS_LIKES,
+          isActive: false,
+        },
       ]}
     />
   );
