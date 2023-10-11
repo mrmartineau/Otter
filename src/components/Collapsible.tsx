@@ -1,5 +1,9 @@
 import { Button } from '@/components/ui/button';
-import { CaretUpDown } from '@phosphor-icons/react';
+import {
+  ArrowSquareRight,
+  CaretRight,
+  CaretUpDown,
+} from '@phosphor-icons/react';
 import {
   CollapsibleContentProps,
   CollapsibleProps,
@@ -10,8 +14,8 @@ import {
 } from '@radix-ui/react-collapsible';
 import { forwardRef, useCallback } from 'react';
 
-import { useUpdateUISettings } from '../hooks/useUpdateUISettings';
 import { Flex } from './Flex';
+import { useUser } from './UserProvider';
 
 interface CollapsibleProps1 extends CollapsibleProps {
   stateKey: 'tags' | 'types';
@@ -19,18 +23,19 @@ interface CollapsibleProps1 extends CollapsibleProps {
 
 export const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps1>(
   ({ children, stateKey, ...props }, ref) => {
-    const [settings, handleUpdateUISettings] = useUpdateUISettings();
-    const handleOpenChange = useCallback(() => {
-      if (stateKey) {
-        handleUpdateUISettings({ type: stateKey });
-      }
+    const { profile, handleUpdateUISettings } = useUser();
+    const handleOpenChange = useCallback((open: boolean) => {
+      handleUpdateUISettings({
+        type: `settings_${stateKey}_visible`,
+        payload: open,
+      });
     }, []);
 
     return (
       <CollapsibleRoot
         ref={ref}
         onOpenChange={handleOpenChange}
-        open={settings.uiState[stateKey]}
+        open={profile ? profile[`settings_${stateKey}_visible`] : false}
         {...props}
       >
         {children}
@@ -43,7 +48,6 @@ export const CollapsibleContent = (props: CollapsibleContentProps) => (
   <Content {...props} className="overflow-hidden pt-3xs" />
 );
 
-// export { CollapsibleTrigger };
 export const CollapsibleTrigger = ({
   children,
   ...rest
@@ -55,7 +59,7 @@ export const CollapsibleTrigger = ({
         size="s"
         className="h-7 w-full justify-start gap-s align-middle"
       >
-        <CaretUpDown weight="duotone" size={18} />
+        <CaretRight weight="duotone" size={12} />
         <Flex justify="between" align="center" className="grow text-step--2">
           {children}
         </Flex>

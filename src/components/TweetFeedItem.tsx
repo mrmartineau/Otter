@@ -1,6 +1,7 @@
 'use client';
 
 import { LinkSimpleHorizontal, PlusCircle } from '@phosphor-icons/react';
+import clsx from 'clsx';
 import urlJoin from 'proper-url-join';
 
 import { ROUTE_NEW_BOOKMARK } from '../constants';
@@ -67,7 +68,7 @@ export const TweetFeedItem = (props: Tweet) => {
 
       {tweetUrls?.length ? (
         <div>
-          <h3 className={headingVariants({ variant: 'date' }) + ' mt-0'}>
+          <h3 className={clsx(headingVariants({ variant: 'date' }), '!mt-0')}>
             URLs
           </h3>
           <ul className="flex flex-col gap-2xs">
@@ -100,7 +101,9 @@ export const TweetFeedItem = (props: Tweet) => {
 
       {tweetMedia?.length ? (
         <div>
-          <h3 className={headingVariants({ variant: 'date' })}>Media</h3>
+          <h3 className={clsx(headingVariants({ variant: 'date' }), '!mt-0')}>
+            Media
+          </h3>
           <div className="toot-media-grid">
             {tweetMedia.map((item) => {
               const isVideoType =

@@ -1,6 +1,7 @@
 'use client';
 
 import { LinkSimpleHorizontal, PlusCircle } from '@phosphor-icons/react';
+import clsx from 'clsx';
 import urlJoin from 'proper-url-join';
 
 import { ROUTE_NEW_BOOKMARK } from '../constants';
@@ -52,7 +53,9 @@ export const TootFeedItem = (props: Toot) => {
 
       {tootUrls?.length ? (
         <div>
-          <h3 className={headingVariants({ variant: 'date' })}>URLs</h3>
+          <h3 className={clsx(headingVariants({ variant: 'date' }), '!mt-0')}>
+            URLs
+          </h3>
           <ul className="flex flex-col gap-2xs">
             {tootUrls.map((item) => {
               return (
@@ -82,24 +85,29 @@ export const TootFeedItem = (props: Toot) => {
       ) : null}
 
       {tootMedia?.length ? (
-        <div className="toot-media-grid">
-          {tootMedia.map((item) => {
-            const isVideoType = item.type === 'gifv' || item.type === 'video';
-            const isPhotoType = item.type === 'image';
-            return (
-              <div key={item.id}>
-                {isVideoType ? (
-                  <video src={item.url} controls className="max-w-full" />
-                ) : isPhotoType ? (
-                  <img
-                    src={item.url}
-                    alt={item?.description}
-                    className="max-w-full rounded-m"
-                  />
-                ) : null}
-              </div>
-            );
-          })}
+        <div>
+          <h3 className={clsx(headingVariants({ variant: 'date' }), '!mt-0')}>
+            Media
+          </h3>
+          <div className="toot-media-grid">
+            {tootMedia.map((item) => {
+              const isVideoType = item.type === 'gifv' || item.type === 'video';
+              const isPhotoType = item.type === 'image';
+              return (
+                <div key={item.id}>
+                  {isVideoType ? (
+                    <video src={item.url} controls className="max-w-full" />
+                  ) : isPhotoType ? (
+                    <img
+                      src={item.url}
+                      alt={item?.description}
+                      className="max-w-full rounded-m"
+                    />
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
         </div>
       ) : null}
     </div>

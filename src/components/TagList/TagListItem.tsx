@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
-import { useUpdateUISettings } from '@/src/hooks/useUpdateUISettings';
 import { MetaTag } from '@/src/utils/fetching/meta';
 import { CheckCircle, Hash, XCircle } from '@phosphor-icons/react';
 
 import { SidebarLink } from '../SidebarLink';
+import { useUser } from '../UserProvider';
 import './TagList.styles.css';
 
 interface PinUnpinTagProps {
@@ -12,7 +12,7 @@ interface PinUnpinTagProps {
 }
 
 const PinUnpinTag = ({ tag, pinned }: PinUnpinTagProps) => {
-  const [, handleUpdateUISettings] = useUpdateUISettings();
+  const { handleUpdateUISettings } = useUser();
 
   const handleTogglePinnedTag = () => {
     if (pinned) {

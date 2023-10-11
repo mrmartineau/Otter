@@ -15,13 +15,13 @@ import './TopBar.css';
 
 interface TopBarProps extends ComponentPropsWithoutRef<'header'> {
   children?: ReactNode;
-  dbMeta: DbMetaResponse;
+  serverDbMeta: DbMetaResponse;
 }
 
 export const TopBar = ({
   className,
   children,
-  dbMeta,
+  serverDbMeta,
   ...rest
 }: TopBarProps) => {
   const topbarClass = clsx(className, 'otter-top-bar');
@@ -45,7 +45,7 @@ export const TopBar = ({
           <span>Otter</span>
         </Link>
       </Flex>
-      <CmdK dbMeta={dbMeta} />
+      <CmdK serverDbMeta={serverDbMeta} />
     </header>
   );
 };

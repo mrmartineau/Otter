@@ -11,7 +11,6 @@ import { Bookmark, Toot, Tweet } from '../types/db';
 import { BookmarkFeedItem } from './BookmarkFeedItem';
 import { Flex } from './Flex';
 import { headingVariants } from './Heading';
-import { Link } from './Link';
 import { SidebarLink } from './SidebarLink';
 import { TootFeedItem } from './TootFeedItem';
 import { TweetFeedItem } from './TweetFeedItem';
@@ -73,7 +72,7 @@ export const Feed = memo(
             <Flex gapX="xs">
               {subNav.map(({ href, text, isActive }) => {
                 return (
-                  <SidebarLink href={href} isActive={isActive}>
+                  <SidebarLink href={href} isActive={isActive} key={href}>
                     {text}
                   </SidebarLink>
                 );

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-// import { useUpdateUISettings } from '../../hooks';
+import { useUser } from '../components/UserProvider';
 import { Bookmark, Toot, Tweet } from '../types/db';
 
 export type FeedItemModel = Tweet | Bookmark | Toot;
@@ -32,15 +32,10 @@ export const groupItemsByDate = (items: FeedItemModel[]) => {
 };
 
 export const useGroupByDate = (items: FeedItemModel[]) => {
-  // const [settings, handleUpdateUISettings] = useUpdateUISettings();
-  const handleSetGroupByDate = (newState: boolean) => {
-    console.log(`🚀 ~ handleSetGroupByDate ~ handleSetGroupByDate:`, newState);
-    // if (settings.uiState.groupByDate !== newState) {
-    //   handleUpdateUISettings({ type: 'groupByDate' });
-    // }
-  };
-  const groupByDate = true; //settings.uiState.groupByDate;
+  const { profile } = useUser();
+
+  const groupByDate = profile?.settings_group_by_date;
   const groupedItems = useMemo(() => groupItemsByDate(items), [items]);
 
-  return { handleSetGroupByDate, groupByDate, groupedItems };
+  return { groupByDate, groupedItems };
 };

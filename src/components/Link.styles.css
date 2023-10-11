@@ -41,12 +41,12 @@
   line-height: var(--line-height-tight);
 
   &:hover {
-    background-color: var(--theme6);
+    background-color: var(--theme5);
     text-decoration: none;
   }
 
   &.is-active {
-    background-color: var(--theme7);
+    background-color: var(--theme6);
     --color: var(--theme11);
 
     &:hover {

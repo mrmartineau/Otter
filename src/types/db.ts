@@ -42,18 +42,4 @@ export interface BookmarkFormValues
   id?: string;
 }
 
-export type UserProfile = Omit<
-  Database['public']['Tables']['profiles']['Row'],
-  'settings'
-> & {
-  settings: {
-    uiState: {
-      tags: boolean;
-      types: boolean;
-      groupByDate: boolean;
-      pinnedTags: string[];
-      topTags: boolean;
-      topTagsLimit: number;
-    };
-  };
-};
+export type UserProfile = Database['public']['Tables']['profiles']['Row'];

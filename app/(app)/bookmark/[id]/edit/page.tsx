@@ -19,7 +19,6 @@ export default async function NewPage({
   return (
     <BookmarkForm
       type="edit"
-      tags={data.tags}
       initialValues={{
         title: bookmarkItem?.data?.title,
         url: bookmarkItem?.data?.url,

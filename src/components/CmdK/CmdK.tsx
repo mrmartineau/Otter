@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { useToggle } from '@/src/hooks/useToggle';
-import { useUpdateUISettings } from '@/src/hooks/useUpdateUISettings';
 import { Bookmark, Tweet } from '@/src/types/db';
 import { DbMetaResponse } from '@/src/utils/fetching/meta';
 import { simpleUrl } from '@/src/utils/simpleUrl';
@@ -42,6 +41,7 @@ import { ApiResponse } from '../../types/api';
 import { Favicon } from '../Favicon';
 import { Flex } from '../Flex';
 import { TypeToIcon } from '../TypeToIcon';
+import { useUser } from '../UserProvider';
 import './Cmdk.css';
 import { AccessoryModel, Item } from './Item';
 import { fetchSearch } from './fetchSearch';
@@ -67,21 +67,29 @@ const sharedAccessories: AccessoryModel[] = [
 ];
 
 interface CmdKProps {
-  dbMeta: DbMetaResponse;
+  serverDbMeta: DbMetaResponse;
 }
-export const CmdK = ({ dbMeta }: CmdKProps) => {
-  const [settings, handleUpdateUISettings] = useUpdateUISettings();
+export const CmdK = ({ serverDbMeta }: CmdKProps) => {
+  const { profile, handleUpdateUISettings } = useUser();
   const [open, toggleOpen, setOpen] = useToggle(false);
   const [bookmarkItems, setBookmarkItems] = useState<Bookmark[]>([]);
   const [tweetItems, setTweetItems] = useState<Tweet[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const dbMeta = serverDbMeta;
+  // useRealtimeDictionary<DbMetaResponse>({
+  //   table: 'bookmarks',
+  //   initialData: serverDbMeta,
+  // });
 
   const handleSetGroupByDate = (newState: boolean) => {
-    if (settings.uiState.groupByDate !== newState) {
-      handleUpdateUISettings({ type: 'groupByDate' });
+    if (profile?.settings_group_by_date !== newState) {
+      handleUpdateUISettings({
+        type: 'settings_group_by_date',
+        payload: newState,
+      });
     }
   };
-  const groupByDate = settings.uiState.groupByDate;
+  const groupByDate = profile?.settings_group_by_date;
 
   const throttledMutate = throttle(async (value: string) => {
     await fetchSearch(value).then((data) => {
@@ -242,9 +250,9 @@ export const CmdK = ({ dbMeta }: CmdKProps) => {
                   );
                 })}
               </Command.Group>
-            ) : settings.uiState.pinnedTags?.length ? (
+            ) : profile?.settings_pinned_tags?.length ? (
               <Command.Group className="cmdk-group" heading="Pinned tags">
-                {settings.uiState.pinnedTags.map((item) => {
+                {profile.settings_pinned_tags.map((item) => {
                   return (
                     <Item
                       key={`tag-pinned-${item}`}

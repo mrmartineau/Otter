@@ -1,8 +1,11 @@
 {
   "private": true,
   "scripts": {
+    "predev": "npm run supabase:types",
     "dev": "next dev -p 5678",
+    "prebuild": "npm run supabase:types",
     "build": "next build",
+    "prestart": "npm run supabase:types",
     "start": "next start",
     "lint": "next lint",
     "format": "npx prettier --write . -l",
@@ -10,7 +13,8 @@
     "supabase": "supabase",
     "supabase:types": "npm run supabase:types:app",
     "supabase:types:app": "npx supabase gen types typescript --project-id \"ffpbylcvwtyozyrplqic\" --schema public > src/types/supabase.ts",
-    "supabase:types:functions": "npx supabase gen types typescript --project-id \"ffpbylcvwtyozyrplqic\" --schema public > supabase/functions/_shared/types/supabase.ts"
+    "supabase:types:functions": "npx supabase gen types typescript --project-id \"ffpbylcvwtyozyrplqic\" --schema public > supabase/functions/_shared/types/supabase.ts",
+    "test": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.1",
@@ -79,6 +83,7 @@
     "@types/title": "^3.4.1",
     "@types/tldjs": "^2.3.2",
     "encoding": "^0.1.13",
+    "happy-dom": "^12.9.1",
     "open-props": "^1.5.16",
     "postcss-axis": "^0.1.2",
     "postcss-custom-media": "^10.0.1",
@@ -87,6 +92,8 @@
     "postcss-nested": "^6.0.1",
     "postcss-preset-env": "^9.1.4",
     "prettier-plugin-tailwindcss": "^0.5.5",
-    "supabase": "^1.99.5"
+    "supabase": "^1.99.5",
+    "vite": "^4.4.11",
+    "vitest": "^0.34.6"
   }
 }

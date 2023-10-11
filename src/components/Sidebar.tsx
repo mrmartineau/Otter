@@ -6,10 +6,8 @@ import {
   ROUTE_SETTINGS_ACCOUNT,
   ROUTE_STARS,
   ROUTE_STATS,
-  ROUTE_TOOTS_LIKES,
   ROUTE_TOOTS_MINE,
   ROUTE_TRASH,
-  ROUTE_TWEETS_LIKES,
   ROUTE_TWEETS_MINE,
 } from '@/src/constants';
 import {
@@ -76,13 +74,13 @@ export const Sidebar = ({ serverDbMeta }: SidebarProps) => {
           {dbMeta.toots > 0 ? (
             <SidebarLink href={ROUTE_TOOTS_MINE} activePath="toots">
               <MastodonLogo size={18} />
-              {CONTENT.tootsMineNav}
+              {CONTENT.tootsNav}
             </SidebarLink>
           ) : null}
           {dbMeta.tweets > 0 ? (
             <SidebarLink href={ROUTE_TWEETS_MINE} activePath="tweets">
               <TwitterLogo size={18} weight="duotone" />
-              {CONTENT.tweetsMineNav}
+              {CONTENT.tweetsNav}
             </SidebarLink>
           ) : null}
           <TypeList types={dbMeta.types} />

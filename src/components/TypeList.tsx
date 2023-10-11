@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button';
-import { CaretUpDown } from '@phosphor-icons/react';
 import title from 'title';
 
 import { CONTENT } from '../constants';

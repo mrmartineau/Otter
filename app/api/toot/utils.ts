@@ -1,4 +1,5 @@
 import { TAG_FOR_AUTO_TOOT } from '@/src/constants';
+// @ts-ignore
 import { pascalCase } from 'change-case';
 
 /**

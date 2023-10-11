@@ -1,9 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { CONTENT } from '@/src/constants';
-import {
-  UseUpdateReturn,
-  useUpdateUISettings,
-} from '@/src/hooks/useUpdateUISettings';
 import { MetaTag } from '@/src/utils/fetching/meta';
 import { useEffect, useState } from 'react';
 
@@ -14,35 +10,32 @@ import {
 } from '../Collapsible';
 import { Flex } from '../Flex';
 import { Text } from '../Text';
+import { useUser } from '../UserProvider';
 import { TagListItem } from './TagListItem';
 
 interface AllTagsProps {
   tags?: MetaTag[];
-  // settings: UseUpdateReturn[0];
-  // handleUpdateUISettings: UseUpdateReturn[1];
 }
 
 export const AllTags = ({ tags }: AllTagsProps) => {
-  const [settings, handleUpdateUISettings] = useUpdateUISettings();
+  const { profile, handleUpdateUISettings } = useUser();
   const [theTags, setTheTags] = useState<MetaTag[] | undefined>(tags);
-  const isViewingTopTags = settings.uiState.topTags;
-  // console.log(
-  //   `🚀 ~ settings.uiState:`,
-  //   JSON.stringify(settings.uiState, null, 2),
-  // );
-  const topTagsLimit = settings.uiState.topTagsLimit;
-  const pinnedTagss = settings.uiState.pinnedTags;
+  const topTagsLimit = profile?.settings_top_tags_count;
 
   const pinnedTags = tags
     ?.filter(({ tag }) => {
-      return tag && settings.uiState.pinnedTags.indexOf(tag) !== -1;
+      return (
+        tag &&
+        profile?.settings_pinned_tags !== null &&
+        profile?.settings_pinned_tags.indexOf(tag) !== -1
+      );
     })
     .sort((one, two) => two.count! - one.count!);
 
-  const handleViewTopNTags = (viewTopTags: boolean, limit = 0) => {
+  const handleViewTopNTags = (limit: number | null) => {
     handleUpdateUISettings({
-      type: 'topTags',
-      payload: { active: viewTopTags, limit },
+      type: 'settings_top_tags_count',
+      payload: limit,
     });
   };
 
@@ -52,12 +45,12 @@ export const AllTags = ({ tags }: AllTagsProps) => {
         ?.filter((tag) => tag.count !== null && tag.count > 5)
         .slice(0, limit);
     };
-    if (isViewingTopTags) {
-      setTheTags(topTags(tags as MetaTag[], topTagsLimit));
+    if (topTagsLimit !== null) {
+      setTheTags(topTags(tags as MetaTag[], topTagsLimit as number));
     } else {
       setTheTags(tags);
     }
-  }, [isViewingTopTags, tags, topTagsLimit]);
+  }, [tags, topTagsLimit]);
 
   if (!tags?.length) {
     return null;
@@ -74,8 +67,8 @@ export const AllTags = ({ tags }: AllTagsProps) => {
             <Button
               variant="ghost"
               size="xs"
-              aria-pressed={isViewingTopTags && topTagsLimit === 5}
-              onClick={() => handleViewTopNTags(true, 5)}
+              aria-pressed={topTagsLimit === 5}
+              onClick={() => handleViewTopNTags(5)}
             >
               5
             </Button>
@@ -84,8 +77,8 @@ export const AllTags = ({ tags }: AllTagsProps) => {
             <Button
               variant="ghost"
               size="xs"
-              aria-pressed={isViewingTopTags && topTagsLimit === 10}
-              onClick={() => handleViewTopNTags(true, 10)}
+              aria-pressed={topTagsLimit === 10}
+              onClick={() => handleViewTopNTags(10)}
             >
               10
             </Button>
@@ -94,8 +87,8 @@ export const AllTags = ({ tags }: AllTagsProps) => {
             <Button
               variant="ghost"
               size="xs"
-              aria-pressed={isViewingTopTags && topTagsLimit === 20}
-              onClick={() => handleViewTopNTags(true, 20)}
+              aria-pressed={topTagsLimit === 20}
+              onClick={() => handleViewTopNTags(20)}
             >
               20
             </Button>
@@ -103,8 +96,8 @@ export const AllTags = ({ tags }: AllTagsProps) => {
           <Button
             variant="ghost"
             size="xs"
-            aria-pressed={!isViewingTopTags}
-            onClick={() => handleViewTopNTags(false)}
+            aria-pressed={topTagsLimit === null}
+            onClick={() => handleViewTopNTags(null)}
           >
             All
           </Button>
@@ -130,7 +123,11 @@ export const AllTags = ({ tags }: AllTagsProps) => {
         <Flex gapY="3xs" direction="column">
           {theTags?.length ? (
             theTags.map(({ tag, count }) => {
-              if (tag && settings.uiState.pinnedTags.indexOf(tag) === -1) {
+              if (
+                tag &&
+                profile?.settings_pinned_tags !== null &&
+                profile?.settings_pinned_tags.indexOf(tag) === -1
+              ) {
                 return (
                   <TagListItem
                     tag={tag}

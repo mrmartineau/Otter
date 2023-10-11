@@ -1,20 +1,22 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 
-import { Bookmark } from '../types/db';
+import { Bookmark, UserProfile } from '../types/db';
 import { Database } from '../types/supabase';
 import { FeedItemModel } from './useGroupByDate';
 
-interface RealtimeBaseProps {
-  table: 'bookmarks' | 'profile';
-}
+/**
+ * Realtime feed: bookmarks, toots & tweets
+ */
 interface RealtimeFeedProps {
   initialData: FeedItemModel[];
   isTrash?: boolean;
+  table?: 'bookmarks' | 'tweets' | 'toots';
 }
 export const useRealtimeFeed = ({
   initialData,
   isTrash,
+  table = 'bookmarks',
 }: RealtimeFeedProps) => {
   const [items, setItems] = useState<FeedItemModel[]>(initialData);
   const supabaseClient = createClientComponentClient<Database>();
@@ -25,12 +27,11 @@ export const useRealtimeFeed = ({
 
   useEffect(() => {
     const channel = supabaseClient
-      .channel('*')
+      .channel('realtime feed')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'bookmarks' },
+        { event: '*', schema: 'public', table },
         (payload) => {
-          console.log(payload);
           switch (payload.eventType) {
             case 'DELETE': {
               // Remove item from list
@@ -80,49 +81,25 @@ export const useRealtimeFeed = ({
   return items;
 };
 
-interface RealtimeCollectionProps<T> extends RealtimeBaseProps {
-  initialData: T[];
-}
-export const useRealtimeCollection = <T = unknown>({
-  initialData,
-  table,
-}: RealtimeCollectionProps<T>) => {
-  const [items, setItems] = useState<T[]>(initialData);
+/**
+ * Realtime profile
+ */
+export const useRealtimeProfile = (initialData: UserProfile | null) => {
+  const [profile, setProfile] = useState<UserProfile | null>(initialData);
   const supabaseClient = createClientComponentClient<Database>();
 
   useEffect(() => {
-    setItems(initialData);
+    setProfile(initialData);
   }, [initialData]);
 
   useEffect(() => {
     const channel = supabaseClient
-      .channel('*')
+      .channel('realtime profile')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table },
+        { event: 'UPDATE', schema: 'public', table: 'profiles' },
         (payload) => {
-          console.log(payload);
-          switch (payload.event) {
-            case 'DELETE':
-              setItems((items) =>
-                items.filter((item) => item.id !== payload.old.id),
-              );
-              break;
-            case 'INSERT':
-              setItems((items) => [...items, payload.new as T]);
-              break;
-            case 'UPDATE':
-              setItems((items) =>
-                items.map((item) =>
-                  item.id === payload.new.id ? payload.new : item,
-                ),
-              );
-              break;
-            default:
-              break;
-          }
-
-          // setItems((items) => [...items, payload.new as T]);
+          setProfile(payload.new as UserProfile);
         },
       )
       .subscribe();
@@ -130,42 +107,7 @@ export const useRealtimeCollection = <T = unknown>({
     return () => {
       supabaseClient.removeChannel(channel);
     };
-  }, [supabaseClient, setItems, items]);
+  }, [supabaseClient, setProfile, profile]);
 
-  return items;
-};
-
-interface RealtimeDictionaryProps<T> extends RealtimeBaseProps {
-  initialData: T;
-}
-export const useRealtimeDictionary = <T = unknown>({
-  initialData,
-  table,
-}: RealtimeDictionaryProps<T>) => {
-  const [items, setItems] = useState<T>(initialData);
-  const supabase = createClientComponentClient<Database>();
-
-  useEffect(() => {
-    setItems(initialData);
-  }, [initialData]);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel('*')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table },
-        (payload) => {
-          console.log(payload);
-          setItems((items) => ({ ...items, ...(payload.new as T) }));
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase, setItems, items]);
-
-  return items;
+  return profile;
 };
