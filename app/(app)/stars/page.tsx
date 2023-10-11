@@ -25,7 +25,7 @@ export default async function StarsPage({
       count={count || 0}
       limit={limit}
       offset={offset}
-      allowGroupByDate={true}
+      allowGroupByDate={false}
       title={CONTENT.starsTitle}
       icon={<Star weight="duotone" size={24} />}
       feedType="bookmarks"

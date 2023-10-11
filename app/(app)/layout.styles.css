@@ -20,6 +20,7 @@
   position: relative;
   z-index: var(--z-2);
   border-bottom: 1px solid var(--theme4);
+  background-color: var(--background);
 
   @media (--bp2) {
     margin-left: var(--sidebar-width);
@@ -62,7 +63,7 @@
     transform: translateX(0);
 
     + .otter-sidebar-pane-overlay {
-      opacity: 0.8;
+      opacity: 1;
       visibility: visible;
     }
   }
@@ -88,7 +89,7 @@
   opacity: 0;
   inset: 0;
   z-index: var(--z-1);
-  background-color: var(--background);
+  background-color: var(--overlay);
   transition: opacity 0.25s var(--ease-in-out-3);
 
   @media (--bp2) {
