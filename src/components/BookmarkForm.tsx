@@ -141,7 +141,6 @@ export const BookmarkForm = ({
         toast({
           title: 'Bookmark edited',
         });
-        router.push(`/bookmark/${id}`);
       }
       onSubmit?.(); // TODO: toast?
     } catch (err) {
