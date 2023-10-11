@@ -19,8 +19,8 @@ export const SidebarLink = ({
   ...rest
 }: SidebarLinkProps) => {
   const pathname = usePathname();
-  const sanitizedPath = pathname.split('#')[0].split('?')[0];
-  const isActive = pathname === href || sanitizedPath === activePath;
+  const isActive =
+    pathname === href || (activePath ? pathname.includes(activePath) : false);
 
   const { handleCloseSidebar } = useSidebar();
 

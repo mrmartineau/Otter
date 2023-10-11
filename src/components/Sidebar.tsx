@@ -24,7 +24,6 @@ import { useRef } from 'react';
 import { useClickAway } from 'use-click-away';
 
 import { useSidebar } from '../hooks/useSidebar';
-// import { useUpdateUISettings } from '../hooks/useUpdateUISettings';
 import { DbMetaResponse } from '../utils/fetching/meta';
 import { Flex } from './Flex';
 import { Link } from './Link';
@@ -36,12 +35,12 @@ import { AllTags } from './TagList';
 import { TypeList } from './TypeList';
 
 interface SidebarProps {
-  dbMeta: DbMetaResponse;
+  serverDbMeta: DbMetaResponse;
 }
 
-export const Sidebar = ({ dbMeta }: SidebarProps) => {
+export const Sidebar = ({ serverDbMeta }: SidebarProps) => {
   const { handleCloseSidebar } = useSidebar();
-  // const [settings, handleUpdateUISettings] = useUpdateUISettings();
+  const dbMeta = serverDbMeta;
 
   const sidebarRef = useRef(null);
   useClickAway(sidebarRef, (event: Event) => {
@@ -75,39 +74,19 @@ export const Sidebar = ({ dbMeta }: SidebarProps) => {
             {CONTENT.topLinksNav}
           </SidebarLink>
           {dbMeta.toots > 0 ? (
-            <SidebarLink href={ROUTE_TOOTS_LIKES} count={dbMeta.toots}>
-              <MastodonLogo size={18} />
-              {CONTENT.tootsLikeNav}
-            </SidebarLink>
-          ) : null}
-          {dbMeta.likedToots > 0 ? (
-            <SidebarLink href={ROUTE_TOOTS_MINE} count={dbMeta.likedToots}>
+            <SidebarLink href={ROUTE_TOOTS_MINE} activePath="toots">
               <MastodonLogo size={18} />
               {CONTENT.tootsMineNav}
             </SidebarLink>
           ) : null}
           {dbMeta.tweets > 0 ? (
-            <SidebarLink href={ROUTE_TWEETS_LIKES} count={dbMeta.tweets}>
-              <TwitterLogo
-                aria-label="Liked tweets"
-                size={18}
-                weight="duotone"
-              />
-              {CONTENT.tweetsLikeNav}
-            </SidebarLink>
-          ) : null}
-          {dbMeta.likedTweets > 0 ? (
-            <SidebarLink href={ROUTE_TWEETS_MINE} count={dbMeta.likedTweets}>
-              <TwitterLogo aria-label="My tweets" size={18} weight="duotone" />
+            <SidebarLink href={ROUTE_TWEETS_MINE} activePath="tweets">
+              <TwitterLogo size={18} weight="duotone" />
               {CONTENT.tweetsMineNav}
             </SidebarLink>
           ) : null}
           <TypeList types={dbMeta.types} />
-          <AllTags
-            tags={dbMeta.tags}
-            // settings={settings}
-            // handleUpdateUISettings={handleUpdateUISettings}
-          />
+          <AllTags tags={dbMeta.tags} />
         </Flex>
       </div>
 

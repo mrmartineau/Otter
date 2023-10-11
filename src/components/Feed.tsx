@@ -11,11 +11,14 @@ import { Bookmark, Toot, Tweet } from '../types/db';
 import { BookmarkFeedItem } from './BookmarkFeedItem';
 import { Flex } from './Flex';
 import { headingVariants } from './Heading';
+import { Link } from './Link';
+import { SidebarLink } from './SidebarLink';
 import { TootFeedItem } from './TootFeedItem';
 import { TweetFeedItem } from './TweetFeedItem';
 
 interface FeedProps {
-  title?: ReactNode;
+  title: ReactNode;
+  subNav?: { text: string; href: string; isActive?: boolean }[];
   icon?: ReactNode;
   items: FeedItemModel[];
   allowDeletion?: boolean;
@@ -46,6 +49,7 @@ export const Feed = memo(
     limit = DEFAULT_API_RESPONSE_LIMIT,
     offset = 0,
     allowGroupByDate = false,
+    subNav,
   }: FeedProps) => {
     const realtimeItems = useRealtimeFeed({
       initialData: items,
@@ -59,20 +63,27 @@ export const Feed = memo(
     });
 
     return (
-      <div className="pt-space-m">
-        <Flex gapX="2xs" wrap="wrap" justify="between">
-          <div>
-            {title ? (
-              <h3 className="mt-0 flex items-center gap-2xs">
-                {icon}
-                {title}
-              </h3>
-            ) : null}
-          </div>
+      <div>
+        <Flex gap="xs" direction="column" justify="between">
+          <h3 className="mt-0 flex items-center gap-2xs">
+            {icon}
+            {title}
+          </h3>
+          {subNav ? (
+            <Flex gapX="xs">
+              {subNav.map(({ href, text, isActive }) => {
+                return (
+                  <SidebarLink href={href} isActive={isActive}>
+                    {text}
+                  </SidebarLink>
+                );
+              })}
+            </Flex>
+          ) : null}
         </Flex>
 
         {allowGroupByDate && groupByDate ? (
-          <div className="gap-sm bp2:gap-md grid">
+          <div className="bp2:gap-m grid gap-s">
             {groupedItems?.length ? (
               groupedItems.map((groupedItem) => (
                 <div key={groupedItem.date}>
@@ -104,7 +115,7 @@ export const Feed = memo(
             )}
           </div>
         ) : (
-          <div className="gap-sm bp1:gap-md grid">
+          <div className="mt-m grid gap-m">
             {realtimeItems?.length ? (
               realtimeItems.map((item) => {
                 if (isTweet(item)) {

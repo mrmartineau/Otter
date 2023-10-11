@@ -29,7 +29,7 @@ export default async function StarsPage({
       count={count || 0}
       limit={limit}
       offset={offset}
-      allowGroupByDate={true}
+      allowGroupByDate={false}
       title={CONTENT.topLinksTitle}
       icon={<ArrowFatLinesUp weight="duotone" size={24} />}
       feedType="bookmarks"

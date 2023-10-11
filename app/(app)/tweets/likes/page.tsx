@@ -1,5 +1,9 @@
 import { Feed } from '@/src/components/Feed';
-import { CONTENT } from '@/src/constants';
+import {
+  CONTENT,
+  ROUTE_TWEETS_LIKES,
+  ROUTE_TWEETS_MINE,
+} from '@/src/constants';
 import { Database } from '@/src/types/supabase';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getTweets } from '@/src/utils/fetching/tweets';
@@ -30,9 +34,13 @@ export default async function LikedTweetsPage({
       limit={limit}
       offset={offset}
       allowGroupByDate={true}
-      title={CONTENT.tweetsMineTitle}
+      title={CONTENT.tweetsLikeTitle}
       icon={<TwitterLogo aria-label="My tweets" size={24} weight="duotone" />}
       feedType="tweets"
+      subNav={[
+        { text: 'My tweets', href: ROUTE_TWEETS_MINE, isActive: false },
+        { text: 'My liked tweets', href: ROUTE_TWEETS_LIKES, isActive: true },
+      ]}
     />
   );
 }

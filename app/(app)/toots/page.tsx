@@ -1,6 +1,6 @@
 import { Feed } from '@/src/components/Feed';
 import { MastodonLogo } from '@/src/components/MastodonLogo';
-import { CONTENT } from '@/src/constants';
+import { CONTENT, ROUTE_TOOTS_LIKES, ROUTE_TOOTS_MINE } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getToots } from '@/src/utils/fetching/toots';
@@ -33,6 +33,10 @@ export default async function MyTootsPage({
       title={CONTENT.tootsMineTitle}
       icon={<MastodonLogo size={24} />}
       feedType="toots"
+      subNav={[
+        { text: 'My toots', href: ROUTE_TOOTS_MINE, isActive: true },
+        { text: 'My liked toots', href: ROUTE_TOOTS_LIKES, isActive: false },
+      ]}
     />
   );
 }
