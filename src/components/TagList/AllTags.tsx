@@ -41,9 +41,7 @@ export const AllTags = ({ tags }: AllTagsProps) => {
 
   useEffect(() => {
     const topTags = (tags: MetaTag[], limit: number): MetaTag[] => {
-      return tags
-        ?.filter((tag) => tag.count !== null && tag.count > 5)
-        .slice(0, limit);
+      return tags.slice(0, limit);
     };
     if (topTagsLimit !== null) {
       setTheTags(topTags(tags as MetaTag[], topTagsLimit as number));
@@ -62,8 +60,8 @@ export const AllTags = ({ tags }: AllTagsProps) => {
         {CONTENT.tagsNav} <Text variant="count">{tags?.length}</Text>
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <Flex gapX="2xs" className="mb-3xs" justify="center">
-          {tags.length > 5 ? (
+        {tags.length > 20 ? (
+          <Flex gapX="2xs" className="mb-3xs" justify="center">
             <Button
               variant="ghost"
               size="xs"
@@ -72,8 +70,6 @@ export const AllTags = ({ tags }: AllTagsProps) => {
             >
               5
             </Button>
-          ) : null}
-          {tags.length > 10 ? (
             <Button
               variant="ghost"
               size="xs"
@@ -82,8 +78,6 @@ export const AllTags = ({ tags }: AllTagsProps) => {
             >
               10
             </Button>
-          ) : null}
-          {tags.length > 20 ? (
             <Button
               variant="ghost"
               size="xs"
@@ -92,16 +86,16 @@ export const AllTags = ({ tags }: AllTagsProps) => {
             >
               20
             </Button>
-          ) : null}
-          <Button
-            variant="ghost"
-            size="xs"
-            aria-pressed={topTagsLimit === null}
-            onClick={() => handleViewTopNTags(null)}
-          >
-            All
-          </Button>
-        </Flex>
+            <Button
+              variant="ghost"
+              size="xs"
+              aria-pressed={topTagsLimit === null}
+              onClick={() => handleViewTopNTags(null)}
+            >
+              All
+            </Button>
+          </Flex>
+        ) : null}
 
         {/* Pinned tags */}
         <Flex gapY="2xs" direction="column">
