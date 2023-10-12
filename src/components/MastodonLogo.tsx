@@ -18,7 +18,7 @@ export const MastodonLogo = ({ size, ...rest }: MastodonLogoProps) => {
         fill="currentColor"
         fillOpacity="0.2"
         stroke="currentColor"
-        strokeWidth="3"
+        strokeWidth="2.5"
       />
     </svg>
   );
