@@ -3,10 +3,24 @@ import { Container } from '@/src/components/Container';
 import { Flex } from '@/src/components/Flex';
 import { FormGroup } from '@/src/components/FormGroup';
 import { Input } from '@/src/components/Input';
+import { ROUTE_FEED_HOME } from '@/src/constants';
+import { Database } from '@/src/types/supabase';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 import Messages from './messages';
 
-export default function Login() {
+export default async function Login() {
+  const supabaseClient = createServerComponentClient<Database>({ cookies });
+  const {
+    data: { session },
+  } = await supabaseClient.auth.getSession();
+
+  if (session) {
+    redirect(ROUTE_FEED_HOME);
+  }
+
   return (
     <Container variant="auth">
       <h2 className="mt-l text-center">Sign in</h2>

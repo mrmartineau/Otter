@@ -9,6 +9,7 @@ import { Database } from '@/src/types/supabase';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
 
 import './layout.css';
@@ -23,6 +24,14 @@ export default async function AppLayout({ children }: LayoutProps) {
   const {
     data: { user },
   } = await supabaseClient.auth.getUser();
+  const {
+    data: { session },
+  } = await supabaseClient.auth.getSession();
+
+  if (!session) {
+    redirect('/');
+  }
+
   const userProfile = await supabaseClient
     .from('profiles')
     .select('*')
