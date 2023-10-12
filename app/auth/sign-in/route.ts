@@ -1,3 +1,4 @@
+import { ROUTE_FEED_HOME, ROUTE_SIGNIN } from '@/src/constants';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.redirect(
-      `${requestUrl.origin}/login?error=Could not authenticate user`,
+      `${requestUrl.origin}${ROUTE_SIGNIN}?error=Could not authenticate user`,
       {
         // a 301 status is required to redirect from a POST to a GET route
         status: 301,
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.redirect(requestUrl.origin, {
+  return NextResponse.redirect(`${requestUrl.origin}${ROUTE_FEED_HOME}`, {
     // a 301 status is required to redirect from a POST to a GET route
     status: 301,
   });

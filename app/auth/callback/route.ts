@@ -1,3 +1,4 @@
+import { ROUTE_FEED_HOME } from '@/src/constants';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -16,6 +17,11 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
+  const defaultRedirect = `${requestUrl.origin}${ROUTE_FEED_HOME}`;
+
+  const redirectTo =
+    requestUrl.searchParams.get('redirectTo') || defaultRedirect;
+
   // URL to redirect to after sign in process completes
-  return NextResponse.redirect(requestUrl.origin);
+  return NextResponse.redirect(`${requestUrl.origin}${ROUTE_FEED_HOME}`);
 }
