@@ -4,7 +4,7 @@ import { Flex } from '@/src/components/Flex';
 import { FormGroup } from '@/src/components/FormGroup';
 import { Input } from '@/src/components/Input';
 
-import Messages from '../login/messages';
+import Messages from './messages';
 
 export default function Login() {
   return (
