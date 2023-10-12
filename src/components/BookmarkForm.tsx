@@ -130,8 +130,9 @@ export const BookmarkForm = ({
           defaultToNull: true,
         });
         toast({
-          title: 'Bookmark added',
+          title: 'Item added',
         });
+        // revalidatePath('/feed');
         router.push('/feed');
       } else {
         await supabaseClient
@@ -139,10 +140,10 @@ export const BookmarkForm = ({
           .update({ ...formData, modified_at: new Date() })
           .match({ id });
         toast({
-          title: 'Bookmark edited',
+          title: 'Item edited',
         });
       }
-      onSubmit?.(); // TODO: toast?
+      onSubmit?.();
     } catch (err) {
       console.error(err);
       toast({
@@ -322,54 +323,47 @@ export const BookmarkForm = ({
         </FormGroup>
 
         {/* TAGS */}
-        {transformedTagsForCombobox?.length ? (
-          <FormGroup
-            label="Tags"
-            name="tags"
-            // error={errors.tags?.message as string}
-          >
-            <Combobox
-              inputId="tags"
-              options={transformedTagsForCombobox}
-              onChange={(option) => {
-                setValue(
-                  'tags',
-                  (option as ComboOption[]).map((item) => item.value),
-                );
-              }}
-              value={transformTagsForCombobox(watchTags)}
-              maxMenuHeight={100}
-            />
-            {possibleMatchingTags.length ? (
-              <Flex
-                className="mt-2 text-sm"
-                gapX="xs"
-                align="center"
-                wrap="wrap"
-              >
-                Suggested tags:
-                {possibleMatchingTags.map((tag, index) => (
-                  <Button
-                    key={`possibleTagMatch-${tag}`}
-                    variant="ghost"
-                    size="s"
-                    onClick={() => {
-                      const existingTags = watchTags?.length ? watchTags : [];
-                      setValue('tags', [...existingTags, tag]);
-                      possibleMatchingTags[index];
-                      setPossibleMatchingTags(
-                        possibleMatchingTags.filter((item) => item !== tag),
-                      );
-                    }}
-                    type="button"
-                  >
-                    #{tag}
-                  </Button>
-                ))}
-              </Flex>
-            ) : null}
-          </FormGroup>
-        ) : null}
+        <FormGroup
+          label="Tags"
+          name="tags"
+          // error={errors.tags?.message as string}
+        >
+          <Combobox
+            inputId="tags"
+            options={transformedTagsForCombobox}
+            onChange={(option) => {
+              setValue(
+                'tags',
+                (option as ComboOption[]).map((item) => item.value),
+              );
+            }}
+            value={transformTagsForCombobox(watchTags)}
+            maxMenuHeight={100}
+          />
+          {possibleMatchingTags.length ? (
+            <Flex className="mt-2 text-sm" gapX="xs" align="center" wrap="wrap">
+              Suggested tags:
+              {possibleMatchingTags.map((tag, index) => (
+                <Button
+                  key={`possibleTagMatch-${tag}`}
+                  variant="ghost"
+                  size="s"
+                  onClick={() => {
+                    const existingTags = watchTags?.length ? watchTags : [];
+                    setValue('tags', [...existingTags, tag]);
+                    possibleMatchingTags[index];
+                    setPossibleMatchingTags(
+                      possibleMatchingTags.filter((item) => item !== tag),
+                    );
+                  }}
+                  type="button"
+                >
+                  #{tag}
+                </Button>
+              ))}
+            </Flex>
+          ) : null}
+        </FormGroup>
 
         {/* TYPE */}
         <FormGroup
