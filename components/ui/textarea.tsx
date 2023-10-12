@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/src/utils/classnames';
 import * as React from 'react';
 import TextareaAutosize, {
   TextareaAutosizeProps,

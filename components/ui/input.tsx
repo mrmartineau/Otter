@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/src/utils/classnames';
 import * as React from 'react';
 
 export const sharedInputStyles =
@@ -13,7 +13,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          'flex h-12 file:border-0 file:bg-transparent file:text-sm file:font-medium',
+          'flex h-10 file:border-0 file:bg-transparent file:text-sm file:font-medium',
           sharedInputStyles,
           className,
         )}
