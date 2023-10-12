@@ -98,7 +98,7 @@ export const BookmarkForm = ({
     };
 
     getMetaData();
-  }, []);
+  }, [supabaseClient]);
 
   const {
     getValues,
@@ -395,7 +395,9 @@ export const BookmarkForm = ({
         {formError && <div className="my-m">Error: {formError}</div>}
 
         <Flex gap="s">
-          <Button type="submit">Save</Button>
+          <Button type="submit" disabled={formSubmitting}>
+            Save
+          </Button>
         </Flex>
       </form>
     </div>

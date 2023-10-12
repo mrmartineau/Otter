@@ -102,7 +102,9 @@ export const UpdateInfoForm = ({ user }: UpdateInfoProps) => {
         </FormGroup>
 
         <div>
-          <Button /* isLoading={formSubmitting} */ type="submit">Save</Button>
+          <Button disabled={formSubmitting} type="submit">
+            Save
+          </Button>
         </div>
       </form>
       {formError && <div className="mt-s">{formError}</div>}

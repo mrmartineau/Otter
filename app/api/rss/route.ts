@@ -29,8 +29,8 @@ export async function GET(request: Request) {
     const feed = await toJson(feedUrl);
     const feedItems = feed.items
       .slice(0, limit)
+      // eslint-disable-next-line
       // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .map(({ content_encoded, content, category, comments, ...rest }) => {
         return rest;
       });
