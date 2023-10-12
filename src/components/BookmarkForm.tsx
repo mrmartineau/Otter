@@ -294,7 +294,7 @@ export const BookmarkForm = ({
 
         {/* TITLE */}
         <FormGroup label="Title" name="title">
-          <Input id="title" placeholder="Title" {...register('title')} />
+          <Input id="title" {...register('title')} />
           {watchTitle !== scrapeResponse?.title ? (
             <FieldValueSuggestion
               id="title"
