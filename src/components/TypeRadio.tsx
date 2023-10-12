@@ -22,3 +22,5 @@ export const TypeRadio = forwardRef<HTMLInputElement, TypeRadioProps>(
     </IconControl>
   ),
 );
+
+TypeRadio.displayName = 'TypeRadio';

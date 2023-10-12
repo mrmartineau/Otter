@@ -65,7 +65,7 @@ export const UserProvider = ({ children, id, profile }: UserProviderProps) => {
         .update({ [column]: value, updated_at: new Date() })
         .match({ id });
     },
-    [id, realtimeProfile],
+    [id, realtimeProfile?.settings_pinned_tags, supabaseClient],
   );
 
   return (

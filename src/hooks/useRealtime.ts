@@ -76,7 +76,7 @@ export const useRealtimeFeed = ({
     return () => {
       supabaseClient.removeChannel(channel);
     };
-  }, [supabaseClient, setItems, items]);
+  }, [supabaseClient, setItems, items, table, isTrash]);
 
   return items;
 };

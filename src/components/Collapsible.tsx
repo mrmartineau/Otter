@@ -24,12 +24,15 @@ interface CollapsibleProps1 extends CollapsibleProps {
 export const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps1>(
   ({ children, stateKey, ...props }, ref) => {
     const { profile, handleUpdateUISettings } = useUser();
-    const handleOpenChange = useCallback((open: boolean) => {
-      handleUpdateUISettings({
-        type: `settings_${stateKey}_visible`,
-        payload: open,
-      });
-    }, []);
+    const handleOpenChange = useCallback(
+      (open: boolean) => {
+        handleUpdateUISettings({
+          type: `settings_${stateKey}_visible`,
+          payload: open,
+        });
+      },
+      [handleUpdateUISettings, stateKey],
+    );
 
     return (
       <CollapsibleRoot
@@ -43,6 +46,8 @@ export const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps1>(
     );
   },
 );
+
+Collapsible.displayName = 'Collapsible';
 
 export const CollapsibleContent = (props: CollapsibleContentProps) => (
   <Content {...props} className="overflow-hidden pt-3xs" />

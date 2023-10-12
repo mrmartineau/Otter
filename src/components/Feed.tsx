@@ -168,3 +168,5 @@ export const Feed = memo(
     );
   },
 );
+
+Feed.displayName = 'Feed';

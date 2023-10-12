@@ -9,11 +9,11 @@ import { Database } from '@/src/types/supabase';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 import './layout.css';
 
-interface LayoutProps extends ComponentPropsWithoutRef<'div'> {
+interface LayoutProps {
   children?: ReactNode;
 }
 

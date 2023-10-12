@@ -94,3 +94,5 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
     );
   },
 );
+
+Item.displayName = 'CmdK.Item';

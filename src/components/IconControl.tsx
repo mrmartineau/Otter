@@ -27,3 +27,5 @@ export const IconControl = forwardRef<HTMLInputElement, IconControlProps>(
     </label>
   ),
 );
+
+IconControl.displayName = 'IconControl';
