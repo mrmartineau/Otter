@@ -14,6 +14,8 @@ import { ReactNode } from 'react';
 
 import './layout.css';
 
+export const dynamic = 'force-dynamic';
+
 interface LayoutProps {
   children?: ReactNode;
 }
