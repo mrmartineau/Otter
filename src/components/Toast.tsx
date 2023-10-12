@@ -1,7 +1,7 @@
 import { cn } from '@/src/utils/classnames';
+import { X } from '@phosphor-icons/react';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { type VariantProps, cva } from 'class-variance-authority';
-import { X } from 'lucide-react';
 import * as React from 'react';
 
 const ToastProvider = ToastPrimitives.Provider;
@@ -80,7 +80,7 @@ const ToastClose = React.forwardRef<
     toast-close=""
     {...props}
   >
-    <X className="h-4 w-4" />
+    <X weight="duotone" className="h-4 w-4" />
   </ToastPrimitives.Close>
 ));
 ToastClose.displayName = ToastPrimitives.Close.displayName;
