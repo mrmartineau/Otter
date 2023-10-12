@@ -2,6 +2,7 @@ import urlJoin from 'proper-url-join';
 
 import { RequestOrder } from './types/api';
 
+export const ALLOW_SIGNUP = false;
 export const CONTENT = {
   appName: 'Otter',
   titleSeparator: ' — ',

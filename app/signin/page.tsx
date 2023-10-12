@@ -3,7 +3,7 @@ import { Container } from '@/src/components/Container';
 import { Flex } from '@/src/components/Flex';
 import { FormGroup } from '@/src/components/FormGroup';
 import { Input } from '@/src/components/Input';
-import { ROUTE_FEED_HOME } from '@/src/constants';
+import { ALLOW_SIGNUP, ROUTE_FEED_HOME } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
@@ -48,9 +48,11 @@ export default async function Login() {
           </FormGroup>
 
           <Flex gap="m" justify="between">
-            <Button formAction="/auth/sign-up" variant="secondary">
-              Sign Up
-            </Button>
+            {ALLOW_SIGNUP ? (
+              <Button formAction="/auth/sign-up" variant="secondary">
+                Sign Up
+              </Button>
+            ) : null}
             <Button>Sign In</Button>
           </Flex>
           <Messages />
