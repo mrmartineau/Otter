@@ -2,9 +2,9 @@ import { Feed } from '@/src/components/Feed';
 import { MastodonLogo } from '@/src/components/MastodonLogo';
 import { CONTENT, ROUTE_TOOTS_LIKES, ROUTE_TOOTS_MINE } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
+import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getToots } from '@/src/utils/fetching/toots';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
 export const metadata = {
@@ -17,7 +17,7 @@ export default async function LikedTootsPage({
   searchParams: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
 }) {
   const { limit, offset } = searchParams;
-  const supabaseClient = createServerComponentClient<Database>({ cookies });
+  const supabaseClient = createServerComponentClient();
   const { data, count } = await getToots({
     supabaseClient,
     params: searchParams,

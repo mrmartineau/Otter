@@ -10,7 +10,6 @@ import { searchParamsToObject } from '@/src/utils/searchParamsToObject';
 import { createClient } from '@supabase/supabase-js';
 
 export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
 
 /**
  * /api/search/url=https://example.com

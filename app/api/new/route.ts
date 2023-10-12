@@ -9,7 +9,6 @@ import { createClient } from '@supabase/supabase-js';
 import pMap from 'p-map';
 
 export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/new

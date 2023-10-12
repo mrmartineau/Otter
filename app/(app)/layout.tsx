@@ -6,22 +6,20 @@ import { TopBar } from '@/src/components/TopBar';
 import { UserProvider } from '@/src/components/UserProvider';
 import { UserProfile } from '@/src/types/db';
 import { Database } from '@/src/types/supabase';
+import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
 
 import './layout.css';
 
-export const dynamic = 'force-dynamic';
-
 interface LayoutProps {
   children?: ReactNode;
 }
 
 export default async function AppLayout({ children }: LayoutProps) {
-  const supabaseClient = createServerComponentClient<Database>({ cookies });
+  const supabaseClient = createServerComponentClient();
   const dbMeta = await getDbMetadata(supabaseClient);
   const {
     data: { user },

@@ -5,14 +5,14 @@ import { FormGroup } from '@/src/components/FormGroup';
 import { Input } from '@/src/components/Input';
 import { ALLOW_SIGNUP, ROUTE_FEED_HOME } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import Messages from './messages';
 
 export default async function Login() {
-  const supabaseClient = createServerComponentClient<Database>({ cookies });
+  const supabaseClient = createServerComponentClient();
   const {
     data: { session },
   } = await supabaseClient.auth.getSession();

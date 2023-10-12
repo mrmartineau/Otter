@@ -5,10 +5,10 @@ import {
   ROUTE_TWEETS_MINE,
 } from '@/src/constants';
 import { Database } from '@/src/types/supabase';
+import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getTweets } from '@/src/utils/fetching/tweets';
 import { TwitterLogo } from '@phosphor-icons/react/dist/ssr';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
 export const metadata = {
@@ -21,7 +21,7 @@ export default async function LikedTweetsPage({
   searchParams: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
 }) {
   const { limit, offset } = searchParams;
-  const supabaseClient = createServerComponentClient<Database>({ cookies });
+  const supabaseClient = createServerComponentClient();
   const { data, count } = await getTweets({
     supabaseClient,
     params: searchParams,

@@ -1,7 +1,7 @@
 import { BookmarkForm } from '@/src/components/BookmarkForm';
 import { Database } from '@/src/types/supabase';
+import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { getBookmark } from '@/src/utils/fetching/bookmarks';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
 export default async function NewPage({
@@ -11,7 +11,7 @@ export default async function NewPage({
   searchParams: { url: string };
   params: { id: string };
 }) {
-  const supabaseClient = createServerComponentClient<Database>({ cookies });
+  const supabaseClient = createServerComponentClient();
   const bookmarkItem = await getBookmark({ supabaseClient, id: params.id });
 
   return (
