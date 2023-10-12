@@ -62,11 +62,8 @@ export const createTitle = (pageName?: string) => {
 };
 
 // Page Routes
-export const ROUTE_HOME = '/';
 export const ROUTE_FEED_HOME = '/feed';
 export const ROUTE_SIGNIN = '/signin';
-export const ROUTE_SIGNUP = '/signup';
-export const ROUTE_SIGNOUT = '/signout';
 export const ROUTE_NEW_BOOKMARK = '/new/bookmark';
 export const ROUTE_STARS = '/stars';
 export const ROUTE_STATS = '/top';
