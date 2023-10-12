@@ -12,7 +12,11 @@ export const matchTagsSource = (data: MatchTagsProps, tags?: MetaTag[]) => {
   const titleWords = data?.title ? matchWords(data.title) : [];
   const descWords = data?.description ? matchWords(data.description) : [];
   const noteWords = data?.note ? matchWords(data.note) : [];
-  const allWords = [...titleWords, ...descWords, ...noteWords];
+  const allWords = [
+    ...(titleWords || []),
+    ...(descWords || []),
+    ...(noteWords || []),
+  ];
   const possibleTags =
     tags?.reduce<string[]>((acc, item): string[] => {
       const found = allWords.find((word) => {
