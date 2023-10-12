@@ -24,36 +24,39 @@ export type MetaType = {
 export const getDbMetadata = async (
   supabaseClient: SupabaseClient<Database>,
 ): Promise<DbMetaResponse> => {
+  const {
+    data: { user },
+  } = await supabaseClient.auth.getUser();
   const all = await supabaseClient
     .from('bookmarks')
     .select('id', { count: 'exact' })
-    .match({ status: 'active' });
+    .match({ status: 'active', user: user?.id });
   const trash = await supabaseClient
     .from('bookmarks')
     .select('id', { count: 'exact' })
-    .match({ status: 'inactive' });
+    .match({ status: 'inactive', user: user?.id });
   const stars = await supabaseClient
     .from('bookmarks')
     .select('id', { count: 'exact' })
-    .match({ star: true, status: 'active' });
+    .match({ star: true, status: 'active', user: user?.id });
   const types = await supabaseClient.from('types_count').select('*');
   const tags = await supabaseClient.from('tags_count').select('*');
   const toots = await supabaseClient
     .from('toots')
     .select('id', { count: 'exact' })
-    .match({ liked_toot: false });
+    .match({ liked_toot: false, db_user_id: user?.id });
   const likedToots = await supabaseClient
     .from('toots')
     .select('id', { count: 'exact' })
-    .match({ liked_toot: true });
+    .match({ liked_toot: true, db_user_id: user?.id });
   const tweets = await supabaseClient
     .from('tweets')
     .select('id', { count: 'exact' })
-    .match({ liked_tweet: false });
+    .match({ liked_tweet: false, db_user_id: user?.id });
   const likedTweets = await supabaseClient
     .from('tweets')
     .select('id', { count: 'exact' })
-    .match({ liked_tweet: true });
+    .match({ liked_tweet: true, db_user_id: user?.id });
 
   return {
     all: all.count || 0,

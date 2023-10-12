@@ -12,8 +12,6 @@ import { Flex } from './Flex';
 import { SidebarLink } from './SidebarLink';
 import { TypeToIcon } from './TypeToIcon';
 
-// import { caretDown } from '../../icons';
-
 interface TypeListProps {
   types?: MetaType[];
 }

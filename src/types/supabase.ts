@@ -26,6 +26,7 @@ export interface Database {
           tweet: Json | null
           type: Database["public"]["Enums"]["type"] | null
           url: string | null
+          user: string | null
         }
         Insert: {
           click_count?: number
@@ -43,6 +44,7 @@ export interface Database {
           tweet?: Json | null
           type?: Database["public"]["Enums"]["type"] | null
           url?: string | null
+          user?: string | null
         }
         Update: {
           click_count?: number
@@ -60,6 +62,7 @@ export interface Database {
           tweet?: Json | null
           type?: Database["public"]["Enums"]["type"] | null
           url?: string | null
+          user?: string | null
         }
         Relationships: []
       }
@@ -113,7 +116,6 @@ export interface Database {
         Row: {
           avatar_url: string | null
           id: string
-          settings: Json | null
           settings_group_by_date: boolean | null
           settings_pinned_tags: string[]
           settings_tags_visible: boolean
@@ -125,7 +127,6 @@ export interface Database {
         Insert: {
           avatar_url?: string | null
           id: string
-          settings?: Json | null
           settings_group_by_date?: boolean | null
           settings_pinned_tags?: string[]
           settings_tags_visible?: boolean
@@ -137,7 +138,6 @@ export interface Database {
         Update: {
           avatar_url?: string | null
           id?: string
-          settings?: Json | null
           settings_group_by_date?: boolean | null
           settings_pinned_tags?: string[]
           settings_tags_visible?: boolean
@@ -184,6 +184,7 @@ export interface Database {
       toots: {
         Row: {
           created_at: string | null
+          db_user_id: string | null
           hashtags: string[] | null
           id: string
           liked_toot: boolean
@@ -199,6 +200,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string | null
+          db_user_id?: string | null
           hashtags?: string[] | null
           id?: string
           liked_toot?: boolean
@@ -214,6 +216,7 @@ export interface Database {
         }
         Update: {
           created_at?: string | null
+          db_user_id?: string | null
           hashtags?: string[] | null
           id?: string
           liked_toot?: boolean
@@ -232,6 +235,7 @@ export interface Database {
       tweets: {
         Row: {
           created_at: string | null
+          db_user_id: string | null
           hashtags: string[] | null
           id: string
           liked_tweet: boolean
@@ -247,6 +251,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string | null
+          db_user_id?: string | null
           hashtags?: string[] | null
           id?: string
           liked_tweet?: boolean
@@ -262,6 +267,7 @@ export interface Database {
         }
         Update: {
           created_at?: string | null
+          db_user_id?: string | null
           hashtags?: string[] | null
           id?: string
           liked_tweet?: boolean
@@ -315,6 +321,7 @@ export interface Database {
           tweet: Json | null
           type: Database["public"]["Enums"]["type"] | null
           url: string | null
+          user: string | null
         }[]
       }
     }

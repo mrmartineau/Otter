@@ -14,6 +14,9 @@ export const getSearchBookmarks = async ({
   params,
 }: SearchFetchingOptions) => {
   const { limit, offset, order, status, type } = apiParameters(params);
+  const {
+    data: { user },
+  } = await supabaseClient.auth.getUser();
 
   // Search bookmarks
   let bookmarksSearchQuery = supabaseClient
@@ -21,7 +24,8 @@ export const getSearchBookmarks = async ({
     .select('*', { count: 'exact' })
     .or(
       `title.ilike.*${searchTerm}*,url.ilike.*${searchTerm}*,description.ilike.*${searchTerm}*,note.ilike.*${searchTerm}*,tags.cs.{${searchTerm}}`,
-    );
+    )
+    .match({ user: user?.id });
   if (status) {
     bookmarksSearchQuery = bookmarksSearchQuery.match({ status });
   }
@@ -41,12 +45,16 @@ export const getSearchTweets = async ({
   params,
 }: SearchFetchingOptions) => {
   const { limit, offset, order, status, type } = apiParameters(params);
+  const {
+    data: { user },
+  } = await supabaseClient.auth.getUser();
 
   // Search tweets
   let tweetsSearchQuery = supabaseClient
     .from('tweets')
     .select('*', { count: 'exact' })
-    .or(`text.ilike.*${searchTerm}*,user_name.ilike.*${searchTerm}*`);
+    .or(`text.ilike.*${searchTerm}*,user_name.ilike.*${searchTerm}*`)
+    .match({ user: user?.id });
   if (status) {
     tweetsSearchQuery = tweetsSearchQuery.match({ status });
   }
@@ -66,12 +74,16 @@ export const getSearchToots = async ({
   params,
 }: SearchFetchingOptions) => {
   const { limit, offset, order, status, type } = apiParameters(params);
+  const {
+    data: { user },
+  } = await supabaseClient.auth.getUser();
 
   // Search Mastodon toots
   let tweetsSearchQuery = supabaseClient
     .from('toots')
     .select('*', { count: 'exact' })
-    .or(`text.ilike.*${searchTerm}*,user_name.ilike.*${searchTerm}*`);
+    .or(`text.ilike.*${searchTerm}*,user_name.ilike.*${searchTerm}*`)
+    .match({ user: user?.id });
   if (status) {
     tweetsSearchQuery = tweetsSearchQuery.match({ status });
   }
