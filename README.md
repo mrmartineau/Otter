@@ -33,6 +33,7 @@
 1. Install dependencies with [pnpm](https://pnpm.io): `pnpm install`
 2. Setup env vars (see below)
 3. Run the app locally using `pnpm dev`
+4. Seed your database with `pnpm supabase:seed`
 
 ### Env vars
 
@@ -60,6 +61,25 @@ Interactive API docs can be found in the various `*.rest` files in the `/app/api
 - `POST /api/toot` - A PostgreSQL trigger function calls this endpoint anytime a bookmark is created or edited which then creates a new toot on two of my Mastodon accounts ([@otterbot@botsin.space](https://botsin.space/@otterbot) & [@zander@toot.cafe](https://toot.cafe/@zander)). It only sends a toot if the bookmark is tagged as `public`.
 
 ### Mastodon integration
+
+Otter has the ability to auto-toot to 2 Mastodon accounts when a new bookmark is created or edited. This is done via a PostgreSQL trigger function that calls the `/api/toot` endpoint.
+
+The trigger function below uses an environment variable in the `Authorization` header to ensure only the owner of the Otter instance can call the endpoint.
+
+```sql
+create trigger "toot-otter-items"
+after insert
+or
+update on bookmarks for each row
+execute function supabase_functions.http_request (
+  'https://{your-otter-instance}/api/toot',
+  'POST',
+  -- replace {OTTER_API_TOKEN} with your own token
+  '{"Content-type":"application/json","Authorization":"{OTTER_API_TOKEN}"}',
+  '{}',
+  '1000'
+);
+```
 
 TODO:
 

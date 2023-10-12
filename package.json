@@ -13,7 +13,9 @@
     "supabase": "supabase",
     "supabase:types": "npm run supabase:types:app",
     "supabase:types:app": "npx supabase gen types typescript --project-id \"ffpbylcvwtyozyrplqic\" --schema public > src/types/supabase.ts",
-    "supabase:types:functions": "npx supabase gen types typescript --project-id \"ffpbylcvwtyozyrplqic\" --schema public > supabase/functions/_shared/types/supabase.ts",
+    "supabase:dumpdb": "npx supabase db pull",
+    "supabase:setup": "npx supabase db push",
+    "supabase:seed": "npx supabase start",
     "test": "vitest"
   },
   "dependencies": {
