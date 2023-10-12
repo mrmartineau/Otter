@@ -323,11 +323,7 @@ export const BookmarkForm = ({
         </FormGroup>
 
         {/* TAGS */}
-        <FormGroup
-          label="Tags"
-          name="tags"
-          // error={errors.tags?.message as string}
-        >
+        <FormGroup label="Tags" name="tags">
           <Combobox
             inputId="tags"
             options={transformedTagsForCombobox}
@@ -366,11 +362,7 @@ export const BookmarkForm = ({
         </FormGroup>
 
         {/* TYPE */}
-        <FormGroup
-          label="Type"
-          name="type"
-          // error={errors.type?.message as string}
-        >
+        <FormGroup label="Type" name="type">
           <Flex gap="xs" wrap="wrap" justify="start">
             <TypeRadio value="link" {...register('type')} />
             <TypeRadio value="article" {...register('type')} />
