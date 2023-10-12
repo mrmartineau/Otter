@@ -27,7 +27,7 @@ import { Flex } from './Flex';
 import { Link } from './Link';
 import LogoutButton from './LogoutButton';
 import { MastodonLogo } from './MastodonLogo';
-import './Sidebar.styles.css';
+import './Sidebar.css';
 import { SidebarLink } from './SidebarLink';
 import { AllTags } from './TagList';
 import { TypeList } from './TypeList';

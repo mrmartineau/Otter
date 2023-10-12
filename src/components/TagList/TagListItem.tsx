@@ -4,7 +4,7 @@ import { CheckCircle, Hash, XCircle } from '@phosphor-icons/react';
 
 import { SidebarLink } from '../SidebarLink';
 import { useUser } from '../UserProvider';
-import './TagList.styles.css';
+import './TagList.css';
 
 interface PinUnpinTagProps {
   tag: string;

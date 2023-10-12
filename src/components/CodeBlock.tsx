@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-import './CodeBlock.styles.css';
+import './CodeBlock.css';
 
 interface CodeBlockProps extends ComponentPropsWithoutRef<'pre'> {
   children?: ReactNode;

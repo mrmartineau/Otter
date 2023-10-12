@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority';
 
-import './Heading.styles.css';
+import './Heading.css';
 
 export const headingVariants = cva('heading', {
   variants: {

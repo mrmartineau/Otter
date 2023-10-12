@@ -7,7 +7,7 @@ import urlJoin from 'proper-url-join';
 import { ROUTE_NEW_BOOKMARK } from '../constants';
 import { Toot, TootUrls } from '../types/db';
 import { Favicon } from './Favicon';
-import './Feed.styles.css';
+import './Feed.css';
 import { Flex } from './Flex';
 import { headingVariants } from './Heading';
 import { Link } from './Link';

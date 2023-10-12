@@ -11,7 +11,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-import './layout.styles.css';
+import './layout.css';
 
 interface LayoutProps extends ComponentPropsWithoutRef<'div'> {
   children?: ReactNode;

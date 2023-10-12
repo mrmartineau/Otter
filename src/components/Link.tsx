@@ -3,7 +3,7 @@ import { type VariantProps, cva } from 'class-variance-authority';
 import NextLink from 'next/link';
 import * as React from 'react';
 
-import './Link.styles.css';
+import './Link.css';
 
 const linkVariants = cva(['link-base', 'focus'], {
   variants: {

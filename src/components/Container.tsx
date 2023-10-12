@@ -1,26 +1,31 @@
-import { cva } from 'class-variance-authority';
-import { clsx } from 'clsx';
+import { cn } from '@/src/utils/classnames';
+import { VariantProps, cva } from 'class-variance-authority';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-import './Container.styles.css';
+import './Container.css';
 
 export const containerVariants = cva('container', {
   variants: {
     variant: {
-      auth: 'px-m max-w-[400px]',
+      auth: 'container-auth',
     },
   },
 });
 
-interface ContainerProps extends ComponentPropsWithoutRef<'div'> {
+interface ContainerProps
+  extends ComponentPropsWithoutRef<'div'>,
+    VariantProps<typeof containerVariants> {
   children?: ReactNode;
 }
 
-export const Container = ({ className, children, ...rest }: ContainerProps) => {
-  const ParagraphClass = clsx(className, 'container');
-
+export const Container = ({
+  className,
+  variant,
+  children,
+  ...rest
+}: ContainerProps) => {
   return (
-    <div className={ParagraphClass} {...rest}>
+    <div className={cn(containerVariants({ variant, className }))} {...rest}>
       {children}
     </div>
   );

@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { type VariantProps, cva } from 'class-variance-authority';
 import * as React from 'react';
 
-import './Text.styles.css';
+import './Text.css';
 
 const textVariants = cva('box-border', {
   variants: {

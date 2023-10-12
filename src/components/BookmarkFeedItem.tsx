@@ -4,7 +4,7 @@ import { Note, TwitterLogo } from '@phosphor-icons/react';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
-import './Feed.styles.css';
+import './Feed.css';
 import { FeedItemFooter } from './FeedItemFooter';
 // import { FeedItemFooter } from './FeedItemFooter';
 import { Flex } from './Flex';

@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-import './Paragraph.styles.css';
+import './Paragraph.css';
 
 interface ParagraphProps extends ComponentPropsWithoutRef<'p'> {
   children?: ReactNode;

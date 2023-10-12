@@ -1,6 +1,6 @@
 import { HTMLProps, ReactNode, forwardRef } from 'react';
 
-import './IconControl.styles.css';
+import './IconControl.css';
 
 export interface IconControlProps extends HTMLProps<HTMLInputElement> {
   children: ReactNode;

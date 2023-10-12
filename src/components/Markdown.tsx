@@ -7,7 +7,7 @@ import { remarkTruncateLinks } from 'remark-truncate-links';
 
 import { Code, CodeBlock } from './CodeBlock';
 import { Link } from './Link';
-import './Markdown.styles.css';
+import './Markdown.css';
 import { Paragraph } from './Paragraph';
 
 interface MarkdownProps {

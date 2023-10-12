@@ -4,3 +4,7 @@
   margin: 0 auto;
   padding-x: var(--space-s);
 }
+
+.container-auth {
+  max-width: 400px;
+}

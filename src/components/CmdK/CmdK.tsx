@@ -42,7 +42,7 @@ import { Favicon } from '../Favicon';
 import { Flex } from '../Flex';
 import { TypeToIcon } from '../TypeToIcon';
 import { useUser } from '../UserProvider';
-import './Cmdk.css';
+import './CmdK.css';
 import { AccessoryModel, Item } from './Item';
 import { fetchSearch } from './fetchSearch';
 
@@ -221,7 +221,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                   },
                 )}
                 <Item
-                  to={`/search?searchTerm=${searchTerm}`}
+                  to={`/search?q=${searchTerm}`}
                   value={`search-${searchTerm}`}
                   image={
                     <MagnifyingGlass weight="duotone" aria-label="Search" />
