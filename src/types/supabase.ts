@@ -115,7 +115,7 @@ export interface Database {
           id: string
           settings: Json | null
           settings_group_by_date: boolean | null
-          settings_pinned_tags: string[] | null
+          settings_pinned_tags: string[]
           settings_tags_visible: boolean
           settings_top_tags_count: number | null
           settings_types_visible: boolean
@@ -127,7 +127,7 @@ export interface Database {
           id: string
           settings?: Json | null
           settings_group_by_date?: boolean | null
-          settings_pinned_tags?: string[] | null
+          settings_pinned_tags?: string[]
           settings_tags_visible?: boolean
           settings_top_tags_count?: number | null
           settings_types_visible?: boolean
@@ -139,7 +139,7 @@ export interface Database {
           id?: string
           settings?: Json | null
           settings_group_by_date?: boolean | null
-          settings_pinned_tags?: string[] | null
+          settings_pinned_tags?: string[]
           settings_tags_visible?: boolean
           settings_top_tags_count?: number | null
           settings_types_visible?: boolean
