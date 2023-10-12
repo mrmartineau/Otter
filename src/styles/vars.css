@@ -42,6 +42,8 @@
     --radii-round: 50%;
     --radii-pill: 9999px;
 
+    --radius: 0.5rem; /* from shadcn */
+
     /* Colors */
     --theme1: var(--sand-1);
     --theme2: var(--sand-2);
@@ -69,9 +71,11 @@
     --accent12: var(--violet-12);
 
     --text: var(--theme10);
+    --foreground: var(--theme12);
     --background: var(--theme1);
     --focus: var(--theme9);
     --overlay: var(--overlayAlpha);
+    --border: var(--theme7);
 
     /* Other */
     --flow-space: var(--space-m);

@@ -6,28 +6,26 @@ import * as React from 'react';
 import './Button.css';
 
 const buttonVariants = cva(
-  'inline-flex items-center gap-xs justify-center rounded-m text-s font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center gap-xs justify-center rounded-m text-s font-light ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'bg-theme10 text-theme3 hover:bg-theme9',
+        default: 'bg-accent9 text-foreground hover:bg-accent7',
         destructive:
           'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
-          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+          'text-foreground border border-border bg-background hover:bg-theme4 hover:text-accent-foreground',
+        secondary: 'bg-theme8 text-foreground hover:bg-theme6',
         ghost: 'button-ghost',
         collapsible:
           'hover:bg-theme6 hover:text-theme10 px-2xs py-3xs font-normal',
-        link: 'text-primary underline-offset-4 hover:underline',
         icon: 'h-10 w-10 hover:bg-theme6 hover:text-theme10 button-icon',
         nav: 'text-text hover:bg-theme3 rounded-l flex-shrink-0',
         cmdk: 'button-cmdk',
       },
 
       size: {
-        default: 'h-10 px-4 py-2',
+        default: 'h-10 px-m py-s',
         xs: 'h-5 rounded-s px-2 text-step--2',
         s: 'h-9 rounded-m px-2xs py-3xs',
         l: 'h-11 rounded-m px-8',
