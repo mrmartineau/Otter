@@ -10,7 +10,7 @@ import { Metadata } from 'next';
 import { cookies } from 'next/headers';
 
 type SearchPageProps = ApiParameters & {
-  searchTerm: string;
+  q: string;
 };
 
 type Props = {
@@ -22,18 +22,18 @@ export async function generateMetadata({
 }: Props): Promise<Metadata> {
   return {
     title: `${CONTENT.searchTitle}: ${decodeURIComponent(
-      searchParams.searchTerm || '',
+      searchParams.q || '',
     )}`,
   };
 }
 
 export default async function SearchPage({ searchParams }: Props) {
-  const { limit, offset, searchTerm } = searchParams;
+  const { limit, offset, q } = searchParams;
   const supabaseClient = createServerComponentClient<Database>({ cookies });
   const { data, count } = await getSearchBookmarks({
     supabaseClient,
     params: searchParams,
-    searchTerm: searchTerm || '',
+    searchTerm: q || '',
   });
 
   return (
@@ -43,7 +43,7 @@ export default async function SearchPage({ searchParams }: Props) {
       limit={limit}
       offset={offset}
       allowGroupByDate={true}
-      title={`${CONTENT.searchTitle}: ${searchTerm}`}
+      title={`${CONTENT.searchTitle}: ${q}`}
       icon={<MagnifyingGlass weight="duotone" size={24} />}
       feedType="bookmarks"
     />
