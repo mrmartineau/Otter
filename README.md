@@ -17,11 +17,8 @@
       src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"
       alt="PRs welcome!"
     />
-    <a href="https://twitter.com/intent/follow?screen_name=MrMartineau">
-      <img
-        src="https://img.shields.io/twitter/follow/MrMartineau.svg?label=Follow%20@MrMartineau"
-        alt="Follow @MrMartineau"
-      />
+    <a href="https://main.elk.zone/toot.cafe/@zander">
+      <img src="https://img.shields.io/mastodon/follow/90758?domain=https%3A%2F%2Ftoot.cafe" alt="Follow @zander" />
     </a>
   </p>
 
@@ -64,7 +61,9 @@ Interactive API docs can be found in the various `*.rest` files in the `/app/api
 
 ### Mastodon integration
 
-TODO: document the PostgreSQL trigger function that calls the `/api/toot` endpoint
+TODO:
+
+- [ ] document the PostgreSQL trigger function that calls the `/api/toot` endpoint
 
 ### Bookmarks
 
@@ -81,4 +80,4 @@ TODO: document the PostgreSQL trigger function that calls the `/api/toot` endpoi
 
 [MIT](https://choosealicense.com/licenses/mit/) © [Zander Martineau](https://zander.wtf)
 
-> Made by Zander • [zander.wtf](https://zander.wtf) • [GitHub](https://github.com/mrmartineau/) • [Twitter](https://twitter.com/mrmartineau/)
+> Made by Zander • [zander.wtf](https://zander.wtf) • [GitHub](https://github.com/mrmartineau/) • [Mastodon](https://main.elk.zone/toot.cafe/@zander)
