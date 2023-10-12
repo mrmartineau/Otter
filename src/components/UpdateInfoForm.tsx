@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/src/components/Button';
+import { Input } from '@/src/components/Input';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import emailValidator from 'email-validator';
 import React, { useState } from 'react';

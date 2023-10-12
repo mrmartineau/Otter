@@ -3,7 +3,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from '@/src/components/Tooltip';
 import { MINIMUM_CLICK_COUNT } from '@/src/constants';
 import { Calendar, NavigationArrow, Star } from '@phosphor-icons/react';
 import { usePathname } from 'next/navigation';

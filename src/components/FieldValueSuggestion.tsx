@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/Button';
 import { UseFormSetValue } from 'react-hook-form';
 
 import { BookmarkFormValues } from '../types/db';

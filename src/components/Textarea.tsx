@@ -4,7 +4,7 @@ import TextareaAutosize, {
   TextareaAutosizeProps,
 } from 'react-textarea-autosize';
 
-import { sharedInputStyles } from './input';
+import { sharedInputStyles } from './Input';
 
 export interface TextareaProps extends TextareaAutosizeProps {}
 

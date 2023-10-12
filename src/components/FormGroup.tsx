@@ -1,4 +1,4 @@
-import { Label } from '@/components/ui/label';
+import { Label } from '@/src/components/Label';
 import { cn } from '@/src/utils/classnames';
 import clsx from 'clsx';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';

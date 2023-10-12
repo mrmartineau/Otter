@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/Button';
 import { List } from '@phosphor-icons/react';
 import { clsx } from 'clsx';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';

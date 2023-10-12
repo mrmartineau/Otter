@@ -1,15 +1,15 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/src/components/Button';
+import { Input } from '@/src/components/Input';
+import { Textarea } from '@/src/components/Textarea';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/src/components/Tooltip';
+import { useToast } from '@/src/hooks/use-toast';
 import { MagicWand } from '@phosphor-icons/react/dist/ssr';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { clsx } from 'clsx';

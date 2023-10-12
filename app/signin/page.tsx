@@ -1,8 +1,8 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/src/components/Button';
 import { Container } from '@/src/components/Container';
 import { Flex } from '@/src/components/Flex';
 import { FormGroup } from '@/src/components/FormGroup';
+import { Input } from '@/src/components/Input';
 
 import Messages from '../login/messages';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/Button';
 import { CONTENT, DEFAULT_API_RESPONSE_LIMIT } from '@/src/constants';
 import { FeedItemModel, useGroupByDate } from '@/src/hooks/useGroupByDate';
 import { usePagination } from '@/src/hooks/usePagination';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/Button';
 import { useToggle } from '@/src/hooks/useToggle';
 import { Bookmark, Tweet } from '@/src/types/db';
 import { DbMetaResponse } from '@/src/utils/fetching/meta';

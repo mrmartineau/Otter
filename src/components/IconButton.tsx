@@ -5,7 +5,7 @@ import * as React from 'react';
 
 import './button.css';
 
-const buttonVariants = cva(
+const iconButtonVariants = cva(
   'inline-flex items-center justify-center rounded-m text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
@@ -22,22 +22,22 @@ const buttonVariants = cva(
 
 export interface IconButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+    VariantProps<typeof iconButtonVariants> {
   asChild?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, IconButtonProps>(
+const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   ({ className, variant, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
-        className={cn(buttonVariants({ variant, className }))}
+        className={cn(iconButtonVariants({ variant, className }))}
         ref={ref}
         {...props}
       />
     );
   },
 );
-Button.displayName = 'IconButton';
+IconButton.displayName = 'IconButton';
 
-export { Button, buttonVariants };
+export { IconButton, iconButtonVariants };

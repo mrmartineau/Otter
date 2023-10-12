@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/Button';
 import { CONTENT } from '@/src/constants';
 import { MetaTag } from '@/src/utils/fetching/meta';
 import { useEffect, useState } from 'react';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/Button';
 import { Flex } from '@/src/components/Flex';
 import { useEffect } from 'react';
 

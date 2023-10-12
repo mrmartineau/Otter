@@ -1,7 +1,7 @@
-import { Toaster } from '@/components/ui/toaster';
 import { Container } from '@/src/components/Container';
 import { FabAdd } from '@/src/components/FabAdd';
 import { Sidebar } from '@/src/components/Sidebar';
+import { Toaster } from '@/src/components/Toaster';
 import { TopBar } from '@/src/components/TopBar';
 import { UserProvider } from '@/src/components/UserProvider';
 import { UserProfile } from '@/src/types/db';

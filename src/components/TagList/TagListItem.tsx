@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/Button';
 import { MetaTag } from '@/src/utils/fetching/meta';
 import { CheckCircle, Hash, XCircle } from '@phosphor-icons/react';
 
