@@ -38,8 +38,16 @@ export default async function MyTweetsage({
       icon={<TwitterLogo aria-label="My tweets" size={24} weight="duotone" />}
       feedType="tweets"
       subNav={[
-        { text: 'My tweets', href: ROUTE_TWEETS_MINE, isActive: true },
-        { text: 'My liked tweets', href: ROUTE_TWEETS_LIKES, isActive: false },
+        {
+          text: CONTENT.tweetsMineTitle,
+          href: ROUTE_TWEETS_MINE,
+          isActive: true,
+        },
+        {
+          text: CONTENT.tweetsLikeTitle,
+          href: ROUTE_TWEETS_LIKES,
+          isActive: false,
+        },
       ]}
     />
   );
