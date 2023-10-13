@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import urlJoin from 'proper-url-join';
 import { useEffect, useState } from 'react';
 
@@ -80,12 +81,12 @@ export const RssFeed = ({ feedUrl }: RssFeedProps) => {
 
   return (
     <>
-      <h5 className={headingVariants({ variant: 'date' })}>
+      <h5 className={clsx('!mt-0', headingVariants({ variant: 'date' }))}>
         {CONTENT.latestRssItems}
       </h5>
       <ol className="max-w-260 mb-0 list-inside list-decimal pl-0">
         {feed?.items.map(({ link, title, guid }) => (
-          <li key={guid}>
+          <li key={guid} className="text-sm">
             <Link href={link} className="!inline">
               {title}
             </Link>

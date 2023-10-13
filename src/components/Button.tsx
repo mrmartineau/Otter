@@ -23,9 +23,9 @@ const buttonVariants = cva(['button-base', 'focus'], {
 
     size: {
       default: 'h-10 px-m py-s',
-      xs: 'h-5 rounded-s px-2 text-step--2',
-      s: 'h-9 rounded-m px-2xs py-3xs',
-      l: 'h-11 rounded-m px-8',
+      xs: 'h-5 px-2 text-step--2',
+      s: 'h-9 px-2xs py-3xs',
+      l: 'h-11 px-8',
       collapsible: 'h-6 w-6',
     },
   },
