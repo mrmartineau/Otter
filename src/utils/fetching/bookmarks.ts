@@ -13,13 +13,7 @@ export const getBookmarks = async ({
 }: BookmarksFetchingOptions) => {
   const { limit, offset, order, status, type, star, tag, top } =
     apiParameters(params);
-  const {
-    data: { user },
-  } = await supabaseClient.auth.getUser();
-  let query = supabaseClient
-    .from('bookmarks')
-    .select('*', { count: 'exact' })
-    .match({ user: user?.id });
+  let query = supabaseClient.from('bookmarks').select('*', { count: 'exact' });
 
   if (status) {
     query = query.match({ status });
@@ -56,13 +50,10 @@ export const getBookmark = async ({
   supabaseClient,
   id,
 }: BookmarkFetchingOptions) => {
-  const {
-    data: { user },
-  } = await supabaseClient.auth.getUser();
   const supabaseResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
-    .match({ id, user: user?.id })
+    .match({ id })
     .single();
 
   return supabaseResponse;
