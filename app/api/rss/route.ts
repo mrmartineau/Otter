@@ -1,6 +1,8 @@
 import { API_HEADERS } from '@/src/constants';
 import { errorResponse } from '@/src/utils/fetching/errorResponse';
 import { getErrorMessage } from '@/src/utils/get-error-message';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { toJson } from 'rss-converter';
 
 /**
@@ -9,7 +11,19 @@ import { toJson } from 'rss-converter';
  * It uses the `OTTER_API_TOKEN` environment variable to authenticate via an Authorization header token
  */
 export async function GET(request: Request) {
-  if (request.headers.get('Authorization') !== process.env.OTTER_API_TOKEN) {
+  const cookieStore = cookies();
+  const supabaseClient = createRouteHandlerClient({
+    cookies: () => cookieStore,
+  });
+  const {
+    data: { session },
+  } = await supabaseClient.auth.getSession();
+
+  let isAuthorised =
+    session ||
+    request.headers.get('Authorization') !== process.env.OTTER_API_TOKEN;
+
+  if (!isAuthorised) {
     return errorResponse({ reason: 'Not authorised', status: 401 });
   }
 
