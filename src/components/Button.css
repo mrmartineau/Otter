@@ -1,3 +1,18 @@
+.button-base {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  justify-content: center;
+  border-radius: var(--radii-m);
+  font-size: var(--step-s);
+  font-weight: 300;
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}
+
 .button-ghost {
   @apply hover:bg-theme6 hover:text-theme10;
 
@@ -6,7 +21,6 @@
   }
 }
 .button-cmdk {
-  @extend .focus;
   background-color: var(--theme3);
   padding-x: var(--space-xs);
   color: var(--theme10);
@@ -34,14 +48,34 @@
   }
   &:focus {
     background-color: var(--theme7);
-    box-shadow:
-      inset 0 0 0 1px var(--theme4),
-      0 0 0 1px var(--theme4);
+  }
+  &:focus {
+    outline: 0;
+    box-shadow: 0px 0px 0px 3px var(--focus);
+  }
+  &:focus:not(:focus-visible) {
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0px 0px 0px 3px var(--focus);
   }
 }
 
 .button-icon {
   svg {
     pointer-events: none;
+  }
+}
+
+.button-collapsible {
+  padding: var(--space-3xs);
+  font-weight: normal;
+  margin-x: var(--space-3xs);
+
+  &:hover {
+    background-color: var(--theme6);
+    color: var(--theme10);
   }
 }
