@@ -57,7 +57,7 @@ export const Sidebar = ({ serverDbMeta }: SidebarProps) => {
           </Link>
         </div>
         <Flex gapY="3xs" direction="column">
-          <SidebarLink href={ROUTE_FEED_HOME} count={dbMeta?.all}>
+          <SidebarLink href={ROUTE_FEED_HOME} count={dbMeta.all}>
             <ListBullets aria-label="All" size={18} weight="duotone" />
             {CONTENT.feedNav}
           </SidebarLink>
@@ -67,17 +67,19 @@ export const Sidebar = ({ serverDbMeta }: SidebarProps) => {
               {CONTENT.starsNav}
             </SidebarLink>
           ) : null}
-          <SidebarLink href={ROUTE_STATS}>
-            <ArrowFatLinesUp aria-label="Top" size={18} weight="duotone" />
-            {CONTENT.topLinksNav}
-          </SidebarLink>
-          {dbMeta.toots > 0 ? (
+          {dbMeta.top > 0 ? (
+            <SidebarLink href={ROUTE_STATS} count={dbMeta.top}>
+              <ArrowFatLinesUp aria-label="Top" size={18} weight="duotone" />
+              {CONTENT.topLinksNav}
+            </SidebarLink>
+          ) : null}
+          {dbMeta.toots > 0 || dbMeta.likedToots > 0 ? (
             <SidebarLink href={ROUTE_TOOTS_MINE} activePath="toots">
               <MastodonLogo size={18} />
               {CONTENT.tootsNav}
             </SidebarLink>
           ) : null}
-          {dbMeta.tweets > 0 ? (
+          {dbMeta.tweets > 0 || dbMeta.likedTweets > 0 ? (
             <SidebarLink href={ROUTE_TWEETS_MINE} activePath="tweets">
               <TwitterLogo size={18} weight="duotone" />
               {CONTENT.tweetsNav}
@@ -89,7 +91,7 @@ export const Sidebar = ({ serverDbMeta }: SidebarProps) => {
       </div>
 
       <Flex gapY="3xs" direction="column" className="mt-s">
-        <SidebarLink href={ROUTE_TRASH} count={dbMeta?.trash}>
+        <SidebarLink href={ROUTE_TRASH} count={dbMeta.trash}>
           <Trash aria-label="Trash" size={18} weight="duotone" />
           {CONTENT.trashNav}
         </SidebarLink>

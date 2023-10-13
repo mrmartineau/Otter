@@ -10,7 +10,7 @@ export const metadata = {
   title: 'Top links',
 };
 
-export default async function StarsPage({
+export default async function TopPage({
   searchParams,
 }: {
   searchParams: Partial<ApiParameters>;

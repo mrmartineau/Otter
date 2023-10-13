@@ -28,7 +28,9 @@ export const getBookmarks = async ({
     query = query.filter('tags', 'cs', `{${tag}}`);
   }
   if (top) {
-    query = query.order('click_count', { ascending: false });
+    query = query
+      .order('click_count', { ascending: false })
+      .gte('click_count', 1);
   }
 
   const supabaseResponse = await query
