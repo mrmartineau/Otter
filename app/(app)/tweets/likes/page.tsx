@@ -6,6 +6,7 @@ import {
 } from '@/src/constants';
 import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
+import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { getTweets } from '@/src/utils/fetching/tweets';
 import { TwitterLogo } from '@phosphor-icons/react/dist/ssr';
 
@@ -25,6 +26,25 @@ export default async function LikedTweetsPage({
     params: searchParams,
     likes: true,
   });
+  const dbMeta = await getDbMetadata(supabaseClient);
+  const hasToots = dbMeta.toots > 0;
+  const hasLikedToots = dbMeta.likedToots > 0;
+  const subNav = [];
+  if (hasToots) {
+    subNav.push({
+      text: CONTENT.tweetsMineTitle,
+      href: ROUTE_TWEETS_MINE,
+      isActive: false,
+    });
+  }
+  if (hasLikedToots) {
+    subNav.push({
+      text: CONTENT.tweetsLikeTitle,
+      href: ROUTE_TWEETS_LIKES,
+      isActive: true,
+    });
+  }
+
   return (
     <Feed
       items={data}
@@ -35,18 +55,7 @@ export default async function LikedTweetsPage({
       title={CONTENT.tweetsTitle}
       icon={<TwitterLogo aria-label="My tweets" size={24} weight="duotone" />}
       feedType="tweets"
-      subNav={[
-        {
-          text: CONTENT.tweetsMineTitle,
-          href: ROUTE_TWEETS_MINE,
-          isActive: false,
-        },
-        {
-          text: CONTENT.tweetsLikeTitle,
-          href: ROUTE_TWEETS_LIKES,
-          isActive: true,
-        },
-      ]}
+      subNav={subNav}
     />
   );
 }

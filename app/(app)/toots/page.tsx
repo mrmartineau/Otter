@@ -3,6 +3,7 @@ import { MastodonLogo } from '@/src/components/MastodonLogo';
 import { CONTENT, ROUTE_TOOTS_LIKES, ROUTE_TOOTS_MINE } from '@/src/constants';
 import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
+import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { getToots } from '@/src/utils/fetching/toots';
 
 export const metadata = {
@@ -21,6 +22,25 @@ export default async function MyTootsPage({
     params: searchParams,
     likes: false,
   });
+  const dbMeta = await getDbMetadata(supabaseClient);
+  const hasToots = dbMeta.toots > 0;
+  const hasLikedToots = dbMeta.likedToots > 0;
+  const subNav = [];
+  if (hasToots) {
+    subNav.push({
+      text: CONTENT.tootsMineTitle,
+      href: ROUTE_TOOTS_MINE,
+      isActive: true,
+    });
+  }
+  if (hasLikedToots) {
+    subNav.push({
+      text: CONTENT.tootsLikeTitle,
+      href: ROUTE_TOOTS_LIKES,
+      isActive: false,
+    });
+  }
+
   return (
     <Feed
       items={data}
@@ -31,18 +51,7 @@ export default async function MyTootsPage({
       title={CONTENT.tootsTitle}
       icon={<MastodonLogo size={24} />}
       feedType="toots"
-      subNav={[
-        {
-          text: CONTENT.tootsMineTitle,
-          href: ROUTE_TOOTS_MINE,
-          isActive: true,
-        },
-        {
-          text: CONTENT.tootsLikeTitle,
-          href: ROUTE_TOOTS_LIKES,
-          isActive: false,
-        },
-      ]}
+      subNav={subNav}
     />
   );
 }
