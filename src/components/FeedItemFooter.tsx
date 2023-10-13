@@ -5,23 +5,29 @@ import {
   TooltipTrigger,
 } from '@/src/components/Tooltip';
 import { MINIMUM_CLICK_COUNT } from '@/src/constants';
-import { Calendar, NavigationArrow, Star } from '@phosphor-icons/react';
-import { usePathname } from 'next/navigation';
+import {
+  Calendar,
+  NavigationArrow,
+  RssSimple,
+  Star,
+} from '@phosphor-icons/react';
 import urlJoin from 'proper-url-join';
+import { Suspense } from 'react';
 import title from 'title';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
 import { getRelativeDate } from '../utils/dates';
 import { simpleUrl } from '../utils/simpleUrl';
+import { Button } from './Button';
 import { Favicon } from './Favicon';
 import { FeedItemActions } from './FeedItemActions';
 import { Flex } from './Flex';
 import { Link } from './Link';
-// import { Paragraph } from './Paragraph';
+import { Paragraph } from './Paragraph';
+import { Popover, PopoverContent, PopoverTrigger } from './Popover';
+import { RssFeed } from './RssFeed';
 import { TypeToIcon } from './TypeToIcon';
-
-// import { RssFeed } from './RssFeed';
 
 export interface FeedItemFooterProps extends Bookmark {
   allowDeletion?: boolean;
@@ -43,16 +49,12 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
     feed,
   } = props;
   const handleClickRegister = useClickBookmark();
-  const pathname = usePathname();
   const createdDate = getRelativeDate(created_at);
   const modifiedDate = getRelativeDate(modified_at);
   const dateTooltip =
     created_at !== modified_at
       ? `Created on ${createdDate.formatted}, modified on ${modifiedDate.formatted}`
       : `Created on ${createdDate.formatted}`;
-
-  const href = `/bookmark/${id}`;
-  const isActive = pathname === href;
 
   return (
     <TooltipProvider delayDuration={800} skipDelayDuration={500}>
@@ -132,26 +134,24 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               </Tooltip>
             ) : null}
 
-            {/* {feed ? (
+            {feed ? (
               <Popover>
-                <Tooltip content="View latest RSS feed items">
-                  <PopoverTrigger asChild>
-                    <Button size="icon">
-                      <Rss
-                        aria-label="View latest RSS feed items"
-                        size={16}
-                        weight="duotone"
-                      />
-                    </Button>
-                  </PopoverTrigger>
-                </Tooltip>
+                <PopoverTrigger asChild>
+                  <Button variant="icon" size="collapsible">
+                    <RssSimple
+                      aria-label="View latest RSS feed items"
+                      size={18}
+                      weight="duotone"
+                    />
+                  </Button>
+                </PopoverTrigger>
                 <PopoverContent>
                   <Suspense fallback={<Paragraph>Loading...</Paragraph>}>
                     <RssFeed feedUrl={feed} />
                   </Suspense>
                 </PopoverContent>
               </Popover>
-            ) : null} */}
+            ) : null}
           </Flex>
 
           <FeedItemActions

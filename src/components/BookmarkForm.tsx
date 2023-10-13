@@ -100,19 +100,13 @@ export const BookmarkForm = ({
     getMetaData();
   }, [supabaseClient]);
 
-  const {
-    getValues,
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-    watch,
-  } = useForm<BookmarkFormValues>({
-    defaultValues: {
-      type: 'link',
-      ...initialValues,
-    },
-  });
+  const { getValues, register, handleSubmit, setValue, watch } =
+    useForm<BookmarkFormValues>({
+      defaultValues: {
+        type: 'link',
+        ...initialValues,
+      },
+    });
   const watchUrl = watch('url');
   const watchTitle = watch('title');
   const watchDescription = watch('description');
@@ -132,7 +126,6 @@ export const BookmarkForm = ({
         toast({
           title: 'Item added',
         });
-        // revalidatePath('/feed');
         router.push('/feed');
       } else {
         await supabaseClient
@@ -187,6 +180,7 @@ export const BookmarkForm = ({
         if (data.url !== value) {
           setValue('url', data.url);
         }
+        setValue('feed', data.feeds?.length ? data.feeds[0] : null);
         setValue('type', data.urlType);
         setScrapeResponse(data);
         handleMatchTags({
@@ -258,6 +252,7 @@ export const BookmarkForm = ({
         className={bookmarkformClass}
       >
         <input type="hidden" {...register('image')} />
+        <input type="hidden" {...register('feed')} />
 
         {/* URL */}
         <FormGroup label="URL" name="url">

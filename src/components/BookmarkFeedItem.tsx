@@ -20,7 +20,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
   const handleClickRegister = useClickBookmark();
 
   return (
-    <div className="feed-wrapper">
+    <div className="feed-item-wrapper">
       {url && title ? (
         <div>
           <Link

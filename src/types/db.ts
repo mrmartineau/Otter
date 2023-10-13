@@ -37,7 +37,6 @@ export interface BookmarkFormValues
     | 'collection'
     | 'click_count'
     | 'excerpt'
-    | 'feed'
   > {
   id?: string;
 }
