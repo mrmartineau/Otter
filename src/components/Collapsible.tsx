@@ -1,9 +1,5 @@
 import { Button } from '@/src/components/Button';
-import {
-  ArrowSquareRight,
-  CaretRight,
-  CaretUpDown,
-} from '@phosphor-icons/react';
+import { CaretUpDown } from '@phosphor-icons/react';
 import {
   CollapsibleContentProps,
   CollapsibleProps,
@@ -62,9 +58,11 @@ export const CollapsibleTrigger = ({
       <Button
         variant="collapsible"
         size="s"
-        className="h-7 w-full justify-start gap-s align-middle"
+        className="h-7 w-full justify-start gap-s"
       >
-        <CaretRight weight="duotone" size={12} />
+        <div className="rounded-m bg-theme3 p-1">
+          <CaretUpDown weight="duotone" size={14} />
+        </div>
         <Flex justify="between" align="center" className="grow text-step--2">
           {children}
         </Flex>

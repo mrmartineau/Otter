@@ -1,4 +1,4 @@
-.feed-wrapper {
+.feed-item-wrapper {
   display: grid;
   gap: var(--space-2xs);
   position: relative;
@@ -20,8 +20,6 @@
       opacity: 1;
     }
   }
-
-  @extend .focus;
 
   @media (--fine) {
     .feedItem__actions {

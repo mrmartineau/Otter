@@ -41,7 +41,7 @@ export const TweetFeedItem = (props: Tweet) => {
   const tweetMedia = media as any[];
 
   return (
-    <div className="feed-wrapper">
+    <div className="feed-item-wrapper">
       <div className="flex items-center gap-xs">
         {user_avatar ? (
           <img src={user_avatar} alt="" className="feed-avatar" />

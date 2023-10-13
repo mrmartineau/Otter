@@ -62,7 +62,7 @@ export const Feed = memo(
     });
 
     return (
-      <div>
+      <div className="feed">
         <Flex gap="xs" direction="column" justify="between">
           <h3 className="mt-0 flex items-center gap-2xs">
             {icon}
