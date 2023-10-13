@@ -1,10 +1,7 @@
 import { API_HEADERS } from '@/src/constants';
 import { apiResponseGenerator } from '@/src/utils/fetching/apiResponse';
 import { errorResponse } from '@/src/utils/fetching/errorResponse';
-import {
-  getSearchBookmarks,
-  getSearchTweets,
-} from '@/src/utils/fetching/search';
+import { getSearchBookmarks } from '@/src/utils/fetching/search';
 import { getErrorMessage } from '@/src/utils/get-error-message';
 import { searchParamsToObject } from '@/src/utils/searchParamsToObject';
 import { createClient } from '@supabase/supabase-js';
@@ -18,7 +15,7 @@ export const runtime = 'edge';
  */
 export async function GET(request: Request) {
   try {
-    const { searchTerm, ...searchParams } = searchParamsToObject(request.url);
+    const { q, ...searchParams } = searchParamsToObject(request.url);
     const authHeader = request.headers.get('Authorization');
     const bearerToken = authHeader?.split(' ')[1];
     const supabaseClient = createClient(
@@ -30,7 +27,7 @@ export async function GET(request: Request) {
     const { data, count, error } = await getSearchBookmarks({
       supabaseClient,
       params: searchParams,
-      searchTerm,
+      searchTerm: q,
     });
 
     if (error) {
