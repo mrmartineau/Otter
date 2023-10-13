@@ -1,11 +1,9 @@
 import { Feed } from '@/src/components/Feed';
 import { MastodonLogo } from '@/src/components/MastodonLogo';
 import { CONTENT, ROUTE_TOOTS_LIKES, ROUTE_TOOTS_MINE } from '@/src/constants';
-import { Database } from '@/src/types/supabase';
 import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getToots } from '@/src/utils/fetching/toots';
-import { cookies } from 'next/headers';
 
 export const metadata = {
   title: CONTENT.tootsMineTitle,

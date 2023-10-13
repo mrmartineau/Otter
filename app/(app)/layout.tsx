@@ -5,10 +5,8 @@ import { Toaster } from '@/src/components/Toaster';
 import { TopBar } from '@/src/components/TopBar';
 import { UserProvider } from '@/src/components/UserProvider';
 import { UserProfile } from '@/src/types/db';
-import { Database } from '@/src/types/supabase';
 import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
 

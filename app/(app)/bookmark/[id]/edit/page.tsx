@@ -1,8 +1,6 @@
 import { BookmarkForm } from '@/src/components/BookmarkForm';
-import { Database } from '@/src/types/supabase';
 import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { getBookmark } from '@/src/utils/fetching/bookmarks';
-import { cookies } from 'next/headers';
 
 export default async function NewPage({
   searchParams,

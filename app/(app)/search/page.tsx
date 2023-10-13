@@ -1,13 +1,11 @@
 import { Feed } from '@/src/components/Feed';
 import { CONTENT } from '@/src/constants';
 import { Bookmark } from '@/src/types/db';
-import { Database } from '@/src/types/supabase';
 import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getSearchBookmarks } from '@/src/utils/fetching/search';
 import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr';
 import { Metadata } from 'next';
-import { cookies } from 'next/headers';
 
 type SearchPageProps = ApiParameters & {
   q: string;

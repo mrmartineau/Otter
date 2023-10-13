@@ -1,12 +1,10 @@
 import { Feed } from '@/src/components/Feed';
 import { TypeToIcon } from '@/src/components/TypeToIcon';
 import { Bookmark, BookmarkType } from '@/src/types/db';
-import { Database } from '@/src/types/supabase';
 import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
 import { Metadata } from 'next';
-import { cookies } from 'next/headers';
 import title from 'title';
 
 type Props = {

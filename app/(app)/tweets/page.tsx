@@ -4,12 +4,10 @@ import {
   ROUTE_TWEETS_LIKES,
   ROUTE_TWEETS_MINE,
 } from '@/src/constants';
-import { Database } from '@/src/types/supabase';
 import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getTweets } from '@/src/utils/fetching/tweets';
 import { TwitterLogo } from '@phosphor-icons/react/dist/ssr';
-import { cookies } from 'next/headers';
 
 export const metadata = {
   title: CONTENT.tweetsMineTitle,

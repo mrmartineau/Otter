@@ -4,9 +4,7 @@ import { Flex } from '@/src/components/Flex';
 import { FormGroup } from '@/src/components/FormGroup';
 import { Input } from '@/src/components/Input';
 import { ALLOW_SIGNUP, ROUTE_FEED_HOME } from '@/src/constants';
-import { Database } from '@/src/types/supabase';
 import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import Messages from './messages';
