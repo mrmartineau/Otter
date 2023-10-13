@@ -7,6 +7,7 @@
 @import '../src/styles/utopia.css';
 @import '../src/styles/fonts.css';
 @import '../src/styles/typography.css';
+@import '../src/styles/focus.css';
 @import '../src/components/DropDownMenu.css';
 
 @import 'tailwindcss/components';
