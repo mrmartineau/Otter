@@ -94,6 +94,7 @@ export const API_TWEETS_SEARCH = '/api/search/tweets';
 export const API_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Content-Type': 'application/json',
 };
 
 // Default payload/responses
