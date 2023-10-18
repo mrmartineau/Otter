@@ -121,5 +121,6 @@
 
   hr {
     border-top-color: var(--text);
+    margin: var(--space-m);
   }
 }
