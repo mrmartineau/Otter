@@ -4,10 +4,10 @@ import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import './Container.css';
 
-export const containerVariants = cva('container', {
+export const containerVariants = cva('otter-container', {
   variants: {
     variant: {
-      auth: 'container-auth',
+      auth: 'otter-container-auth',
     },
   },
 });
