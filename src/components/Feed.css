@@ -34,3 +34,12 @@
   width: 50px;
   height: 50px;
 }
+
+.feed-image {
+  border-radius: 0.5em;
+  border: 3px solid;
+
+  @media (--bp2) {
+    max-width: 50%;
+  }
+}

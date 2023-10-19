@@ -6,7 +6,6 @@ import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
 import './Feed.css';
 import { FeedItemFooter } from './FeedItemFooter';
-// import { FeedItemFooter } from './FeedItemFooter';
 import { Flex } from './Flex';
 import { Link } from './Link';
 import { Markdown } from './Markdown';
@@ -16,7 +15,7 @@ export interface BookmarkFeedItemProps extends Bookmark {
 }
 
 export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
-  const { title, url, description, note, id, tweet } = props;
+  const { title, url, description, note, id, tweet, image } = props;
   const handleClickRegister = useClickBookmark();
 
   return (
@@ -35,6 +34,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
         <div>{title}</div>
       ) : null}
       {description ? <Markdown>{description}</Markdown> : null}
+      {image ? <img src={image} alt="" className="feed-image" /> : null}
       {note ? (
         <div className="rounded bg-theme4 p-xs">
           <Flex
