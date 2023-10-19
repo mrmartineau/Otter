@@ -9,17 +9,13 @@ export async function GET(request: Request) {
   // https://supabase.com/docs/guides/auth/auth-helpers/nextjs#managing-sign-in-with-code-exchange
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
-
   if (code) {
     const supabase = createRouteHandlerClient({ cookies });
-    await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) {
+      const defaultRedirect = `${requestUrl.origin}${ROUTE_FEED_HOME}`;
+      // URL to redirect to after sign in process completes
+      return NextResponse.redirect(defaultRedirect);
+    }
   }
-
-  const defaultRedirect = `${requestUrl.origin}${ROUTE_FEED_HOME}`;
-
-  const redirectTo =
-    requestUrl.searchParams.get('redirectTo') || defaultRedirect;
-
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(`${requestUrl.origin}${ROUTE_FEED_HOME}`);
 }
