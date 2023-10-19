@@ -21,6 +21,19 @@
   body {
     background-color: var(--background);
   }
+
+  .skip-link {
+    left: 50%;
+    position: absolute;
+    transform: translateY(-150%);
+    top: var(--header-height);
+    margin-top: 1rem;
+    transition: all 200ms ease-in-out;
+
+    &:focus {
+      transform: translateY(0%);
+    }
+  }
 }
 
 .animate-in {

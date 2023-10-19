@@ -40,14 +40,17 @@ export default async function AppLayout({ children }: LayoutProps) {
     <UserProvider profile={userProfile?.data as UserProfile} id={user?.id}>
       <div className="otter-app-container">
         <TopBar serverDbMeta={dbMeta} />
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         <div className="otter-primary-pane">
           <Sidebar serverDbMeta={dbMeta} />
           <div className="otter-sidebar-pane-overlay" />
-          <div className="otter-content-pane">
+          <main id="main" className="otter-content-pane">
             <div className="otter-content-pane-inner">
               <Container>{children}</Container>
             </div>
-          </div>
+          </main>
         </div>
         <FabAdd />
         <Toaster />
