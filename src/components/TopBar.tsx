@@ -10,6 +10,7 @@ import { useSidebar } from '../hooks/useSidebar';
 import { DbMetaResponse } from '../utils/fetching/meta';
 import { CmdK } from './CmdK';
 import { Flex } from './Flex';
+import { IconButton } from './IconButton';
 import { Link } from './Link';
 import './TopBar.css';
 
@@ -30,15 +31,13 @@ export const TopBar = ({
   return (
     <header className={topbarClass} {...rest}>
       <Flex align="center" gap="2xs" className="top-bar-buttons">
-        <Button
-          variant="icon"
-          size="s"
+        <IconButton
           aria-label="View navigation"
           data-testid="navButton"
           onClick={handleToggleSidebar}
         >
           <List weight="duotone" size={30} />
-        </Button>
+        </IconButton>
 
         <Link href={ROUTE_FEED_HOME} variant="logo">
           <span className="emoji">🦦</span>

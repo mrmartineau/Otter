@@ -1,27 +1,15 @@
 .tagListItem {
   position: relative;
+  border-radius: var(--radii-m);
 
   &:hover {
-    border-radius: var(--radii-m);
     background-color: var(--theme3);
 
     .icon {
       visibility: hidden;
     }
-    .pinButton {
+    .icon-button-taglist {
       display: inline-flex;
     }
   }
-}
-
-.pinButton {
-  position: absolute;
-  top: 50%;
-  left: 7px;
-  display: none;
-  transform: translateY(-50%);
-  z-index: 1;
-  background-color: var(--theme8);
-  color: var(--theme11);
-  border-radius: var(--radii-full);
 }

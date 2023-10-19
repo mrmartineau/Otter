@@ -6,6 +6,7 @@ import { VariantProps, cva } from 'class-variance-authority';
 import React, { HTMLAttributes, ReactNode } from 'react';
 
 import './Dialog.css';
+import { IconButton } from './IconButton';
 
 export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
@@ -62,13 +63,9 @@ export const DialogContent = React.forwardRef<
       >
         <div className="sticky top-0">
           <DialogPrimitive.Close asChild>
-            <Button
-              variant="icon"
-              size="s"
-              className="z-3 absolute right-0 top-0"
-            >
-              <X weight="duotone" size="18" />
-            </Button>
+            <IconButton className="z-3 absolute right-0 top-0">
+              <X size="18" />
+            </IconButton>
           </DialogPrimitive.Close>
         </div>
         {title ? (

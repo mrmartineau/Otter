@@ -8,12 +8,12 @@ import './Button.css';
 const buttonVariants = cva(['button-base', 'focus'], {
   variants: {
     variant: {
-      default: 'bg-accent9 text-foreground hover:bg-accent7',
+      default: 'bg-accent9 hover:bg-accent7',
       destructive:
         'bg-destructive text-destructive-foreground hover:bg-destructive/90',
       outline:
-        'text-foreground border border-border bg-background hover:bg-theme4 hover:text-accent-foreground',
-      secondary: 'bg-theme8 text-foreground hover:bg-theme6',
+        'border border-border bg-background hover:bg-theme4 hover:text-accent-foreground',
+      secondary: 'bg-theme8 hover:bg-theme6',
       ghost: 'button-ghost',
       collapsible: 'button-collapsible',
       icon: 'h-10 w-10 hover:bg-theme6 hover:text-theme10 button-icon',
@@ -22,7 +22,7 @@ const buttonVariants = cva(['button-base', 'focus'], {
     },
 
     size: {
-      default: 'h-10 px-m py-s',
+      default: 'h-10 px-m py-s text-step-0',
       xs: 'h-5 px-2 text-step--2',
       s: 'h-9 px-2xs py-3xs',
       l: 'h-11 px-8',

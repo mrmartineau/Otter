@@ -37,6 +37,7 @@ import { Combobox } from './Combobox';
 import { FieldValueSuggestion } from './FieldValueSuggestion';
 import { Flex } from './Flex';
 import { FormGroup } from './FormGroup';
+import { IconButton } from './IconButton';
 import { PossibleMatchingItems } from './PossibleMatchingItems';
 import { TypeRadio } from './TypeRadio';
 
@@ -267,9 +268,7 @@ export const BookmarkForm = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="icon"
-                    size="s"
+                  <IconButton
                     type="button"
                     disabled={!watchUrl || isScraping}
                     onClick={() => {
@@ -279,7 +278,7 @@ export const BookmarkForm = ({
                     }}
                   >
                     <MagicWand weight="duotone" size="18" />
-                  </Button>
+                  </IconButton>
                 </TooltipTrigger>
                 <TooltipContent>{CONTENT.scrapeThisUrl}</TooltipContent>
               </Tooltip>

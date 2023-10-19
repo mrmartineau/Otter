@@ -23,6 +23,7 @@ import { Button } from './Button';
 import { Favicon } from './Favicon';
 import { FeedItemActions } from './FeedItemActions';
 import { Flex } from './Flex';
+import { IconButton } from './IconButton';
 import { Link } from './Link';
 import { Paragraph } from './Paragraph';
 import { Popover, PopoverContent, PopoverTrigger } from './Popover';
@@ -137,13 +138,13 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
             {feed ? (
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="icon" size="collapsible">
+                  <IconButton size="m">
                     <RssSimple
                       aria-label="View latest RSS feed items"
                       size={18}
                       weight="duotone"
                     />
-                  </Button>
+                  </IconButton>
                 </PopoverTrigger>
                 <PopoverContent>
                   <Suspense fallback={<Paragraph>Loading...</Paragraph>}>

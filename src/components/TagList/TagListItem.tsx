@@ -1,7 +1,7 @@
-import { Button } from '@/src/components/Button';
 import { MetaTag } from '@/src/utils/fetching/meta';
 import { CheckCircle, Hash, XCircle } from '@phosphor-icons/react';
 
+import { IconButton } from '../IconButton';
 import { SidebarLink } from '../SidebarLink';
 import { useUser } from '../UserProvider';
 import './TagList.css';
@@ -25,9 +25,9 @@ const PinUnpinTag = ({ tag, pinned }: PinUnpinTagProps) => {
     }
   };
   return (
-    <Button
-      variant="icon"
-      size="collapsible"
+    <IconButton
+      variant="taglist"
+      size="s"
       onClick={handleTogglePinnedTag}
       className="pinButton"
     >
@@ -36,7 +36,7 @@ const PinUnpinTag = ({ tag, pinned }: PinUnpinTagProps) => {
       ) : (
         <CheckCircle aria-label="pin" weight="duotone" size={18} />
       )}
-    </Button>
+    </IconButton>
   );
 };
 

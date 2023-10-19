@@ -4,8 +4,8 @@
   gap: var(--space-xs);
   justify-content: center;
   border-radius: var(--radii-m);
-  font-size: var(--step-s);
   font-weight: 300;
+  color: var(--foreground);
 
   &:disabled {
     pointer-events: none;
@@ -14,10 +14,13 @@
 }
 
 .button-ghost {
-  @apply hover:bg-theme6 hover:text-theme10;
+  font-weight: 500;
+  color: var(--text);
 
+  &:hover,
   &[aria-pressed='true'] {
-    @apply bg-theme6 text-theme10;
+    background-color: var(--theme6);
+    color: var(--theme11);
   }
 }
 
@@ -64,16 +67,11 @@
   }
 }
 
-.button-icon {
-  svg {
-    pointer-events: none;
-  }
-}
-
 .button-collapsible {
   padding: var(--space-3xs);
   font-weight: normal;
   margin-x: var(--space-3xs);
+  color: var(--theme10);
 
   &:hover {
     background-color: var(--theme6);
