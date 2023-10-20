@@ -36,10 +36,9 @@
 }
 
 .feed-image {
-  border-radius: 0.5em;
+  border-radius: var(--radii-m);
   border: 3px solid;
-
-  @media (--bp2) {
-    max-width: 50%;
-  }
+  width: 150px;
+  max-width: 150px;
+  background-color: var(--theme4);
 }
