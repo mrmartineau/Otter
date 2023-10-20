@@ -20,8 +20,8 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
 
   return (
     <div className="feed-item-wrapper">
-      <Flex gap="m" justify="between">
-        <div>
+      <div className="feed-item-content">
+        <div className="grow">
           {url && title ? (
             <div>
               <Link
@@ -66,10 +66,12 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
             </Flex>
           ) : null}
         </div>
-        <div>
-          {image ? <img src={image} alt="" className="feed-image" /> : null}
-        </div>
-      </Flex>
+        {image ? (
+          <div>
+            <img src={image} alt="" className="feed-image" />
+          </div>
+        ) : null}
+      </div>
       <FeedItemFooter {...props} key={`footer-${id}`} />
     </div>
   );

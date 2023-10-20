@@ -29,6 +29,15 @@
   }
 }
 
+.feed-item-content {
+  display: flex;
+  gap: var(--space-xs);
+  flex-direction: column;
+  @media (--bp2) {
+    flex-direction: row;
+  }
+}
+
 .feed-avatar {
   border-radius: var(--radii-full);
   width: 50px;
@@ -37,7 +46,7 @@
 
 .feed-image {
   border-radius: var(--radii-m);
-  border: 3px solid;
+  border: 1px solid var(--border);
   width: 150px;
   max-width: 150px;
   background-color: var(--theme4);
