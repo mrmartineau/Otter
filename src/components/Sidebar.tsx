@@ -12,11 +12,11 @@ import {
 } from '@/src/constants';
 import {
   ArrowFatLinesUp,
-  Gear,
   ListBullets,
   Star,
   Trash,
   TwitterLogo,
+  UserCircle,
 } from '@phosphor-icons/react';
 import { useRef } from 'react';
 import { useClickAway } from 'use-click-away';
@@ -53,7 +53,8 @@ export const Sidebar = ({ serverDbMeta }: SidebarProps) => {
       <div>
         <div className="sidebar-top">
           <Link href={ROUTE_FEED_HOME} variant="logo">
-            🦦 <div>Otter</div>
+            <img src="/otter-logo.svg" width="33" height="33" />{' '}
+            <div>Otter</div>
           </Link>
         </div>
         <Flex gapY="3xs" direction="column">
@@ -96,7 +97,7 @@ export const Sidebar = ({ serverDbMeta }: SidebarProps) => {
           {CONTENT.trashNav}
         </SidebarLink>
         <SidebarLink href={ROUTE_SETTINGS_ACCOUNT} activePath="settings">
-          <Gear aria-label="Settings" size={18} weight="duotone" />
+          <UserCircle aria-label="Settings" size={18} weight="duotone" />
           {CONTENT.settingsNav}
         </SidebarLink>
         <LogoutButton />

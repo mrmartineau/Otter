@@ -40,7 +40,7 @@ export const TopBar = ({
         </IconButton>
 
         <Link href={ROUTE_FEED_HOME} variant="logo">
-          <span className="emoji">🦦</span>
+          <img src="/otter-logo.svg" width="33" height="33" />
           <span>Otter</span>
         </Link>
       </Flex>

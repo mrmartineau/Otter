@@ -21,7 +21,13 @@ export default async function Login() {
 
   return (
     <Container variant="auth">
-      <h2 className="mt-l text-center">Sign in</h2>
+      <img
+        src="/otter-logo.svg"
+        width="90"
+        height="90"
+        className="mx-auto mt-l"
+      />
+      <h2 className="mt-s text-center">Sign in</h2>
 
       <form action="/auth/sign-in" method="post">
         <Flex direction={'column'} gap="m">

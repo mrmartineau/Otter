@@ -8,12 +8,14 @@ import { UserCircle } from '@phosphor-icons/react/dist/ssr';
 
 export default async function Index() {
   return (
-    <Container className="text-center">
-      <h2 className="mt-l">
-        🦦
-        <br />
-        {CONTENT.appName}
-      </h2>
+    <Container variant="auth" className="text-center">
+      <img
+        src="/otter-logo.svg"
+        width="90"
+        height="90"
+        className="mx-auto mt-l"
+      />
+      <h2 className="mt-s">{CONTENT.appName}</h2>
       <Flex align="center" justify="center" gapX="xs" className="my-s">
         <SidebarLink href={ROUTE_SIGNIN}>
           <UserCircle weight="duotone" width="18" />
@@ -27,32 +29,34 @@ export default async function Index() {
           </NextLink> */}
       </Flex>
 
-      <Paragraph className="mt-m">
-        This is an instance of{' '}
-        <Link variant="accent" href="https://github.com/mrmartineau/Otter">
-          Otter
-        </Link>{' '}
-        by{' '}
-        <Link variant="accent" href="https://zander.wtf">
-          Zander Martineau
-        </Link>
-        . It is an open-source, private bookmarking app built on{' '}
-        <Link variant="accent" href="https://nextjs.org">
-          next.js
-        </Link>{' '}
-        and{' '}
-        <Link variant="accent" href="https://supabase.com">
-          Supabase
-        </Link>
-        .
-      </Paragraph>
-      <Paragraph>
-        If you want to create your own instance, find out more at{' '}
-        <Link variant="accent" href="https://github.com/mrmartineau/Otter">
-          the project home page
-        </Link>
-        .
-      </Paragraph>
+      <article>
+        <Paragraph className="mt-m">
+          This is an instance of{' '}
+          <Link variant="accent" href="https://github.com/mrmartineau/Otter">
+            Otter
+          </Link>{' '}
+          by{' '}
+          <Link variant="accent" href="https://zander.wtf">
+            Zander Martineau
+          </Link>
+          . It is an open-source, private bookmarking app built on{' '}
+          <Link variant="accent" href="https://nextjs.org">
+            next.js
+          </Link>{' '}
+          and{' '}
+          <Link variant="accent" href="https://supabase.com">
+            Supabase
+          </Link>
+          .
+        </Paragraph>
+        <Paragraph>
+          If you want to create your own instance, find out more at{' '}
+          <Link variant="accent" href="https://github.com/mrmartineau/Otter">
+            the project home page
+          </Link>
+          .
+        </Paragraph>
+      </article>
     </Container>
   );
 }
