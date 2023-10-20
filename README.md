@@ -43,11 +43,12 @@
 
 ### Screenshots
 
-<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/feed.png" width="400" />
-<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/search.png" width="400" />
-<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/types-sidebar.png" width="400" />
-<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/tags-sidebar.png" width="400" />
-<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/toots.png" width="400" />
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/screens/feed.png?raw=true" width="400" />
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/screens/feed-light.png?raw=true" width="400" />
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/screens/search.png?raw=true" width="400" />
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/screens/types-sidebar.png?raw=true" width="400" />
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/screens/tags-sidebar.png?raw=true" width="400" />
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/screens/toots.png?raw=true" width="400" />
 
 ## Getting started
 
