@@ -1,6 +1,10 @@
 <div align="center">
 
-  <h1>🦦<br/>Otter</h1>
+  <h1><img
+        src="https://raw.githubusercontent.com/mrmartineau/Otter/main/public/otter-logo.svg"
+        width="90"
+        height="90"
+      /><br/>Otter</h1>
 
 > Otter is a simple bookmark manager made with [Next.js](https://nextjs.org) with Mastodon integration.
 
@@ -10,7 +14,7 @@
     >
       <img
         src="https://img.shields.io/badge/license-MIT-blue.svg"
-        alt="otter is released under the MIT license."
+        alt="Otter is released under the MIT license."
       />
     </a>
     <img
@@ -23,10 +27,27 @@
   </p>
 
   <p>
+    <a href="#features">Features</a> •
     <a href="#getting-started">Getting started</a> •
     <a href="#docs">Docs</a>
   </p>
 </div>
+
+## Features
+
+- Private bookmarking app with search, tagging and filtering
+- Mastodon integration - backup of your own toots as well as your favourite toots
+- Chrome extension
+- Bookmarklet
+- Raycast extension to search your bookmarks, view recent bookmarks and create new ones
+
+### Screenshots
+
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/feed.png" width="400" />
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/search.png" width="400" />
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/types-sidebar.png" width="400" />
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/tags-sidebar.png" width="400" />
+<img src="https://raw.githubusercontent.com/mrmartineau/Otter/main/toots.png" width="400" />
 
 ## Getting started
 
@@ -43,8 +64,10 @@ Set up the following env vars. For local development you can set them in a `.env
 # Find these in your Supabase project settings > API
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+
 PERSONAL_MASTODON_ACCESS_TOKEN=your-personal-app-mastodon-access-token
 BOT_MASTODON_ACCESS_TOKEN=your-bot-app-mastodon-access-token
+OTTER_API_TOKEN=your-otter-api-token
 ```
 
 ## Docs
@@ -93,6 +116,10 @@ TODO:
 2. Add a new `case` to the `TypeToIcon` component
 3. Add a new `TypeRadio` component to the `BookmarkForm` component
 4. Add a new value to `BookmarkType` type
+
+## Otter ecosystem
+
+There are
 
 ---
 
