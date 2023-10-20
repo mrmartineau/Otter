@@ -29,17 +29,19 @@
   <p>
     <a href="#features">Features</a> •
     <a href="#getting-started">Getting started</a> •
-    <a href="#docs">Docs</a>
+    <a href="#docs">Docs</a> •
+    <a href="#otter-ecosystem">Ecosystem</a>
   </p>
 </div>
 
 ## Features
 
 - Private bookmarking app with search, tagging and filtering
+- Dark/light colour modes
 - Mastodon integration - backup of your own toots as well as your favourite toots
-- Chrome extension
-- Bookmarklet
 - Raycast extension to search your bookmarks, view recent bookmarks and create new ones
+- Chrome extension for easy bookmarking
+- Bookmarklet
 
 ### Screenshots
 
@@ -120,9 +122,12 @@ TODO:
 
 ## Otter ecosystem
 
-There are
+I use various other tools to make Otter even better:
 
----
+- Raycast extension (not currently on the Raycast extension marketplace)
+- Chrome extension (not currently on the Chrome webstore)
+- [Page scraprer Cloudflare worker](https://github.com/mrmartineau/cloudflare-worker-scraper) used to scrape the metadata of a URL. This is used when adding new bookmarks to Otter
+- [Mastodon to Supabase Cloudflare worker](https://github.com/mrmartineau/mastodon-to-supabase) used to backup my Mastodon toots to Supabase
 
 ## License
 
