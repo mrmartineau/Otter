@@ -19,7 +19,7 @@
   padding-x: var(--space-2xs);
   position: relative;
   z-index: var(--z-2);
-  border-bottom: 1px solid var(--theme4);
+  border-bottom: 1px solid var(--border);
   background-color: var(--background);
 
   @media (--bp2) {

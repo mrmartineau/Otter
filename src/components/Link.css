@@ -64,6 +64,7 @@
     'wdth' 125,
     'ital' 10;
   gap: var(--space-xs);
+  align-items: center;
 
   &:hover {
     text-decoration: none;

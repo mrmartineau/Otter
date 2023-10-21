@@ -7,7 +7,7 @@
   overflow: hidden;
   transition: all var(--ease);
   background-color: var(--theme2);
-  border: 1px solid var(--theme4);
+  border: 1px solid var(--border);
   color: var(--theme10);
 
   &:hover,
@@ -49,5 +49,5 @@
   border: 1px solid var(--border);
   width: 150px;
   max-width: 150px;
-  background-color: var(--theme4);
+  background-color: var(--theme3);
 }
