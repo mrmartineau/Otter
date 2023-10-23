@@ -1,6 +1,7 @@
 'use client';
 
 import { Note, TwitterLogo } from '@phosphor-icons/react';
+import urlJoin from 'proper-url-join';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
@@ -17,6 +18,9 @@ export interface BookmarkFeedItemProps extends Bookmark {
 export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
   const { title, url, description, note, id, tweet, image } = props;
   const handleClickRegister = useClickBookmark();
+  const domain = url ? new URL(url).origin : null;
+  const imagePath =
+    image?.charAt(0) === '/' && domain ? urlJoin(domain, image) : image;
 
   return (
     <div className="feed-item-wrapper">
@@ -66,9 +70,9 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
             </Flex>
           ) : null}
         </div>
-        {image ? (
+        {imagePath ? (
           <div>
-            <img src={image} alt="" className="feed-image" />
+            <img src={imagePath} alt="" className="feed-image" />
           </div>
         ) : null}
       </div>
