@@ -10,7 +10,7 @@
 
   <p>
     <a
-      href="https://github.com/MrMartineau/otter/blob/master/LICENSE"
+      href="https://github.com/MrMartineau/Otter/blob/master/LICENSE"
     >
       <img
         src="https://img.shields.io/badge/license-MIT-blue.svg"
@@ -123,8 +123,8 @@ TODO:
 
 I use various other tools to make Otter even better:
 
-- Raycast extension (not currently on the Raycast extension marketplace)
-- Chrome extension (not currently on the Chrome webstore)
+- [Raycast extension](https://github.com/mrmartineau/raycast-extensions/tree/main/otter) (not currently on the Raycast extension marketplace)
+- [Chrome extension](https://github.com/mrmartineau/otter-extension) (not currently on the Chrome webstore)
 - [Page scraprer Cloudflare worker](https://github.com/mrmartineau/cloudflare-worker-scraper) used to scrape the metadata of a URL. This is used when adding new bookmarks to Otter
 - [Mastodon to Supabase Cloudflare worker](https://github.com/mrmartineau/mastodon-to-supabase) used to backup my Mastodon toots to Supabase
 
