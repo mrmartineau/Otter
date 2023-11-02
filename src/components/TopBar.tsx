@@ -1,8 +1,7 @@
 'use client';
 
-import { Button } from '@/src/components/Button';
+import { cn } from '@/src/utils/classnames';
 import { List } from '@phosphor-icons/react';
-import { clsx } from 'clsx';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import { ROUTE_FEED_HOME } from '../constants';
@@ -25,7 +24,7 @@ export const TopBar = ({
   serverDbMeta,
   ...rest
 }: TopBarProps) => {
-  const topbarClass = clsx(className, 'otter-top-bar');
+  const topbarClass = cn(className, 'otter-top-bar');
   const { handleToggleSidebar } = useSidebar();
 
   return (

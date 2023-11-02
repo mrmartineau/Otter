@@ -1,4 +1,4 @@
-import { clsx } from 'clsx';
+import { cn } from '@/src/utils/classnames';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import './Paragraph.css';
@@ -8,7 +8,7 @@ interface ParagraphProps extends ComponentPropsWithoutRef<'p'> {
 }
 
 export const Paragraph = ({ className, children, ...rest }: ParagraphProps) => {
-  const ParagraphClass = clsx(className, 'paragraph');
+  const ParagraphClass = cn(className, 'paragraph');
 
   return (
     <p className={ParagraphClass} {...rest}>

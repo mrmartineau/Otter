@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@/src/utils/classnames';
 import urlJoin from 'proper-url-join';
 import { useEffect, useState } from 'react';
 
@@ -81,7 +81,7 @@ export const RssFeed = ({ feedUrl }: RssFeedProps) => {
 
   return (
     <>
-      <h5 className={clsx('!mt-0', headingVariants({ variant: 'date' }))}>
+      <h5 className={cn('!mt-0', headingVariants({ variant: 'date' }))}>
         {CONTENT.latestRssItems}
       </h5>
       <ol className="max-w-260 mb-0 list-inside list-decimal pl-0">

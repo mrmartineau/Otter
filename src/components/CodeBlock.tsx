@@ -1,4 +1,4 @@
-import { clsx } from 'clsx';
+import { cn } from '@/src/utils/classnames';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import './CodeBlock.css';
@@ -8,7 +8,7 @@ interface CodeBlockProps extends ComponentPropsWithoutRef<'pre'> {
 }
 
 export const CodeBlock = ({ className, children, ...rest }: CodeBlockProps) => {
-  const CodeBlockClass = clsx(className, 'pre');
+  const CodeBlockClass = cn(className, 'pre');
 
   return (
     <pre className={CodeBlockClass} {...rest}>
@@ -22,7 +22,7 @@ interface CodeProps extends ComponentPropsWithoutRef<'code'> {
 }
 
 export const Code = ({ className, children, ...rest }: CodeProps) => {
-  const CodeClass = clsx(className, 'code');
+  const CodeClass = cn(className, 'code');
 
   return (
     <code className={CodeClass} {...rest}>

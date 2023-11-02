@@ -10,9 +10,9 @@ import {
   TooltipTrigger,
 } from '@/src/components/Tooltip';
 import { useToast } from '@/src/hooks/use-toast';
+import { cn } from '@/src/utils/classnames';
 import { MagicWand } from '@phosphor-icons/react/dist/ssr';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { clsx } from 'clsx';
 import { useRouter } from 'next/navigation';
 import {
   ChangeEvent,
@@ -75,10 +75,7 @@ export const BookmarkForm = ({
 }: BookmarkFormProps) => {
   const isNew = type === 'new';
   const router = useRouter();
-  const bookmarkformClass = clsx(
-    className,
-    'bookmark-form flex flex-col gap-s',
-  );
+  const bookmarkformClass = cn(className, 'bookmark-form flex flex-col gap-s');
   const supabaseClient = createClientComponentClient();
   const [formSubmitting, , setFormSubmitting] = useToggle(false);
   const [bookmarkTags, setBookmarkTags] = useState<MetaTag[]>([]);
@@ -374,11 +371,11 @@ export const BookmarkForm = ({
 
         {formError && <div className="my-m">Error: {formError}</div>}
 
-        <Flex gap="s">
-          <Button type="submit" disabled={formSubmitting}>
+        <div>
+          <Button size="m" type="submit" disabled={formSubmitting}>
             Save
           </Button>
-        </Flex>
+        </div>
       </form>
     </div>
   );
