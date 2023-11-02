@@ -5,7 +5,7 @@
   justify-content: center;
   border-radius: var(--radii-m);
   font-weight: 300;
-  color: var(--foreground);
+  color: #f5f5f0;
 
   &:disabled {
     pointer-events: none;

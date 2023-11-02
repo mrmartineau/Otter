@@ -116,7 +116,12 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
 
   return (
     <>
-      <Button variant="cmdk" aria-label="Search Otter" onClick={toggleOpen}>
+      <Button
+        variant="cmdk"
+        aria-label="Search Otter"
+        onClick={toggleOpen}
+        className="h-10"
+      >
         <MagnifyingGlass weight="duotone" size="25" />
         Search
         <Flex align="center" justify="center" className="cmdk-button-label">

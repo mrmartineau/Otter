@@ -22,16 +22,16 @@ const buttonVariants = cva(['button-base', 'focus'], {
     },
 
     size: {
-      default: 'h-10 px-m py-s text-step-0',
-      xs: 'h-5 px-2 text-step--2',
-      s: 'h-9 px-2xs py-3xs',
-      l: 'h-11 px-8',
+      xs: 'px-xs py-3xs text-step--2',
+      s: 'px-s py-2xs',
+      m: 'px-m py-xs text-step-0',
+      l: 'px-m py-s',
       collapsible: 'h-6 w-6',
     },
   },
   defaultVariants: {
     variant: 'default',
-    size: 'default',
+    size: 'm',
   },
 });
 
