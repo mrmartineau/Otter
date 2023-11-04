@@ -2,6 +2,7 @@
 
 import { cn } from '@/src/utils/classnames';
 import { LinkSimpleHorizontal, PlusCircle } from '@phosphor-icons/react';
+import clsx from 'clsx';
 import urlJoin from 'proper-url-join';
 
 import { ROUTE_NEW_BOOKMARK } from '../constants';
@@ -53,7 +54,7 @@ export const TootFeedItem = (props: Toot) => {
 
       {tootUrls?.length ? (
         <div>
-          <h3 className={cn(headingVariants({ variant: 'date' }), '!mt-0')}>
+          <h3 className={clsx(headingVariants({ variant: 'date' }), '!mt-0')}>
             URLs
           </h3>
           <ul className="flex flex-col gap-2xs">

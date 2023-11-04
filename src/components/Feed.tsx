@@ -8,6 +8,7 @@ import { ReactNode, memo } from 'react';
 
 import { useRealtimeFeed } from '../hooks/useRealtime';
 import { Bookmark, Toot, Tweet } from '../types/db';
+import { cn } from '../utils/classnames';
 import { BookmarkFeedItem } from './BookmarkFeedItem';
 import { Flex } from './Flex';
 import { headingVariants } from './Heading';
@@ -64,7 +65,12 @@ export const Feed = memo(
     return (
       <div className="feed">
         <Flex gap="xs" direction="column" justify="between">
-          <h3 className="mt-0 flex items-center gap-2xs">
+          <h3
+            className={cn(
+              headingVariants({ variant: 'feedTitle' }),
+              'flex items-center gap-2xs',
+            )}
+          >
             {icon}
             {title}
           </h3>
