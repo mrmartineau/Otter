@@ -101,6 +101,17 @@
   }
 }
 
+.link-feed-title {
+  align-items: flex-start;
+  gap: var(--space-xs);
+  font-size: var(--step-1);
+  font-variation-settings:
+    'wght' 700,
+    'wdth' 125,
+    'ital' 10;
+  color: var(--theme11);
+}
+
 .link-fab {
   --color: var(--theme12);
   position: fixed;
