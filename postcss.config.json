@@ -17,6 +17,9 @@
     "postcss-axis": {},
     "tailwindcss/nesting": {},
     "tailwindcss": {},
-    "autoprefixer": {}
+    "cssnano": {
+      "preset": "default",
+      "plugins": [["autoprefixer", {}]]
+    }
   }
 }

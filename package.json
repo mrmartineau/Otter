@@ -83,6 +83,7 @@
     "@types/react-dom": "18.2.14",
     "@types/title": "^3.4.2",
     "@types/tldjs": "^2.3.3",
+    "cssnano": "^6.0.1",
     "encoding": "^0.1.13",
     "happy-dom": "^12.10.1",
     "open-props": "^1.6.10",
