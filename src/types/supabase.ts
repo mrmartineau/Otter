@@ -66,52 +66,6 @@ export interface Database {
         }
         Relationships: []
       }
-      item_tags: {
-        Row: {
-          item_id: number
-          tag_id: number
-        }
-        Insert: {
-          item_id: number
-          tag_id: number
-        }
-        Update: {
-          item_id?: number
-          tag_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "item_tags_item_id_fkey"
-            columns: ["item_id"]
-            referencedRelation: "items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "item_tags_tag_id_fkey"
-            columns: ["tag_id"]
-            referencedRelation: "tags2"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      items: {
-        Row: {
-          description: string | null
-          id: number
-          name: string
-        }
-        Insert: {
-          description?: string | null
-          id?: number
-          name: string
-        }
-        Update: {
-          description?: string | null
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -145,39 +99,6 @@ export interface Database {
           settings_types_visible?: boolean
           updated_at?: string | null
           username?: string | null
-        }
-        Relationships: []
-      }
-      tags: {
-        Row: {
-          created_at: string | null
-          id: number
-          tag_name: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: number
-          tag_name?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: number
-          tag_name?: string | null
-        }
-        Relationships: []
-      }
-      tags2: {
-        Row: {
-          id: number
-          name: string
-        }
-        Insert: {
-          id?: number
-          name: string
-        }
-        Update: {
-          id?: number
-          name?: string
         }
         Relationships: []
       }
