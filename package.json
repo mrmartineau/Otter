@@ -1,4 +1,15 @@
 {
+  "name": "otter",
+  "description": "Otter is a simple bookmark manager",
+  "author": {
+    "name": "Zander Martineau",
+    "url": "https://zander.wtf"
+  },
+  "version": "2.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mrmartineau/Otter"
+  },
   "private": true,
   "scripts": {
     "predev": "npm run supabase:types",
@@ -12,11 +23,12 @@
     "type-check": "tsc --noEmit",
     "supabase": "supabase",
     "supabase:types": "npm run supabase:types:app",
+    "--note--": "the project ID in the script below will need to be updated to match your own Supabase project ID",
     "supabase:types:app": "npx supabase gen types typescript --project-id \"ffpbylcvwtyozyrplqic\" --schema public > src/types/supabase.ts",
     "supabase:dumpdb": "npx supabase db pull",
     "supabase:setup": "npx supabase db push",
     "supabase:seed": "npx supabase start",
-    "test": "vitest"
+    "test": "vitest",
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
