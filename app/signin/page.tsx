@@ -4,13 +4,15 @@ import { Flex } from '@/src/components/Flex';
 import { FormGroup } from '@/src/components/FormGroup';
 import { Input } from '@/src/components/Input';
 import { ALLOW_SIGNUP, ROUTE_FEED_HOME } from '@/src/constants';
-import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
+import { createServerClient } from '@/src/utils/supabase/server';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import Messages from './messages';
 
 export default async function Login() {
-  const supabaseClient = createServerComponentClient();
+  const cookieStore = cookies();
+  const supabaseClient = createServerClient(cookieStore);
   const {
     data: { session },
   } = await supabaseClient.auth.getSession();
@@ -18,6 +20,50 @@ export default async function Login() {
   if (session) {
     redirect(ROUTE_FEED_HOME);
   }
+
+  const signIn = async (formData: FormData) => {
+    'use server';
+
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const cookieStore = cookies();
+    const supabase = createServerClient(cookieStore);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return redirect('/signin?message=Could not authenticate user');
+    }
+
+    return redirect(ROUTE_FEED_HOME);
+  };
+
+  const signUp = async (formData: FormData) => {
+    'use server';
+
+    const origin = headers().get('origin');
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const cookieStore = cookies();
+    const supabase = createServerClient(cookieStore);
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      return redirect('/signin?message=Could not authenticate user');
+    }
+
+    return redirect('/signin?message=Check email to continue sign in process');
+  };
 
   return (
     <Container variant="auth">
@@ -29,7 +75,7 @@ export default async function Login() {
       />
       <h2 className="mt-s text-center">Sign in</h2>
 
-      <form action="/auth/sign-in" method="post">
+      <form action={signIn}>
         <Flex direction={'column'} gap="m">
           <FormGroup label="Email" name="email">
             <Input
@@ -53,7 +99,7 @@ export default async function Login() {
 
           <Flex gap="m" justify="between">
             {ALLOW_SIGNUP ? (
-              <Button formAction="/auth/sign-up" variant="secondary">
+              <Button formAction={signUp} variant="secondary">
                 Sign Up
               </Button>
             ) : null}

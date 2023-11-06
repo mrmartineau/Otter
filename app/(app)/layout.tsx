@@ -5,8 +5,9 @@ import { Toaster } from '@/src/components/Toaster';
 import { TopBar } from '@/src/components/TopBar';
 import { UserProvider } from '@/src/components/UserProvider';
 import { UserProfile } from '@/src/types/db';
-import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
+import { createServerClient } from '@/src/utils/supabase/server';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
 
@@ -17,7 +18,8 @@ interface LayoutProps {
 }
 
 export default async function AppLayout({ children }: LayoutProps) {
-  const supabaseClient = createServerComponentClient();
+  const cookieStore = cookies();
+  const supabaseClient = createServerClient(cookieStore);
   const dbMeta = await getDbMetadata(supabaseClient);
   const {
     data: { user },

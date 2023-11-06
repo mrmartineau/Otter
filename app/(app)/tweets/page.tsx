@@ -4,11 +4,12 @@ import {
   ROUTE_TWEETS_LIKES,
   ROUTE_TWEETS_MINE,
 } from '@/src/constants';
-import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { getTweets } from '@/src/utils/fetching/tweets';
+import { createServerClient } from '@/src/utils/supabase/server';
 import { TwitterLogo } from '@phosphor-icons/react/dist/ssr';
+import { cookies } from 'next/headers';
 
 export const metadata = {
   title: CONTENT.tweetsMineTitle,
@@ -20,7 +21,8 @@ export default async function MyTweetsage({
   searchParams: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
 }) {
   const { limit, offset } = searchParams;
-  const supabaseClient = createServerComponentClient();
+  const cookieStore = cookies();
+  const supabaseClient = createServerClient(cookieStore);
   const { data, count } = await getTweets({
     supabaseClient,
     params: searchParams,

@@ -18,7 +18,7 @@ export default async function Index() {
       <h2 className="mt-s">{CONTENT.appName}</h2>
       <Flex align="center" justify="center" gapX="xs" className="my-s">
         <SidebarLink href={ROUTE_SIGNIN}>
-          <UserCircle weight="duotone" width="18" />
+          <UserCircle weight="duotone" width="18" height="18" />
           {CONTENT.signInTitle}
         </SidebarLink>
         {/* <NextLink href={ROUTE_SIGNUP} passHref>

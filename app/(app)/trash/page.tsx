@@ -1,10 +1,11 @@
 import { Feed } from '@/src/components/Feed';
 import { CONTENT } from '@/src/constants';
 import { Bookmark } from '@/src/types/db';
-import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
+import { createServerClient } from '@/src/utils/supabase/server';
 import { Trash } from '@phosphor-icons/react/dist/ssr';
+import { cookies } from 'next/headers';
 
 export const metadata = {
   title: 'Trash',
@@ -16,7 +17,8 @@ export default async function TrashPage({
   searchParams: Partial<ApiParameters>;
 }) {
   const { limit, offset } = searchParams;
-  const supabaseClient = createServerComponentClient();
+  const cookieStore = cookies();
+  const supabaseClient = createServerClient(cookieStore);
   const { data, count } = await getBookmarks({
     supabaseClient,
     params: { ...searchParams, status: 'inactive' },

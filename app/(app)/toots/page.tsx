@@ -1,10 +1,11 @@
 import { Feed } from '@/src/components/Feed';
 import { MastodonLogo } from '@/src/components/MastodonLogo';
 import { CONTENT, ROUTE_TOOTS_LIKES, ROUTE_TOOTS_MINE } from '@/src/constants';
-import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { getToots } from '@/src/utils/fetching/toots';
+import { createServerClient } from '@/src/utils/supabase/server';
+import { cookies } from 'next/headers';
 
 export const metadata = {
   title: CONTENT.tootsMineTitle,
@@ -16,7 +17,8 @@ export default async function MyTootsPage({
   searchParams: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
 }) {
   const { limit, offset } = searchParams;
-  const supabaseClient = createServerComponentClient();
+  const cookieStore = cookies();
+  const supabaseClient = createServerClient(cookieStore);
   const { data, count } = await getToots({
     supabaseClient,
     params: searchParams,

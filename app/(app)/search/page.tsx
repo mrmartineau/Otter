@@ -1,11 +1,12 @@
 import { Feed } from '@/src/components/Feed';
 import { CONTENT } from '@/src/constants';
 import { Bookmark } from '@/src/types/db';
-import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getSearchBookmarks } from '@/src/utils/fetching/search';
+import { createServerClient } from '@/src/utils/supabase/server';
 import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr';
 import { Metadata } from 'next';
+import { cookies } from 'next/headers';
 
 type SearchPageProps = ApiParameters & {
   q: string;
@@ -27,7 +28,8 @@ export async function generateMetadata({
 
 export default async function SearchPage({ searchParams }: Props) {
   const { limit, offset, q } = searchParams;
-  const supabaseClient = createServerComponentClient();
+  const cookieStore = cookies();
+  const supabaseClient = createServerClient(cookieStore);
   const { data, count } = await getSearchBookmarks({
     supabaseClient,
     params: searchParams,

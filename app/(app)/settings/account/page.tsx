@@ -1,9 +1,11 @@
-import { Code, CodeBlock } from '@/src/components/CodeBlock';
+import { CodeBlock } from '@/src/components/CodeBlock';
 import { UpdateInfoForm } from '@/src/components/UpdateInfoForm';
-import { createServerComponentClient } from '@/src/utils/createServerComponentClient';
+import { createServerClient } from '@/src/utils/supabase/server';
+import { cookies } from 'next/headers';
 
 export default async function AccountPage() {
-  const supabaseClient = createServerComponentClient();
+  const cookieStore = cookies();
+  const supabaseClient = createServerClient(cookieStore);
   const {
     data: { user },
   } = await supabaseClient.auth.getUser();
