@@ -6,7 +6,7 @@
         height="90"
       /><br/>Otter</h1>
 
-> Otter is a simple bookmark manager made with [Next.js](https://nextjs.org) with Mastodon integration.
+> Otter is a self-hosted bookmark manager made with [Next.js](https://nextjs.org) and Supabase with Mastodon integration.
 
   <p>
     <a
