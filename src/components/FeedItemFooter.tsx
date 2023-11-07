@@ -18,6 +18,7 @@ import title from 'title';
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
 import { getRelativeDate } from '../utils/dates';
+import { fullPath } from '../utils/fullPath';
 import { simpleUrl } from '../utils/simpleUrl';
 import { Button } from './Button';
 import { Favicon } from './Favicon';
@@ -135,7 +136,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               </Tooltip>
             ) : null}
 
-            {feed ? (
+            {feed && url ? (
               <Popover>
                 <PopoverTrigger asChild>
                   <IconButton size="m">
@@ -148,7 +149,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                 </PopoverTrigger>
                 <PopoverContent>
                   <Suspense fallback={<Paragraph>Loading...</Paragraph>}>
-                    <RssFeed feedUrl={feed} />
+                    <RssFeed feedUrl={fullPath(url, feed)} />
                   </Suspense>
                 </PopoverContent>
               </Popover>
