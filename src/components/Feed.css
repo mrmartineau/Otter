@@ -12,7 +12,7 @@
 
   &:hover,
   &:focus-within {
-    .feedItem__actions {
+    .feed-item-actions {
       visibility: visible;
       opacity: 1;
     }
@@ -22,7 +22,7 @@
   }
 
   @media (--fine) {
-    .feedItem__actions {
+    .feed-item-actions {
       visibility: hidden;
       opacity: 0px;
     }

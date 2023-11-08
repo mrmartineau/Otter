@@ -1,4 +1,6 @@
-.feedItemActions {
+.feed-item-actions {
+  display: flex;
+  gap: var(--space-3xs);
   transition: all 0.2s ease-in-out;
 
   @media (--coarse) {

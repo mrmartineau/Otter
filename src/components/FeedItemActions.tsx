@@ -127,7 +127,7 @@ export const FeedItemActions = ({
   };
 
   return (
-    <Flex gap="3xs" className="feedItemActions">
+    <div className="feed-item-actions">
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
           <Button variant="ghost" size="xs">
@@ -267,6 +267,6 @@ export const FeedItemActions = ({
           />
         </DialogContent>
       </Dialog>
-    </Flex>
+    </div>
   );
 };
