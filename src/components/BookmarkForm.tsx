@@ -366,6 +366,7 @@ export const BookmarkForm = ({
             <TypeRadio value="game" {...register('type')} />
             <TypeRadio value="note" {...register('type')} />
             <TypeRadio value="event" {...register('type')} />
+            <TypeRadio value="place" {...register('type')} />
           </Flex>
         </FormGroup>
 

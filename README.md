@@ -114,9 +114,9 @@ TODO:
 #### Adding new bookmark types
 
 1. Add the new type to the types enum `ALTER TYPE type ADD VALUE '???';`
-2. Add a new `case` to the `TypeToIcon` component
-3. Add a new `TypeRadio` component to the `BookmarkForm` component
-4. Add a new value to `BookmarkType` type
+2. Run `pnpm run supabase:types` to update the TypeScript types
+3. Add a new `case` to the `TypeToIcon` component
+4. Add a new `TypeRadio` component to the `BookmarkForm` component
 
 ## Otter ecosystem
 

@@ -8,6 +8,7 @@ import {
   Headphones,
   ImageSquare,
   LinkSimpleHorizontal,
+  MapPin,
   NewspaperClipping,
   Notepad,
   VideoCamera,
@@ -124,6 +125,16 @@ export const TypeToIcon = ({ type, color, ...rest }: TypeToIconProps) => {
       return (
         <CalendarX
           aria-label="Product"
+          weight="duotone"
+          size={18}
+          color={color}
+          {...rest}
+        />
+      );
+    case 'place':
+      return (
+        <MapPin
+          aria-label="Place"
           weight="duotone"
           size={18}
           color={color}

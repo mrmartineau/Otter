@@ -262,6 +262,7 @@ export interface Database {
         | "product"
         | "note"
         | "file"
+        | "place"
     }
     CompositeTypes: {
       [_ in never]: never
