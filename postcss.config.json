@@ -1,7 +1,7 @@
 {
   "plugins": {
     "postcss-import": {},
-    "postcss-nested": {},
+    "tailwindcss/nesting": {},
     "@csstools/postcss-global-data": {
       "files": ["src/styles/media.css"]
     },
@@ -15,7 +15,6 @@
     },
     "postcss-extend-rule": {},
     "postcss-axis": {},
-    "tailwindcss/nesting": {},
     "tailwindcss": {},
     "cssnano": {
       "preset": "default",
