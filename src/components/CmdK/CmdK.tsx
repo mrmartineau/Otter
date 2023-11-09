@@ -2,7 +2,7 @@
 
 import { Button } from '@/src/components/Button';
 import { useToggle } from '@/src/hooks/useToggle';
-import { Bookmark, Tweet } from '@/src/types/db';
+import { Bookmark, Toot, Tweet } from '@/src/types/db';
 import { DbMetaResponse } from '@/src/utils/fetching/meta';
 import { simpleUrl } from '@/src/utils/simpleUrl';
 import {
@@ -74,6 +74,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
   const [open, toggleOpen, setOpen] = useToggle(false);
   const [bookmarkItems, setBookmarkItems] = useState<Bookmark[]>([]);
   const [tweetItems, setTweetItems] = useState<Tweet[]>([]);
+  const [tootItems, setTootItems] = useState<Toot[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const dbMeta = serverDbMeta;
 
@@ -91,8 +92,9 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
     await fetchSearch(value).then((data) => {
       setBookmarkItems((data?.bookmarksSearch?.data as Bookmark[]) ?? []);
       setTweetItems(data?.tweetsSearch?.data ?? []);
+      setTootItems(data?.tootsSearch?.data ?? []);
     });
-  }, 500);
+  }, 1000);
 
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
@@ -331,6 +333,36 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                       accessories={sharedAccessories}
                     >
                       {formatTitle(type)}
+                    </Item>
+                  );
+                })}
+              </Command.Group>
+            ) : null}
+
+            {/* Toots */}
+            {searchTerm.length && tootItems?.length ? (
+              <Command.Group className="cmdk-group" heading="Toots">
+                {tootItems?.map(({ id, text, user_avatar, user_id }) => {
+                  if (!text) {
+                    return null;
+                  }
+
+                  const value = [text].filter(Boolean).join(' ');
+                  return (
+                    <Item key={`toot-${id}`} value={value} to={`/toots/${id}`}>
+                      <div>
+                        <Flex align="center" gap="xs" className="mb-2xs">
+                          {user_avatar ? (
+                            <img
+                              src={user_avatar}
+                              width="20px"
+                              className="rounded-full"
+                            />
+                          ) : null}
+                          <span>{user_id}</span>
+                        </Flex>
+                        {text}
+                      </div>
                     </Item>
                   );
                 })}

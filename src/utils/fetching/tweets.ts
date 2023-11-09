@@ -3,7 +3,7 @@ import { type SupabaseClient } from '@supabase/supabase-js';
 
 import { type ApiParameters, apiParameters } from './apiParameters';
 
-interface TweetFetchingOptions {
+interface TweetsFetchingOptions {
   supabaseClient: SupabaseClient<Database>;
   params: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
   likes: boolean;
@@ -12,7 +12,7 @@ export const getTweets = async ({
   supabaseClient,
   params,
   likes,
-}: TweetFetchingOptions) => {
+}: TweetsFetchingOptions) => {
   const { limit, offset, order } = apiParameters(params);
 
   const supabaseResponse = await supabaseClient
@@ -25,6 +25,23 @@ export const getTweets = async ({
   if (supabaseResponse.error) {
     throw supabaseResponse.error;
   }
+
+  return supabaseResponse;
+};
+
+interface TweetFetchingOptions {
+  supabaseClient: SupabaseClient<Database>;
+  id: string;
+}
+export const getTweet = async ({
+  supabaseClient,
+  id,
+}: TweetFetchingOptions) => {
+  const supabaseResponse = await supabaseClient
+    .from('tweets')
+    .select('*')
+    .match({ id })
+    .single();
 
   return supabaseResponse;
 };

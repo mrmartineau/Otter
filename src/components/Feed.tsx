@@ -99,11 +99,9 @@ export const Feed = memo(
                     {groupedItem?.items?.map((item) => {
                       if (isTweet(item)) {
                         return <TweetFeedItem {...item} key={item.id} />;
-                      }
-                      if (isToot(item)) {
+                      } else if (isToot(item)) {
                         return <TootFeedItem {...item} key={item.id} />;
                       }
-
                       return (
                         <BookmarkFeedItem
                           {...item}
@@ -125,8 +123,7 @@ export const Feed = memo(
               realtimeItems.map((item) => {
                 if (isTweet(item)) {
                   return <TweetFeedItem {...item} key={item.id} />;
-                }
-                if (isToot(item)) {
+                } else if   (isToot(item)) {
                   return <TootFeedItem {...item} key={item.id} />;
                 }
                 return (

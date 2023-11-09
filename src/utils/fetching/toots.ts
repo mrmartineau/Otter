@@ -3,7 +3,7 @@ import { type SupabaseClient } from '@supabase/supabase-js';
 
 import { type ApiParameters, apiParameters } from './apiParameters';
 
-interface TootFetchingOptions {
+interface TootsFetchingOptions {
   supabaseClient: SupabaseClient<Database>;
   params: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
   likes: boolean;
@@ -12,7 +12,7 @@ export const getToots = async ({
   supabaseClient,
   params,
   likes,
-}: TootFetchingOptions) => {
+}: TootsFetchingOptions) => {
   const { limit, offset, order } = apiParameters(params);
 
   const supabaseResponse = await supabaseClient
@@ -25,6 +25,20 @@ export const getToots = async ({
   if (supabaseResponse.error) {
     throw supabaseResponse.error;
   }
+
+  return supabaseResponse;
+};
+
+interface TootFetchingOptions {
+  supabaseClient: SupabaseClient<Database>;
+  id: string;
+}
+export const getToot = async ({ supabaseClient, id }: TootFetchingOptions) => {
+  const supabaseResponse = await supabaseClient
+    .from('toots')
+    .select('*')
+    .match({ id })
+    .single();
 
   return supabaseResponse;
 };

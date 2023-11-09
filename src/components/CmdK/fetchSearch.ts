@@ -13,17 +13,28 @@ export const fetchSearch = async (searchTerm: string) => {
     .match({ status: 'active' })
     .order('created_at', { ascending: false })
     .limit(5);
-
   const tweetsSearch = await supabaseClient
     .from('tweets')
     .select('*', { count: 'exact' })
-    .or(`text.ilike.*${searchTerm}*,user_name.ilike.*${searchTerm}*`)
-    .match({ status: 'active' })
+    .or(
+      `text.ilike.*${searchTerm}*,user_name.ilike.*${searchTerm}*,hashtags.cs.{${searchTerm}}`,
+    )
     .order('created_at', { ascending: false })
     .limit(5);
+  console.log(`🚀 ~ fetchSearch ~ tweetsSearch:`, tweetsSearch);
+  const tootsSearch = await supabaseClient
+    .from('toots')
+    .select('*', { count: 'exact' })
+    .or(
+      `text.ilike.*${searchTerm}*,user_name.ilike.*${searchTerm}*,user_id.ilike.*${searchTerm}*,hashtags.cs.{${searchTerm}}`,
+    )
+    .order('created_at', { ascending: false })
+    .limit(5);
+  console.log(`🚀 ~ fetchSearch ~ tootsSearch:`, tootsSearch);
 
   return {
     bookmarksSearch,
     tweetsSearch,
+    tootsSearch,
   };
 };
