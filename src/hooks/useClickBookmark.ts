@@ -1,7 +1,10 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+'use client';
+
+import { Database } from '../types/supabase';
+import { createBrowserClient } from '../utils/supabase/client';
 
 export const useClickBookmark = () => {
-  const supabaseClient = createClientComponentClient();
+  const supabaseClient = createBrowserClient<Database>();
 
   const handleClickRegister = async (id: string) => {
     const selectItem = await supabaseClient
@@ -14,7 +17,7 @@ export const useClickBookmark = () => {
       .from('bookmarks')
       .update({
         click_count: count + 1,
-        modified_at: new Date(),
+        modified_at: new Date().toString(),
       })
       .match({ id });
   };

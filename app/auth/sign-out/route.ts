@@ -1,13 +1,14 @@
 import { ROUTE_SIGNIN } from '@/src/constants';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@/src/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   const requestUrl = new URL(request.url);
-  const supabase = createRouteHandlerClient({ cookies });
+  const cookieStore = cookies();
+  const supabaseClient = createServerClient(cookieStore);
 
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
 
   return NextResponse.redirect(`${requestUrl.origin}${ROUTE_SIGNIN}`, {
     // a 301 status is required to redirect from a POST to a GET route

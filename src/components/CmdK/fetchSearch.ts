@@ -1,7 +1,10 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+'use client';
+
+import { Database } from '@/src/types/supabase';
+import { createBrowserClient } from '@/src/utils/supabase/client';
 
 export const fetchSearch = async (searchTerm: string) => {
-  const supabaseClient = createClientComponentClient();
+  const supabaseClient = createBrowserClient<Database>();
   const bookmarksSearch = await supabaseClient
     .from('bookmarks')
     .select('*', { count: 'exact' })

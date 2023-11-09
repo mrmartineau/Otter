@@ -11,17 +11,17 @@ import {
   Trash,
 } from '@phosphor-icons/react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import urlJoin from 'proper-url-join';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { useToggle } from '../hooks/useToggle';
+import { Database } from '../types/supabase';
+import { createBrowserClient } from '../utils/supabase/client';
 import { BookmarkFeedItemProps } from './BookmarkFeedItem';
 import { BookmarkForm } from './BookmarkForm';
 import { Dialog, DialogContent, DialogTrigger } from './Dialog';
 import './FeedItemActions.css';
-import { Flex } from './Flex';
 
 interface FeedItemActionsProps extends BookmarkFeedItemProps {
   isInFeed?: boolean;
@@ -40,7 +40,7 @@ export const FeedItemActions = ({
   allowDeletion,
   isInFeed = true,
 }: FeedItemActionsProps) => {
-  const supabaseClient = createClientComponentClient();
+  const supabaseClient = createBrowserClient<Database>();
   const [isToggled, , setToggleState] = useToggle();
   const router = useRouter();
   const handleClickRegister = useClickBookmark();
@@ -51,7 +51,7 @@ export const FeedItemActions = ({
         .from('bookmarks')
         .update({
           status: 'inactive',
-          modified_at: new Date(),
+          modified_at: new Date().toString(),
         })
         .match({ id });
     }
@@ -61,7 +61,7 @@ export const FeedItemActions = ({
       .from('bookmarks')
       .update({
         status: 'active',
-        modified_at: new Date(),
+        modified_at: new Date().toString(),
       })
       .match({ id });
   };
@@ -75,7 +75,7 @@ export const FeedItemActions = ({
       .from('bookmarks')
       .update({
         star: !star,
-        modified_at: new Date(),
+        modified_at: new Date().toString(),
       })
       .match({ id });
   };

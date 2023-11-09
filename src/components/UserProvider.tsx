@@ -1,10 +1,11 @@
 'use client';
 
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { ReactNode, createContext, useCallback, useContext } from 'react';
 
 import { useRealtimeProfile } from '../hooks/useRealtime';
 import { UserProfile } from '../types/db';
+import { Database } from '../types/supabase';
+import { createBrowserClient } from '../utils/supabase/client';
 
 export type UseUpdateReturn = (action: UIStateAction) => void;
 export type UIStateAction =
@@ -40,7 +41,7 @@ interface UserProviderProps extends Pick<UserContextType, 'profile' | 'id'> {
 
 export const UserProvider = ({ children, id, profile }: UserProviderProps) => {
   const realtimeProfile = useRealtimeProfile(profile);
-  const supabaseClient = createClientComponentClient();
+  const supabaseClient = createBrowserClient<Database>();
 
   const handleUpdateUISettings = useCallback(
     async (action: UIStateAction) => {

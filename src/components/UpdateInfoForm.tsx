@@ -2,13 +2,14 @@
 
 import { Button } from '@/src/components/Button';
 import { Input } from '@/src/components/Input';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import emailValidator from 'email-validator';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useToggle } from '../hooks/useToggle';
+import { Database } from '../types/supabase';
 import { getErrorMessage } from '../utils/get-error-message';
+import { createBrowserClient } from '../utils/supabase/client';
 import { FormGroup } from './FormGroup';
 
 export interface FormData {
@@ -21,7 +22,7 @@ interface UpdateInfoProps {
 }
 
 export const UpdateInfoForm = ({ user }: UpdateInfoProps) => {
-  const supabaseClient = createClientComponentClient();
+  const supabaseClient = createBrowserClient<Database>();
   const [formError, setFormError] = useState<string>('');
   const [formSubmitting, , setFormSubmitting] = useToggle();
   const {

@@ -1,7 +1,7 @@
 import { API_HEADERS } from '@/src/constants';
 import { errorResponse } from '@/src/utils/fetching/errorResponse';
 import { getErrorMessage } from '@/src/utils/get-error-message';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@/src/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { toJson } from 'rss-converter';
 
@@ -12,9 +12,7 @@ import { toJson } from 'rss-converter';
  */
 export async function GET(request: Request) {
   const cookieStore = cookies();
-  const supabaseClient = createRouteHandlerClient({
-    cookies: () => cookieStore,
-  });
+  const supabaseClient = createServerClient(cookieStore);
   const {
     data: { session },
   } = await supabaseClient.auth.getSession();

@@ -12,7 +12,6 @@ import {
 import { useToast } from '@/src/hooks/use-toast';
 import { cn } from '@/src/utils/classnames';
 import { MagicWand } from '@phosphor-icons/react/dist/ssr';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import {
   ChangeEvent,
@@ -33,6 +32,7 @@ import { MetaTag, getDbMetadata } from '../utils/fetching/meta';
 import { getScrapeData } from '../utils/fetching/scrape';
 import { getErrorMessage } from '../utils/get-error-message';
 import { MatchTagsProps, matchTags } from '../utils/matchTags';
+import { createBrowserClient } from '../utils/supabase/client';
 import { Combobox } from './Combobox';
 import { FieldValueSuggestion } from './FieldValueSuggestion';
 import { Flex } from './Flex';
@@ -76,7 +76,7 @@ export const BookmarkForm = ({
   const isNew = type === 'new';
   const router = useRouter();
   const bookmarkformClass = cn(className, 'bookmark-form flex flex-col gap-s');
-  const supabaseClient = createClientComponentClient();
+  const supabaseClient = createBrowserClient<Database>();
   const [formSubmitting, , setFormSubmitting] = useToggle(false);
   const [bookmarkTags, setBookmarkTags] = useState<MetaTag[]>([]);
   const [formError, setFormError] = useState<string>('');

@@ -17,10 +17,11 @@ import title from 'title';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
+import { Database } from '../types/supabase';
 import { getRelativeDate } from '../utils/dates';
 import { fullPath } from '../utils/fullPath';
 import { simpleUrl } from '../utils/simpleUrl';
-import { Button } from './Button';
+import { createBrowserClient } from '../utils/supabase/client';
 import { Favicon } from './Favicon';
 import { FeedItemActions } from './FeedItemActions';
 import { Flex } from './Flex';
@@ -38,6 +39,7 @@ export interface FeedItemFooterProps extends Bookmark {
 }
 
 export const FeedItemFooter = (props: FeedItemFooterProps) => {
+  const supabaseClient = createBrowserClient<Database>();
   const {
     url,
     tags,
@@ -57,6 +59,16 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
     created_at !== modified_at
       ? `Created on ${createdDate.formatted}, modified on ${modifiedDate.formatted}`
       : `Created on ${createdDate.formatted}`;
+
+  const handleToggleStar = async (): Promise<void> => {
+    await supabaseClient
+      .from('bookmarks')
+      .update({
+        star: !star,
+        modified_at: new Date(),
+      })
+      .match({ id });
+  };
 
   return (
     <TooltipProvider delayDuration={800} skipDelayDuration={500}>
@@ -91,15 +103,24 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               </>
             ) : null}
 
-            {star ? (
-              <Star size={16} weight="fill" />
-            ) : (
-              <Star size={16} weight="duotone" />
-            )}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                {star ? (
+                  <IconButton onClick={handleToggleStar} size="s">
+                    <Star size={16} weight="fill" />
+                  </IconButton>
+                ) : (
+                  <IconButton onClick={handleToggleStar} size="s">
+                    <Star size={16} weight="duotone" />
+                  </IconButton>
+                )}
+              </TooltipTrigger>
+              <TooltipContent>Star/unstar this item</TooltipContent>
+            </Tooltip>
 
             {type !== null ? (
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger asChild>
                   <Flex align="center">
                     <Link href={urlJoin('/type', type)}>
                       <TypeToIcon type={type} size="16" />

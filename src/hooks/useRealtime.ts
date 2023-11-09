@@ -1,8 +1,10 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+'use client';
+
 import { useEffect, useState } from 'react';
 
 import { Bookmark, UserProfile } from '../types/db';
 import { Database } from '../types/supabase';
+import { createBrowserClient } from '../utils/supabase/client';
 import { FeedItemModel } from './useGroupByDate';
 
 /**
@@ -19,7 +21,7 @@ export const useRealtimeFeed = ({
   table = 'bookmarks',
 }: RealtimeFeedProps) => {
   const [items, setItems] = useState<FeedItemModel[]>(initialData);
-  const supabaseClient = createClientComponentClient<Database>();
+  const supabaseClient = createBrowserClient<Database>();
 
   useEffect(() => {
     setItems(initialData);
@@ -86,7 +88,7 @@ export const useRealtimeFeed = ({
  */
 export const useRealtimeProfile = (initialData: UserProfile | null) => {
   const [profile, setProfile] = useState<UserProfile | null>(initialData);
-  const supabaseClient = createClientComponentClient<Database>();
+  const supabaseClient = createBrowserClient<Database>();
 
   useEffect(() => {
     setProfile(initialData);
