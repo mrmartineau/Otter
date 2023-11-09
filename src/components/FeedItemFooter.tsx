@@ -60,14 +60,16 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
 
   return (
     <TooltipProvider delayDuration={800} skipDelayDuration={500}>
-      <div className="grid gap-1 font-mono text-step--2">
+      <div className="grid gap-1 text-step--2">
         <Flex align="center" gapX="m" wrap="wrap">
           {tags?.length ? (
             <Flex align="center" gap="xs">
-              <ul className="m-0 flex list-none flex-wrap gap-xs p-0">
+              <ul className="m-0 flex list-none flex-wrap gap-3xs p-0">
                 {tags.map((tag) => (
                   <li id={tag} key={tag}>
-                    <Link href={urlJoin('/tag', tag)}>#{tag}</Link>
+                    <Link href={urlJoin('/tag', tag)} variant="tag">
+                      {tag}
+                    </Link>
                   </li>
                 ))}
               </ul>

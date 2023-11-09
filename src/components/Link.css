@@ -12,6 +12,7 @@
   cursor: pointer;
   transition: all var(--transition);
   color: var(--color);
+  border-radius: var(--radii-s);
 
   &:hover {
     text-decoration-line: underline;
@@ -46,18 +47,18 @@
   }
 
   &.is-active {
-    background-color: var(--theme6);
-    --color: var(--theme11);
+    background-color: var(--accent6);
+    --color: var(--accent11);
 
     &:hover {
-      background-color: var(--theme7);
-      --color: var(--theme11);
+      background-color: var(--accent7);
+      --color: var(--accent11);
     }
   }
 }
 
 .link-logo {
-  --color: var(--theme10);
+  --color: var(--accent10);
   font-size: var(--step-1);
   font-variation-settings:
     'wght' 900,
@@ -132,5 +133,18 @@
   &:hover {
     background-color: var(--accent6);
     color: var(--color);
+  }
+}
+
+.link-tag {
+  border: 1px solid var(--theme5);
+  border-radius: var(--radii-pill);
+  padding-x: var(--space-2xs);
+  background-color: var(--theme3);
+
+  &:hover {
+    border-color: var(--theme6);
+    background-color: var(--theme4);
+    text-decoration-line: none;
   }
 }

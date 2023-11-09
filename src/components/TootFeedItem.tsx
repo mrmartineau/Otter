@@ -28,7 +28,7 @@ export const TootFeedItem = (props: Toot) => {
   const tootMedia = media as any[];
 
   return (
-    <div className="feed-item-wrapper">
+    <div className="feed-item">
       <div className="flex items-center gap-xs">
         {user_avatar ? (
           <img src={user_avatar} alt="" className="feed-avatar" />

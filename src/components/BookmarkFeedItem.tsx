@@ -20,9 +20,9 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
   const handleClickRegister = useClickBookmark();
 
   return (
-    <div className="feed-item-wrapper">
-      <div className="feed-item-content">
-        <div className="grow">
+    <div className="feed-item">
+      <div className="feed-item-cols">
+        <div className="feed-item-content">
           {url && title ? (
             <div>
               <Link
@@ -38,7 +38,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
           ) : null}
           {description ? <Markdown>{description}</Markdown> : null}
           {note ? (
-            <div className="rounded bg-theme4 p-xs">
+            <div className="feed-item-note">
               <Flex
                 gap="2xs"
                 align="center"

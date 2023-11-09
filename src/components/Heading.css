@@ -30,5 +30,5 @@
     'wdth' 125,
     'ital' 10;
   color: var(--theme11);
-  margin-top: 0;
+  margin-y: 0;
 }

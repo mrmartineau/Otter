@@ -58,6 +58,7 @@
   transform: translateX(calc(-1 * var(--sidebar-width)));
   background-color: var(--theme2);
   overflow-y: auto;
+  border-right: 1px solid var(--border);
 
   &.is-active {
     transform: translateX(0);
