@@ -76,10 +76,6 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
   const [tweetItems, setTweetItems] = useState<Tweet[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const dbMeta = serverDbMeta;
-  // useRealtimeDictionary<DbMetaResponse>({
-  //   table: 'bookmarks',
-  //   initialData: serverDbMeta,
-  // });
 
   const handleSetGroupByDate = (newState: boolean) => {
     if (profile?.settings_group_by_date !== newState) {
@@ -93,7 +89,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
 
   const throttledMutate = throttle(async (value: string) => {
     await fetchSearch(value).then((data) => {
-      setBookmarkItems(data?.bookmarksSearch?.data ?? []);
+      setBookmarkItems((data?.bookmarksSearch?.data as Bookmark[]) ?? []);
       setTweetItems(data?.tweetsSearch?.data ?? []);
     });
   }, 500);

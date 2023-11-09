@@ -1,10 +1,9 @@
 'use client';
 
-import { Database } from '../types/supabase';
 import { createBrowserClient } from '../utils/supabase/client';
 
 export const useClickBookmark = () => {
-  const supabaseClient = createBrowserClient<Database>();
+  const supabaseClient = createBrowserClient();
 
   const handleClickRegister = async (id: string) => {
     const selectItem = await supabaseClient

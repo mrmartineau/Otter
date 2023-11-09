@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 
 import { Bookmark, UserProfile } from '../types/db';
-import { Database } from '../types/supabase';
 import { createBrowserClient } from '../utils/supabase/client';
 import { FeedItemModel } from './useGroupByDate';
 
@@ -21,7 +20,7 @@ export const useRealtimeFeed = ({
   table = 'bookmarks',
 }: RealtimeFeedProps) => {
   const [items, setItems] = useState<FeedItemModel[]>(initialData);
-  const supabaseClient = createBrowserClient<Database>();
+  const supabaseClient = createBrowserClient();
 
   useEffect(() => {
     setItems(initialData);
@@ -88,7 +87,7 @@ export const useRealtimeFeed = ({
  */
 export const useRealtimeProfile = (initialData: UserProfile | null) => {
   const [profile, setProfile] = useState<UserProfile | null>(initialData);
-  const supabaseClient = createBrowserClient<Database>();
+  const supabaseClient = createBrowserClient();
 
   useEffect(() => {
     setProfile(initialData);

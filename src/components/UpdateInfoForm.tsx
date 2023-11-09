@@ -7,7 +7,6 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useToggle } from '../hooks/useToggle';
-import { Database } from '../types/supabase';
 import { getErrorMessage } from '../utils/get-error-message';
 import { createBrowserClient } from '../utils/supabase/client';
 import { FormGroup } from './FormGroup';
@@ -22,7 +21,7 @@ interface UpdateInfoProps {
 }
 
 export const UpdateInfoForm = ({ user }: UpdateInfoProps) => {
-  const supabaseClient = createBrowserClient<Database>();
+  const supabaseClient = createBrowserClient();
   const [formError, setFormError] = useState<string>('');
   const [formSubmitting, , setFormSubmitting] = useToggle();
   const {

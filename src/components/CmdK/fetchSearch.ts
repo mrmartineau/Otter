@@ -1,10 +1,9 @@
 'use client';
 
-import { Database } from '@/src/types/supabase';
 import { createBrowserClient } from '@/src/utils/supabase/client';
 
 export const fetchSearch = async (searchTerm: string) => {
-  const supabaseClient = createBrowserClient<Database>();
+  const supabaseClient = createBrowserClient();
   const bookmarksSearch = await supabaseClient
     .from('bookmarks')
     .select('*', { count: 'exact' })

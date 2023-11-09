@@ -17,7 +17,6 @@ import title from 'title';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
-import { Database } from '../types/supabase';
 import { getRelativeDate } from '../utils/dates';
 import { fullPath } from '../utils/fullPath';
 import { simpleUrl } from '../utils/simpleUrl';
@@ -39,7 +38,7 @@ export interface FeedItemFooterProps extends Bookmark {
 }
 
 export const FeedItemFooter = (props: FeedItemFooterProps) => {
-  const supabaseClient = createBrowserClient<Database>();
+  const supabaseClient = createBrowserClient();
   const {
     url,
     tags,
@@ -65,7 +64,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       .from('bookmarks')
       .update({
         star: !star,
-        modified_at: new Date(),
+        modified_at: new Date().toString(),
       })
       .match({ id });
   };

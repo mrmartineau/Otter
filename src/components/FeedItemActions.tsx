@@ -16,7 +16,6 @@ import urlJoin from 'proper-url-join';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { useToggle } from '../hooks/useToggle';
-import { Database } from '../types/supabase';
 import { createBrowserClient } from '../utils/supabase/client';
 import { BookmarkFeedItemProps } from './BookmarkFeedItem';
 import { BookmarkForm } from './BookmarkForm';
@@ -40,7 +39,7 @@ export const FeedItemActions = ({
   allowDeletion,
   isInFeed = true,
 }: FeedItemActionsProps) => {
-  const supabaseClient = createBrowserClient<Database>();
+  const supabaseClient = createBrowserClient();
   const [isToggled, , setToggleState] = useToggle();
   const router = useRouter();
   const handleClickRegister = useClickBookmark();

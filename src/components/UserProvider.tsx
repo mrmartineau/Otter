@@ -4,7 +4,6 @@ import { ReactNode, createContext, useCallback, useContext } from 'react';
 
 import { useRealtimeProfile } from '../hooks/useRealtime';
 import { UserProfile } from '../types/db';
-import { Database } from '../types/supabase';
 import { createBrowserClient } from '../utils/supabase/client';
 
 export type UseUpdateReturn = (action: UIStateAction) => void;
@@ -41,7 +40,7 @@ interface UserProviderProps extends Pick<UserContextType, 'profile' | 'id'> {
 
 export const UserProvider = ({ children, id, profile }: UserProviderProps) => {
   const realtimeProfile = useRealtimeProfile(profile);
-  const supabaseClient = createBrowserClient<Database>();
+  const supabaseClient = createBrowserClient();
 
   const handleUpdateUISettings = useCallback(
     async (action: UIStateAction) => {
@@ -63,7 +62,7 @@ export const UserProvider = ({ children, id, profile }: UserProviderProps) => {
       }
       await supabaseClient
         .from('profiles')
-        .update({ [column]: value, updated_at: new Date() })
+        .update({ [column]: value, updated_at: new Date().toString() })
         .match({ id });
     },
     [id, realtimeProfile?.settings_pinned_tags, supabaseClient],

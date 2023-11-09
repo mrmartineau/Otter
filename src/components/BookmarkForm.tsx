@@ -28,6 +28,7 @@ import { CONTENT, DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER } from '../constants';
 import { useToggle } from '../hooks/useToggle';
 import { MetadataResponse } from '../types/api';
 import { type Bookmark, type BookmarkFormValues } from '../types/db';
+import { Database } from '../types/supabase';
 import { MetaTag, getDbMetadata } from '../utils/fetching/meta';
 import { getScrapeData } from '../utils/fetching/scrape';
 import { getErrorMessage } from '../utils/get-error-message';
@@ -76,7 +77,7 @@ export const BookmarkForm = ({
   const isNew = type === 'new';
   const router = useRouter();
   const bookmarkformClass = cn(className, 'bookmark-form flex flex-col gap-s');
-  const supabaseClient = createBrowserClient<Database>();
+  const supabaseClient = createBrowserClient();
   const [formSubmitting, , setFormSubmitting] = useToggle(false);
   const [bookmarkTags, setBookmarkTags] = useState<MetaTag[]>([]);
   const [formError, setFormError] = useState<string>('');
@@ -128,7 +129,7 @@ export const BookmarkForm = ({
       } else {
         await supabaseClient
           .from('bookmarks')
-          .update({ ...formData, modified_at: new Date() })
+          .update({ ...formData, modified_at: new Date().toString() })
           .match({ id });
         toast({
           title: 'Item edited',
@@ -219,7 +220,7 @@ export const BookmarkForm = ({
       const { data } = await supabaseClient.rpc('check_url', {
         url_input: url.hostname,
       });
-      setPossibleMatchingItems(data);
+      setPossibleMatchingItems(data as Bookmark[]);
     } catch (err) {
       setPossibleMatchingItems(null);
     }
