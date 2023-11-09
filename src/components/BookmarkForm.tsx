@@ -129,7 +129,8 @@ export const BookmarkForm = ({
       } else {
         await supabaseClient
           .from('bookmarks')
-          .update({ ...formData, modified_at: new Date().toString() })
+          // @ts-ignore
+          .update({ ...formData, modified_at: new Date() })
           .match({ id });
         toast({
           title: 'Item edited',

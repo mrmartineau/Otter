@@ -64,7 +64,8 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       .from('bookmarks')
       .update({
         star: !star,
-        modified_at: new Date().toString(),
+        // @ts-ignore
+        modified_at: new Date(),
       })
       .match({ id });
   };

@@ -50,7 +50,8 @@ export const FeedItemActions = ({
         .from('bookmarks')
         .update({
           status: 'inactive',
-          modified_at: new Date().toString(),
+          // @ts-ignore
+          modified_at: new Date(),
         })
         .match({ id });
     }
@@ -60,7 +61,8 @@ export const FeedItemActions = ({
       .from('bookmarks')
       .update({
         status: 'active',
-        modified_at: new Date().toString(),
+        // @ts-ignore
+        modified_at: new Date(),
       })
       .match({ id });
   };
@@ -74,7 +76,8 @@ export const FeedItemActions = ({
       .from('bookmarks')
       .update({
         star: !star,
-        modified_at: new Date().toString(),
+        // @ts-ignore
+        modified_at: new Date(),
       })
       .match({ id });
   };
