@@ -4,6 +4,7 @@ import { Note, TwitterLogo } from '@phosphor-icons/react';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
+import { cn } from '../utils/classnames';
 import { fullPath } from '../utils/fullPath';
 import './Feed.css';
 import { FeedItemFooter } from './FeedItemFooter';
@@ -13,14 +14,18 @@ import { Markdown } from './Markdown';
 
 export interface BookmarkFeedItemProps extends Bookmark {
   allowDeletion?: boolean;
+  isClamped?: boolean;
 }
 
 export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
   const { title, url, description, note, id, tweet, image } = props;
   const handleClickRegister = useClickBookmark();
+  const feedItemClasses = cn('feed-item', {
+    'feed-item-clamped': props.isClamped,
+  });
 
   return (
-    <div className="feed-item">
+    <div className={feedItemClasses}>
       <div className="feed-item-cols">
         <div className="feed-item-content">
           {url && title ? (

@@ -6,6 +6,8 @@ export const ALLOW_SIGNUP = false;
 export const CONTENT = {
   appName: 'Otter',
   titleSeparator: ' — ',
+  dashboardTitle: 'Dashboard',
+  dashboardNav: 'Dashboard',
   feedTitle: 'Feed',
   feedNav: 'Feed',
   allDescription: 'All your items',
@@ -63,6 +65,7 @@ export const createTitle = (pageName?: string) => {
 };
 
 // Page Routes
+export const ROUTE_FEED_DASHBOARD = '/dashboard';
 export const ROUTE_FEED_HOME = '/feed';
 export const ROUTE_SIGNIN = '/signin';
 export const ROUTE_NEW_BOOKMARK = '/new/bookmark';

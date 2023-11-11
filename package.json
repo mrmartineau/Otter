@@ -49,6 +49,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
+    "date-fns": "^2.30.0",
     "email-validator": "^2.0.4",
     "lodash.throttle": "^4.1.1",
     "match-words": "^1.0.0",

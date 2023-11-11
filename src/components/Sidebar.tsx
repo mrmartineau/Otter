@@ -2,6 +2,7 @@
 
 import {
   CONTENT,
+  ROUTE_FEED_DASHBOARD,
   ROUTE_FEED_HOME,
   ROUTE_SETTINGS_ACCOUNT,
   ROUTE_STARS,
@@ -12,6 +13,7 @@ import {
 } from '@/src/constants';
 import {
   ArrowFatLinesUp,
+  Gauge,
   ListBullets,
   Star,
   Trash,
@@ -58,6 +60,10 @@ export const Sidebar = ({ serverDbMeta }: SidebarProps) => {
           </Link>
         </div>
         <Flex gapY="3xs" direction="column">
+          <SidebarLink href={ROUTE_FEED_DASHBOARD}>
+            <Gauge aria-label="Dashboard" size={18} weight="duotone" />
+            {CONTENT.dashboardNav}
+          </SidebarLink>
           <SidebarLink href={ROUTE_FEED_HOME} count={dbMeta.all}>
             <ListBullets aria-label="All" size={18} weight="duotone" />
             {CONTENT.feedNav}

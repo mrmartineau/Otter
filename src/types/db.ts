@@ -1,9 +1,7 @@
 import { Database } from './supabase';
 
-export type Bookmark = Omit<
-  Database['public']['Tables']['bookmarks']['Row'],
-  'tweet'
-> & {
+export type BaseBookmark = Database['public']['Tables']['bookmarks']['Row'];
+export type Bookmark = Omit<BaseBookmark, 'tweet'> & {
   tweet?: {
     text: string;
     username: string;

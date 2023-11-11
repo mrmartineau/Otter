@@ -4,7 +4,6 @@ import {
 } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-// import { cache } from 'react';
 import { Database } from '../../types/supabase';
 
 export const createServerClient = (cookieStore: ReturnType<typeof cookies>) => {

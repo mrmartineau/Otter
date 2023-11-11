@@ -21,7 +21,6 @@ export const fetchSearch = async (searchTerm: string) => {
     )
     .order('created_at', { ascending: false })
     .limit(5);
-  console.log(`🚀 ~ fetchSearch ~ tweetsSearch:`, tweetsSearch);
   const tootsSearch = await supabaseClient
     .from('toots')
     .select('*', { count: 'exact' })
@@ -30,7 +29,6 @@ export const fetchSearch = async (searchTerm: string) => {
     )
     .order('created_at', { ascending: false })
     .limit(5);
-  console.log(`🚀 ~ fetchSearch ~ tootsSearch:`, tootsSearch);
 
   return {
     bookmarksSearch,
