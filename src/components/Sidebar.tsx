@@ -2,6 +2,7 @@
 
 import {
   CONTENT,
+  REPO_URL,
   ROUTE_FEED_DASHBOARD,
   ROUTE_FEED_HOME,
   ROUTE_SETTINGS_ACCOUNT,
@@ -15,6 +16,7 @@ import {
   ArrowFatLinesUp,
   Gauge,
   ListBullets,
+  RocketLaunch,
   Star,
   Trash,
   TwitterLogo,
@@ -36,9 +38,10 @@ import { TypeList } from './TypeList';
 
 interface SidebarProps {
   serverDbMeta: DbMetaResponse;
+  version?: string;
 }
 
-export const Sidebar = ({ serverDbMeta }: SidebarProps) => {
+export const Sidebar = ({ serverDbMeta, version }: SidebarProps) => {
   const { handleCloseSidebar } = useSidebar();
   const dbMeta = serverDbMeta;
 
@@ -107,6 +110,10 @@ export const Sidebar = ({ serverDbMeta }: SidebarProps) => {
           {CONTENT.settingsNav}
         </SidebarLink>
         <LogoutButton />
+        <SidebarLink href={`${REPO_URL}/releases/tag/${version}`}>
+          <RocketLaunch aria-label="Trash" size={18} weight="duotone" />
+          Otter {version}
+        </SidebarLink>
       </Flex>
     </div>
   );

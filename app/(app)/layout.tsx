@@ -11,6 +11,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
 
+import pkg from '../../package.json';
 import './layout.css';
 
 interface LayoutProps {
@@ -46,7 +47,7 @@ export default async function AppLayout({ children }: LayoutProps) {
           Skip to content
         </a>
         <div className="otter-primary-pane">
-          <Sidebar serverDbMeta={dbMeta} />
+          <Sidebar serverDbMeta={dbMeta} version={pkg.version} />
           <div className="otter-sidebar-pane-overlay" />
           <main id="main" className="otter-content-pane">
             <div className="otter-content-pane-inner">
