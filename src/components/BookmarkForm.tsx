@@ -28,7 +28,6 @@ import { CONTENT, DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER } from '../constants';
 import { useToggle } from '../hooks/useToggle';
 import { MetadataResponse } from '../types/api';
 import { type Bookmark, type BookmarkFormValues } from '../types/db';
-import { Database } from '../types/supabase';
 import { MetaTag, getDbMetadata } from '../utils/fetching/meta';
 import { getScrapeData } from '../utils/fetching/scrape';
 import { getErrorMessage } from '../utils/get-error-message';
@@ -251,7 +250,6 @@ export const BookmarkForm = ({
         onSubmit={handleSubmit(handleSubmitForm)}
         className={bookmarkformClass}
       >
-        <input type="hidden" {...register('image')} />
         <input type="hidden" {...register('feed')} />
 
         {/* URL */}
@@ -371,6 +369,15 @@ export const BookmarkForm = ({
             <TypeRadio value="place" {...register('type')} />
           </Flex>
         </FormGroup>
+
+        {/* IMAGE */}
+        {type === 'edit' ? (
+          <FormGroup label="Image" name="image">
+            <Input id="image" {...register('image')} />
+          </FormGroup>
+        ) : (
+          <input type="hidden" {...register('image')} />
+        )}
 
         {formError && <div className="my-m">Error: {formError}</div>}
 
