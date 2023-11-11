@@ -9,6 +9,7 @@ interface DashboardFetchingOptions {
 
 interface DashboardFetchingResponse {
   recent: Bookmark[];
+  oneWeekAgo: Bookmark[];
   oneMonthAgo: Bookmark[];
   twoMonthsAgo: Bookmark[];
   sixMonthsAgo: Bookmark[];
@@ -19,6 +20,8 @@ export const getDashboard = async ({
   supabaseClient,
 }: DashboardFetchingOptions): Promise<DashboardFetchingResponse> => {
   const today = new Date();
+  const todayMinusOneWeekAgoLower = subDays(today, 8);
+  const todayMinusOneWeekAgoUpper = subDays(today, 6);
   const todayMinusOneMonthAgoLower = subDays(today, 31);
   const todayMinusOneMonthAgoUpper = subDays(today, 29);
   const todayMinusTwoMonthsAgoLower = subDays(today, 61);
@@ -33,6 +36,13 @@ export const getDashboard = async ({
     .select('*')
     .limit(4)
     .order('created_at', { ascending: false });
+  const oneWeekAgoResponse = await supabaseClient
+    .from('bookmarks')
+    .select('*')
+    .limit(2)
+    .order('created_at', { ascending: false })
+    .gte('created_at', todayMinusOneWeekAgoLower.toISOString())
+    .lte('created_at', todayMinusOneWeekAgoUpper.toISOString());
   const oneMonthAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
@@ -64,6 +74,7 @@ export const getDashboard = async ({
 
   return {
     recent: (recentResponse.data as Bookmark[]) ?? [],
+    oneWeekAgo: (oneWeekAgoResponse.data as Bookmark[]) ?? [],
     oneMonthAgo: (oneMonthAgoResponse.data as Bookmark[]) ?? [],
     twoMonthsAgo: (twoMonthAgoResponse.data as Bookmark[]) ?? [],
     sixMonthsAgo: (sixMonthAgoResponse.data as Bookmark[]) ?? [],
