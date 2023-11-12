@@ -3,10 +3,23 @@ import { Flex } from '@/src/components/Flex';
 import { Link } from '@/src/components/Link';
 import { Paragraph } from '@/src/components/Paragraph';
 import { SidebarLink } from '@/src/components/SidebarLink';
-import { CONTENT, ROUTE_SIGNIN } from '@/src/constants';
+import { CONTENT, ROUTE_FEED_DASHBOARD, ROUTE_SIGNIN } from '@/src/constants';
+import { createServerClient } from '@/src/utils/supabase/server';
 import { UserCircle } from '@phosphor-icons/react/dist/ssr';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 export default async function Index() {
+  const cookieStore = cookies();
+  const supabaseClient = createServerClient(cookieStore);
+  const {
+    data: { session },
+  } = await supabaseClient.auth.getSession();
+
+  if (session) {
+    redirect(ROUTE_FEED_DASHBOARD);
+  }
+
   return (
     <Container variant="auth" className="text-center">
       <img
