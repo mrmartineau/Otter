@@ -3,7 +3,7 @@ import { Container } from '@/src/components/Container';
 import { Flex } from '@/src/components/Flex';
 import { FormGroup } from '@/src/components/FormGroup';
 import { Input } from '@/src/components/Input';
-import { ALLOW_SIGNUP, ROUTE_FEED_HOME } from '@/src/constants';
+import { ALLOW_SIGNUP, ROUTE_FEED_DASHBOARD } from '@/src/constants';
 import { createServerClient } from '@/src/utils/supabase/server';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -18,7 +18,7 @@ export default async function Login() {
   } = await supabaseClient.auth.getSession();
 
   if (session) {
-    redirect(ROUTE_FEED_HOME);
+    redirect(ROUTE_FEED_DASHBOARD);
   }
 
   const signIn = async (formData: FormData) => {
@@ -38,7 +38,7 @@ export default async function Login() {
       return redirect('/signin?message=Could not authenticate user');
     }
 
-    return redirect(ROUTE_FEED_HOME);
+    return redirect(ROUTE_FEED_DASHBOARD);
   };
 
   const signUp = async (formData: FormData) => {
