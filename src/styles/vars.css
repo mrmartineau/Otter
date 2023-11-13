@@ -45,18 +45,18 @@
     --radius: 0.5rem; /* from shadcn */
 
     /* Colors */
-    --theme1: var(--sand-1);
-    --theme2: var(--sand-2);
-    --theme3: var(--sand-3);
-    --theme4: var(--sand-4);
-    --theme5: var(--sand-5);
-    --theme6: var(--sand-6);
-    --theme7: var(--sand-7);
-    --theme8: var(--sand-8);
-    --theme9: var(--sand-9);
-    --theme10: var(--sand-10);
-    --theme11: var(--sand-11);
-    --theme12: var(--sand-12);
+    --theme1: var(--mauve-1);
+    --theme2: var(--mauve-2);
+    --theme3: var(--mauve-3);
+    --theme4: var(--mauve-4);
+    --theme5: var(--mauve-5);
+    --theme6: var(--mauve-6);
+    --theme7: var(--mauve-7);
+    --theme8: var(--mauve-8);
+    --theme9: var(--mauve-9);
+    --theme10: var(--mauve-10);
+    --theme11: var(--mauve-11);
+    --theme12: var(--mauve-12);
     --accent1: var(--violet-1);
     --accent2: var(--violet-2);
     --accent3: var(--violet-3);

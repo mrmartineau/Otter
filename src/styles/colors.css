@@ -1,5 +1,18 @@
 @layer base {
   :root {
+    --mauve-1: #fdfcfd;
+    --mauve-2: #faf9fb;
+    --mauve-3: #f2eff3;
+    --mauve-4: #eae7ec;
+    --mauve-5: #e3dfe6;
+    --mauve-6: #dbd8e0;
+    --mauve-7: #d0cdd7;
+    --mauve-8: #bcbac7;
+    --mauve-9: #8e8c99;
+    --mauve-10: #84828e;
+    --mauve-11: #65636d;
+    --mauve-12: #211f26;
+
     --violet-1: hsl(255 65% 99.4%);
     --violet-2: hsl(252 100% 99%);
     --violet-3: hsl(252 96.9% 97.4%);
@@ -46,6 +59,18 @@
 
   @media (prefers-color-scheme: dark) {
     :root {
+      --mauve-1: #121113;
+      --mauve-2: #1a191b;
+      --mauve-3: #232225;
+      --mauve-4: #2b292d;
+      --mauve-5: #323035;
+      --mauve-6: #3c393f;
+      --mauve-7: #49474e;
+      --mauve-8: #625f69;
+      --mauve-9: #6f6d78;
+      --mauve-10: #7c7a85;
+      --mauve-11: #b5b2bc;
+      --mauve-12: #eeeef0;
       --violet-1: hsl(250 20% 10.2%);
       --violet-2: hsl(255 30.3% 12.9%);
       --violet-3: hsl(254 33.3% 18.4%);
