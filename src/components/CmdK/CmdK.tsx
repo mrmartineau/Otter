@@ -10,6 +10,7 @@ import {
   ArrowFatLinesUp,
   Calendar,
   CheckCircle,
+  Gauge,
   Gear,
   Hash,
   List,
@@ -31,7 +32,8 @@ import tinyRelativeDate from 'tiny-relative-date';
 import formatTitle from 'title';
 
 import {
-  ROUTE_FEED_HOME,
+  ROUTE_DASHBOARD,
+  ROUTE_FEED,
   ROUTE_NEW_BOOKMARK,
   ROUTE_SETTINGS_ACCOUNT,
   ROUTE_STARS,
@@ -282,7 +284,15 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                 Add new item
               </Item>
               <Item
-                to={ROUTE_FEED_HOME}
+                to={ROUTE_DASHBOARD}
+                value="Dashboard"
+                image={<Gauge weight="duotone" aria-label="Dashboard" />}
+                accessories={sharedAccessories}
+              >
+                Dashboard
+              </Item>
+              <Item
+                to={ROUTE_FEED}
                 value="All"
                 image={<ListBullets weight="duotone" aria-label="All" />}
                 accessories={sharedAccessories}

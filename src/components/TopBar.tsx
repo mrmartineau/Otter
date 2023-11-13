@@ -4,7 +4,7 @@ import { cn } from '@/src/utils/classnames';
 import { List } from '@phosphor-icons/react';
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 
-import { ROUTE_FEED_HOME } from '../constants';
+import { ROUTE_HOME } from '../constants';
 import { useSidebar } from '../hooks/useSidebar';
 import { DbMetaResponse } from '../utils/fetching/meta';
 import { CmdK } from './CmdK';
@@ -38,7 +38,7 @@ export const TopBar = ({
           <List weight="duotone" size={30} />
         </IconButton>
 
-        <Link href={ROUTE_FEED_HOME} variant="logo">
+        <Link href={ROUTE_HOME} variant="logo">
           <img src="/otter-logo.svg" width="33" height="33" />
           <span>Otter</span>
         </Link>

@@ -3,8 +3,9 @@
 import {
   CONTENT,
   REPO_URL,
-  ROUTE_FEED_DASHBOARD,
-  ROUTE_FEED_HOME,
+  ROUTE_DASHBOARD,
+  ROUTE_FEED,
+  ROUTE_HOME,
   ROUTE_SETTINGS_ACCOUNT,
   ROUTE_STARS,
   ROUTE_STATS,
@@ -57,17 +58,17 @@ export const Sidebar = ({ serverDbMeta, version }: SidebarProps) => {
     <div className="otter-sidebar-pane" ref={sidebarRef}>
       <div>
         <div className="sidebar-top">
-          <Link href={ROUTE_FEED_HOME} variant="logo">
-            <img src="/otter-logo.svg" width="33" height="33" />{' '}
+          <Link href={ROUTE_HOME} variant="logo">
+            <img src="/otter-logo.svg" width="33" height="33" />
             <div>Otter</div>
           </Link>
         </div>
         <Flex gapY="3xs" direction="column">
-          <SidebarLink href={ROUTE_FEED_DASHBOARD}>
+          <SidebarLink href={ROUTE_DASHBOARD}>
             <Gauge aria-label="Dashboard" size={18} weight="duotone" />
             {CONTENT.dashboardNav}
           </SidebarLink>
-          <SidebarLink href={ROUTE_FEED_HOME} count={dbMeta.all}>
+          <SidebarLink href={ROUTE_FEED} count={dbMeta.all}>
             <ListBullets aria-label="All" size={18} weight="duotone" />
             {CONTENT.feedNav}
           </SidebarLink>
@@ -110,7 +111,7 @@ export const Sidebar = ({ serverDbMeta, version }: SidebarProps) => {
           {CONTENT.settingsNav}
         </SidebarLink>
         <LogoutButton />
-        <SidebarLink href={`${REPO_URL}/releases/tag/${version}`}>
+        <SidebarLink href={`${REPO_URL}/releases/tag/v${version}`}>
           <RocketLaunch aria-label="Trash" size={18} weight="duotone" />
           Otter {version}
         </SidebarLink>

@@ -1,4 +1,4 @@
-import { ROUTE_FEED_HOME } from '@/src/constants';
+import { ROUTE_HOME } from '@/src/constants';
 import { createServerClient } from '@/src/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   }
 
   // URL to redirect to after sign in process completes
-  const defaultRedirect = `${requestUrl.origin}${ROUTE_FEED_HOME}`;
+  const defaultRedirect = `${requestUrl.origin}${ROUTE_HOME}`;
   // URL to redirect to after sign in process completes
   return NextResponse.redirect(defaultRedirect);
 }
