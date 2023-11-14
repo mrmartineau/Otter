@@ -57,13 +57,9 @@ export async function POST(request: Request) {
     filteredTagsString.length > 0 ? `${filteredTagsString} •` : '';
   const descriptionString =
     body.record.description.length > 0 ? ` - ${body.record.description}` : '';
-  const personalTootStart =
-    body.record.type === 'article'
-      ? 'I just read this #article - check it out:'
-      : `New liked #${body.record.type}:`;
 
   // send mastodon toot to personal account
-  const tootContent = `${personalTootStart} "${body.record.title}"${descriptionString}\n${body.record.url}\n${tagsString} #Otter`;
+  const tootContent = `"${body.record.title}"${descriptionString}\n${body.record.url}\n${tagsString} • New #${body.record.type} just added to #Otter.`;
   console.log(`🚀 ~ tootContent`, tootContent);
   await fetch(
     `https://toot.cafe/api/v1/statuses?access_token=${process.env.PERSONAL_MASTODON_ACCESS_TOKEN}`,
