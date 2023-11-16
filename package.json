@@ -28,6 +28,7 @@
     "supabase:dumpdb": "npx supabase db pull",
     "supabase:setup": "npx supabase db push",
     "supabase:seed": "npx supabase start",
+    "supabase:link": "npx supabase link --project-ref ffpbylcvwtyozyrplqic",
     "test": "vitest"
   },
   "dependencies": {
