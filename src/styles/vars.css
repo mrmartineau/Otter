@@ -73,7 +73,7 @@
     --text: var(--theme10);
     --foreground: var(--theme12);
     --background: var(--theme1);
-    --focus: var(--theme9);
+    --focus: var(--accent7);
     --overlay: var(--overlayAlpha);
     --border: var(--theme3);
 

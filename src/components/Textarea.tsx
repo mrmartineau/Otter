@@ -4,15 +4,13 @@ import TextareaAutosize, {
   TextareaAutosizeProps,
 } from 'react-textarea-autosize';
 
-import { sharedInputStyles } from './Input';
-
 export interface TextareaProps extends TextareaAutosizeProps {}
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, ...props }, ref) => {
     return (
       <TextareaAutosize
-        className={cn('flex min-h-[80px]', sharedInputStyles, className)}
+        className={cn('input-base focus min-h-[80px]', className)}
         ref={ref}
         {...props}
       />

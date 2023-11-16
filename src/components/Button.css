@@ -14,6 +14,17 @@
   }
 }
 
+.button-outline {
+  color: var(--text);
+  border: 1px solid;
+  background-color: var(--background);
+
+  &:hover,
+  &[aria-pressed='true'] {
+    background-color: var(--theme3);
+  }
+}
+
 .button-ghost {
   font-weight: 500;
   color: var(--text);

@@ -4,26 +4,23 @@ import CreatableSelect from 'react-select/creatable';
 export const comboboxStyles: Props['styles'] = {
   control: (provided, state) => ({
     ...provided,
+    backgroundColor: 'var(--theme2)',
     borderRadius: 'var(--radii-m)',
     boxShadow: state.isFocused
       ? '0 0 0 2px var(--focus)'
       : '0 0 0 2px transparent',
-    borderColor: state.isFocused ? 'var(--focus)' : 'transparent',
-    ':hover': {
-      borderColor: 'transparent',
-    },
-    // minHeight: '3.6rem',
-    // paddingLeft: '0.3rem',
+    borderWidth: '2px',
+    borderColor: state.isFocused ? 'var(--theme6)' : 'var(--theme6)',
   }),
   valueContainer: (provided) => ({
     ...provided,
     padding: 'var(--space-3xs) var(--space-2xs)',
-    fontSize: 'var(--step-0)',
+    fontSize: 'var(--step--1)',
   }),
   multiValue: (provided) => ({
     ...provided,
     borderRadius: 'var(--radii-default)',
-    fontSize: 'var(--step-0)',
+    fontSize: 'var(--step--1)',
     padding: 'var(--space-3xs)',
     alignItems: 'center',
   }),
@@ -40,13 +37,10 @@ export const comboboxStyles: Props['styles'] = {
       color: 'var(--accent1)',
     },
   }),
-  // option: (provided, state) => ({
-  //   ...provided,
-  //   color: state.isSelected ? stitchesTheme.colors.text.value : 'inherit',
-  //   backgroundColor: state.isSelected
-  //     ? stitchesTheme.colors.accent7.value
-  //     : 'inherit',
-  // }),
+  option: (provided, state) => ({
+    ...provided,
+    fontSize: 'var(--step--1)',
+  }),
 };
 
 export const comboboxTheme: Props['theme'] = (theme) => ({

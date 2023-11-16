@@ -1,0 +1,24 @@
+.input-base {
+  width: 100%;
+  display: flex;
+  border-radius: var(--radii-m);
+  background-color: var(--theme2);
+  border: 2px solid var(--theme6);
+  padding: var(--space-3xs) var(--space-2xs);
+  font-size: var(--step-0);
+  color: var(--theme10);
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  /* &:hover,
+  &:focus {
+    border-color: var(--theme7);
+  } */
+
+  &::placeholder {
+    color: var(--theme7);
+  }
+}

@@ -10,6 +10,17 @@
 
   &:focus-visible {
     outline: 0;
-    box-shadow: 0px 0px 0px 3px var(--focus);
+    --ring-offset-width: 2px;
+    --ring-offset-color: var(--theme1);
+    --ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--ring-offset-width)
+      var(--ring-offset-color);
+    --ring-shadow: var(--tw-ring-inset) 0 0 0
+      calc(2px + var(--ring-offset-width)) var(--focus);
+    box-shadow:
+      var(--tw-ring-inset) 0 0 0 var(--ring-offset-width)
+        var(--ring-offset-color),
+      var(--tw-ring-inset) 0 0 0 calc(2px + var(--ring-offset-width))
+        var(--focus),
+      0 0 rgba(0, 0, 0, 0);
   }
 }

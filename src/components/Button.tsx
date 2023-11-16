@@ -11,8 +11,7 @@ const buttonVariants = cva(['button-base', 'focus'], {
       default: 'bg-accent9 hover:bg-accent7',
       destructive:
         'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-      outline:
-        'border border-border bg-background hover:bg-theme4 hover:text-accent-foreground',
+      outline: 'button-outline',
       secondary: 'bg-theme8 hover:bg-theme6',
       ghost: 'button-ghost',
       collapsible: 'button-collapsible',
@@ -24,7 +23,7 @@ const buttonVariants = cva(['button-base', 'focus'], {
     size: {
       xs: 'px-xs py-3xs text-step--2',
       s: 'px-s py-2xs',
-      m: 'px-m py-xs text-step-0',
+      m: 'px-l py-2xs text-step-0',
       l: 'px-m py-s',
       collapsible: 'h-6 w-6',
     },

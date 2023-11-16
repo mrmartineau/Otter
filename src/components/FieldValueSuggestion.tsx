@@ -26,12 +26,7 @@ export const FieldValueSuggestion = ({
       <span>Suggestion:</span>
       <div>{suggestion}</div>
       <div>
-        <Button
-          variant="secondary"
-          size="s"
-          onClick={handleClick}
-          type="button"
-        >
+        <Button variant="outline" size="xs" onClick={handleClick} type="button">
           Use Suggestion
         </Button>
       </div>

@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radii-full);
-  font-size: var(--step--1);
+  font-size: var(--step--2);
   min-width: 80px;
   width: 10%;
   flex-basis: max-content;
