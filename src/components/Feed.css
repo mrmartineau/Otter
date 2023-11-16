@@ -14,21 +14,6 @@
   &:hover,
   &:focus-within {
     border: 1px solid var(--theme4);
-
-    .feed-item-actions {
-      visibility: visible;
-      opacity: 1;
-    }
-    &::before {
-      opacity: 1;
-    }
-  }
-
-  @media (--fine) {
-    .feed-item-actions {
-      visibility: hidden;
-      opacity: 0px;
-    }
   }
 }
 
