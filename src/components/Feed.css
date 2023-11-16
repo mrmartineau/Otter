@@ -6,16 +6,13 @@
   position: relative;
   padding: var(--space-s);
   border-radius: var(--radii-l);
-  overflow: hidden;
   transition: all 200ms var(--ease-in-out-1);
   background-color: var(--theme2);
   border: 1px solid var(--border);
   color: var(--theme10);
-  container-type: inline-size;
 
   &:hover,
   &:focus-within {
-    /* background-color: var(--theme3); */
     border: 1px solid var(--theme4);
 
     .feed-item-actions {
@@ -73,7 +70,7 @@
   gap: var(--space-xs);
   flex-direction: column;
 
-  @container (min-width: 500px) {
+  @media (--bp1) {
     flex-direction: row;
   }
 }
