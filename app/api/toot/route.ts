@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 
   const filteredTagsString = filteredTags(body.record.tags);
   const tagsString =
-    filteredTagsString.length > 0 ? `${filteredTagsString} •` : '';
+    filteredTagsString.length > 0 ? `${filteredTagsString}` : '';
   const descriptionString =
     body.record.description.length > 0 ? ` - ${body.record.description}` : '';
 
@@ -73,8 +73,7 @@ export async function POST(request: Request) {
   );
 
   // send mastodon toot to bot account
-  const botTootContent = `New #${body.record.type}: "${body.record.title}"${descriptionString}\n${body.record.url}\n${filteredTagsString}`;
-  console.log(`🚀 ~ botTootContent`, botTootContent);
+  const botTootContent = `New #${body.record.type}: "${body.record.title}"${descriptionString}\n${body.record.url}\n${tagsString}`;
   await fetch(
     `https://botsin.space/api/v1/statuses?access_token=${process.env.BOT_MASTODON_ACCESS_TOKEN}`,
     {
