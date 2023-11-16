@@ -35,42 +35,48 @@ export const getDashboard = async ({
     .from('bookmarks')
     .select('*')
     .limit(4)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .match({ status: 'active' });
   const oneWeekAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
     .limit(2)
     .order('created_at', { ascending: false })
     .gte('created_at', todayMinusOneWeekAgoLower.toISOString())
-    .lte('created_at', todayMinusOneWeekAgoUpper.toISOString());
+    .lte('created_at', todayMinusOneWeekAgoUpper.toISOString())
+    .match({ status: 'active' });
   const oneMonthAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
     .limit(2)
     .order('created_at', { ascending: false })
     .gte('created_at', todayMinusOneMonthAgoLower.toISOString())
-    .lte('created_at', todayMinusOneMonthAgoUpper.toISOString());
+    .lte('created_at', todayMinusOneMonthAgoUpper.toISOString())
+    .match({ status: 'active' });
   const twoMonthAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
     .limit(2)
     .order('created_at', { ascending: false })
     .gte('created_at', todayMinusTwoMonthsAgoLower.toISOString())
-    .lte('created_at', todayMinusTwoMonthsAgoUpper.toISOString());
+    .lte('created_at', todayMinusTwoMonthsAgoUpper.toISOString())
+    .match({ status: 'active' });
   const sixMonthAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
     .limit(2)
     .order('created_at', { ascending: false })
     .gte('created_at', todayMinusSixMonthsAgoLower.toISOString())
-    .lte('created_at', todayMinusSixMonthsAgoUpper.toISOString());
+    .lte('created_at', todayMinusSixMonthsAgoUpper.toISOString())
+    .match({ status: 'active' });
   const oneYearAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
     .limit(2)
     .order('created_at', { ascending: false })
     .gte('created_at', todayMinusOneYearAgoLower.toISOString())
-    .lte('created_at', todayMinusOneYearAgoUpper.toISOString());
+    .lte('created_at', todayMinusOneYearAgoUpper.toISOString())
+    .match({ status: 'active' });
 
   return {
     recent: (recentResponse.data as Bookmark[]) ?? [],
