@@ -6,7 +6,7 @@
         height="90"
       /><br/>Otter</h1>
 
-> Otter is a self-hosted bookmark manager made with [Next.js](https://nextjs.org) and Supabase with Mastodon integration.
+> Otter is a self-hosted bookmark manager made with [Next.js](https://nextjs.org) and [Supabase](https://supabase.com) with Mastodon integration.
 
   <p>
     <a
@@ -52,26 +52,32 @@
 
 ## Getting started
 
-1. Install dependencies with [pnpm](https://pnpm.io): `pnpm install`
-2. Setup env vars (see below)
-3. Run the app locally using `pnpm dev`
-4. Seed your database with `pnpm supabase:seed`
+1. Fork this repo
+2. Go to [database.new](https://database.new) and create a new [Supabase](https://supabase.com) project. You will need the project ID (found in the project settings page) and the the database password for the next step.
+3. Link your Supabase project to your local dev environment: `pnpm supabase:link`
+4. Seed your database with `pnpm supabase:setup`
+5. Install npm dependencies with [pnpm](https://pnpm.io): `pnpm install`
+6. Create a new project on vercel and setup env vars (see below)
+7. To allow signups, set the value of `ALLOW_SIGNUP` in `./src/constants.ts` to `true`
+8. Run the app locally using `pnpm dev`
+9. Visit `http://localhost:5678` and create an account
 
 ### Env vars
 
-Set up the following env vars. For local development you can set them in a `.env.local` file. See an example [here](.env.local.example)).
+Set up the following env vars using either the Vercel CLI or through the Vercel project settings. Once they are added run `vc env pull` to pull them down to your local dev environment.
 
 ```bash
 # Find these in your Supabase project settings > API
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_KEY=your-service-key # only needed for testing APIs using the `*.rest` files
 
 PERSONAL_MASTODON_ACCESS_TOKEN=your-personal-app-mastodon-access-token
 BOT_MASTODON_ACCESS_TOKEN=your-bot-app-mastodon-access-token
 OTTER_API_TOKEN=your-otter-api-token
 ```
 
-## Docs
+### Docs
 
 ### API Endpoints
 
