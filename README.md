@@ -52,6 +52,15 @@
 
 ## Getting started
 
+### Prerequisites
+
+- [pnpm](https://pnpm.io) - install with `npm i -g pnpm`
+- [Vercel](https://vercel.com) account and the [Vercel CLI](https://vercel.com/cli) - install with `npm i -g vercel`
+- [Supabase](https://supabase.com) account and the [Supabase CLI](https://supabase.com/docs/reference/cli/introduction) - install with `npm i -g supabase`
+- [Cloudflare](https://cloudflare.com) account (optional) - used for the page scraper and Mastodon to Supabase worker
+
+### Setup
+
 1. Fork this repo
 2. Go to [database.new](https://database.new) and create a new [Supabase](https://supabase.com) project. You will need the project ID (found in the project settings page) and the the database password for the next step.
 3. Link your Supabase project to your local dev environment: `pnpm supabase:link`
@@ -60,7 +69,7 @@
 6. Create a new project on vercel and setup env vars (see below)
 7. To allow signups, set the value of `ALLOW_SIGNUP` in `./src/constants.ts` to `true`
 8. Run the app locally using `pnpm dev`
-9. Visit `http://localhost:5678` and create an account
+9. Visit [`http://localhost:5678`](http://localhost:5678) and create an account
 
 ### Env vars
 
