@@ -40,7 +40,7 @@ export const getDashboard = async ({
   const oneWeekAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
-    .limit(2)
+    .limit(5)
     .order('created_at', { ascending: false })
     .gte('created_at', todayMinusOneWeekAgoLower.toISOString())
     .lte('created_at', todayMinusOneWeekAgoUpper.toISOString())
@@ -48,7 +48,7 @@ export const getDashboard = async ({
   const oneMonthAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
-    .limit(2)
+    .limit(5)
     .order('created_at', { ascending: false })
     .gte('created_at', todayMinusOneMonthAgoLower.toISOString())
     .lte('created_at', todayMinusOneMonthAgoUpper.toISOString())
@@ -56,7 +56,7 @@ export const getDashboard = async ({
   const twoMonthAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
-    .limit(2)
+    .limit(5)
     .order('created_at', { ascending: false })
     .gte('created_at', todayMinusTwoMonthsAgoLower.toISOString())
     .lte('created_at', todayMinusTwoMonthsAgoUpper.toISOString())
@@ -64,7 +64,7 @@ export const getDashboard = async ({
   const sixMonthAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
-    .limit(2)
+    .limit(5)
     .order('created_at', { ascending: false })
     .gte('created_at', todayMinusSixMonthsAgoLower.toISOString())
     .lte('created_at', todayMinusSixMonthsAgoUpper.toISOString())
@@ -72,7 +72,7 @@ export const getDashboard = async ({
   const oneYearAgoResponse = await supabaseClient
     .from('bookmarks')
     .select('*')
-    .limit(2)
+    .limit(5)
     .order('created_at', { ascending: false })
     .gte('created_at', todayMinusOneYearAgoLower.toISOString())
     .lte('created_at', todayMinusOneYearAgoUpper.toISOString())

@@ -4,6 +4,7 @@ import { getBookmarks } from '@/src/utils/fetching/bookmarks';
 import { getDashboard } from '@/src/utils/fetching/dashboard';
 import { createServerClient } from '@/src/utils/supabase/server';
 import { cookies } from 'next/headers';
+import pickRandomElements from 'random-array-subset';
 
 export const metadata = {
   title: 'Dashboard',
@@ -30,11 +31,26 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-l">
       <FeedSimple items={data.recent} title="Recent" />
-      <FeedSimple items={data.oneWeekAgo} title="One week ago" />
-      <FeedSimple items={data.oneMonthAgo} title="One month ago" />
-      <FeedSimple items={data.twoMonthsAgo} title="Two months ago" />
-      <FeedSimple items={data.sixMonthsAgo} title="Six months ago" />
-      <FeedSimple items={data.oneYearAgo} title="One year ago" />
+      <FeedSimple
+        items={pickRandomElements<Bookmark>(data.oneWeekAgo, 2)}
+        title="One week ago"
+      />
+      <FeedSimple
+        items={pickRandomElements<Bookmark>(data.oneMonthAgo, 2)}
+        title="One month ago"
+      />
+      <FeedSimple
+        items={pickRandomElements<Bookmark>(data.twoMonthsAgo, 2)}
+        title="Two months ago"
+      />
+      <FeedSimple
+        items={pickRandomElements<Bookmark>(data.sixMonthsAgo, 2)}
+        title="Six months ago"
+      />
+      <FeedSimple
+        items={pickRandomElements<Bookmark>(data.oneYearAgo, 2)}
+        title="One year ago"
+      />
       <FeedSimple
         items={followUpResponse.data as Bookmark[]}
         title="#follow-up"
