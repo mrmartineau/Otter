@@ -16,11 +16,17 @@ export async function GET(request: Request) {
   try {
     const searchParams = searchParamsToObject(request.url);
     const authHeader = request.headers.get('Authorization');
-    const bearerToken = authHeader?.split(' ')[1];
     const supabaseClient = createClient(
       // @ts-ignore
       process.env.NEXT_PUBLIC_SUPABASE_URL,
-      bearerToken,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        global: {
+          headers: {
+            Authorization: authHeader,
+          },
+        },
+      },
     );
 
     const { data, count, error } = await getBookmarks({
@@ -51,7 +57,7 @@ export async function GET(request: Request) {
     const errorMessage = getErrorMessage(error);
     return new Response(
       JSON.stringify({
-        reason: 'Problem adding new bookmark',
+        reason: 'Problem fetching bookmarks',
         error: errorMessage,
         data: null,
       }),
