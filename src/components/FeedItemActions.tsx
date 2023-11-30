@@ -1,3 +1,4 @@
+import { filteredTags } from '@/app/api/toot/utils';
 import { Button } from '@/src/components/Button';
 import {
   Archive,
@@ -13,6 +14,7 @@ import {
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useRouter } from 'next/navigation';
 import urlJoin from 'proper-url-join';
+import { useEffect, useState } from 'react';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { useToggle } from '../hooks/useToggle';
@@ -43,6 +45,7 @@ export const FeedItemActions = ({
   const [isToggled, , setToggleState] = useToggle();
   const router = useRouter();
   const handleClickRegister = useClickBookmark();
+  const [canShare, setCanShare] = useState<boolean>(false);
 
   const handleArchiveBookmark = async () => {
     if (window.confirm('Do you really want to trash this bookmark?')) {
@@ -88,28 +91,49 @@ export const FeedItemActions = ({
     navigator.clipboard.writeText(url);
   };
 
-  const handleShare = async (): Promise<void> => {
+  const handleShare = async (
+    platform?: 'twitter' | 'mastodon',
+  ): Promise<void> => {
     if (!url || !title) {
       return;
     }
+    const filteredTagsString = filteredTags(tags || []);
+    const tagsString =
+      filteredTagsString.length > 0 ? `${filteredTagsString}` : '';
+    const descriptionString =
+      description!?.length > 0 ? ` - ${description}` : '';
+    const shareContent = `"${title}"${descriptionString}\n${url}\n${tagsString}`;
+
     try {
       await navigator.share({
-        title,
-        text: description || note || '',
+        text: shareContent,
         url,
       });
     } catch (err) {
-      window.open(
-        urlJoin('https://twitter.com/intent/tweet', {
-          query: {
-            original_referer: window.location.href,
-            source: 'tweetbutton',
-            text: `${title} — ${description}`,
-            url,
-            hashtags: tags?.join(',') || '',
-          },
-        }),
-      );
+      switch (platform) {
+        case 'twitter':
+          window.open(
+            urlJoin('https://twitter.com/intent/tweet', {
+              query: {
+                original_referer: window.location.href,
+                source: 'tweetbutton',
+                text: shareContent,
+                url,
+              },
+            }),
+          );
+          break;
+        case 'mastodon':
+        default:
+          window.open(
+            urlJoin('https://main.elk.zone/intent/post', {
+              query: {
+                text: shareContent,
+              },
+            }),
+          );
+          break;
+      }
     }
   };
 
@@ -127,6 +151,16 @@ export const FeedItemActions = ({
       window.open(url, '_blank');
     }
   };
+
+  useEffect(() => {
+    if (
+      window.navigator &&
+      window.navigator.canShare &&
+      window.navigator.canShare({ text: '' })
+    ) {
+      setCanShare(true);
+    }
+  }, []);
 
   return (
     <div className="feed-item-actions">
@@ -171,12 +205,38 @@ export const FeedItemActions = ({
               </div>
             </DropdownMenu.Item>
           ) : null}
-          <DropdownMenu.Item className="DropdownMenuItem" onClick={handleShare}>
-            Share on Twitter
-            <div className="DropdownMenuItem-rightSlot">
-              <ShareNetwork weight="duotone" />
-            </div>
-          </DropdownMenu.Item>
+          {canShare ? (
+            <DropdownMenu.Item
+              className="DropdownMenuItem"
+              onClick={() => handleShare()}
+            >
+              Share
+              <div className="DropdownMenuItem-rightSlot">
+                <ShareNetwork weight="duotone" />
+              </div>
+            </DropdownMenu.Item>
+          ) : (
+            <>
+              <DropdownMenu.Item
+                className="DropdownMenuItem"
+                onClick={() => handleShare('mastodon')}
+              >
+                Share on Mastodon
+                <div className="DropdownMenuItem-rightSlot">
+                  <ShareNetwork weight="duotone" />
+                </div>
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                className="DropdownMenuItem"
+                onClick={() => handleShare('twitter')}
+              >
+                Share on Twitter
+                <div className="DropdownMenuItem-rightSlot">
+                  <ShareNetwork weight="duotone" />
+                </div>
+              </DropdownMenu.Item>
+            </>
+          )}
           {isInFeed && (
             <DropdownMenu.Item
               className="DropdownMenuItem"
