@@ -23,16 +23,16 @@ export const FieldValueSuggestion = ({
   if (!suggestion) {
     return null;
   }
-  let title = 'Suggestion:';
+  let title = 'Suggestion';
   switch (type) {
     case 'ai':
-      title = 'AI suggestion:';
+      title = 'AI suggestion';
       break;
     case 'original':
-      title = 'Original:';
+      title = 'Original';
       break;
     default:
-      title = 'Suggestion:';
+      title = 'Suggestion';
       break;
   }
   return (
@@ -43,7 +43,7 @@ export const FieldValueSuggestion = ({
       </div>
       <div>
         <Button variant="outline" size="xs" onClick={handleClick} type="button">
-          Use Suggestion
+          Use {title}
         </Button>
       </div>
     </Flex>
