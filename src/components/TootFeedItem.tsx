@@ -22,7 +22,8 @@ export const TootFeedItem = (props: Toot) => {
     const isHashTag = item.href.includes('/tags/');
     const isDodgyLink = item.href.includes('</span>');
     const isMention = item.href.includes('/@');
-    if (isHashTag || isDodgyLink || isMention) return false;
+    const noProtocol = !item.value.includes('http');
+    if (isHashTag || isDodgyLink || isMention || noProtocol) return false;
     return true;
   });
   const tootMedia = media as any[];
@@ -62,7 +63,7 @@ export const TootFeedItem = (props: Toot) => {
               return (
                 <li
                   key={item.href}
-                  className="flex flex-wrap items-center gap-2xs text-step--1"
+                  className="flex items-center gap-2xs overflow-hidden text-clip text-step--1"
                 >
                   <Link
                     href={urlJoin(ROUTE_NEW_BOOKMARK, {
@@ -75,7 +76,7 @@ export const TootFeedItem = (props: Toot) => {
                     <PlusCircle weight="duotone" size={14} /> Add
                   </Link>
                   <Favicon url={item.href} />
-                  <Link href={item.href} className="break-all">
+                  <Link href={item.href} className="">
                     {item.href}
                   </Link>
                 </li>

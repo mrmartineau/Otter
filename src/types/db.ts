@@ -22,6 +22,7 @@ export type TootUrls = {
   type: string;
   isLink: boolean;
   href: string;
+  value: string;
   end: number;
   start: number;
 }[];
