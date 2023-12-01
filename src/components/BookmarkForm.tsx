@@ -251,22 +251,12 @@ export const BookmarkForm = ({
     }
   }, [watchTitle, watchDescription, watchNote, handleMatchTags, setInput]);
 
-  const latestMessageItem = messages
+  //  get most recent message from AI
+  const latestAiMessageItem = messages
     .filter((item) => {
       return item.role !== 'user';
     })
-    .reduce((latest: Message, current: Message) => {
-      if (
-        !latest ||
-        (latest?.createdAt &&
-          // @ts-ignore
-          latest.createdAt < current?.createdAt &&
-          current.createdAt)
-      ) {
-        return current;
-      }
-      return latest;
-    }, {} as Message);
+    .findLast(() => true);
 
   return (
     <div className="bookmark-form" {...rest}>
@@ -331,11 +321,11 @@ export const BookmarkForm = ({
               </Tooltip>
             </TooltipProvider>
           </Flex>
-          {latestMessageItem ? (
+	  {latestAiMessageItem ? (
             <FieldValueSuggestion
               id="title"
               setValue={setValue}
-              suggestion={latestMessageItem.content as string}
+	      suggestion={latestAiMessageItem.content as string}
               type="ai"
             />
           ) : null}
