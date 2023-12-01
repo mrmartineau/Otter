@@ -5,28 +5,40 @@ import { BookmarkFormValues } from '../types/db';
 import { Flex } from './Flex';
 
 interface FieldValueSuggestionProps {
-  id: keyof BookmarkFormValues;
+  fieldId: keyof BookmarkFormValues;
   suggestion?: string;
-  setValue: UseFormSetValue<BookmarkFormValues>;
-  type?: 'ai' | 'default';
+  setFieldValue: UseFormSetValue<BookmarkFormValues>;
+  type?: 'ai' | 'default' | 'original';
 }
 
 export const FieldValueSuggestion = ({
-  id,
+  fieldId,
   suggestion,
-  setValue,
+  setFieldValue,
   type = 'default',
 }: FieldValueSuggestionProps) => {
   const handleClick = () => {
-    setValue(id, suggestion);
+    setFieldValue(fieldId, suggestion);
   };
   if (!suggestion) {
     return null;
   }
+  let title = 'Suggestion:';
+  switch (type) {
+    case 'ai':
+      title = 'AI suggestion:';
+      break;
+    case 'original':
+      title = 'Original:';
+      break;
+    default:
+      title = 'Suggestion:';
+      break;
+  }
   return (
     <Flex direction="column" gap="2xs" className="mt-2xs px-2xs text-step--2">
       <div>
-        <b>{type === 'ai' ? 'AI ' : null}Suggestion:</b>
+        <b>{title}</b>
         <div>{suggestion}</div>
       </div>
       <div>

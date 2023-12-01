@@ -315,19 +315,20 @@ export const BookmarkForm = ({
               </Tooltip>
             </TooltipProvider>
           </Flex>
-          {latestAiMessageItem ? (
+          {latestAiMessageItem && latestAiMessageItem.content !== watchTitle ? (
             <FieldValueSuggestion
-              id="title"
-              setValue={setValue}
+              fieldId="title"
+              setFieldValue={setValue}
               suggestion={latestAiMessageItem.content as string}
               type="ai"
             />
           ) : null}
           {watchTitle !== scrapeResponse?.title ? (
             <FieldValueSuggestion
-              id="title"
-              setValue={setValue}
+              fieldId="title"
+              setFieldValue={setValue}
               suggestion={scrapeResponse?.title as string}
+              type="original"
             />
           ) : null}
         </FormGroup>
@@ -337,9 +338,10 @@ export const BookmarkForm = ({
           <Textarea id="description" {...register('description')}></Textarea>
           {watchDescription !== scrapeResponse?.description ? (
             <FieldValueSuggestion
-              id="description"
-              setValue={setValue}
+              fieldId="description"
+              setFieldValue={setValue}
               suggestion={scrapeResponse?.description as string}
+              type="original"
             />
           ) : null}
         </FormGroup>
