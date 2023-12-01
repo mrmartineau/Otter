@@ -1,7 +1,6 @@
 import { Container } from '@/src/components/Container';
 import { FabAdd } from '@/src/components/FabAdd';
 import { Sidebar } from '@/src/components/Sidebar';
-import { Toaster } from '@/src/components/Toaster';
 import { TopBar } from '@/src/components/TopBar';
 import { UserProvider } from '@/src/components/UserProvider';
 import { UserProfile } from '@/src/types/db';
@@ -10,6 +9,7 @@ import { createServerClient } from '@/src/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
+import { Toaster } from 'sonner';
 
 import pkg from '../../package.json';
 import './layout.css';
@@ -56,7 +56,7 @@ export default async function AppLayout({ children }: LayoutProps) {
           </main>
         </div>
         <FabAdd />
-        <Toaster />
+        <Toaster position="bottom-center" richColors />
       </div>
     </UserProvider>
   );

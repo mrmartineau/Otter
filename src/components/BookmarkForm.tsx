@@ -9,7 +9,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/src/components/Tooltip';
-import { useToast } from '@/src/hooks/use-toast';
 import { cn } from '@/src/utils/classnames';
 import { MagicWand } from '@phosphor-icons/react/dist/ssr';
 import { Message, useChat } from 'ai/react';
@@ -24,6 +23,7 @@ import {
   useState,
 } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { CONTENT, DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER } from '../constants';
 import { useToggle } from '../hooks/useToggle';
@@ -117,7 +117,6 @@ export const BookmarkForm = ({
   const watchDescription = watch('description');
   const watchNote = watch('note');
   const watchTags = watch('tags');
-  const { toast } = useToast();
 
   const handleSubmitForm = async (formData: BookmarkFormValues) => {
     setFormSubmitting(true);
@@ -128,9 +127,7 @@ export const BookmarkForm = ({
         await supabaseClient.from('bookmarks').insert([{ ...formData }], {
           defaultToNull: true,
         });
-        toast({
-          title: 'Item added',
-        });
+        toast.success('Item added');
         router.push('/feed');
       } else {
         await supabaseClient
@@ -138,15 +135,12 @@ export const BookmarkForm = ({
           // @ts-ignore
           .update({ ...formData, modified_at: new Date() })
           .match({ id });
-        toast({
-          title: 'Item edited',
-        });
+        toast.success('Item edited');
       }
       onSubmit?.();
     } catch (err) {
       console.error(err);
-      toast({
-        title: 'Uh oh! Something went wrong.',
+      toast.message('Uh oh! Something went wrong.', {
         description: 'There was a problem with your request. Please try again.',
       });
     }
@@ -321,11 +315,11 @@ export const BookmarkForm = ({
               </Tooltip>
             </TooltipProvider>
           </Flex>
-	  {latestAiMessageItem ? (
+          {latestAiMessageItem ? (
             <FieldValueSuggestion
               id="title"
               setValue={setValue}
-	      suggestion={latestAiMessageItem.content as string}
+              suggestion={latestAiMessageItem.content as string}
               type="ai"
             />
           ) : null}
