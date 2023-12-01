@@ -46,6 +46,7 @@ export const CONTENT = {
   addToLabel: 'Add to Otter',
   findMatchingTags: 'Find matching tags',
   scrapeThisUrl: 'Scrape this URL',
+  fixWithAi: 'Fix with AI',
 
   // used in the feed pagination area
   noItems: 'No items',

@@ -12,6 +12,7 @@ import {
 import { useToast } from '@/src/hooks/use-toast';
 import { cn } from '@/src/utils/classnames';
 import { MagicWand } from '@phosphor-icons/react/dist/ssr';
+import { Message, useChat } from 'ai/react';
 import { useRouter } from 'next/navigation';
 import {
   ChangeEvent,
@@ -88,6 +89,12 @@ export const BookmarkForm = ({
   );
   const [isScraping, , setIsScraping] = useToggle(false);
   const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>();
+  const {
+    messages,
+    setInput,
+    handleSubmit: handleAiTitleSubmit,
+    isLoading: isAiLoading,
+  } = useChat({ api: '/api/ai/title' });
 
   useEffect(() => {
     const getMetaData = async () => {
@@ -232,6 +239,7 @@ export const BookmarkForm = ({
       const matchTagsData: MatchTagsProps = {};
       if (watchTitle) {
         matchTagsData.title = watchTitle;
+        setInput(watchTitle);
       }
       if (watchDescription) {
         matchTagsData.description = watchDescription;
@@ -241,11 +249,31 @@ export const BookmarkForm = ({
       }
       handleMatchTags(matchTagsData);
     }
-  }, [watchTitle, watchDescription, watchNote, handleMatchTags]);
+  }, [watchTitle, watchDescription, watchNote, handleMatchTags, setInput]);
+
+  const latestMessageItem = messages
+    .filter((item) => {
+      return item.role !== 'user';
+    })
+    .reduce((latest: Message, current: Message) => {
+      if (
+        !latest ||
+        (latest?.createdAt &&
+          // @ts-ignore
+          latest.createdAt < current?.createdAt &&
+          current.createdAt)
+      ) {
+        return current;
+      }
+      return latest;
+    }, {} as Message);
 
   return (
     <div className="bookmark-form" {...rest}>
       <h2 className="mb-s">{isNew ? CONTENT.newTitle : CONTENT.editTitle}</h2>
+      <form onSubmit={handleAiTitleSubmit} id="titleFix">
+        <input value={watchTitle || ''} readOnly type="hidden" />
+      </form>
       <form
         onSubmit={handleSubmit(handleSubmitForm)}
         className={bookmarkformClass}
@@ -286,7 +314,31 @@ export const BookmarkForm = ({
 
         {/* TITLE */}
         <FormGroup label="Title" name="title">
-          <Input id="title" {...register('title')} />
+          <Flex gapX="s" align="center">
+            <Input id="title" {...register('title')} />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <IconButton
+                    type="submit"
+                    form="titleFix"
+                    disabled={!watchTitle || isAiLoading}
+                  >
+                    <MagicWand weight="duotone" size="18" />
+                  </IconButton>
+                </TooltipTrigger>
+                <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </Flex>
+          {latestMessageItem ? (
+            <FieldValueSuggestion
+              id="title"
+              setValue={setValue}
+              suggestion={latestMessageItem.content as string}
+              type="ai"
+            />
+          ) : null}
           {watchTitle !== scrapeResponse?.title ? (
             <FieldValueSuggestion
               id="title"
