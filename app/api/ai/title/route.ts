@@ -25,7 +25,7 @@ After: deck․gallery – nicely designed decks, curated
 or
 
 Before: GitHub - MrKai77/Loop: MacOS window management made elegant.
-After: Loop – MacOS window management made elegant.
+After: Loop – MacOS window management made elegant on GitHub.
 
 Before: Clientside - The Platform for Frontend Experts
 After: Clientside - The Platform for Frontend Experts
@@ -38,7 +38,7 @@ After: Horizontal Scrolling in a Centered Max-Width Container - Ryan Mulligan
 or
 
 Before: An Attempted Taxonomy of Web Components—zachleat.com
-After: An Attempted Taxonomy of Web Components - zachleat.com
+After: An Attempted Taxonomy of Web Components – zachleat.com
 
 or
 
