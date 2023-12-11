@@ -6,6 +6,7 @@ import {
   ROUTE_DASHBOARD,
   ROUTE_FEED,
   ROUTE_HOME,
+  ROUTE_PUBLIC,
   ROUTE_SETTINGS_ACCOUNT,
   ROUTE_STARS,
   ROUTE_STATS,
@@ -15,6 +16,7 @@ import {
 } from '@/src/constants';
 import {
   ArrowFatLinesUp,
+  Eye,
   Gauge,
   ListBullets,
   RocketLaunch,
@@ -72,6 +74,12 @@ export const Sidebar = ({ serverDbMeta, version }: SidebarProps) => {
             <ListBullets aria-label="All" size={18} weight="duotone" />
             {CONTENT.feedNav}
           </SidebarLink>
+          {dbMeta.public > 0 ? (
+            <SidebarLink href={ROUTE_PUBLIC} count={dbMeta.public}>
+              <Eye aria-label="Public" size={18} weight="duotone" />
+              {CONTENT.publicNav}
+            </SidebarLink>
+          ) : null}
           {dbMeta.stars > 0 ? (
             <SidebarLink href={ROUTE_STARS} count={dbMeta.stars}>
               <Star aria-label="Stars" size={18} weight="duotone" />

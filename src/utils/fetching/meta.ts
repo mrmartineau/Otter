@@ -4,6 +4,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 export interface DbMetaResponse {
   all: number;
   top: number;
+  public: number;
   stars: number;
   trash: number;
   types: MetaType[];
@@ -42,6 +43,10 @@ export const getDbMetadata = async (
     .from('bookmarks')
     .select('id', { count: 'exact' })
     .match({ star: true, status: 'active' });
+  const publicBookmarks = await supabaseClient
+    .from('bookmarks')
+    .select('id', { count: 'exact' })
+    .match({ public: true, status: 'active' });
   const types = await supabaseClient.from('types_count').select('*');
   const tags = await supabaseClient.from('tags_count').select('*');
   const toots = await supabaseClient
@@ -65,6 +70,7 @@ export const getDbMetadata = async (
     all: all.count || 0,
     top: top.count || 0,
     trash: trash.count || 0,
+    public: publicBookmarks.count || 0,
     stars: stars.count || 0,
     types: types.data || [],
     tags: tags.data || [],

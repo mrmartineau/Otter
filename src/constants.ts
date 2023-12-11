@@ -18,6 +18,8 @@ export const CONTENT = {
   trashTitle: 'Trash',
   starsTitle: 'Stars',
   starsNav: 'Stars',
+  publicNav: 'Public',
+  publicTitle: 'Public',
   editTitle: 'Edit',
   newTitle: 'New item',
   newDescription: 'Add new item',
@@ -74,6 +76,7 @@ export const ROUTE_FEED = '/feed';
 export const ROUTE_SIGNIN = '/signin';
 export const ROUTE_NEW_BOOKMARK = '/new/bookmark';
 export const ROUTE_STARS = '/stars';
+export const ROUTE_PUBLIC = '/public';
 export const ROUTE_STATS = '/top';
 export const ROUTE_TRASH = '/trash';
 export const ROUTE_SETTINGS_ACCOUNT = '/settings/account';
@@ -114,5 +117,3 @@ export const DEFAULT_API_RESPONSE_ORDER: RequestOrder = 'desc';
 export const MINIMUM_CLICK_COUNT = 1;
 
 export const DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER = 'https://zander.wtf';
-
-export const TAG_FOR_AUTO_TOOT = 'public';

@@ -11,8 +11,17 @@ export const getBookmarks = async ({
   supabaseClient,
   params,
 }: BookmarksFetchingOptions) => {
-  const { limit, offset, order, status, type, star, tag, top } =
-    apiParameters(params);
+  const {
+    limit,
+    offset,
+    order,
+    status,
+    type,
+    star,
+    tag,
+    top,
+    public: publicItems,
+  } = apiParameters(params);
   let query = supabaseClient.from('bookmarks').select('*', { count: 'exact' });
 
   if (status) {
@@ -20,6 +29,9 @@ export const getBookmarks = async ({
   }
   if (star) {
     query = query.match({ star });
+  }
+  if (publicItems) {
+    query = query.match({ public: publicItems });
   }
   if (type) {
     query = query.match({ type });

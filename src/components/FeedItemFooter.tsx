@@ -7,6 +7,7 @@ import {
 import { MINIMUM_CLICK_COUNT } from '@/src/constants';
 import {
   Calendar,
+  Eye,
   NavigationArrow,
   RssSimple,
   Star,
@@ -50,6 +51,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
     click_count,
     isInFeed,
     feed,
+    public: isPublic,
   } = props;
   const handleClickRegister = useClickBookmark();
   const createdDate = getRelativeDate(created_at);
@@ -59,11 +61,15 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       ? `Created on ${createdDate.formatted}, modified on ${modifiedDate.formatted}`
       : `Created on ${createdDate.formatted}`;
 
-  const handleToggleStar = async (): Promise<void> => {
+  const handleToggleState = async (
+    column: 'public' | 'star',
+  ): Promise<void> => {
+    const updateData =
+      column === 'public' ? { public: !isPublic } : { star: !star };
     await supabaseClient
       .from('bookmarks')
       .update({
-        star: !star,
+        ...updateData,
         // @ts-ignore
         modified_at: new Date(),
       })
@@ -105,12 +111,41 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
 
             <Tooltip>
               <TooltipTrigger asChild>
+                {isPublic ? (
+                  <IconButton
+                    onClick={() => handleToggleState('public')}
+                    size="s"
+                  >
+                    <Eye size={16} weight="fill" />
+                  </IconButton>
+                ) : (
+                  <IconButton
+                    onClick={() => handleToggleState('public')}
+                    size="s"
+                  >
+                    <Eye size={16} weight="duotone" />
+                  </IconButton>
+                )}
+              </TooltipTrigger>
+              <TooltipContent>
+                {isPublic ? 'Make this item private' : 'Make this item publicam'}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
                 {star ? (
-                  <IconButton onClick={handleToggleStar} size="s">
+                  <IconButton
+                    onClick={() => handleToggleState('star')}
+                    size="s"
+                  >
                     <Star size={16} weight="fill" />
                   </IconButton>
                 ) : (
-                  <IconButton onClick={handleToggleStar} size="s">
+                  <IconButton
+                    onClick={() => handleToggleState('star')}
+                    size="s"
+                  >
                     <Star size={16} weight="duotone" />
                   </IconButton>
                 )}

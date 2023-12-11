@@ -1,7 +1,6 @@
-import { TAG_FOR_AUTO_TOOT } from '@/src/constants';
 import { errorResponse } from '@/src/utils/fetching/errorResponse';
 
-import { filteredTags, similarArrays } from './utils';
+import { filteredTags } from './utils';
 
 /**
  * /api/toot
@@ -20,33 +19,22 @@ export async function POST(request: Request) {
     return errorResponse({ reason: 'Toot not sent 😞', status: 418 });
   }
 
-  // don't continue if the record doesn't have the 'TAG_FOR_AUTO_TOOT' tag
-  if (!body.record.tags.includes(TAG_FOR_AUTO_TOOT)) {
-    return errorResponse({ reason: 'Toot not sent 😞', status: 418 });
-  }
-
-  // don't continue if the record doesn't have a url
-  if (!body.record.url) {
+  // don't continue if the record isn't public
+  // or if the record doesn't have a url
+  if (body.record.public === false || !body.record.url) {
     return errorResponse({ reason: 'Toot not sent 😞', status: 418 });
   }
 
   // Only
   if (body.type === 'UPDATE') {
-    if (similarArrays(body.record.tags, body.old_record.tags)) {
-      // tags haven't changed, so there's no need to send a toot
-      return errorResponse({
-        reason: 'UPDATE: old and new tags are the same. Toot not sent 😞',
-        status: 418,
-      });
-    } else if (
-      // tags might have changed, but the bookmark still has is still the 'TAG_FOR_AUTO_TOOT' tag
+    if (
+      // other content might have changed, but the bookmark is still is public
       // so there's no need to send a toot
-      body.record.tags.includes(TAG_FOR_AUTO_TOOT) &&
-      body.old_record.tags.includes(TAG_FOR_AUTO_TOOT)
+      body.record.public === true &&
+      body.old_record.public === true
     ) {
       return errorResponse({
-        reason:
-          'UPDATE: this bookmark already had the required tag. Toot not sent 😞',
+        reason: 'UPDATE: this bookmark is already public. Toot not sent 😞',
         status: 418,
       });
     }

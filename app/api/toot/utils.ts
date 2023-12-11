@@ -1,5 +1,3 @@
-import { TAG_FOR_AUTO_TOOT } from '@/src/constants';
-// @ts-ignore
 import { pascalCase } from 'change-case';
 
 /**
@@ -13,13 +11,9 @@ export const filteredTags = (tags: string[]) => {
   return tags
     .filter((item) => {
       if (
-        [
-          TAG_FOR_AUTO_TOOT,
-          'IFTTT',
-          'TwitterLike',
-          'OtterBot',
-          'instapaper',
-        ].includes(item)
+        ['public', 'IFTTT', 'TwitterLike', 'OtterBot', 'instapaper'].includes(
+          item,
+        )
       ) {
         return false;
       }

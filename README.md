@@ -97,7 +97,7 @@ Interactive API docs can be found in the various `*.rest` files in the `/app/api
 - `GET /api/bookmarks` - returns all bookmarks
 <!-- - `GET /api/bookmarks/:id` - returns a single bookmark -->
 - `GET /api/search?searchTerm=zander` - search bookmark
-- `POST /api/toot` - A PostgreSQL trigger function calls this endpoint anytime a bookmark is created or edited which then creates a new toot on two of my Mastodon accounts ([@otterbot@botsin.space](https://botsin.space/@otterbot) & [@zander@toot.cafe](https://toot.cafe/@zander)). It only sends a toot if the bookmark is tagged as `public`.
+- `POST /api/toot` - A PostgreSQL trigger function calls this endpoint anytime a bookmark is created or edited which then creates a new toot on two of my Mastodon accounts ([@otterbot@botsin.space](https://botsin.space/@otterbot) & [@zander@toot.cafe](https://toot.cafe/@zander)). It only sends a toot if the bookmark has the `public` column set to `true`.
 
 ### Mastodon integration
 
