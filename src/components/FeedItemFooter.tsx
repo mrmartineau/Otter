@@ -128,7 +128,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                 )}
               </TooltipTrigger>
               <TooltipContent>
-                {isPublic ? 'Make this item private' : 'Make this item publicam'}
+                {isPublic ? 'Make this item private' : 'Make this item public'}
               </TooltipContent>
             </Tooltip>
 
