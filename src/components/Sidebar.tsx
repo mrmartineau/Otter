@@ -76,7 +76,7 @@ export const Sidebar = ({ serverDbMeta, version }: SidebarProps) => {
           </SidebarLink>
           {dbMeta.public > 0 ? (
             <SidebarLink href={ROUTE_PUBLIC} count={dbMeta.public}>
-              <Eye aria-label="Public" size={18} weight="duotone" />
+              <Eye aria-label="Public" size={18} weight="fill" />
               {CONTENT.publicNav}
             </SidebarLink>
           ) : null}
