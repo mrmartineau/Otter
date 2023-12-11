@@ -7,6 +7,10 @@ import { createServerClient } from '@/src/utils/supabase/server';
 import { Star } from '@phosphor-icons/react/dist/ssr';
 import { cookies } from 'next/headers';
 
+export const metadata = {
+  title: `Public bookmarks – Otter`,
+};
+
 export default async function PublicPage({
   searchParams,
 }: {
