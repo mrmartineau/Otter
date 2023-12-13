@@ -16,8 +16,7 @@ export const useClickBookmark = () => {
       .from('bookmarks')
       .update({
         click_count: count + 1,
-        // @ts-ignore
-        modified_at: new Date(),
+        modified_at: new Date().toISOString(),
       })
       .match({ id });
   };

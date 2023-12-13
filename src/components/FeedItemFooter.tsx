@@ -70,8 +70,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       .from('bookmarks')
       .update({
         ...updateData,
-        // @ts-ignore
-        modified_at: new Date(),
+        modified_at: new Date().toISOString(),
       })
       .match({ id });
   };

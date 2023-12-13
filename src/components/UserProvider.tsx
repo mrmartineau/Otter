@@ -62,8 +62,7 @@ export const UserProvider = ({ children, id, profile }: UserProviderProps) => {
       }
       await supabaseClient
         .from('profiles')
-        // @ts-ignore
-        .update({ [column]: value, updated_at: new Date() })
+        .update({ [column]: value, updated_at: new Date().toISOString() })
         .match({ id });
     },
     [id, realtimeProfile?.settings_pinned_tags, supabaseClient],
