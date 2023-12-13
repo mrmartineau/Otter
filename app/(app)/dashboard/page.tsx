@@ -1,7 +1,8 @@
 import { FeedSimple } from '@/src/components/FeedSimple';
-import { Bookmark } from '@/src/types/db';
+import { Bookmark, Toot } from '@/src/types/db';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
 import { getDashboard } from '@/src/utils/fetching/dashboard';
+import { getToots } from '@/src/utils/fetching/toots';
 import { randomElements } from '@/src/utils/random-array-elements';
 import { createServerClient } from '@/src/utils/supabase/server';
 import { cookies } from 'next/headers';
@@ -26,6 +27,14 @@ export default async function DashboardPage() {
       limit: 4,
       status: 'active',
     },
+  });
+
+  const tootResponse = await getToots({
+    supabaseClient,
+    params: {
+      limit: 4,
+    },
+    likes: true,
   });
 
   return (
@@ -55,6 +64,7 @@ export default async function DashboardPage() {
         items={followUpResponse.data as Bookmark[]}
         title="#follow-up"
       />
+      <FeedSimple items={tootResponse.data as Toot[]} title="Liked toots" />
     </div>
   );
 }

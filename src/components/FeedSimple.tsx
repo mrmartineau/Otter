@@ -1,19 +1,29 @@
-import { CONTENT } from '@/src/constants';
+'use client';
+
 import { ReactNode, memo } from 'react';
 
-import { Bookmark } from '../types/db';
+import { FeedItemModel } from '../hooks/useGroupByDate';
+import { useRealtimeFeed } from '../hooks/useRealtime';
 import { cn } from '../utils/classnames';
 import { BookmarkFeedItem } from './BookmarkFeedItem';
+import { isToot, isTweet } from './Feed';
 import { headingVariants } from './Heading';
+import { TootFeedItem } from './TootFeedItem';
+import { TweetFeedItem } from './TweetFeedItem';
 
 interface FeedSimpleProps {
   title?: ReactNode;
   icon?: ReactNode;
-  items: Bookmark[];
+  items: FeedItemModel[];
 }
 
 export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
-  if (!items?.length) {
+  const realtimeItems = useRealtimeFeed({
+    initialData: items,
+    isTrash: false,
+  });
+
+  if (!realtimeItems?.length) {
     return null;
   }
 
@@ -30,13 +40,16 @@ export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
       </h3>
 
       <div className="feed-simple-grid">
-        {items?.length ? (
-          items.map((item) => {
-            return <BookmarkFeedItem {...item} key={item.id} isClamped />;
-          })
-        ) : (
-          <div>{CONTENT.noItems}</div>
-        )}
+        {realtimeItems.map((item) => {
+          if (isTweet(item)) {
+            return <TweetFeedItem {...item} key={item.id} />;
+          } else if (isToot(item)) {
+            return <TootFeedItem {...item} key={item.id} />;
+          }
+          return (
+            <BookmarkFeedItem {...item} allowDeletion={false} key={item.id} />
+          );
+        })}
       </div>
     </div>
   );

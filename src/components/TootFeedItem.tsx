@@ -30,16 +30,47 @@ export const TootFeedItem = (props: Toot) => {
 
   return (
     <div className="feed-item">
-      <div className="flex items-center gap-xs">
-        {user_avatar ? (
-          <img src={user_avatar} alt="" className="feed-avatar" />
+      <div className="feed-item-cols">
+        <div className="feed-item-content">
+          <div className="flex items-center gap-xs">
+            {user_avatar ? (
+              <img src={user_avatar} alt="" className="feed-avatar" />
+            ) : null}
+            <Flex direction="column">
+              <div className="text-step--1">{user_name}</div>
+              <div className="text-step--2">@{user_id}</div>
+            </Flex>
+          </div>
+          {text ? <Markdown>{text}</Markdown> : null}
+        </div>
+        {tootMedia?.length ? (
+          <div>
+            <h3 className={cn(headingVariants({ variant: 'date' }), '!mt-0')}>
+              Media
+            </h3>
+            <div className="toot-media-grid">
+              {tootMedia.map((item) => {
+                const isVideoType =
+                  item.type === 'gifv' || item.type === 'video';
+                const isPhotoType = item.type === 'image';
+                return (
+                  <div key={item.id}>
+                    {isVideoType ? (
+                      <video src={item.url} controls className="max-w-full" />
+                    ) : isPhotoType ? (
+                      <img
+                        src={item.url}
+                        alt={item?.description}
+                        className="max-w-full rounded-m"
+                      />
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         ) : null}
-        <Flex direction="column">
-          <div className="text-step--1">{user_name}</div>
-          <div className="text-step--2">@{user_id}</div>
-        </Flex>
       </div>
-      {text ? <Markdown>{text}</Markdown> : null}
 
       {toot_url ? (
         <div>
@@ -83,33 +114,6 @@ export const TootFeedItem = (props: Toot) => {
               );
             })}
           </ul>
-        </div>
-      ) : null}
-
-      {tootMedia?.length ? (
-        <div>
-          <h3 className={cn(headingVariants({ variant: 'date' }), '!mt-0')}>
-            Media
-          </h3>
-          <div className="toot-media-grid">
-            {tootMedia.map((item) => {
-              const isVideoType = item.type === 'gifv' || item.type === 'video';
-              const isPhotoType = item.type === 'image';
-              return (
-                <div key={item.id}>
-                  {isVideoType ? (
-                    <video src={item.url} controls className="max-w-full" />
-                  ) : isPhotoType ? (
-                    <img
-                      src={item.url}
-                      alt={item?.description}
-                      className="max-w-full rounded-m"
-                    />
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
         </div>
       ) : null}
     </div>
