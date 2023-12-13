@@ -9,6 +9,36 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      bookmark_tags: {
+        Row: {
+          bookmark_id: string
+          tag_id: string
+        }
+        Insert: {
+          bookmark_id: string
+          tag_id: string
+        }
+        Update: {
+          bookmark_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookmark_tags_bookmark_id_fkey"
+            columns: ["bookmark_id"]
+            isOneToOne: false
+            referencedRelation: "bookmarks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookmark_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       bookmarks: {
         Row: {
           click_count: number
@@ -102,6 +132,21 @@ export interface Database {
           settings_types_visible?: boolean
           updated_at?: string | null
           username?: string | null
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          id: string
+          tag: string
+        }
+        Insert: {
+          id?: string
+          tag: string
+        }
+        Update: {
+          id?: string
+          tag?: string
         }
         Relationships: []
       }
@@ -209,9 +254,24 @@ export interface Database {
       }
     }
     Views: {
+      collection_tags_view: {
+        Row: {
+          bookmark_count: number | null
+          collection: string | null
+          tags: string[] | null
+        }
+        Relationships: []
+      }
       tags_count: {
         Row: {
           count: number | null
+          tag: string | null
+        }
+        Relationships: []
+      }
+      tags_count1: {
+        Row: {
+          bookmark_count: number | null
           tag: string | null
         }
         Relationships: []
@@ -248,6 +308,14 @@ export interface Database {
           url: string | null
           user: string | null
         }[]
+      }
+      update_bookmark_tags: {
+        Args: {
+          old_tag: string
+          new_tag: string
+          user_id: string
+        }
+        Returns: undefined
       }
     }
     Enums: {

@@ -2,7 +2,7 @@ import { Flex } from '@/src/components/Flex';
 import { headingVariants } from '@/src/components/Heading';
 import { SidebarLink } from '@/src/components/SidebarLink';
 import { CONTENT } from '@/src/constants';
-import { Gear, Plugs, UserCircle } from '@phosphor-icons/react/dist/ssr';
+import { Gear, Hash, Plugs, UserCircle } from '@phosphor-icons/react/dist/ssr';
 import { ReactNode } from 'react';
 
 export interface SettingsLayoutProps {
@@ -35,6 +35,10 @@ export default async function SettingsLayout({
         <SidebarLink href="/settings/integrations">
           <Plugs weight="duotone" size={18} />
           Integrations
+        </SidebarLink>
+        <SidebarLink href="/settings/tags">
+          <Hash weight="duotone" size={18} />
+          Manage tags
         </SidebarLink>
       </Flex>
       {children}
