@@ -107,7 +107,7 @@ export const Sidebar = ({ serverDbMeta, version }: SidebarProps) => {
           ) : null}
           <TypeList types={dbMeta.types} />
           <AllTags tags={dbMeta.tags} />
-          <CollectionList collections={dbMeta.collections} />
+          <CollectionList collections={dbMeta.collections} tags={dbMeta.tags} />
         </Flex>
       </div>
 

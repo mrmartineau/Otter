@@ -1,7 +1,7 @@
 import { Cards } from '@phosphor-icons/react';
 
 import { CONTENT } from '../constants';
-import { CollectionType } from '../utils/fetching/meta';
+import { CollectionType, MetaTag } from '../utils/fetching/meta';
 import {
   Collapsible,
   CollapsibleContent,
@@ -13,8 +13,9 @@ import { Text } from './Text';
 
 interface TypeListProps {
   collections?: CollectionType[];
+  tags?: MetaTag[];
 }
-export const CollectionList = ({ collections }: TypeListProps) => (
+export const CollectionList = ({ collections, tags }: TypeListProps) => (
   <Collapsible stateKey="collections">
     <CollapsibleTrigger asChild>
       {CONTENT.collectionsNav}{' '}
@@ -23,23 +24,51 @@ export const CollectionList = ({ collections }: TypeListProps) => (
     <CollapsibleContent>
       <Flex gapY="3xs" direction="column">
         {collections?.length
-          ? collections.map(({ tags, bookmark_count, collection }) => {
-              if (!collection) {
-                return null;
-              }
-              return (
-                <SidebarLink
-                  count={bookmark_count || 0}
-                  href={`/collection/${collection}`}
-                  activePath={`/collection/${collection}`}
-                  key={collection}
-                >
-                  <Cards size={18} weight="duotone" aria-label={collection} />
-                  {collection}
-                </SidebarLink>
-              );
-            })
-          : 'No types'}
+          ? collections
+              .map(({ bookmark_count, collection }) => {
+                if (!collection) {
+                  return null;
+                }
+
+                let count = bookmark_count || 0;
+                // also count up tags that match the collection name
+                const matchingTags =
+                  tags &&
+                  tags.filter((item) => {
+                    return item.tag?.toLowerCase() === collection.toLowerCase();
+                  });
+                for (const tag of matchingTags!) {
+                  if (tag?.count) {
+                    count += tag.count;
+                  }
+                }
+                return {
+                  count,
+                  collection,
+                };
+              })
+              .sort((a, b) => (b?.count ?? 0) - (a?.count ?? 0))
+              .map((item) => {
+                if (!item) {
+                  return null;
+                }
+                return (
+                  <SidebarLink
+                    count={item.count}
+                    href={`/collection/${item.collection}`}
+                    activePath={`/collection/${item.collection}`}
+                    key={item.collection}
+                  >
+                    <Cards
+                      size={18}
+                      weight="duotone"
+                      aria-label={item.collection}
+                    />
+                    {item.collection}
+                  </SidebarLink>
+                );
+              })
+          : null}
       </Flex>
     </CollapsibleContent>
   </Collapsible>
