@@ -1,7 +1,6 @@
 import { Button } from '@/src/components/Button';
 import { FormGroup } from '@/src/components/FormGroup';
 import { Input } from '@/src/components/Input';
-import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { createServerClient } from '@/src/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -9,7 +8,10 @@ import { redirect } from 'next/navigation';
 export default async function TagsManagementPage() {
   const cookieStore = cookies();
   const supabaseClient = createServerClient(cookieStore);
-  const { tags } = await getDbMetadata(supabaseClient);
+  const dbMetaTags = await supabaseClient
+    .from('tags_count')
+    .select('*')
+    .order('tag', { ascending: true });
   const {
     data: { user },
   } = await supabaseClient.auth.getUser();
@@ -41,38 +43,36 @@ export default async function TagsManagementPage() {
     <>
       <h2>All tags</h2>
       <ul className="flex flex-col gap-xs">
-        {tags.map(({ tag }) => {
-          if (!tag) {
-            return null;
-          }
+        {dbMetaTags.data?.length
+          ? dbMetaTags.data.map(({ tag }) => {
+              if (!tag) {
+                return null;
+              }
 
-          return (
-            <li key={tag}>
-              <form action={handleRenameTag} className="flex items-end gap-xs">
-                <FormGroup label="Existing tag" name={`old_tag-${tag}`}>
-                  <Input
-                    id={`old_tag-${tag}`}
-                    name="old_tag"
-                    readOnly
-                    value={tag}
-                  />
-                </FormGroup>
-                <FormGroup label="New Tag" name={`new_tag-${tag}`}>
-                  <Input
-                    id={`new_tag-${tag}`}
-                    name="new_tag"
-                    placeholder={tag}
-                  />
-                </FormGroup>
-                <div>
-                  <Button type="submit" variant="outline" size="xs">
-                    Rename
-                  </Button>
-                </div>
-              </form>
-            </li>
-          );
-        })}
+              return (
+                <li key={tag}>
+                  <form
+                    action={handleRenameTag}
+                    className="flex items-end gap-xs"
+                  >
+                    <input type="hidden" name="old_tag" value={tag} />
+                    <FormGroup label="Tag" name={`new_tag-${tag}`}>
+                      <Input
+                        id={`new_tag-${tag}`}
+                        name="new_tag"
+                        defaultValue={tag}
+                      />
+                    </FormGroup>
+                    <div>
+                      <Button type="submit" variant="outline" size="xs">
+                        Rename
+                      </Button>
+                    </div>
+                  </form>
+                </li>
+              );
+            })
+          : null}
       </ul>
     </>
   );
