@@ -9,6 +9,7 @@ import {
   ArrowElbowDownLeft,
   ArrowFatLinesUp,
   Calendar,
+  Cards,
   CheckCircle,
   Gauge,
   Gear,
@@ -247,7 +248,9 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                       key={`tag-all-${tag}`}
                       to={`/tag/${tag}`}
                       value={`tag-${tag}`}
-                      image={<Hash weight="duotone" aria-label="Tag" />}
+                      image={
+                        <Hash weight="duotone" aria-label={`Tag: ${tag}`} />
+                      }
                       accessories={sharedAccessories}
                     >
                       {tag}
@@ -263,10 +266,36 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                       key={`tag-pinned-${item}`}
                       to={`/tag/${item}`}
                       value={`tag-pinned-${item}`}
-                      image={<Hash weight="duotone" aria-label="Tag" />}
+                      image={
+                        <Hash weight="duotone" aria-label={`Tag: ${item}`} />
+                      }
                       accessories={sharedAccessories}
                     >
                       {item}
+                    </Item>
+                  );
+                })}
+              </Command.Group>
+            ) : null}
+
+            {/* Collections */}
+            {searchTerm.length && dbMeta?.collections?.length ? (
+              <Command.Group className="cmdk-group" heading="Collections">
+                {dbMeta.collections.map(({ collection }) => {
+                  return (
+                    <Item
+                      key={`collection-${collection}`}
+                      to={`/collection/${collection}`}
+                      value={`collection-${collection}`}
+                      image={
+                        <Cards
+                          weight="duotone"
+                          aria-label={`Collection: ${collection}`}
+                        />
+                      }
+                      accessories={sharedAccessories}
+                    >
+                      {collection}
                     </Item>
                   );
                 })}
