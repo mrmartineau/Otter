@@ -72,50 +72,51 @@ export const TootFeedItem = (props: Toot) => {
         ) : null}
       </div>
 
-      {toot_url ? (
-        <div>
-          <Link
-            rel="external"
-            href={toot_url}
-            className="flex items-center gap-2xs text-step--1"
-          >
-            <LinkSimpleHorizontal weight="duotone" size="14" /> Toot
-          </Link>
-        </div>
-      ) : null}
-
-      {tootUrls?.length ? (
-        <div>
-          <h3 className={clsx(headingVariants({ variant: 'date' }), '!mt-0')}>
-            URLs
-          </h3>
-          <ul className="flex flex-col gap-2xs">
-            {tootUrls.map((item) => {
-              return (
-                <li
-                  key={item.href}
-                  className="flex items-center gap-2xs overflow-hidden text-clip text-step--1"
-                >
-                  <Link
-                    href={urlJoin(ROUTE_NEW_BOOKMARK, {
-                      query: {
-                        url: item.href,
-                      },
-                    })}
-                    variant="add"
+      <div>
+        {toot_url ? (
+          <div>
+            <Link
+              rel="external"
+              href={toot_url}
+              className="flex items-center gap-2xs text-step--1"
+            >
+              <LinkSimpleHorizontal weight="duotone" size="14" /> Toot
+            </Link>
+          </div>
+        ) : null}
+        {tootUrls?.length ? (
+          <div>
+            <h3 className={clsx(headingVariants({ variant: 'date' }), '!mt-0')}>
+              URLs
+            </h3>
+            <ul className="flex flex-col gap-2xs">
+              {tootUrls.map((item) => {
+                return (
+                  <li
+                    key={item.href}
+                    className="flex items-center gap-2xs overflow-hidden text-clip text-step--1"
                   >
-                    <PlusCircle weight="duotone" size={14} /> Add
-                  </Link>
-                  <Favicon url={item.href} />
-                  <Link href={item.href} className="">
-                    {item.href}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ) : null}
+                    <Link
+                      href={urlJoin(ROUTE_NEW_BOOKMARK, {
+                        query: {
+                          url: item.href,
+                        },
+                      })}
+                      variant="add"
+                    >
+                      <PlusCircle weight="duotone" size={14} /> Add
+                    </Link>
+                    <Favicon url={item.href} />
+                    <Link href={item.href} className="">
+                      {item.href}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 };
