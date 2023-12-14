@@ -140,7 +140,7 @@ I use various other tools to make Otter even better:
 - [Raycast extension](https://github.com/mrmartineau/raycast-extensions/tree/main/otter) (not currently on the Raycast extension marketplace)
 - [Chrome extension](https://github.com/mrmartineau/otter-extension) (not currently on the Chrome webstore)
 - [Apple Shortcut](https://github.com/mrmartineau/Otter/blob/main/public/Add%20to%20Otter.shortcut) - download this shortcut and update your Otter instance URL within it. Then you can add it to your iOS share sheet and quickly add new bookmarks to Otter
-- [Page scraprer Cloudflare worker](https://github.com/mrmartineau/cloudflare-worker-scraper) used to scrape the metadata of a URL. This is used when adding new bookmarks to Otter
+- [Page scraper Cloudflare worker](https://github.com/mrmartineau/cloudflare-worker-scraper) used to scrape the metadata of a URL. This is used when adding new bookmarks to Otter
 - [Mastodon to Supabase Cloudflare worker](https://github.com/mrmartineau/mastodon-to-supabase) used to backup my Mastodon toots to Supabase
 
 ## License
