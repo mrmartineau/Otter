@@ -2,7 +2,6 @@ import { Feed } from '@/src/components/Feed';
 import { Bookmark } from '@/src/types/db';
 import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
 import { getCollections } from '@/src/utils/fetching/collections';
-import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { createServerClient } from '@/src/utils/supabase/server';
 import { Cards, Hash } from '@phosphor-icons/react/dist/ssr';
 import { Metadata } from 'next';
