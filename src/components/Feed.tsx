@@ -18,7 +18,12 @@ import { TweetFeedItem } from './TweetFeedItem';
 
 interface FeedProps {
   title: ReactNode;
-  subNav?: { text: string; href: string; isActive?: boolean }[];
+  subNav?: {
+    text: string;
+    href: string;
+    isActive?: boolean;
+    icon?: ReactNode;
+  }[];
   icon?: ReactNode;
   items: FeedItemModel[];
   allowDeletion?: boolean;
@@ -75,10 +80,11 @@ export const Feed = memo(
             {title}
           </h3>
           {subNav ? (
-            <Flex gapX="xs">
-              {subNav.map(({ href, text, isActive }) => {
+            <Flex gapX="3xs" gapY="3xs" wrap="wrap">
+              {subNav.map(({ href, text, isActive, icon }) => {
                 return (
                   <SidebarLink href={href} isActive={isActive} key={href}>
+                    {icon}
                     {text}
                   </SidebarLink>
                 );
@@ -123,7 +129,7 @@ export const Feed = memo(
               realtimeItems.map((item) => {
                 if (isTweet(item)) {
                   return <TweetFeedItem {...item} key={item.id} />;
-                } else if   (isToot(item)) {
+                } else if (isToot(item)) {
                   return <TootFeedItem {...item} key={item.id} />;
                 }
                 return (

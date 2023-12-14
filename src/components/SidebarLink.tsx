@@ -32,9 +32,7 @@ export const SidebarLink = ({
       isActive={isActive}
       onClick={handleCloseSidebar}
     >
-      <Flex display="inline" gapX="xs" align="center">
-        {children}
-      </Flex>
+      <div className="link-sidebar-inner">{children}</div>
       {count ? <Text variant="count">{count}</Text> : null}
     </Link>
   );

@@ -14,7 +14,7 @@ import { Flex } from './Flex';
 import { useUser } from './UserProvider';
 
 interface CollapsibleProps1 extends CollapsibleProps {
-  stateKey: 'tags' | 'types';
+  stateKey: 'tags' | 'types' | 'collections';
 }
 
 export const Collapsible = forwardRef<HTMLDivElement, CollapsibleProps1>(

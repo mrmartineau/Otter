@@ -13,15 +13,13 @@ export interface DbMetaResponse {
   likedToots: number;
   tweets: number;
   likedTweets: number;
+  collections?: CollectionType[];
 }
-export type MetaTag = {
-  count: number | null;
-  tag: string | null;
-};
-export type MetaType = {
-  count: number | null;
-  type: Database['public']['Enums']['type'] | null;
-};
+export type MetaTag = Database['public']['Views']['tags_count']['Row'];
+export type MetaType = Database['public']['Views']['types_count']['Row'];
+
+export type CollectionType =
+  Database['public']['Views']['collection_tags_view']['Row'];
 
 export const getDbMetadata = async (
   supabaseClient: SupabaseClient<Database>,
@@ -49,6 +47,9 @@ export const getDbMetadata = async (
     .match({ public: true, status: 'active' });
   const types = await supabaseClient.from('types_count').select('*');
   const tags = await supabaseClient.from('tags_count').select('*');
+  const collections = await supabaseClient
+    .from('collection_tags_view')
+    .select('*');
   const toots = await supabaseClient
     .from('toots')
     .select('id', { count: 'exact' })
@@ -74,6 +75,7 @@ export const getDbMetadata = async (
     stars: stars.count || 0,
     types: types.data || [],
     tags: tags.data || [],
+    collections: collections.data || [],
     toots: toots.count || 0,
     likedToots: likedToots.count || 0,
     tweets: tweets.count || 0,

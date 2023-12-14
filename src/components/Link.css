@@ -57,6 +57,12 @@
   }
 }
 
+.link-sidebar-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3xs);
+}
+
 .link-logo {
   --color: var(--accent10);
   font-size: var(--step-1);

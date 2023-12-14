@@ -30,6 +30,7 @@ import { useClickAway } from 'use-click-away';
 
 import { useSidebar } from '../hooks/useSidebar';
 import { DbMetaResponse } from '../utils/fetching/meta';
+import { CollectionList } from './CollectionList';
 import { Flex } from './Flex';
 import { Link } from './Link';
 import LogoutButton from './LogoutButton';
@@ -106,6 +107,7 @@ export const Sidebar = ({ serverDbMeta, version }: SidebarProps) => {
           ) : null}
           <TypeList types={dbMeta.types} />
           <AllTags tags={dbMeta.tags} />
+          <CollectionList collections={dbMeta.collections} />
         </Flex>
       </div>
 

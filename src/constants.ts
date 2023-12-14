@@ -31,6 +31,7 @@ export const CONTENT = {
   signupTitle: 'Register',
   signOutNav: 'Sign out',
   typesNav: 'Types',
+  collectionsNav: 'Collections',
   tagsNav: 'Tags',
   tootsTitle: 'Toots',
   tootsNav: 'Toots',
