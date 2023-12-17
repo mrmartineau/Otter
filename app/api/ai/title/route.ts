@@ -7,7 +7,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 });
 
-const systemPrompt = `You are a web page title rewriter. You will be given a string and you should rewrite it to make it more clear. If the name of the site is separated from the page title using a pipe character ("|"), replace it with a en dash ("–"). Follow the writing style of text, if it doesn't use captilization, don't use it. Only include the rewritten text, nothing extra. Be concise. If the name of the site is already in the correct place, don't change it Ideally the name of the website should be first, but if the title is for an article or product with a person's name or the domain name, that should be positioned at the end instead. Below are a few examples:
+const systemPrompt = `You are a web page title rewriter. You will be given a string and you should rewrite it to make it more clear. If the name of the site is separated from the page title using a pipe character ("|"), replace it with a en dash ("–"). Follow the writing style of text, if it doesn't use captilization, don't use it. Only include the rewritten text, nothing extra. Be concise. If the title repeats words or phrases, remove any repitition as long as it makes sense. If the name of the site is already in the correct place, don't change it. Ideally the name of the website should be first, but if the title is for an article or product with a person's name or the domain name, that should be positioned at the end instead. Below are a few examples:
 
 Before: POC Kortal Race Mips Helmet | MTB Helmets                  – POC Sports
 After: POC Sports – POC Kortal Race Mips Helmet | MTB Helmets
