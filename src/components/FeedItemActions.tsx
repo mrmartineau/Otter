@@ -309,7 +309,7 @@ export const FeedItemActions = ({
             <Pencil weight="duotone" size="16" /> Edit
           </Button>
         </DialogTrigger>
-        <DialogContent placement="right" width="m" title="Edit">
+        <DialogContent placement="right" width="l">
           <BookmarkForm
             type="edit"
             initialValues={{
