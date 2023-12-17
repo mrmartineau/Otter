@@ -2,7 +2,7 @@ import { ArrowUpRight } from '@phosphor-icons/react/dist/ssr';
 import urlJoin from 'proper-url-join';
 
 import { Bookmark } from '../types/db';
-import { simpleUrl } from '../utils/simpleUrl';
+import { Flex } from './Flex';
 import { Link } from './Link';
 
 interface PossibleMatchingItemsProps {
@@ -17,10 +17,8 @@ export const PossibleMatchingItems = ({
   }
 
   return (
-    <div className="flow my-2xs rounded-m border border-solid border-theme3 bg-theme2 p-2xs text-step--2">
-      <h5 className="my-0 text-step--1 font-medium">
-        Do you already have this item saved?
-      </h5>
+    <div className="mt-2xs px-2xs text-step--2">
+      <b>Do you already have this item saved?</b>
       <ol className="list-inside list-decimal">
         {items?.slice(0, 3).map((item) => (
           <li key={item.id} className="text-theme10">

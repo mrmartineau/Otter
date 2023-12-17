@@ -10,8 +10,8 @@ import {
   TooltipTrigger,
 } from '@/src/components/Tooltip';
 import { cn } from '@/src/utils/classnames';
-import { MagicWand } from '@phosphor-icons/react/dist/ssr';
-import { Message, useChat } from 'ai/react';
+import { Lightning, MagicWand } from '@phosphor-icons/react/dist/ssr';
+import { useChat } from 'ai/react';
 import { useRouter } from 'next/navigation';
 import {
   ChangeEvent,
@@ -34,6 +34,7 @@ import { getScrapeData } from '../utils/fetching/scrape';
 import { getErrorMessage } from '../utils/get-error-message';
 import { MatchTagsProps, matchTags } from '../utils/matchTags';
 import { createBrowserClient } from '../utils/supabase/client';
+import './BookmarkForm.css';
 import { Combobox } from './Combobox';
 import { FieldValueSuggestion } from './FieldValueSuggestion';
 import { Flex } from './Flex';
@@ -264,9 +265,33 @@ export const BookmarkForm = ({
       >
         <input type="hidden" {...register('feed')} />
 
-        {/* URL */}
-        <FormGroup label="URL" name="url">
-          <Flex gapX="s" align="center">
+        <div className="bookmark-form-grid">
+          {/* URL */}
+          <FormGroup
+            label="URL"
+            name="url"
+            labelSuffix={
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <IconButton
+                      type="button"
+                      size="s"
+                      disabled={!watchUrl || isScraping}
+                      onClick={() => {
+                        if (watchUrl) {
+                          handleScrape(watchUrl);
+                        }
+                      }}
+                    >
+                      <MagicWand weight="duotone" size="18" />
+                    </IconButton>
+                  </TooltipTrigger>
+                  <TooltipContent>{CONTENT.scrapeThisUrl}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            }
+          >
             <Input
               id="url"
               placeholder={DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER}
@@ -274,82 +299,71 @@ export const BookmarkForm = ({
               onBlur={handleUrlBlur}
               autoFocus
             />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <IconButton
-                    type="button"
-                    disabled={!watchUrl || isScraping}
-                    onClick={() => {
-                      if (watchUrl) {
-                        handleScrape(watchUrl);
-                      }
-                    }}
-                  >
-                    <MagicWand weight="duotone" size="18" />
-                  </IconButton>
-                </TooltipTrigger>
-                <TooltipContent>{CONTENT.scrapeThisUrl}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </Flex>
-          <PossibleMatchingItems items={possibleMatchingItems} />
-        </FormGroup>
+            <PossibleMatchingItems items={possibleMatchingItems} />
+          </FormGroup>
 
-        {/* TITLE */}
-        <FormGroup label="Title" name="title">
-          <Flex gapX="s" align="center">
+          {/* TITLE */}
+          <FormGroup
+            label="Title"
+            name="title"
+            labelSuffix={
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <IconButton
+                      type="submit"
+                      size="s"
+                      form="titleFix"
+                      disabled={!watchTitle || isAiLoading}
+                    >
+                      <Lightning weight="duotone" size="18" />
+                    </IconButton>
+                  </TooltipTrigger>
+                  <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            }
+          >
             <Input id="title" {...register('title')} />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <IconButton
-                    type="submit"
-                    form="titleFix"
-                    disabled={!watchTitle || isAiLoading}
-                  >
-                    <MagicWand weight="duotone" size="18" />
-                  </IconButton>
-                </TooltipTrigger>
-                <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </Flex>
-          {latestAiMessageItem && latestAiMessageItem.content !== watchTitle ? (
-            <FieldValueSuggestion
-              fieldId="title"
-              setFieldValue={setValue}
-              suggestion={latestAiMessageItem.content as string}
-              type="ai"
-            />
-          ) : null}
-          {watchTitle !== scrapeResponse?.title ? (
-            <FieldValueSuggestion
-              fieldId="title"
-              setFieldValue={setValue}
-              suggestion={scrapeResponse?.title as string}
-              type="original"
-            />
-          ) : null}
-        </FormGroup>
+            {latestAiMessageItem &&
+            latestAiMessageItem.content !== watchTitle ? (
+              <FieldValueSuggestion
+                fieldId="title"
+                setFieldValue={setValue}
+                suggestion={latestAiMessageItem.content as string}
+                type="ai"
+              />
+            ) : null}
+            {watchTitle !== scrapeResponse?.title ? (
+              <FieldValueSuggestion
+                fieldId="title"
+                setFieldValue={setValue}
+                suggestion={scrapeResponse?.title as string}
+                type="original"
+              />
+            ) : null}
+          </FormGroup>
+        </div>
 
-        {/* DESCRIPTION */}
-        <FormGroup label="Description" name="description">
-          <Textarea id="description" {...register('description')}></Textarea>
-          {watchDescription !== scrapeResponse?.description ? (
-            <FieldValueSuggestion
-              fieldId="description"
-              setFieldValue={setValue}
-              suggestion={scrapeResponse?.description as string}
-              type="original"
-            />
-          ) : null}
-        </FormGroup>
+        <div className="bookmark-form-grid">
+          {/* DESCRIPTION */}
+          <FormGroup label="Description" name="description">
+            <Textarea id="description" {...register('description')}></Textarea>
+            {watchDescription !== scrapeResponse?.description ? (
+              <FieldValueSuggestion
+                fieldId="description"
+                setFieldValue={setValue}
+                suggestion={scrapeResponse?.description as string}
+                type="original"
+              />
+            ) : null}
+          </FormGroup>
 
-        {/* NOTE */}
-        <FormGroup label="Note" name="note">
-          <Textarea id="note" {...register('note')}></Textarea>
-        </FormGroup>
+          {/* NOTE */}
+          <FormGroup label="Note" name="note">
+            <Textarea id="note" {...register('note')}></Textarea>
+          </FormGroup>
+        </div>
 
         {/* TAGS */}
         <FormGroup label="Tags" name="tags">

@@ -9,6 +9,7 @@ export interface FormGroupProps extends ComponentPropsWithoutRef<'div'> {
   label: string;
   name: string;
   note?: string;
+  labelSuffix?: ReactNode;
   children: ReactNode;
   labelIsVisible?: boolean;
 
@@ -23,6 +24,7 @@ export const FormGroup = ({
   error,
   children,
   className,
+  labelSuffix,
   ...rest
 }: FormGroupProps): JSX.Element => {
   const formGroupClass = cn('form-group', className);
@@ -30,7 +32,7 @@ export const FormGroup = ({
   return (
     <div className={formGroupClass} {...rest}>
       <Label htmlFor={name} className={labelClass}>
-        {label}
+        {label} {labelSuffix}
       </Label>
       {children}
       {note ? <Text>{note}</Text> : null}
