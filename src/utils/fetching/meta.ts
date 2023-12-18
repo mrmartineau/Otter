@@ -32,7 +32,7 @@ export const getDbMetadata = async (
     .from('bookmarks')
     .select('id', { count: 'exact' })
     .match({ status: 'active' })
-    .gte('click_count', 1);
+    .gte('click_count', 3);
   const trash = await supabaseClient
     .from('bookmarks')
     .select('id', { count: 'exact' })
