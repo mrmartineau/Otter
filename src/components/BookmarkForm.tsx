@@ -148,10 +148,15 @@ export const BookmarkForm = ({
   };
 
   const transformedTagsForCombobox = useMemo(() => {
-    return bookmarkTags?.map((item) => ({
-      label: item.tag,
-      value: item.tag,
-    }));
+    return bookmarkTags?.map((item) => {
+      if (item.tag === 'Untagged') {
+	return;
+      }
+      return {
+	label: item.tag,
+	value: item.tag,
+      };
+    });
   }, [bookmarkTags]);
 
   const handleMatchTags = useCallback(
