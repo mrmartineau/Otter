@@ -70,6 +70,9 @@
   color: var(--theme11);
   :focus > & {
     color: var(--text);
+    svg {
+      fill: var(--theme12);
+    }
   }
   [data-disabled] & {
     color: var(--theme8);
