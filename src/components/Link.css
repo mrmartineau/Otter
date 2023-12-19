@@ -42,6 +42,7 @@
   line-height: var(--line-height-tight);
 
   &:hover {
+    color: var(--theme11);
     background-color: var(--theme5);
     text-decoration: none;
   }
