@@ -10,8 +10,8 @@ import {
   TooltipTrigger,
 } from '@/src/components/Tooltip';
 import { cn } from '@/src/utils/classnames';
-import { Lightning, MagicWand } from '@phosphor-icons/react/dist/ssr';
-import { useChat } from 'ai/react';
+import { MagicWand, Sparkle } from '@phosphor-icons/react/dist/ssr';
+import { Message, useChat } from 'ai/react';
 import { useRouter } from 'next/navigation';
 import {
   ChangeEvent,
@@ -91,11 +91,17 @@ export const BookmarkForm = ({
   const [isScraping, , setIsScraping] = useToggle(false);
   const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>();
   const {
-    messages,
-    setInput,
+    messages: titleAiMessages,
+    setInput: setTitleAiInput,
     handleSubmit: handleAiTitleSubmit,
-    isLoading: isAiLoading,
+    isLoading: isTitleAiLoading,
   } = useChat({ api: '/api/ai/title' });
+  const {
+    messages: descriptionAiMessages,
+    setInput: setDescriptionAiInput,
+    handleSubmit: handleAiDescriptionSubmit,
+    isLoading: isDescriptionAiLoading,
+  } = useChat({ api: '/api/ai/description' });
 
   useEffect(() => {
     const getMetaData = async () => {
@@ -150,11 +156,11 @@ export const BookmarkForm = ({
   const transformedTagsForCombobox = useMemo(() => {
     return bookmarkTags?.map((item) => {
       if (item.tag === 'Untagged') {
-	return;
+        return;
       }
       return {
-	label: item.tag,
-	value: item.tag,
+        label: item.tag,
+        value: item.tag,
       };
     });
   }, [bookmarkTags]);
@@ -239,30 +245,48 @@ export const BookmarkForm = ({
       const matchTagsData: MatchTagsProps = {};
       if (watchTitle) {
         matchTagsData.title = watchTitle;
-        setInput(watchTitle);
+        setTitleAiInput(watchTitle);
       }
       if (watchDescription) {
         matchTagsData.description = watchDescription;
+        setDescriptionAiInput(watchDescription);
       }
       if (watchNote) {
         matchTagsData.note = watchNote;
       }
       handleMatchTags(matchTagsData);
     }
-  }, [watchTitle, watchDescription, watchNote, handleMatchTags, setInput]);
+  }, [
+    watchTitle,
+    setDescriptionAiInput,
+    watchDescription,
+    watchNote,
+    handleMatchTags,
+    setTitleAiInput,
+  ]);
 
   //  get most recent message from AI
-  const latestAiMessageItem = messages
-    .filter((item) => {
-      return item.role !== 'user';
-    })
-    .findLast(() => true);
+  const latestAiMessageItem = (messages: Message[]) => {
+    return messages
+      .filter((item) => {
+        return item.role !== 'user';
+      })
+      .findLast(() => true);
+  };
+
+  const lastTitleAiMessageItem = latestAiMessageItem(titleAiMessages);
+  const lastDescriptionAiMessageItem = latestAiMessageItem(
+    descriptionAiMessages,
+  );
 
   return (
     <div className="bookmark-form" {...rest}>
       <h2 className="mb-s">{isNew ? CONTENT.newTitle : CONTENT.editTitle}</h2>
       <form onSubmit={handleAiTitleSubmit} id="titleFix">
         <input value={watchTitle || ''} readOnly type="hidden" />
+      </form>
+      <form onSubmit={handleAiDescriptionSubmit} id="descriptionFix">
+        <input value={watchDescription || ''} readOnly type="hidden" />
       </form>
       <form
         onSubmit={handleSubmit(handleSubmitForm)}
@@ -319,9 +343,9 @@ export const BookmarkForm = ({
                       type="submit"
                       size="s"
                       form="titleFix"
-                      disabled={!watchTitle || isAiLoading}
+                      disabled={!watchTitle || isTitleAiLoading}
                     >
-                      <Lightning weight="duotone" size="18" />
+                      <Sparkle weight="duotone" size="18" />
                     </IconButton>
                   </TooltipTrigger>
                   <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
@@ -330,12 +354,12 @@ export const BookmarkForm = ({
             }
           >
             <Input id="title" {...register('title')} />
-            {latestAiMessageItem &&
-            latestAiMessageItem.content !== watchTitle ? (
+            {lastTitleAiMessageItem &&
+            lastTitleAiMessageItem.content !== watchTitle ? (
               <FieldValueSuggestion
                 fieldId="title"
                 setFieldValue={setValue}
-                suggestion={latestAiMessageItem.content as string}
+                suggestion={lastTitleAiMessageItem.content as string}
                 type="ai"
               />
             ) : null}
@@ -352,8 +376,37 @@ export const BookmarkForm = ({
 
         <div className="bookmark-form-grid">
           {/* DESCRIPTION */}
-          <FormGroup label="Description" name="description">
+          <FormGroup
+            label="Description"
+            name="description"
+            labelSuffix={
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <IconButton
+                      type="submit"
+                      size="s"
+                      form="descriptionFix"
+                      disabled={!watchDescription || isDescriptionAiLoading}
+                    >
+                      <Sparkle weight="duotone" size="18" />
+                    </IconButton>
+                  </TooltipTrigger>
+                  <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            }
+          >
             <Textarea id="description" {...register('description')}></Textarea>
+            {lastDescriptionAiMessageItem &&
+            lastDescriptionAiMessageItem.content !== watchDescription ? (
+              <FieldValueSuggestion
+                fieldId="description"
+                setFieldValue={setValue}
+                suggestion={lastDescriptionAiMessageItem.content as string}
+                type="ai"
+              />
+            ) : null}
             {watchDescription !== scrapeResponse?.description ? (
               <FieldValueSuggestion
                 fieldId="description"
