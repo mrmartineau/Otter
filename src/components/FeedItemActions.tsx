@@ -37,7 +37,7 @@ export const FeedItemActions = ({
   star,
   type,
   image,
-  allowDeletion,
+  allowDeletion = false,
   isInFeed = true,
 }: FeedItemActionsProps) => {
   const supabaseClient = createBrowserClient();

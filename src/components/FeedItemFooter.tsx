@@ -52,7 +52,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
     isInFeed,
     feed,
     public: isPublic,
-    allowDeletion,
+    allowDeletion = false,
   } = props;
   const handleClickRegister = useClickBookmark();
   const createdDate = getRelativeDate(created_at);
