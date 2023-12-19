@@ -1,7 +1,14 @@
-import type { Props } from 'react-select';
+import type { Props, StylesConfig } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-export const comboboxStyles: Props['styles'] = {
+export const comboboxStyles: StylesConfig<
+  {
+    label: string | null;
+    value: string | null;
+  }[],
+  true
+> = {
+  // @ts-ignore
   control: (provided, state) => ({
     ...provided,
     backgroundColor: 'var(--theme2)',
@@ -12,11 +19,13 @@ export const comboboxStyles: Props['styles'] = {
     borderWidth: '2px',
     borderColor: state.isFocused ? 'var(--theme6)' : 'var(--theme6)',
   }),
+  // @ts-ignore
   valueContainer: (provided) => ({
     ...provided,
     padding: 'var(--space-3xs) var(--space-2xs)',
     fontSize: 'var(--step--1)',
   }),
+  // @ts-ignore
   multiValue: (provided) => ({
     ...provided,
     borderRadius: 'var(--radii-default)',
@@ -24,20 +33,26 @@ export const comboboxStyles: Props['styles'] = {
     padding: 'var(--space-3xs)',
     alignItems: 'center',
   }),
+  // @ts-ignore
   multiValueRemove: (provided) => ({
     ...provided,
     borderRadius: 'var(--radii-full)',
     marginLeft: '0.2em',
     cursor: 'pointer',
-    height: '1em',
-    width: '1em',
+    height: '1.5em',
+    width: '1.5em',
     flexShrink: 0,
     ':hover': {
-      backgroundColor: 'var(--accent8)',
-      color: 'var(--accent1)',
+      backgroundColor: 'var(--theme8)',
+      color: 'var(--theme12)',
+    },
+    svg: {
+      height: '20px',
+      width: '20px',
     },
   }),
-  option: (provided, state) => ({
+  // @ts-ignore
+  option: (provided) => ({
     ...provided,
     fontSize: 'var(--step--1)',
   }),
@@ -71,6 +86,7 @@ export const Combobox = ({ value, options, ...rest }: Props) => (
     value={value}
     options={options}
     theme={comboboxTheme}
+    // @ts-ignore
     styles={comboboxStyles}
     {...rest}
   />

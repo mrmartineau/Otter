@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from '@/src/components/Tooltip';
 import { cn } from '@/src/utils/classnames';
-import { MagicWand, Sparkle } from '@phosphor-icons/react/dist/ssr';
+import { Download, Sparkle } from '@phosphor-icons/react/dist/ssr';
 import { Message, useChat } from 'ai/react';
 import { useRouter } from 'next/navigation';
 import {
@@ -48,7 +48,7 @@ export interface ComboOption {
   value: string;
 }
 
-export const transformTagsForCombobox = (
+export const setComboboxValue = (
   tags?: string[] | null,
 ): readonly ComboOption[] => {
   if (!tags) {
@@ -154,15 +154,14 @@ export const BookmarkForm = ({
   };
 
   const transformedTagsForCombobox = useMemo(() => {
-    return bookmarkTags?.map((item) => {
-      if (item.tag === 'Untagged') {
-        return;
-      }
-      return {
-        label: item.tag,
-        value: item.tag,
-      };
-    });
+    return bookmarkTags
+      ?.filter((item) => item.tag !== 'Untagged')
+      .map((item) => {
+        return {
+          label: item.tag,
+          value: item.tag,
+        };
+      });
   }, [bookmarkTags]);
 
   const handleMatchTags = useCallback(
@@ -313,7 +312,7 @@ export const BookmarkForm = ({
                         }
                       }}
                     >
-                      <MagicWand weight="duotone" size="18" />
+                      <Download weight="duotone" size="18" />
                     </IconButton>
                   </TooltipTrigger>
                   <TooltipContent>{CONTENT.scrapeThisUrl}</TooltipContent>
@@ -434,7 +433,7 @@ export const BookmarkForm = ({
                 (option as ComboOption[]).map((item) => item.value),
               );
             }}
-            value={transformTagsForCombobox(watchTags)}
+            value={setComboboxValue(watchTags)}
             maxMenuHeight={100}
           />
           {possibleMatchingTags.length ? (
