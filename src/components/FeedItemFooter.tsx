@@ -52,6 +52,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
     isInFeed,
     feed,
     public: isPublic,
+    allowDeletion,
   } = props;
   const handleClickRegister = useClickBookmark();
   const createdDate = getRelativeDate(created_at);
@@ -108,49 +109,55 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               </>
             ) : null}
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                {isPublic ? (
-                  <IconButton
-                    onClick={() => handleToggleState('public')}
-                    size="s"
-                  >
-                    <Eye size={16} weight="fill" />
-                  </IconButton>
-                ) : (
-                  <IconButton
-                    onClick={() => handleToggleState('public')}
-                    size="s"
-                  >
-                    <Eye size={16} weight="duotone" />
-                  </IconButton>
-                )}
-              </TooltipTrigger>
-              <TooltipContent>
-                {isPublic ? 'Make this item private' : 'Make this item public'}
-              </TooltipContent>
-            </Tooltip>
+            {allowDeletion === false ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {isPublic ? (
+                    <IconButton
+                      onClick={() => handleToggleState('public')}
+                      size="s"
+                    >
+                      <Eye size={16} weight="fill" />
+                    </IconButton>
+                  ) : (
+                    <IconButton
+                      onClick={() => handleToggleState('public')}
+                      size="s"
+                    >
+                      <Eye size={16} weight="duotone" />
+                    </IconButton>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent>
+                  {isPublic
+                    ? 'Make this item private'
+                    : 'Make this item public'}
+                </TooltipContent>
+              </Tooltip>
+            ) : null}
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                {star ? (
-                  <IconButton
-                    onClick={() => handleToggleState('star')}
-                    size="s"
-                  >
-                    <Star size={16} weight="fill" />
-                  </IconButton>
-                ) : (
-                  <IconButton
-                    onClick={() => handleToggleState('star')}
-                    size="s"
-                  >
-                    <Star size={16} weight="duotone" />
-                  </IconButton>
-                )}
-              </TooltipTrigger>
-              <TooltipContent>Star/unstar this item</TooltipContent>
-            </Tooltip>
+            {allowDeletion === false ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  {star ? (
+                    <IconButton
+                      onClick={() => handleToggleState('star')}
+                      size="s"
+                    >
+                      <Star size={16} weight="fill" />
+                    </IconButton>
+                  ) : (
+                    <IconButton
+                      onClick={() => handleToggleState('star')}
+                      size="s"
+                    >
+                      <Star size={16} weight="duotone" />
+                    </IconButton>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent>Star/unstar this item</TooltipContent>
+              </Tooltip>
+            ) : null}
 
             {type !== null ? (
               <Tooltip>

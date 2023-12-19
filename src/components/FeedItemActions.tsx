@@ -8,7 +8,6 @@ import {
   ListPlus,
   Pencil,
   ShareNetwork,
-  Star,
   Trash,
 } from '@phosphor-icons/react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
@@ -72,16 +71,7 @@ export const FeedItemActions = ({
       await supabaseClient.from('bookmarks').delete().match({ id });
     }
   };
-  const handleToggleStar = async (): Promise<void> => {
-    await supabaseClient
-      .from('bookmarks')
-      .update({
-        star: !star,
 
-        modified_at: new Date().toISOString(),
-      })
-      .match({ id });
-  };
   const handleCopyUrl = (): void => {
     if (!url) {
       return;
@@ -162,171 +152,143 @@ export const FeedItemActions = ({
 
   return (
     <div className="feed-item-actions">
-      <DropdownMenu.Root>
-        <DropdownMenu.Trigger asChild>
-          <Button variant="ghost" size="xs">
-            <ListPlus weight="duotone" size="16" /> More
-          </Button>
-        </DropdownMenu.Trigger>
+      {allowDeletion === false ? (
+        <>
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <Button variant="ghost" size="xs">
+                <ListPlus weight="duotone" size="16" /> More
+              </Button>
+            </DropdownMenu.Trigger>
 
-        <DropdownMenu.Content className="DropdownMenuContent" sideOffset={0}>
-          {!allowDeletion && (
-            <DropdownMenu.Item
-              className="DropdownMenuItem"
-              onClick={handleToggleStar}
+            <DropdownMenu.Content
+              className="DropdownMenuContent"
+              sideOffset={0}
             >
-              {star ? (
-                <>
-                  Unstar
+              {url ? (
+                <DropdownMenu.Item
+                  className="DropdownMenuItem"
+                  onClick={handleNavigateToBookmark}
+                >
+                  Open in new tab
                   <div className="DropdownMenuItem-rightSlot">
-                    <Star weight="fill" />
+                    <ArrowSquareOut weight="duotone" />
                   </div>
-                </>
+                </DropdownMenu.Item>
+              ) : null}
+              {canShare ? (
+                <DropdownMenu.Item
+                  className="DropdownMenuItem"
+                  onClick={() => handleShare()}
+                >
+                  Share
+                  <div className="DropdownMenuItem-rightSlot">
+                    <ShareNetwork weight="duotone" />
+                  </div>
+                </DropdownMenu.Item>
               ) : (
                 <>
-                  Star
-                  <div className="DropdownMenuItem-rightSlot">
-                    <Star weight="duotone" />
-                  </div>
+                  <DropdownMenu.Item
+                    className="DropdownMenuItem"
+                    onClick={() => handleShare('mastodon')}
+                  >
+                    Share on Mastodon
+                    <div className="DropdownMenuItem-rightSlot">
+                      <ShareNetwork weight="duotone" />
+                    </div>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    className="DropdownMenuItem"
+                    onClick={() => handleShare('twitter')}
+                  >
+                    Share on Twitter
+                    <div className="DropdownMenuItem-rightSlot">
+                      <ShareNetwork weight="duotone" />
+                    </div>
+                  </DropdownMenu.Item>
                 </>
               )}
-            </DropdownMenu.Item>
-          )}
-          {url ? (
-            <DropdownMenu.Item
-              className="DropdownMenuItem"
-              onClick={handleNavigateToBookmark}
-            >
-              Open in new tab
-              <div className="DropdownMenuItem-rightSlot">
-                <ArrowSquareOut weight="duotone" />
-              </div>
-            </DropdownMenu.Item>
-          ) : null}
-          {canShare ? (
-            <DropdownMenu.Item
-              className="DropdownMenuItem"
-              onClick={() => handleShare()}
-            >
-              Share
-              <div className="DropdownMenuItem-rightSlot">
-                <ShareNetwork weight="duotone" />
-              </div>
-            </DropdownMenu.Item>
-          ) : (
-            <>
+              {isInFeed && (
+                <DropdownMenu.Item
+                  className="DropdownMenuItem"
+                  onClick={handleDeepLink}
+                >
+                  Deep link
+                  <div className="DropdownMenuItem-rightSlot">
+                    <LinkSimpleHorizontal weight="duotone" />
+                  </div>
+                </DropdownMenu.Item>
+              )}
+              {url ? (
+                <DropdownMenu.Item
+                  className="DropdownMenuItem"
+                  onClick={handleCopyUrl}
+                >
+                  Copy URL to clipboard
+                  <div className="DropdownMenuItem-rightSlot">
+                    <Copy weight="duotone" />
+                  </div>
+                </DropdownMenu.Item>
+              ) : null}
+
               <DropdownMenu.Item
                 className="DropdownMenuItem"
-                onClick={() => handleShare('mastodon')}
+                onClick={handleArchiveBookmark}
               >
-                Share on Mastodon
-                <div className="DropdownMenuItem-rightSlot">
-                  <ShareNetwork weight="duotone" />
-                </div>
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                className="DropdownMenuItem"
-                onClick={() => handleShare('twitter')}
-              >
-                Share on Twitter
-                <div className="DropdownMenuItem-rightSlot">
-                  <ShareNetwork weight="duotone" />
-                </div>
-              </DropdownMenu.Item>
-            </>
-          )}
-          {isInFeed && (
-            <DropdownMenu.Item
-              className="DropdownMenuItem"
-              onClick={handleDeepLink}
-            >
-              Deep link
-              <div className="DropdownMenuItem-rightSlot">
-                <LinkSimpleHorizontal weight="duotone" />
-              </div>
-            </DropdownMenu.Item>
-          )}
-          {url ? (
-            <DropdownMenu.Item
-              className="DropdownMenuItem"
-              onClick={handleCopyUrl}
-            >
-              Copy URL to clipboard
-              <div className="DropdownMenuItem-rightSlot">
-                <Copy weight="duotone" />
-              </div>
-            </DropdownMenu.Item>
-          ) : null}
-          {allowDeletion ? (
-            <>
-              <DropdownMenu.Item
-                className="DropdownMenuItem"
-                onClick={handleDeleteBookmark}
-              >
-                Permanently delete
+                Trash
                 <div className="DropdownMenuItem-rightSlot">
                   <Trash weight="duotone" />
                 </div>
               </DropdownMenu.Item>
-              <DropdownMenu.Item
-                className="DropdownMenuItem"
-                onClick={handleUnArchiveBookmark}
-              >
-                Un-Archive
-                <div className="DropdownMenuItem-rightSlot">
-                  <Archive weight="duotone" />
-                </div>
-              </DropdownMenu.Item>
-            </>
-          ) : (
-            <DropdownMenu.Item
-              className="DropdownMenuItem"
-              onClick={handleArchiveBookmark}
-            >
-              Archive
-              <div className="DropdownMenuItem-rightSlot">
-                <Archive weight="duotone" />
-              </div>
-            </DropdownMenu.Item>
-          )}
-          <DropdownMenu.Arrow className="DropdownMenuArrow" />
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
+              <DropdownMenu.Arrow className="DropdownMenuArrow" />
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
 
-      <Dialog
-        open={isToggled}
-        onOpenChange={(open) => {
-          setToggleState(open);
-        }}
-      >
-        <DialogTrigger
-          asChild
-          onClick={() => {
-            setToggleState(true);
-          }}
-        >
-          <Button variant="ghost" size="xs">
-            <Pencil weight="duotone" size="16" /> Edit
-          </Button>
-        </DialogTrigger>
-        <DialogContent placement="right" width="l">
-          <BookmarkForm
-            type="edit"
-            initialValues={{
-              title,
-              url,
-              description,
-              note,
-              tags,
-              star,
-              type,
-              image,
+          <Dialog
+            open={isToggled}
+            onOpenChange={(open) => {
+              setToggleState(open);
             }}
-            id={id}
-            onSubmit={handleSubmit}
-          />
-        </DialogContent>
-      </Dialog>
+          >
+            <DialogTrigger
+              asChild
+              onClick={() => {
+                setToggleState(true);
+              }}
+            >
+              <Button variant="ghost" size="xs">
+                <Pencil weight="duotone" size="16" /> Edit
+              </Button>
+            </DialogTrigger>
+            <DialogContent placement="right" width="l">
+              <BookmarkForm
+                type="edit"
+                initialValues={{
+                  title,
+                  url,
+                  description,
+                  note,
+                  tags,
+                  star,
+                  type,
+                  image,
+                }}
+                id={id}
+                onSubmit={handleSubmit}
+              />
+            </DialogContent>
+          </Dialog>
+        </>
+      ) : (
+        <>
+          <Button variant="ghost" size="xs" onClick={handleUnArchiveBookmark}>
+            <Archive weight="duotone" size="16" /> Un-Archive
+          </Button>
+          <Button variant="ghost" size="xs" onClick={handleDeleteBookmark}>
+            <Trash weight="duotone" size="16" /> Permanently delete
+          </Button>
+        </>
+      )}
     </div>
   );
 };
