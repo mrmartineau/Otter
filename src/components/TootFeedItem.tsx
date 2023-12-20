@@ -7,6 +7,7 @@ import urlJoin from 'proper-url-join';
 
 import { ROUTE_NEW_BOOKMARK } from '../constants';
 import { Toot, TootUrls } from '../types/db';
+import { simpleUrl } from '../utils/simpleUrl';
 import { Favicon } from './Favicon';
 import './Feed.css';
 import { Flex } from './Flex';
@@ -72,7 +73,7 @@ export const TootFeedItem = (props: Toot) => {
         ) : null}
       </div>
 
-      <div>
+      <div className="flex flex-col gap-2xs">
         {toot_url ? (
           <div>
             <Link
@@ -94,7 +95,7 @@ export const TootFeedItem = (props: Toot) => {
                 return (
                   <li
                     key={item.href}
-                    className="flex items-center gap-2xs overflow-hidden text-clip text-step--1"
+                    className="flex items-center gap-2xs overflow-hidden text-step--1"
                   >
                     <Link
                       href={urlJoin(ROUTE_NEW_BOOKMARK, {
@@ -107,9 +108,9 @@ export const TootFeedItem = (props: Toot) => {
                       <PlusCircle weight="duotone" size={14} /> Add
                     </Link>
                     <Favicon url={item.href} />
-                    <Link href={item.href} className="">
-                      {item.href}
-                    </Link>
+                    <div className="truncate">
+                      <Link href={item.href}>{simpleUrl(item.href)}</Link>
+                    </div>
                   </li>
                 );
               })}

@@ -146,7 +146,7 @@ export const Feed = memo(
           </div>
         )}
 
-        {/* Next/previos navigation */}
+        {/* Next/previous navigation */}
         {hasOldItems || hasNewItems ? (
           <Flex align="center" justify="center" gap="m" className="mt-m">
             {hasNewItems ? (

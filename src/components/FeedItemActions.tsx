@@ -1,7 +1,7 @@
 import { filteredTags } from '@/app/api/toot/utils';
 import { Button } from '@/src/components/Button';
 import {
-  Archive,
+  ArrowCounterClockwise,
   ArrowSquareOut,
   Copy,
   LinkSimpleHorizontal,
@@ -282,10 +282,12 @@ export const FeedItemActions = ({
       ) : (
         <>
           <Button variant="ghost" size="xs" onClick={handleUnArchiveBookmark}>
-            <Archive weight="duotone" size="16" /> Un-Archive
+            <ArrowCounterClockwise weight="duotone" size="16" />
+            Un-delete
           </Button>
           <Button variant="ghost" size="xs" onClick={handleDeleteBookmark}>
-            <Trash weight="duotone" size="16" /> Permanently delete
+            <Trash weight="duotone" size="16" />
+            Permanently delete
           </Button>
         </>
       )}
