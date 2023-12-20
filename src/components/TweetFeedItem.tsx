@@ -6,6 +6,7 @@ import urlJoin from 'proper-url-join';
 
 import { ROUTE_NEW_BOOKMARK } from '../constants';
 import { type Tweet, type TweetUrls } from '../types/db';
+import { simpleUrl } from '../utils/simpleUrl';
 import { Favicon } from './Favicon';
 import './Feed.css';
 import { Flex } from './Flex';
@@ -76,7 +77,7 @@ export const TweetFeedItem = (props: Tweet) => {
               return (
                 <li
                   key={item.expanded_url}
-                  className="flex flex-wrap items-center gap-2xs text-step--1"
+                  className="flex items-center gap-2xs overflow-hidden text-step--1"
                 >
                   <Link
                     href={urlJoin(ROUTE_NEW_BOOKMARK, {
@@ -89,9 +90,11 @@ export const TweetFeedItem = (props: Tweet) => {
                     <PlusCircle weight="duotone" size={14} /> Add
                   </Link>
                   <Favicon url={item.expanded_url} />
-                  <Link href={item.expanded_url} className="break-all">
-                    {item.expanded_url}
-                  </Link>
+                  <div className="truncate">
+                    <Link href={item.expanded_url}>
+                      {simpleUrl(item.expanded_url)}
+                    </Link>
+                  </div>
                 </li>
               );
             })}
