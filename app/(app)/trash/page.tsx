@@ -1,7 +1,7 @@
 import { Feed } from '@/src/components/Feed';
 import { CONTENT } from '@/src/constants';
 import { Bookmark } from '@/src/types/db';
-import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
+import { type ApiParametersQuery } from '@/src/utils/fetching/apiParameters';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
 import { createServerClient } from '@/src/utils/supabase/server';
 import { Trash } from '@phosphor-icons/react/dist/ssr';
@@ -14,7 +14,7 @@ export const metadata = {
 export default async function TrashPage({
   searchParams,
 }: {
-  searchParams: Partial<ApiParameters>;
+  searchParams: Partial<ApiParametersQuery>;
 }) {
   const { limit, offset } = searchParams;
   const cookieStore = cookies();

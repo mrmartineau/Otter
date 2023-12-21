@@ -4,7 +4,7 @@ import {
   ROUTE_TWEETS_LIKES,
   ROUTE_TWEETS_MINE,
 } from '@/src/constants';
-import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
+import { type ApiParametersQuery } from '@/src/utils/fetching/apiParameters';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { getTweets } from '@/src/utils/fetching/tweets';
 import { createServerClient } from '@/src/utils/supabase/server';
@@ -18,7 +18,7 @@ export const metadata = {
 export default async function LikedTweetsPage({
   searchParams,
 }: {
-  searchParams: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
+  searchParams: Partial<Pick<ApiParametersQuery, 'limit' | 'offset' | 'order'>>;
 }) {
   const { limit, offset } = searchParams;
   const cookieStore = cookies();

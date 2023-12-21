@@ -1,7 +1,7 @@
 import { Feed } from '@/src/components/Feed';
 import { MastodonLogo } from '@/src/components/MastodonLogo';
 import { CONTENT, ROUTE_TOOTS_LIKES, ROUTE_TOOTS_MINE } from '@/src/constants';
-import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
+import { type ApiParametersQuery } from '@/src/utils/fetching/apiParameters';
 import { getDbMetadata } from '@/src/utils/fetching/meta';
 import { getToots } from '@/src/utils/fetching/toots';
 import { createServerClient } from '@/src/utils/supabase/server';
@@ -14,7 +14,7 @@ export const metadata = {
 export default async function LikedTootsPage({
   searchParams,
 }: {
-  searchParams: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
+  searchParams: Partial<Pick<ApiParametersQuery, 'limit' | 'offset' | 'order'>>;
 }) {
   const { limit, offset } = searchParams;
   const cookieStore = cookies();

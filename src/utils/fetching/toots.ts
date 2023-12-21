@@ -1,11 +1,11 @@
 import { type Database } from '@/src/types/supabase';
 import { type SupabaseClient } from '@supabase/supabase-js';
 
-import { type ApiParameters, apiParameters } from './apiParameters';
+import { type ApiParametersQuery, apiParameters } from './apiParameters';
 
 interface TootsFetchingOptions {
   supabaseClient: SupabaseClient<Database>;
-  params: Partial<Pick<ApiParameters, 'limit' | 'offset' | 'order'>>;
+  params: Partial<Pick<ApiParametersQuery, 'limit' | 'offset' | 'order'>>;
   likes: boolean;
 }
 export const getToots = async ({

@@ -1,11 +1,11 @@
 import { type Database } from '@/src/types/supabase';
 import { type SupabaseClient } from '@supabase/supabase-js';
 
-import { type ApiParameters, apiParameters } from './apiParameters';
+import { type ApiParametersQuery, apiParameters } from './apiParameters';
 
 interface BookmarksFetchingOptions {
   supabaseClient: SupabaseClient<Database>;
-  params: Partial<ApiParameters>;
+  params: Partial<ApiParametersQuery>;
 }
 export const getBookmarks = async ({
   supabaseClient,

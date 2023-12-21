@@ -1,6 +1,6 @@
 import { Feed } from '@/src/components/Feed';
 import { Bookmark } from '@/src/types/db';
-import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
+import { type ApiParametersQuery } from '@/src/utils/fetching/apiParameters';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
 import { createServerClient } from '@/src/utils/supabase/server';
 import { Hash } from '@phosphor-icons/react/dist/ssr';
@@ -9,7 +9,7 @@ import { cookies } from 'next/headers';
 
 type Props = {
   params: { name: string };
-  searchParams: Partial<ApiParameters>;
+  searchParams: Partial<ApiParametersQuery>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

@@ -1,11 +1,11 @@
 import { Database } from '@/src/types/supabase';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-import { ApiParameters, apiParameters } from './apiParameters';
+import { ApiParametersQuery, apiParameters } from './apiParameters';
 
 interface SearchFetchingOptions {
   supabaseClient: SupabaseClient<Database>;
-  params: Partial<ApiParameters>;
+  params: Partial<ApiParametersQuery>;
   searchTerm: string;
 }
 export const getSearchBookmarks = async ({

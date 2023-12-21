@@ -3,7 +3,6 @@
 import { usePathname } from 'next/navigation';
 
 import { useSidebar } from '../hooks/useSidebar';
-import { Flex } from './Flex';
 import { Link, LinkProps } from './Link';
 import { Text } from './Text';
 

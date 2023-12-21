@@ -1,7 +1,7 @@
 import { Feed } from '@/src/components/Feed';
 import { TypeToIcon } from '@/src/components/TypeToIcon';
 import { Bookmark, BookmarkType } from '@/src/types/db';
-import { type ApiParameters } from '@/src/utils/fetching/apiParameters';
+import { type ApiParametersQuery } from '@/src/utils/fetching/apiParameters';
 import { getBookmarks } from '@/src/utils/fetching/bookmarks';
 import { createServerClient } from '@/src/utils/supabase/server';
 import { Metadata } from 'next';
@@ -10,7 +10,7 @@ import title from 'title';
 
 type Props = {
   params: { type: string };
-  searchParams: Partial<ApiParameters>;
+  searchParams: Partial<ApiParametersQuery>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
