@@ -77,6 +77,9 @@ dependencies:
   next:
     specifier: ^14.0.4
     version: 14.0.4(react-dom@18.2.0)(react@18.2.0)
+  next-usequerystate:
+    specifier: ^1.13.2
+    version: 1.13.2(next@14.0.4)
   openai:
     specifier: ^4.23.0
     version: 4.23.0(encoding@0.1.13)
@@ -5717,6 +5720,10 @@ packages:
       yallist: 4.0.0
     dev: true
 
+  /mitt@3.0.1:
+    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
+    dev: false
+
   /mkdirp@1.0.4:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
     engines: {node: '>=10'}
@@ -5764,6 +5771,15 @@ packages:
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
     dev: true
+
+  /next-usequerystate@1.13.2(next@14.0.4):
+    resolution: {integrity: sha512-Jg6pJy/ltevoVc/Qa8Dvgz9UY5UeKsKQfELj9dNxGx2TdxiPTa5w9bfo5y0n1TKeTcnFRHIyf6PqkjLsDFuo1A==}
+    peerDependencies:
+      next: '>=13.4 <14.0.2 || ^14.0.3'
+    dependencies:
+      mitt: 3.0.1
+      next: 14.0.4(react-dom@18.2.0)(react@18.2.0)
+    dev: false
 
   /next@14.0.4(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-qbwypnM7327SadwFtxXnQdGiKpkuhaRLE2uq62/nRul9cj9KhQ5LhHmlziTNqUidZotw/Q1I9OjirBROdUJNgA==}

@@ -4,7 +4,10 @@ import { Button } from '@/src/components/Button';
 import { CONTENT, DEFAULT_API_RESPONSE_LIMIT } from '@/src/constants';
 import { FeedItemModel, useGroupByDate } from '@/src/hooks/useGroupByDate';
 import { usePagination } from '@/src/hooks/usePagination';
-import { ReactNode, memo } from 'react';
+import { Eye, Star } from '@phosphor-icons/react';
+import { parseAsBoolean, useQueryState } from 'next-usequerystate';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { ReactNode, memo, useCallback } from 'react';
 
 import { useRealtimeFeed } from '../hooks/useRealtime';
 import { Bookmark, Toot, Tweet } from '../types/db';
@@ -56,6 +59,9 @@ export const Feed = memo(
     allowGroupByDate = false,
     subNav,
   }: FeedProps) => {
+    const pathname = usePathname();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const realtimeItems = useRealtimeFeed({
       initialData: items,
       isTrash: allowDeletion,
@@ -66,19 +72,79 @@ export const Feed = memo(
       limit,
       count,
     });
+    const [starQuery, setStarQuery] = useQueryState(
+      'star',
+      parseAsBoolean.withDefault(false),
+    );
+    const [publicQuery, setPublicQuery] = useQueryState(
+      'public',
+      parseAsBoolean.withDefault(false),
+    );
+    const createQueryString = useCallback(
+      (newParams: { name: string; value: string }[]) => {
+        const params = new URLSearchParams(searchParams);
+        for (const { name, value } of newParams) {
+          params.set(name, value);
+        }
+        return params.toString();
+      },
+      [searchParams],
+    );
+
+    const handleToggleState = async (
+      column: 'public' | 'star',
+    ): Promise<void> => {
+      let newPublicQuery = publicQuery;
+      let newStarQuery = starQuery;
+      if (column === 'public') {
+        newPublicQuery = !publicQuery;
+        setPublicQuery(newPublicQuery);
+      }
+      if (column === 'star') {
+        newStarQuery = !starQuery;
+        setStarQuery(newStarQuery);
+      }
+      router.push(
+        `${pathname}?${createQueryString([
+          { name: 'star', value: newStarQuery ? 'true' : 'false' },
+          { name: 'public', value: newPublicQuery ? 'true' : 'false' },
+        ])}`,
+      );
+    };
 
     return (
       <div className="feed">
         <Flex gap="xs" direction="column" justify="between">
-          <h3
-            className={cn(
-              headingVariants({ variant: 'feedTitle' }),
-              'flex items-center gap-2xs',
-            )}
-          >
-            {icon}
-            {title}
-          </h3>
+          <Flex gap="xs" justify="between" wrap="wrap" align="center">
+            <h3
+              className={cn(
+                headingVariants({ variant: 'feedTitle' }),
+                'flex items-center gap-2xs',
+              )}
+            >
+              {icon}
+              {title}
+            </h3>
+            <Flex gap="3xs">
+              <Button
+                onClick={() => handleToggleState('star')}
+                size="xs"
+                variant="ghost"
+                aria-pressed={starQuery}
+              >
+                <Star size={16} weight={starQuery ? 'fill' : 'duotone'} /> Stars
+              </Button>
+              <Button
+                onClick={() => handleToggleState('public')}
+                size="xs"
+                variant="ghost"
+                aria-pressed={publicQuery}
+              >
+                <Eye size={16} weight={publicQuery ? 'fill' : 'duotone'} />{' '}
+                Public
+              </Button>
+            </Flex>
+          </Flex>
           {subNav ? (
             <Flex gapX="3xs" gapY="3xs" wrap="wrap">
               {subNav.map(({ href, text, isActive, icon }) => {

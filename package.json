@@ -56,6 +56,7 @@
     "match-words": "^1.0.0",
     "memoize-one": "^6.0.0",
     "next": "^14.0.4",
+    "next-usequerystate": "^1.13.2",
     "openai": "^4.23.0",
     "p-map": "^7.0.0",
     "postcss": "8.4.32",

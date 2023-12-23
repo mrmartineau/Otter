@@ -9,7 +9,6 @@ export interface BaseApiParameters {
   offset: number;
   order: RequestOrder;
   status: Status;
-  public: boolean | null;
   type: string | null;
   tag: string | null;
   top: boolean | null;
@@ -17,9 +16,11 @@ export interface BaseApiParameters {
 
 export interface ApiParametersQuery extends BaseApiParameters {
   star: string | null;
+  public: string | null;
 }
 export interface ApiParametersReturn extends BaseApiParameters {
   star: boolean;
+  public: boolean | null;
 }
 
 export const apiParameters = (
@@ -30,7 +31,7 @@ export const apiParameters = (
   const order = apiParams.order || DEFAULT_API_RESPONSE_ORDER;
   const status = apiParams.status || 'active';
   const star = apiParams.star === 'true' ? true : false;
-  const publicItems = apiParams.public || false;
+  const publicItems = apiParams.public === 'true' ? true : false;
   const type = apiParams.type || null;
   const tag = apiParams.tag ? decodeURIComponent(apiParams.tag) : null;
   const top = apiParams.top || null;
