@@ -21,7 +21,7 @@ export default async function PublicPage({
   const supabaseClient = createServerClient(cookieStore);
   const { data, count } = await getBookmarks({
     supabaseClient,
-    params: { ...searchParams, public: true },
+    params: { ...searchParams, public: 'true' },
   });
   return (
     <Feed
