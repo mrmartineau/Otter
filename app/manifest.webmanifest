@@ -2,7 +2,7 @@
   "name": "Otter",
   "short_name": "Otter",
   "start_url": "/",
-  "display": "standalone",
+  "display": "minimal-ui",
   "background_color": "hsl(60 6% 9%)",
   "description": "Bookmarking app",
   "icons": [
