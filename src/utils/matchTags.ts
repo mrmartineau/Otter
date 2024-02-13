@@ -20,7 +20,14 @@ export const matchTagsSource = (data: MatchTagsProps, tags?: MetaTag[]) => {
   const possibleTags =
     tags?.reduce<string[]>((acc, item): string[] => {
       const found = allWords.find((word) => {
-        return word.toLowerCase() === item.tag?.toLowerCase();
+        const tag = item.tag?.toLowerCase();
+        if (tag) {
+          const split = tag.split(':');
+          if (split.length > 1) {
+            return split.some((t) => word.toLowerCase().includes(t));
+          }
+          return word.toLowerCase().includes(tag);
+        }
       });
       if (found) {
         acc.push(item.tag as string);
