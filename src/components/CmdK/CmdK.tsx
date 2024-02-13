@@ -130,7 +130,6 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
         </Flex>
       </Button>
       <Command.Dialog
-        className="cmdk-dialog"
         open={open}
         onOpenChange={setOpen}
         label="Search"
@@ -143,7 +142,6 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
         }}
       >
         <Command.Input
-          className="cmdk-input"
           value={searchTerm}
           onValueChange={(value) => {
             setSearchTerm(value);
@@ -152,14 +150,14 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
           placeholder="What do you need?"
         />
         <CmdKContext.Provider value={{ toggleOpen }}>
-          <Command.List className="cmdk-list">
+          <Command.List>
             <Command.Empty className="cmdk-empty">
               🙁 No results found.
             </Command.Empty>
 
             {/* Search */}
             {searchTerm.length && bookmarkItems?.length ? (
-              <Command.Group heading="Bookmarks" className="cmdk-group">
+              <Command.Group heading="Bookmarks">
                 {bookmarkItems?.map(
                   ({
                     id,
@@ -241,7 +239,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
 
             {/* Tags */}
             {searchTerm.length ? (
-              <Command.Group className="cmdk-group" heading="Tags">
+              <Command.Group heading="Tags">
                 {dbMeta?.tags.map(({ tag }) => {
                   return (
                     <Item
@@ -259,7 +257,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                 })}
               </Command.Group>
             ) : profile?.settings_pinned_tags?.length ? (
-              <Command.Group className="cmdk-group" heading="Pinned tags">
+              <Command.Group heading="Pinned tags">
                 {profile.settings_pinned_tags.map((item) => {
                   return (
                     <Item
@@ -280,7 +278,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
 
             {/* Collections */}
             {searchTerm.length && dbMeta?.collections?.length ? (
-              <Command.Group className="cmdk-group" heading="Collections">
+              <Command.Group heading="Collections">
                 {dbMeta.collections.map(({ collection }) => {
                   return (
                     <Item
@@ -303,7 +301,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
             ) : null}
 
             {/* Navigation */}
-            <Command.Group className="cmdk-group" heading="Navigation">
+            <Command.Group heading="Navigation">
               <Item
                 to={ROUTE_NEW_BOOKMARK}
                 value="Add new bookmark"
@@ -358,7 +356,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
 
             {/* Types */}
             {dbMeta.types?.length ? (
-              <Command.Group className="cmdk-group" heading="Types">
+              <Command.Group heading="Types">
                 {dbMeta.types.map(({ type }) => {
                   if (!type) {
                     return null;
@@ -380,7 +378,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
 
             {/* Toots */}
             {searchTerm.length && tootItems?.length ? (
-              <Command.Group className="cmdk-group" heading="Toots">
+              <Command.Group heading="Toots">
                 {tootItems?.map(({ id, text, user_avatar, user_id }) => {
                   if (!text) {
                     return null;
@@ -410,7 +408,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
 
             {/* Tweets */}
             {searchTerm.length && tweetItems?.length ? (
-              <Command.Group className="cmdk-group" heading="Tweets">
+              <Command.Group heading="Tweets">
                 {tweetItems?.map(({ id, text, user_avatar, user_id }) => {
                   if (!text) {
                     return null;
@@ -443,7 +441,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
             ) : null}
 
             {/* Settings */}
-            <Command.Group className="cmdk-group" heading="Settings">
+            <Command.Group heading="Settings">
               <Item
                 action={() => handleSetGroupByDate(false)}
                 value="Display flat feed"

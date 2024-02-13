@@ -7,13 +7,13 @@
   z-index: var(--z-2);
 }
 
-.cmdk-dialog {
+[cmdk-root] {
   background-color: var(--theme3);
   position: fixed;
   z-index: var(--z-2);
   overflow: auto;
   border-radius: var(--radii-m);
-  top: 15vh;
+  top: 5dvh;
   left: 50%;
   transform: translateX(-50%);
   min-height: unset;
@@ -26,7 +26,7 @@
   }
 }
 
-.cmdk-input {
+[cmdk-input] {
   fontfamily: var(--font-sans);
   border: none;
   width: 100%;
@@ -35,23 +35,23 @@
   outline: none;
   background: var(--theme3);
   color: var(--text);
-  borderbottom: 1px solid var(--theme6);
+  border-bottom: 1px solid var(--theme6);
 
   &::placeholder {
     color: var(--theme8);
   }
 }
 
-.cmdk-list {
-  height: min(330px, calc(var(--cmdk-list-height)));
-  max-height: 400px;
+[cmdk-list] {
+  min-height: min(330px, calc(var(--cmdk-list-height)));
+  max-height: 50dvh;
   overflow: auto;
   overscroll-behavior: contain;
   transition: 100ms ease;
-  transitionproperty: height;
+  transition-property: height;
 }
 
-.cmdk-group {
+[cmdk-group] {
   &:not([hidden]) + [cmdk-group] {
     margin-top: 1px;
   }
