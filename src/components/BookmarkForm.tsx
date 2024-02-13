@@ -278,6 +278,17 @@ export const BookmarkForm = ({
     descriptionAiMessages,
   );
 
+  useEffect(() => {
+    if (lastTitleAiMessageItem) {
+      setValue('title', lastTitleAiMessageItem.content);
+    }
+  }, [lastTitleAiMessageItem, setValue]);
+  useEffect(() => {
+    if (lastDescriptionAiMessageItem) {
+      setValue('description', lastDescriptionAiMessageItem.content);
+    }
+  }, [lastDescriptionAiMessageItem, setValue]);
+
   return (
     <div className="bookmark-form" {...rest}>
       <h2 className="mb-s">{isNew ? CONTENT.newTitle : CONTENT.editTitle}</h2>
@@ -352,16 +363,11 @@ export const BookmarkForm = ({
               </TooltipProvider>
             }
           >
-            <Input id="title" {...register('title')} />
-            {lastTitleAiMessageItem &&
-            lastTitleAiMessageItem.content !== watchTitle ? (
-              <FieldValueSuggestion
-                fieldId="title"
-                setFieldValue={setValue}
-                suggestion={lastTitleAiMessageItem.content as string}
-                type="ai"
-              />
-            ) : null}
+            <Textarea
+              id="title"
+              {...register('title')}
+              className="min-h-[41px]"
+            ></Textarea>
             {watchTitle !== scrapeResponse?.title ? (
               <FieldValueSuggestion
                 fieldId="title"
@@ -397,15 +403,6 @@ export const BookmarkForm = ({
             }
           >
             <Textarea id="description" {...register('description')}></Textarea>
-            {lastDescriptionAiMessageItem &&
-            lastDescriptionAiMessageItem.content !== watchDescription ? (
-              <FieldValueSuggestion
-                fieldId="description"
-                setFieldValue={setValue}
-                suggestion={lastDescriptionAiMessageItem.content as string}
-                type="ai"
-              />
-            ) : null}
             {watchDescription !== scrapeResponse?.description ? (
               <FieldValueSuggestion
                 fieldId="description"
