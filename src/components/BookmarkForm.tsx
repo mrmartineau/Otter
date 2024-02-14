@@ -217,26 +217,31 @@ export const BookmarkForm = ({
     }
   }, [handleScrape, isNew, setValue, initialValues]);
 
-  const handleUrlBlur = async (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    if (value && isNew) {
-      await checkMatchingItems(value);
-    } else {
-      setPossibleMatchingItems(null);
-    }
-  };
+  const checkMatchingItems = useCallback(
+    async (link: string): Promise<void> => {
+      try {
+        const url = new URL(link);
+        const { data } = await supabaseClient.rpc('check_url', {
+          url_input: url.hostname,
+        });
+        setPossibleMatchingItems(data as Bookmark[]);
+      } catch (err) {
+        setPossibleMatchingItems(null);
+      }
+    },
+    [supabaseClient],
+  );
 
-  const checkMatchingItems = async (link: string): Promise<void> => {
-    try {
-      const url = new URL(link);
-      const { data } = await supabaseClient.rpc('check_url', {
-        url_input: url.hostname,
-      });
-      setPossibleMatchingItems(data as Bookmark[]);
-    } catch (err) {
-      setPossibleMatchingItems(null);
-    }
-  };
+  const handleCheckExistingItem = useCallback(
+    async (value?: string) => {
+      if (value && isNew) {
+        await checkMatchingItems(value);
+      } else {
+        setPossibleMatchingItems(null);
+      }
+    },
+    [checkMatchingItems, isNew],
+  );
 
   // check for matching tags when content changes
   useEffect(() => {
@@ -278,6 +283,11 @@ export const BookmarkForm = ({
     descriptionAiMessages,
   );
 
+  useEffect(() => {
+    if (watchUrl && watchUrl.length > 4) {
+      handleCheckExistingItem(watchUrl);
+    }
+  }, [handleCheckExistingItem, watchUrl]);
   useEffect(() => {
     if (lastTitleAiMessageItem) {
       setValue('title', lastTitleAiMessageItem.content);
@@ -335,8 +345,12 @@ export const BookmarkForm = ({
               id="url"
               placeholder={DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER}
               {...register('url')}
-              onBlur={handleUrlBlur}
               autoFocus
+              onBlur={() => {
+                if (watchUrl) {
+                  handleScrape(watchUrl);
+                }
+              }}
             />
             <PossibleMatchingItems items={possibleMatchingItems} />
           </FormGroup>
