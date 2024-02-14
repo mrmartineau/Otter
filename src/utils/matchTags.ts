@@ -24,7 +24,7 @@ export const matchTagsSource = (data: MatchTagsProps, tags?: MetaTag[]) => {
         if (tag) {
           const split = tag.split(':');
           if (split.length > 1) {
-            return split.some((t) => word.toLowerCase().includes(t));
+            return split.some((t) => word.toLowerCase() === t);
           }
           return word.toLowerCase().includes(tag);
         }
