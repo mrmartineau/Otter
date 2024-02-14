@@ -450,13 +450,19 @@ export const BookmarkForm = ({
             maxMenuHeight={100}
           />
           {possibleMatchingTags.length ? (
-            <Flex className="mt-2 text-sm" gapX="xs" align="center" wrap="wrap">
+            <Flex
+              className="mt-2 text-sm"
+              gapX="2xs"
+              gapY="3xs"
+              align="center"
+              wrap="wrap"
+            >
               Suggested tags:
               {possibleMatchingTags.map((tag, index) => (
                 <Button
                   key={`possibleTagMatch-${tag}`}
                   variant="ghost"
-                  size="xs"
+                  size="2xs"
                   onClick={() => {
                     const existingTags = watchTags?.length ? watchTags : [];
                     setValue('tags', [...existingTags, tag]);

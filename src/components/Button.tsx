@@ -21,6 +21,7 @@ const buttonVariants = cva(['button-base', 'focus'], {
     },
 
     size: {
+      '2xs': 'px-3xs py-4xs text-step--2',
       xs: 'px-xs py-3xs text-step--2',
       s: 'px-s py-2xs',
       m: 'px-l py-2xs text-step-0',
