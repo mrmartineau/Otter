@@ -7,7 +7,7 @@
 .bookmark-form-image {
   border-radius: var(--radii-m);
   border: 1px solid var(--border);
-  width: 450px;
+  width: 100%;
   max-width: 450px;
   background-color: var(--theme3);
   margin-bottom: var(--space-s);
