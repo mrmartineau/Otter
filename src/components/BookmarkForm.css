@@ -3,3 +3,12 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   grid-gap: 1rem;
 }
+
+.bookmark-form-image {
+  border-radius: var(--radii-m);
+  border: 1px solid var(--border);
+  width: 450px;
+  max-width: 450px;
+  background-color: var(--theme3);
+  margin-bottom: var(--space-s);
+}

@@ -31,6 +31,7 @@ import { MetadataResponse } from '../types/api';
 import { type Bookmark, type BookmarkFormValues } from '../types/db';
 import { MetaTag, getDbMetadata } from '../utils/fetching/meta';
 import { getScrapeData } from '../utils/fetching/scrape';
+import { fullPath } from '../utils/fullPath';
 import { getErrorMessage } from '../utils/get-error-message';
 import { MatchTagsProps, matchTags } from '../utils/matchTags';
 import { createBrowserClient } from '../utils/supabase/client';
@@ -124,6 +125,7 @@ export const BookmarkForm = ({
   const watchDescription = watch('description');
   const watchNote = watch('note');
   const watchTags = watch('tags');
+  const watchImage = watch('image');
 
   const handleSubmitForm = async (formData: BookmarkFormValues) => {
     setFormSubmitting(true);
@@ -491,13 +493,26 @@ export const BookmarkForm = ({
         </FormGroup>
 
         {/* IMAGE */}
-        {type === 'edit' ? (
-          <FormGroup label="Image" name="image">
-            <Input id="image" {...register('image')} />
-          </FormGroup>
-        ) : (
-          <input type="hidden" {...register('image')} />
-        )}
+        <FormGroup label="Image" name="image">
+          {watchUrl && watchImage ? (
+            <img
+              src={fullPath(watchUrl, watchImage)}
+              alt=""
+              className="bookmark-form-image"
+            />
+          ) : null}
+          {type === 'edit' ? (
+            <Textarea
+              id="image"
+              {...register('image')}
+              className="min-h-[41px]"
+            ></Textarea>
+          ) : (
+            <>
+              <input type="hidden" {...register('image')} />
+            </>
+          )}
+        </FormGroup>
 
         {formError && <div className="my-m">Error: {formError}</div>}
 
