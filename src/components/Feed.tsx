@@ -7,11 +7,12 @@ import { usePagination } from '@/src/hooks/usePagination';
 import { Eye, Star } from '@phosphor-icons/react';
 import { parseAsBoolean, useQueryState } from 'next-usequerystate';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ReactNode, memo, useCallback } from 'react';
+import { ReactNode, memo, useCallback, useEffect, useState } from 'react';
 
 import { useRealtimeFeed } from '../hooks/useRealtime';
 import { Bookmark, Toot, Tweet } from '../types/db';
 import { cn } from '../utils/classnames';
+import { createBrowserClient } from '../utils/supabase/client';
 import { BookmarkFeedItem } from './BookmarkFeedItem';
 import { Flex } from './Flex';
 import { headingVariants } from './Heading';
@@ -59,6 +60,8 @@ export const Feed = memo(
     allowGroupByDate = false,
     subNav,
   }: FeedProps) => {
+    const [collections, setCollections] = useState<any>();
+    const supabaseClient = createBrowserClient();
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -111,6 +114,16 @@ export const Feed = memo(
         ])}`,
       );
     };
+
+    useEffect(() => {
+      const getCollections = async () => {
+        const collectionTagsResponse = await supabaseClient
+          .from('collection_tags_view')
+          .select('*');
+        setCollections(collectionTagsResponse.data);
+      };
+      getCollections();
+    }, [supabaseClient]);
 
     return (
       <div className="feed">
@@ -178,6 +191,7 @@ export const Feed = memo(
                         <BookmarkFeedItem
                           {...item}
                           allowDeletion={allowDeletion}
+                          collections={collections}
                           key={item.id}
                         />
                       );
@@ -202,6 +216,7 @@ export const Feed = memo(
                   <BookmarkFeedItem
                     {...item}
                     allowDeletion={allowDeletion}
+                    collections={collections}
                     key={item.id}
                   />
                 );

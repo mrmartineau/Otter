@@ -7,21 +7,26 @@ import {
 import { MINIMUM_CLICK_COUNT } from '@/src/constants';
 import {
   Calendar,
+  Cards,
   Eye,
+  Hash,
   NavigationArrow,
   RssSimple,
   Star,
 } from '@phosphor-icons/react';
 import urlJoin from 'proper-url-join';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import title from 'title';
+import { i } from 'vitest/dist/reporters-1evA5lom';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark } from '../types/db';
 import { getRelativeDate } from '../utils/dates';
+import { findMatchingCollections } from '../utils/findMatchingCollections';
 import { fullPath } from '../utils/fullPath';
 import { simpleUrl } from '../utils/simpleUrl';
 import { createBrowserClient } from '../utils/supabase/client';
+import type { BookmarkFeedItemProps } from './BookmarkFeedItem';
 import { Favicon } from './Favicon';
 import { FeedItemActions } from './FeedItemActions';
 import { Flex } from './Flex';
@@ -32,8 +37,8 @@ import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 import { RssFeed } from './RssFeed';
 import { TypeToIcon } from './TypeToIcon';
 
-export interface FeedItemFooterProps extends Bookmark {
-  allowDeletion?: boolean;
+export interface FeedItemFooterProps
+  extends Omit<BookmarkFeedItemProps, 'isClamped'> {
   id: string;
   isInFeed?: boolean;
 }
@@ -53,6 +58,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
     feed,
     public: isPublic,
     allowDeletion = false,
+    collections,
   } = props;
   const handleClickRegister = useClickBookmark();
   const createdDate = getRelativeDate(created_at);
@@ -76,22 +82,48 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       .match({ id });
   };
 
+  const matchingCollections = useMemo(() => {
+    return findMatchingCollections(collections, tags);
+  }, [collections, tags]);
+
   return (
     <TooltipProvider delayDuration={800} skipDelayDuration={500}>
       <div className="feed-item-footer">
-        {tags?.length ? (
-          <Flex align="center" gapX="m" wrap="wrap">
-            <Flex align="center" gap="xs">
-              <ul className="m-0 flex list-none flex-wrap gap-3xs p-0">
-                {tags.map((tag) => (
-                  <li id={tag} key={tag}>
-                    <Link href={urlJoin('/tag', tag)} variant="tag">
-                      {tag}
-                    </Link>
+        {tags?.length || matchingCollections?.length ? (
+          <Flex align="center" gapX="m" gapY="xs" wrap="wrap">
+            <ul className="m-0 flex list-none flex-wrap gap-3xs p-0">
+              {matchingCollections?.length ? (
+                <>
+                  <li>
+                    <Cards weight="duotone" size={18} />
                   </li>
-                ))}
-              </ul>
-            </Flex>
+                  {matchingCollections.map(({ collection }) => (
+                    <li key={collection}>
+                      <Link
+                        href={urlJoin('/collection', collection)}
+                        variant="tag"
+                      >
+                        {collection}
+                      </Link>
+                    </li>
+                  ))}
+                </>
+              ) : null}
+              {tags?.length ? (
+                <>
+                  <li>
+                    <Hash weight="duotone" size={18} />
+                  </li>
+                  {tags.map((tag) => (
+                    <li id={tag} key={tag}>
+                      <Link href={urlJoin('/tag', tag)} variant="tag">
+                        {tag}
+                      </Link>
+                    </li>
+                  ))}
+                </>
+              ) : null}
+            </ul>
           </Flex>
         ) : null}
         <Flex justify="between" gap="3xs" wrap="wrap">

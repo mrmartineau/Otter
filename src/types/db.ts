@@ -41,3 +41,6 @@ export interface BookmarkFormValues
 }
 
 export type UserProfile = Database['public']['Tables']['profiles']['Row'];
+
+export type Collection =
+  Database['public']['Views']['collection_tags_view']['Row'];
