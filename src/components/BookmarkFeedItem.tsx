@@ -3,7 +3,7 @@
 import { Note, TwitterLogo } from '@phosphor-icons/react';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
-import { Bookmark } from '../types/db';
+import { Bookmark, type Collection } from '../types/db';
 import { cn } from '../utils/classnames';
 import { fullPath } from '../utils/fullPath';
 import './Feed.css';
@@ -15,6 +15,7 @@ import { Markdown } from './Markdown';
 export interface BookmarkFeedItemProps extends Bookmark {
   allowDeletion?: boolean;
   isClamped?: boolean;
+  collections?: Collection[];
 }
 
 export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
@@ -78,7 +79,11 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
           </div>
         ) : null}
       </div>
-      <FeedItemFooter {...props} key={`footer-${id}`} />
+      <FeedItemFooter
+        {...props}
+        key={`footer-${id}`}
+        collections={props.collections}
+      />
     </div>
   );
 };
