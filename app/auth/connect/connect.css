@@ -1,0 +1,16 @@
+.connect {
+  display: grid;
+  height: 100vh;
+  margin: 0;
+  place-items: center center;
+
+  a {
+    all: unset;
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+      cursor: pointer;
+      transform: scale(1.2);
+    }
+  }
+}
