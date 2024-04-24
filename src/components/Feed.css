@@ -17,12 +17,6 @@
   }
 }
 
-.feed-item-clamped {
-  .markdown {
-    @apply line-clamp-2;
-  }
-}
-
 .feed-simple-grid {
   display: grid;
   margin-top: var(--space-m);

@@ -4,6 +4,8 @@ import { useCallback, useState } from 'react';
 /**
  * @name useToggle
  * @description Toggle something
+ * @example
+ * const [open, toggleOpen, setOpen] = useToggle(false);
  */
 export const useToggle = (
   initialState = false,

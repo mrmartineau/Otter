@@ -4,7 +4,6 @@ import { Note, TwitterLogo } from '@phosphor-icons/react';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
 import { Bookmark, type Collection } from '../types/db';
-import { cn } from '../utils/classnames';
 import { fullPath } from '../utils/fullPath';
 import './Feed.css';
 import { FeedItemFooter } from './FeedItemFooter';
@@ -14,19 +13,16 @@ import { Markdown } from './Markdown';
 
 export interface BookmarkFeedItemProps extends Bookmark {
   allowDeletion?: boolean;
-  isClamped?: boolean;
+  preventMarkdownClamping?: boolean;
   collections?: Collection[];
 }
 
 export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
   const { title, url, description, note, id, tweet, image } = props;
   const handleClickRegister = useClickBookmark();
-  const feedItemClasses = cn('feed-item', {
-    'feed-item-clamped': props.isClamped,
-  });
 
   return (
-    <div className={feedItemClasses}>
+    <div className="feed-item">
       <div className="feed-item-cols">
         <div className="feed-item-content">
           {url && title ? (
@@ -42,7 +38,11 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
           ) : title ? (
             <div>{title}</div>
           ) : null}
-          {description ? <Markdown>{description}</Markdown> : null}
+          {description ? (
+            <Markdown preventClamping={props.preventMarkdownClamping}>
+              {description}
+            </Markdown>
+          ) : null}
           {note ? (
             <div className="feed-item-note">
               <Flex
@@ -58,7 +58,9 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
                 />
                 Note
               </Flex>
-              <Markdown>{note}</Markdown>
+              <Markdown preventClamping={props.preventMarkdownClamping}>
+                {note}
+              </Markdown>
             </div>
           ) : null}
           {tweet?.text ? (
@@ -68,7 +70,9 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
               </div>
               <div className="shrink-0 text-step--1 tracking-tight">
                 <Link href={tweet.url}>@{tweet.username}</Link>
-                <Markdown>{tweet.text}</Markdown>
+                <Markdown preventClamping={props.preventMarkdownClamping}>
+                  {tweet.text}
+                </Markdown>
               </div>
             </Flex>
           ) : null}

@@ -8,6 +8,7 @@ import { MINIMUM_CLICK_COUNT } from '@/src/constants';
 import {
   Calendar,
   Cards,
+  Copy,
   Eye,
   Hash,
   NavigationArrow,
@@ -15,12 +16,10 @@ import {
   Star,
 } from '@phosphor-icons/react';
 import urlJoin from 'proper-url-join';
-import { Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
 import title from 'title';
-import { i } from 'vitest/dist/reporters-1evA5lom';
 
 import { useClickBookmark } from '../hooks/useClickBookmark';
-import { Bookmark } from '../types/db';
 import { getRelativeDate } from '../utils/dates';
 import { findMatchingCollections } from '../utils/findMatchingCollections';
 import { fullPath } from '../utils/fullPath';
@@ -85,6 +84,13 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
   const matchingCollections = useMemo(() => {
     return findMatchingCollections(collections, tags);
   }, [collections, tags]);
+
+  const handleCopyUrl = (): void => {
+    if (!url) {
+      return;
+    }
+    navigator.clipboard.writeText(url);
+  };
 
   return (
     <TooltipProvider delayDuration={800} skipDelayDuration={500}>
@@ -250,6 +256,14 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                 </PopoverContent>
               </Popover>
             ) : null}
+
+            <IconButton size="m" onClick={handleCopyUrl}>
+              <Copy
+                aria-label="Copy URL to clipboard"
+                size={18}
+                weight="duotone"
+              />
+            </IconButton>
           </Flex>
 
           <FeedItemActions

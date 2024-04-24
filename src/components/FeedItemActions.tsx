@@ -3,7 +3,6 @@ import { Button } from '@/src/components/Button';
 import {
   ArrowCounterClockwise,
   ArrowSquareOut,
-  Copy,
   LinkSimpleHorizontal,
   ListPlus,
   Pencil,
@@ -70,13 +69,6 @@ export const FeedItemActions = ({
     if (window.confirm('Do you really want to delete this bookmark forever?')) {
       await supabaseClient.from('bookmarks').delete().match({ id });
     }
-  };
-
-  const handleCopyUrl = (): void => {
-    if (!url) {
-      return;
-    }
-    navigator.clipboard.writeText(url);
   };
 
   const handleShare = async (
@@ -219,17 +211,6 @@ export const FeedItemActions = ({
                   </div>
                 </DropdownMenu.Item>
               )}
-              {url ? (
-                <DropdownMenu.Item
-                  className="DropdownMenuItem"
-                  onClick={handleCopyUrl}
-                >
-                  Copy URL to clipboard
-                  <div className="DropdownMenuItem-rightSlot">
-                    <Copy weight="duotone" />
-                  </div>
-                </DropdownMenu.Item>
-              ) : null}
 
               <DropdownMenu.Item
                 className="DropdownMenuItem"
