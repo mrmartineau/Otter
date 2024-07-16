@@ -3,7 +3,7 @@ import { Bookmark } from '@/src/types/db';
 import { type ApiParametersQuery } from '@/src/utils/fetching/apiParameters';
 import { getCollections } from '@/src/utils/fetching/collections';
 import { createServerClient } from '@/src/utils/supabase/server';
-import { Cards, Hash } from '@phosphor-icons/react/dist/ssr';
+import { Folder, Hash } from '@phosphor-icons/react/dist/ssr';
 import { Metadata } from 'next';
 import { cookies } from 'next/headers';
 
@@ -67,7 +67,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
       offset={offset}
       allowGroupByDate={true}
       title={collection}
-      icon={<Cards weight="duotone" size={24} />}
+      icon={<Folder weight="duotone" size={24} />}
       feedType="bookmarks"
       subNav={subNav}
     />

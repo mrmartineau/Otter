@@ -1,4 +1,4 @@
-import { Cards } from '@phosphor-icons/react';
+import { Folder } from '@phosphor-icons/react';
 
 import { CONTENT } from '../constants';
 import { CollectionType, MetaTag } from '../utils/fetching/meta';
@@ -59,7 +59,7 @@ export const CollectionList = ({ collections, tags }: TypeListProps) => (
                     activePath={`/collection/${item.collection}`}
                     key={item.collection}
                   >
-                    <Cards
+                    <Folder
                       size={18}
                       weight="duotone"
                       aria-label={item.collection}

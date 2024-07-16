@@ -12,5 +12,5 @@ export default async function BookmarkPage({
   const cookieStore = cookies();
   const supabaseClient = createServerClient(cookieStore);
   const { data } = await getBookmark({ supabaseClient, id: params.id });
-  return <BookmarkFeedItem {...(data as Bookmark)} />;
+  return <BookmarkFeedItem {...(data as Bookmark)} preventMarkdownClamping />;
 }
