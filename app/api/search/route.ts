@@ -9,7 +9,7 @@ import { createClient } from '@supabase/supabase-js';
 export const runtime = 'edge';
 
 /**
- * /api/search/url=https://example.com
+ * /api/search?q=css
  * This endpoint searches bookmarks and tweets
  * It uses the Supabase service key environment variable to authenticate via an Authorization header (Bearer token)
  */
@@ -17,11 +17,17 @@ export async function GET(request: Request) {
   try {
     const { q, ...searchParams } = searchParamsToObject(request.url);
     const authHeader = request.headers.get('Authorization');
-    const bearerToken = authHeader?.split(' ')[1];
     const supabaseClient = createClient(
       // @ts-ignore
       process.env.NEXT_PUBLIC_SUPABASE_URL,
-      bearerToken,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        global: {
+          headers: {
+            Authorization: authHeader,
+          },
+        },
+      },
     );
 
     const { data, count, error } = await getSearchBookmarks({
