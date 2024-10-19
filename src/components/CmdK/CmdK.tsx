@@ -134,7 +134,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
         onOpenChange={setOpen}
         label="Search"
         onKeyDown={(event) => {
-          // Escape clears searchTerm if there
+          // Escape clears searchTerm if there results > 0
           if (event.key === 'Escape' && searchTerm.length) {
             event.preventDefault();
             setSearchTerm('');
@@ -214,7 +214,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                       <Item
                         key={`bookmark-${id}`}
                         value={value}
-                        to={url ? url : `/bookmark/${id}`}
+                        to={`/bookmark/${id}`}
                         url={url}
                         accessories={accessories}
                         image={url ? <Favicon url={url} /> : null}
