@@ -8,6 +8,7 @@ import { simpleUrl } from '@/src/utils/simpleUrl';
 import {
   ArrowElbowDownLeft,
   ArrowFatLinesUp,
+  ArrowSquareOut,
   Calendar,
   Cards,
   CheckCircle,
@@ -115,6 +116,26 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
     }
   }, [open]);
 
+  const [isHoldingAltKeyDown, setIsHoldingAltKeyDown] = useState(false);
+  useEffect(() => {
+    const down = (event: KeyboardEvent) => {
+      if (event.key === 'Alt') {
+        setIsHoldingAltKeyDown(true);
+      }
+    };
+    const up = (event: KeyboardEvent) => {
+      if (event.key === 'Alt') {
+        setIsHoldingAltKeyDown(false);
+      }
+    };
+    document.addEventListener('keydown', down);
+    document.addEventListener('keyup', up);
+    return () => {
+      document.removeEventListener('keydown', down);
+      document.removeEventListener('keyup', up);
+    };
+  }, []);
+
   return (
     <>
       <Button
@@ -158,6 +179,16 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
             {/* Search */}
             {searchTerm.length && bookmarkItems?.length ? (
               <Command.Group heading="Bookmarks">
+                <Item
+                  to={`/search?q=${searchTerm}`}
+                  value={`search-${searchTerm}`}
+                  image={
+                    <MagnifyingGlass weight="duotone" aria-label="Search" />
+                  }
+                  accessories={sharedAccessories}
+                >
+                  Full site search
+                </Item>
                 {bookmarkItems?.map(
                   ({
                     id,
@@ -206,6 +237,12 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                       )}`,
                     });
 
+                    if (isHoldingAltKeyDown) {
+                      accessories.push({
+                        Icon: <ArrowSquareOut aria-label="Go" />,
+                      });
+                    }
+
                     const value = [title, description?.slice(0, 30), url]
                       .filter(Boolean)
                       .join(' ');
@@ -214,7 +251,9 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                       <Item
                         key={`bookmark-${id}`}
                         value={value}
-                        to={`/bookmark/${id}`}
+                        to={
+                          isHoldingAltKeyDown && url ? url : `/bookmark/${id}`
+                        }
                         url={url}
                         accessories={accessories}
                         image={url ? <Favicon url={url} /> : null}
@@ -224,16 +263,6 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                     );
                   },
                 )}
-                <Item
-                  to={`/search?q=${searchTerm}`}
-                  value={`search-${searchTerm}`}
-                  image={
-                    <MagnifyingGlass weight="duotone" aria-label="Search" />
-                  }
-                  accessories={sharedAccessories}
-                >
-                  Full site search
-                </Item>
               </Command.Group>
             ) : null}
 
