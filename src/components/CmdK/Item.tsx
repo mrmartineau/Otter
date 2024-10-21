@@ -41,7 +41,7 @@ export const Item = forwardRef<HTMLDivElement, ItemProps>(
 
     const Contents = () => (
       <>
-        <Flex gap="2xs" align="center" className="leading-snug">
+        <Flex gap="2xs" align="center" className="truncate leading-snug">
           {image}
           {children}
         </Flex>

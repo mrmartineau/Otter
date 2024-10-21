@@ -238,8 +238,13 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                     });
 
                     if (isHoldingAltKeyDown) {
-                      accessories.push({
-                        Icon: <ArrowSquareOut aria-label="Go" />,
+                      accessories.unshift({
+                        Icon: (
+                          <ArrowSquareOut
+                            aria-label="Go"
+                            className="actionIcon"
+                          />
+                        ),
                       });
                     }
 
