@@ -84,10 +84,10 @@ export const Feed = memo(
       parseAsBoolean.withDefault(false),
     );
     const createQueryString = useCallback(
-      (newParams: { name: string; value: string }[]) => {
-        const params = new URLSearchParams(searchParams);
+      (newParams: { name: string; value: string | boolean }[]) => {
+        const params = new URLSearchParams(searchParams.toString());
         for (const { name, value } of newParams) {
-          params.set(name, value);
+          params.set(name, String(value));
         }
         return params.toString();
       },
