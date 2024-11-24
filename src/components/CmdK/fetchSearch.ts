@@ -6,7 +6,9 @@ export const fetchSearch = async (searchTerm: string) => {
   const supabaseClient = createBrowserClient();
   const bookmarksSearch = await supabaseClient
     .from('bookmarks')
-    .select('*', { count: 'exact' })
+    .select('id,title,description,note,url,type,tags,created_at', {
+      count: 'exact',
+    })
     .or(
       `title.ilike.*${searchTerm}*,url.ilike.*${searchTerm}*,description.ilike.*${searchTerm}*,note.ilike.*${searchTerm}*,tags.cs.{${searchTerm}}`,
     )
@@ -31,8 +33,8 @@ export const fetchSearch = async (searchTerm: string) => {
     .limit(5);
 
   return {
-    bookmarksSearch,
-    tweetsSearch,
-    tootsSearch,
+    bookmarksSearch: bookmarksSearch.data,
+    tweetsSearch: tweetsSearch.data,
+    tootsSearch: tootsSearch.data,
   };
 };

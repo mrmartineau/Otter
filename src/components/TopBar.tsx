@@ -2,7 +2,10 @@
 
 import { cn } from '@/src/utils/classnames';
 import { List } from '@phosphor-icons/react';
-import { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { ComponentPropsWithoutRef, ReactNode, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import { ROUTE_HOME } from '../constants';
 import { useSidebar } from '../hooks/useSidebar';
@@ -26,6 +29,7 @@ export const TopBar = ({
 }: TopBarProps) => {
   const topbarClass = cn(className, 'otter-top-bar');
   const { handleToggleSidebar } = useSidebar();
+  const [queryClient] = useState(new QueryClient());
 
   return (
     <header className={topbarClass} {...rest}>
@@ -43,7 +47,12 @@ export const TopBar = ({
           <span>Otter</span>
         </Link>
       </Flex>
-      <CmdK serverDbMeta={serverDbMeta} />
+      <QueryClientProvider client={queryClient}>
+        <ErrorBoundary fallback={<div>Something went wrong</div>}>
+          <CmdK serverDbMeta={serverDbMeta} />
+        </ErrorBoundary>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     </header>
   );
 };

@@ -2,14 +2,11 @@
 
 import { Button } from '@/src/components/Button';
 import { useToggle } from '@/src/hooks/useToggle';
-import { Bookmark, Toot, Tweet } from '@/src/types/db';
+import { Tweet } from '@/src/types/db';
 import { DbMetaResponse } from '@/src/utils/fetching/meta';
-import { simpleUrl } from '@/src/utils/simpleUrl';
 import {
   ArrowElbowDownLeft,
   ArrowFatLinesUp,
-  ArrowSquareOut,
-  Calendar,
   Cards,
   CheckCircle,
   Gauge,
@@ -22,15 +19,14 @@ import {
   PlusCircle,
   Star,
 } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import { Command } from 'cmdk';
-import throttle from 'lodash.throttle';
 import {
   DispatchWithoutAction,
   createContext,
   useEffect,
   useState,
 } from 'react';
-import tinyRelativeDate from 'tiny-relative-date';
 import formatTitle from 'title';
 
 import {
@@ -42,18 +38,13 @@ import {
   ROUTE_STATS,
 } from '../../constants';
 import { ApiResponse } from '../../types/api';
-import { Favicon } from '../Favicon';
 import { Flex } from '../Flex';
 import { TypeToIcon } from '../TypeToIcon';
 import { useUser } from '../UserProvider';
+import { BookmarkSearchItem } from './BookmarkSearchItem';
 import './CmdK.css';
 import { AccessoryModel, Item } from './Item';
 import { fetchSearch } from './fetchSearch';
-
-const listFormat = new Intl.ListFormat('en', {
-  style: 'long',
-  type: 'conjunction',
-});
 
 export type TweetSearchResponse = ApiResponse<Tweet[]>;
 
@@ -76,10 +67,15 @@ interface CmdKProps {
 export const CmdK = ({ serverDbMeta }: CmdKProps) => {
   const { profile, handleUpdateUISettings } = useUser();
   const [open, toggleOpen, setOpen] = useToggle(false);
-  const [bookmarkItems, setBookmarkItems] = useState<Bookmark[]>([]);
-  const [tweetItems, setTweetItems] = useState<Tweet[]>([]);
-  const [tootItems, setTootItems] = useState<Toot[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isHoldingAltKeyDown, setIsHoldingAltKeyDown] = useState(false);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['search', searchTerm],
+    queryFn: () => fetchSearch(searchTerm),
+    enabled: !!searchTerm,
+  });
+
   const dbMeta = serverDbMeta;
 
   const handleSetGroupByDate = (newState: boolean) => {
@@ -92,14 +88,6 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
   };
   const groupByDate = profile?.settings_group_by_date;
 
-  const throttledMutate = throttle(async (value: string) => {
-    await fetchSearch(value).then((data) => {
-      setBookmarkItems((data?.bookmarksSearch?.data as Bookmark[]) ?? []);
-      setTweetItems(data?.tweetsSearch?.data ?? []);
-      setTootItems(data?.tootsSearch?.data ?? []);
-    });
-  }, 1000);
-
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
       if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
@@ -110,13 +98,6 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
     return () => document.removeEventListener('keydown', down);
   }, [toggleOpen]);
 
-  useEffect(() => {
-    if (!open) {
-      setSearchTerm('');
-    }
-  }, [open]);
-
-  const [isHoldingAltKeyDown, setIsHoldingAltKeyDown] = useState(false);
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
       if (event.key === 'Alt') {
@@ -136,6 +117,8 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
     };
   }, []);
 
+  const enableIfSearchTermHasValue = searchTerm?.length;
+
   return (
     <>
       <Button
@@ -152,11 +135,16 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
       </Button>
       <Command.Dialog
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSearchTerm('');
+          }
+          setOpen(open);
+        }}
         label="Search"
         onKeyDown={(event) => {
           // Escape clears searchTerm if there results > 0
-          if (event.key === 'Escape' && searchTerm.length) {
+          if (event.key === 'Escape' && enableIfSearchTermHasValue) {
             event.preventDefault();
             setSearchTerm('');
           }
@@ -164,10 +152,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
       >
         <Command.Input
           value={searchTerm}
-          onValueChange={(value) => {
-            setSearchTerm(value);
-            throttledMutate(value);
-          }}
+          onValueChange={setSearchTerm}
           placeholder="What do you need?"
         />
         <CmdKContext.Provider value={{ toggleOpen }}>
@@ -176,8 +161,9 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
               🙁 No results found.
             </Command.Empty>
 
-            {/* Search */}
-            {searchTerm.length && bookmarkItems?.length ? (
+            {isLoading ? (
+              <Command.Loading>Searching bookmarks…</Command.Loading>
+            ) : enableIfSearchTermHasValue && data?.bookmarksSearch?.length ? (
               <Command.Group heading="Bookmarks">
                 <Item
                   to={`/search?q=${searchTerm}`}
@@ -189,7 +175,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                 >
                   Full site search
                 </Item>
-                {bookmarkItems?.map(
+                {data?.bookmarksSearch?.map(
                   ({
                     id,
                     title,
@@ -199,80 +185,26 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
                     type,
                     tags,
                     created_at,
-                  }) => {
-                    let titleReplacement = title;
-                    if (!title) {
-                      titleReplacement = description || note;
-                    }
-                    const accessories: AccessoryModel[] = [];
-                    if (url) {
-                      accessories.push({
-                        text: simpleUrl(url),
-                        tooltip: url,
-                      });
-                    }
-                    if (type) {
-                      accessories.push({
-                        Icon: <TypeToIcon type={type} />,
-                        tooltip: formatTitle(type),
-                        showOnMobile: true,
-                      });
-                    }
-                    if (tags?.length) {
-                      accessories.push({
-                        Icon: <Hash weight="duotone" aria-label="Tag" />,
-                        tooltip: `Tags: ${listFormat.format(tags)}`,
-                      });
-                    }
-                    if (note) {
-                      accessories.push({
-                        Icon: <TypeToIcon type="note" />,
-                        tooltip: note,
-                      });
-                    }
-                    accessories.push({
-                      Icon: <Calendar weight="duotone" aria-label="Date" />,
-                      tooltip: `Added: ${tinyRelativeDate(
-                        new Date(created_at),
-                      )}`,
-                    });
-
-                    if (isHoldingAltKeyDown) {
-                      accessories.unshift({
-                        Icon: (
-                          <ArrowSquareOut
-                            aria-label="Go"
-                            className="actionIcon"
-                          />
-                        ),
-                      });
-                    }
-
-                    const value = [title, description?.slice(0, 30), url]
-                      .filter(Boolean)
-                      .join(' ');
-
-                    return (
-                      <Item
-                        key={`bookmark-${id}`}
-                        value={value}
-                        to={
-                          isHoldingAltKeyDown && url ? url : `/bookmark/${id}`
-                        }
-                        url={url}
-                        accessories={accessories}
-                        image={url ? <Favicon url={url} /> : null}
-                      >
-                        {titleReplacement}
-                      </Item>
-                    );
-                  },
+                  }) => (
+                    <BookmarkSearchItem
+                      key={`bookmark-${id}`}
+                      id={id}
+                      title={title}
+                      description={description}
+                      note={note}
+                      url={url}
+                      type={type}
+                      tags={tags}
+                      created_at={created_at}
+                      isHoldingAltKeyDown={isHoldingAltKeyDown}
+                    />
+                  ),
                 )}
               </Command.Group>
             ) : null}
 
             {/* Tags */}
-            {searchTerm.length ? (
+            {enableIfSearchTermHasValue ? (
               <Command.Group heading="Tags">
                 {dbMeta?.tags.map(({ tag }) => {
                   return (
@@ -311,7 +243,7 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
             ) : null}
 
             {/* Collections */}
-            {searchTerm.length && dbMeta?.collections?.length ? (
+            {enableIfSearchTermHasValue && dbMeta?.collections?.length ? (
               <Command.Group heading="Collections">
                 {dbMeta.collections.map(({ collection }) => {
                   return (
@@ -411,9 +343,9 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
             ) : null}
 
             {/* Toots */}
-            {searchTerm.length && tootItems?.length ? (
+            {enableIfSearchTermHasValue && data?.tootsSearch?.length ? (
               <Command.Group heading="Toots">
-                {tootItems?.map(({ id, text, user_avatar, user_id }) => {
+                {data?.tootsSearch.map(({ id, text, user_avatar, user_id }) => {
                   if (!text) {
                     return null;
                   }
@@ -441,9 +373,9 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
             ) : null}
 
             {/* Tweets */}
-            {searchTerm.length && tweetItems?.length ? (
+            {enableIfSearchTermHasValue && data?.tweetsSearch?.length ? (
               <Command.Group heading="Tweets">
-                {tweetItems?.map(({ id, text, user_avatar, user_id }) => {
+                {data.tweetsSearch.map(({ id, text, user_avatar, user_id }) => {
                   if (!text) {
                     return null;
                   }
