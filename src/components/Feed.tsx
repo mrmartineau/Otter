@@ -229,7 +229,7 @@ export const Feed = memo(
 
         {/* Next/previous navigation */}
         {hasOldItems || hasNewItems ? (
-          <Flex align="center" justify="center" gap="m" className="mt-m">
+          <Flex align="center" justify="center" gap="s" className="mt-m">
             {hasNewItems ? (
               <Button
                 onClick={() =>

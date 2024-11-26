@@ -3,7 +3,7 @@
 import { cn } from '@/src/utils/classnames';
 import { List } from '@phosphor-icons/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ComponentPropsWithoutRef, ReactNode, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -51,7 +51,7 @@ export const TopBar = ({
         <ErrorBoundary fallback={<div>Something went wrong</div>}>
           <CmdK serverDbMeta={serverDbMeta} />
         </ErrorBoundary>
-        <ReactQueryDevtools initialIsOpen={false} />
+        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       </QueryClientProvider>
     </header>
   );

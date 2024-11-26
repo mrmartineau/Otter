@@ -50,6 +50,7 @@
   &.is-active {
     background-color: var(--accent6);
     --color: var(--accent11);
+    font-weight: 500;
 
     &:hover {
       background-color: var(--accent7);

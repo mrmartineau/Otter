@@ -36,6 +36,7 @@
   background: var(--theme3);
   color: var(--text);
   border-bottom: 1px solid var(--theme6);
+  border-radius: 0;
 
   &::placeholder {
     color: var(--theme8);
@@ -78,7 +79,7 @@
   border: 1px solid currentColor;
   color: var(--theme8);
   border-radius: var(--radii-default);
-  margin-left: var(--space-m);
+  margin-inline-start: var(--space-m);
   position: absolute;
   top: 50%;
   right: var(--space-2xs);

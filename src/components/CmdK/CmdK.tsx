@@ -162,19 +162,25 @@ export const CmdK = ({ serverDbMeta }: CmdKProps) => {
             </Command.Empty>
 
             {isLoading ? (
-              <Command.Loading>Searching bookmarks…</Command.Loading>
-            ) : enableIfSearchTermHasValue && data?.bookmarksSearch?.length ? (
+              <Command.Loading>Searching Otter…</Command.Loading>
+            ) : null}
+
+            {enableIfSearchTermHasValue && data?.bookmarksSearch?.length ? (
               <Command.Group heading="Bookmarks">
-                <Item
-                  to={`/search?q=${searchTerm}`}
-                  value={`search-${searchTerm}`}
-                  image={
-                    <MagnifyingGlass weight="duotone" aria-label="Search" />
-                  }
-                  accessories={sharedAccessories}
-                >
-                  Full site search
-                </Item>
+                <Command.Group>
+                  <Item
+                    key="full-site-search"
+                    to={`/search?q=${searchTerm}`}
+                    value={`search-${searchTerm}`}
+                    image={
+                      <MagnifyingGlass weight="duotone" aria-label="Search" />
+                    }
+                    accessories={sharedAccessories}
+                  >
+                    Full site search
+                  </Item>
+                </Command.Group>
+
                 {data?.bookmarksSearch?.map(
                   ({
                     id,

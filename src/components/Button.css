@@ -4,10 +4,12 @@
   align-items: center;
   gap: var(--space-2xs);
   justify-content: center;
-  border-radius: var(--radii-m);
-  font-weight: 300;
+  border-radius: var(--radii-l);
+  font-weight: 500;
   color: #f5f5f0;
   transition: all 200ms var(--ease-in-out-1);
+  font-size: var(--step--1);
+  letter-spacing: 0.03em;
 
   &:disabled {
     pointer-events: none;
@@ -41,7 +43,8 @@
 
 .button-cmdk {
   background-color: var(--theme2);
-  padding-x: var(--space-xs);
+  padding-inline-start: var(--space-xs);
+  padding-inline-end: var(--space-l);
   color: var(--theme10);
   border: 1px solid var(--border);
   justify-content: flex-start;
@@ -49,7 +52,8 @@
   flex-grow: 1;
   position: relative;
   align-items: center;
-  font-weight: 300;
+  font-weight: 500;
+  border-radius: var(--radii-l);
 
   @media (--bp2) {
     margin-x: auto;
@@ -72,6 +76,7 @@
   font-weight: normal;
   margin-x: var(--space-3xs);
   color: var(--theme10);
+  border-radius: var(--radii-m);
 
   &:hover {
     background-color: var(--theme6);

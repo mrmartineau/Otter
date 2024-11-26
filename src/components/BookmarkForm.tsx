@@ -514,9 +514,7 @@ export const BookmarkForm = ({
               className="min-h-[41px]"
             ></Textarea>
           ) : (
-            <>
-              <input type="hidden" {...register('image')} />
-            </>
+            <input type="hidden" {...register('image')} />
           )}
         </FormGroup>
 

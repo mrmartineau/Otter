@@ -5,7 +5,7 @@
 }
 
 .bookmark-form-image {
-  border-radius: var(--radii-m);
+  border-radius: var(--radii-l);
   border: 1px solid var(--border);
   width: 100%;
   max-width: 450px;

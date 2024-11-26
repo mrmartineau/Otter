@@ -12,7 +12,7 @@ export const comboboxStyles: StylesConfig<
   control: (provided, state) => ({
     ...provided,
     backgroundColor: 'var(--theme2)',
-    borderRadius: 'var(--radii-m)',
+    borderRadius: 'var(--radii-l)',
     boxShadow: state.isFocused
       ? '0 0 0 2px var(--focus)'
       : '0 0 0 2px transparent',
