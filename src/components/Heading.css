@@ -27,8 +27,7 @@
   font-size: var(--step-1);
   font-variation-settings:
     'wght' 700,
-    'wdth' 125,
-    'ital' 10;
+    'wdth' 125;
   color: var(--theme11);
   margin-y: 0;
 }
