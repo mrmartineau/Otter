@@ -5,7 +5,6 @@
   gap: var(--space-2xs);
   justify-content: center;
   border-radius: var(--radii-l);
-  font-weight: 500;
   color: #f5f5f0;
   transition: all 200ms var(--ease-in-out-1);
   font-size: var(--step--1);
@@ -29,7 +28,6 @@
 }
 
 .button-ghost {
-  font-weight: 500;
   color: var(--text);
   border: 1px solid transparent;
 
@@ -73,7 +71,6 @@
 
 .button-collapsible {
   padding: var(--space-3xs);
-  font-weight: normal;
   margin-x: var(--space-3xs);
   color: var(--theme10);
   border-radius: var(--radii-m);

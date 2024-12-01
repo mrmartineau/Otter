@@ -20,6 +20,7 @@
 
   body {
     background-color: var(--background);
+    font-weight: 500;
   }
 
   .skip-link {
