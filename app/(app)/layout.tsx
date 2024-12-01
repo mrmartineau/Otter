@@ -19,7 +19,7 @@ interface LayoutProps {
 }
 
 export default async function AppLayout({ children }: LayoutProps) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const dbMeta = await getDbMetadata(supabaseClient);
   const {

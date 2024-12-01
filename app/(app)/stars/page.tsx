@@ -11,13 +11,14 @@ export const metadata = {
   title: `Starred bookmarks – Otter`,
 };
 
-export default async function StarsPage({
-  searchParams,
-}: {
-  searchParams: Partial<ApiParametersQuery>;
-}) {
+export default async function StarsPage(
+  props: {
+    searchParams: Promise<Partial<ApiParametersQuery>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const { limit, offset } = searchParams;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const { data, count } = await getBookmarks({
     supabaseClient,

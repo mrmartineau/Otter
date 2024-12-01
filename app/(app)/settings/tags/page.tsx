@@ -6,7 +6,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export default async function TagsManagementPage() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const dbMetaTags = await supabaseClient
     .from('tags_count')
@@ -21,7 +21,7 @@ export default async function TagsManagementPage() {
 
     const old_tag = formData.get('old_tag') as string;
     const new_tag = formData.get('new_tag') as string;
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = createServerClient(cookieStore);
 
     const { error } = await supabase.rpc('update_bookmark_tags', {

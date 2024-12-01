@@ -15,13 +15,14 @@ export const metadata = {
   title: CONTENT.tweetsLikeTitle,
 };
 
-export default async function LikedTweetsPage({
-  searchParams,
-}: {
-  searchParams: Partial<Pick<ApiParametersQuery, 'limit' | 'offset' | 'order'>>;
-}) {
+export default async function LikedTweetsPage(
+  props: {
+    searchParams: Promise<Partial<Pick<ApiParametersQuery, 'limit' | 'offset' | 'order'>>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const { limit, offset } = searchParams;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const { data, count } = await getTweets({
     supabaseClient,

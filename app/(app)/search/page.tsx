@@ -16,9 +16,8 @@ type Props = {
   searchParams: Partial<SearchPageProps>;
 };
 
-export async function generateMetadata({
-  searchParams,
-}: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const searchParams = await props.searchParams;
   return {
     title: `${CONTENT.searchTitle}: ${decodeURIComponent(
       searchParams.q || '',
@@ -26,9 +25,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function SearchPage({ searchParams }: Props) {
+export default async function SearchPage(props: Props) {
+  const searchParams = await props.searchParams;
   const { limit, offset, q } = searchParams;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const { data, count } = await getSearchBookmarks({
     supabaseClient,

@@ -8,19 +8,22 @@ import { Metadata } from 'next';
 import { cookies } from 'next/headers';
 
 type Props = {
-  params: { name: string };
+  params: Promise<{ name: string }>;
   searchParams: Partial<ApiParametersQuery>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   return {
     title: `Tag: #${decodeURIComponent(params.name)}`,
   };
 }
 
-export default async function TagPage({ params, searchParams }: Props) {
+export default async function TagPage(props: Props) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { limit, offset } = searchParams;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const tag = decodeURIComponent(params.name);
   const { data, count } = await getBookmarks({

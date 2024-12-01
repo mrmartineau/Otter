@@ -11,13 +11,14 @@ export const metadata = {
   title: 'Feed',
 };
 
-export default async function FeedPage({
-  searchParams,
-}: {
-  searchParams: Partial<ApiParametersQuery>;
-}) {
+export default async function FeedPage(
+  props: {
+    searchParams: Promise<Partial<ApiParametersQuery>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const { limit, offset } = searchParams;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const { data, count } = await getBookmarks({
     supabaseClient,

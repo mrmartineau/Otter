@@ -1,7 +1,7 @@
 import { Label } from '@/src/components/Label';
 import { cn } from '@/src/utils/classnames';
 import clsx from 'clsx';
-import { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { ComponentPropsWithoutRef, ReactNode, type JSX } from 'react';
 
 import { Text } from './Text';
 

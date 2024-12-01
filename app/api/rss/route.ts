@@ -11,7 +11,7 @@ import { toJson } from 'rss-converter';
  * It uses the `OTTER_API_TOKEN` environment variable to authenticate via an Authorization header token
  */
 export async function GET(request: Request) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const {
     data: { session },

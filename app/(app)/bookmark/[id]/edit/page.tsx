@@ -3,8 +3,9 @@ import { getBookmark } from '@/src/utils/fetching/bookmarks';
 import { createServerClient } from '@/src/utils/supabase/server';
 import { cookies } from 'next/headers';
 
-export default async function NewPage({ params }: { params: { id: string } }) {
-  const cookieStore = cookies();
+export default async function NewPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const bookmarkItem = await getBookmark({ supabaseClient, id: params.id });
 

@@ -9,19 +9,22 @@ import { cookies } from 'next/headers';
 import title from 'title';
 
 type Props = {
-  params: { type: string };
+  params: Promise<{ type: string }>;
   searchParams: Partial<ApiParametersQuery>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   return {
     title: `Type: ${title(decodeURIComponent(params.type))}`,
   };
 }
 
-export default async function TagPage({ params, searchParams }: Props) {
+export default async function TagPage(props: Props) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { limit, offset } = searchParams;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const type = decodeURIComponent(params.type);
   const { data, count } = await getBookmarks({

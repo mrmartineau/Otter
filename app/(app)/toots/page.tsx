@@ -11,13 +11,14 @@ export const metadata = {
   title: CONTENT.tootsMineTitle,
 };
 
-export default async function MyTootsPage({
-  searchParams,
-}: {
-  searchParams: Partial<Pick<ApiParametersQuery, 'limit' | 'offset' | 'order'>>;
-}) {
+export default async function MyTootsPage(
+  props: {
+    searchParams: Promise<Partial<Pick<ApiParametersQuery, 'limit' | 'offset' | 'order'>>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const { limit, offset } = searchParams;
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const { data, count } = await getToots({
     supabaseClient,

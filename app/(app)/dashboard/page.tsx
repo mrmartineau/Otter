@@ -12,7 +12,7 @@ export const metadata = {
 };
 
 export default async function DashboardPage() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   // Get recent items, 1 week ago, 1 month ago, 2 months ago, 6 months ago & 1 year ago
   const data = await getDashboard({

@@ -11,7 +11,7 @@ import { redirect } from 'next/navigation';
 import Messages from './messages';
 
 export default async function Login() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const {
     data: { session },
@@ -26,7 +26,7 @@ export default async function Login() {
 
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = createServerClient(cookieStore);
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -44,10 +44,10 @@ export default async function Login() {
   const signUp = async (formData: FormData) => {
     'use server';
 
-    const origin = headers().get('origin');
+    const origin = (await headers()).get('origin');
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = createServerClient(cookieStore);
 
     const { error } = await supabase.auth.signUp({

@@ -4,7 +4,7 @@ import { createServerClient } from '@/src/utils/supabase/server';
 import { cookies } from 'next/headers';
 
 export default async function AccountPage() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabaseClient = createServerClient(cookieStore);
   const {
     data: { user },
