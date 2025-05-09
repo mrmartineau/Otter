@@ -2,6 +2,8 @@
 
 .env
 
+.cursor/mcp.json
+
 # dependencies
 /node_modules
 /.pnp
