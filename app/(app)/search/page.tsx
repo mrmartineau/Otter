@@ -13,7 +13,7 @@ type SearchPageProps = ApiParametersQuery & {
 };
 
 type Props = {
-  searchParams: Partial<SearchPageProps>;
+  searchParams: Promise<Partial<SearchPageProps>>;
 };
 
 export async function generateMetadata(props: Props): Promise<Metadata> {

@@ -9,7 +9,7 @@ import { cookies } from 'next/headers';
 
 type Props = {
   params: Promise<{ name: string }>;
-  searchParams: Partial<ApiParametersQuery>;
+  searchParams: Promise<Partial<ApiParametersQuery>>;
 };
 
 export async function generateMetadata(props: Props): Promise<Metadata> {

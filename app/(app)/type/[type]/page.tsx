@@ -10,7 +10,7 @@ import title from 'title';
 
 type Props = {
   params: Promise<{ type: string }>;
-  searchParams: Partial<ApiParametersQuery>;
+  searchParams: Promise<Partial<ApiParametersQuery>>;
 };
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
