@@ -99,6 +99,72 @@ export type Database = {
         }
         Relationships: []
       }
+      feeds: {
+        Row: {
+          created_at: string
+          id: number
+          name: string
+          properties: Json | null
+          type: Database["public"]["Enums"]["feeds_type"]
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name: string
+          properties?: Json | null
+          type: Database["public"]["Enums"]["feeds_type"]
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string
+          properties?: Json | null
+          type?: Database["public"]["Enums"]["feeds_type"]
+          url?: string
+        }
+        Relationships: []
+      }
+      media: {
+        Row: {
+          created_at: string
+          id: number
+          media_id: string | null
+          modified_at: string | null
+          name: string
+          platform: string | null
+          rating: Database["public"]["Enums"]["media_rating"] | null
+          sort_order: number | null
+          status: Database["public"]["Enums"]["media_status"] | null
+          type: Database["public"]["Enums"]["media_type"] | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          media_id?: string | null
+          modified_at?: string | null
+          name?: string
+          platform?: string | null
+          rating?: Database["public"]["Enums"]["media_rating"] | null
+          sort_order?: number | null
+          status?: Database["public"]["Enums"]["media_status"] | null
+          type?: Database["public"]["Enums"]["media_type"] | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          media_id?: string | null
+          modified_at?: string | null
+          name?: string
+          platform?: string | null
+          rating?: Database["public"]["Enums"]["media_rating"] | null
+          sort_order?: number | null
+          status?: Database["public"]["Enums"]["media_status"] | null
+          type?: Database["public"]["Enums"]["media_type"] | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -338,6 +404,28 @@ export type Database = {
       }
     }
     Enums: {
+      feeds_type: "rss" | "api"
+      media_rating:
+        | "0"
+        | "0.5"
+        | "1"
+        | "1.5"
+        | "2"
+        | "2.5"
+        | "3"
+        | "3.5"
+        | "4"
+        | "4.5"
+        | "5"
+      media_status: "now" | "skipped" | "done" | "wishlist"
+      media_type:
+        | "tv"
+        | "film"
+        | "game"
+        | "book"
+        | "podcast"
+        | "music"
+        | "other"
       status: "active" | "inactive"
       type:
         | "link"
@@ -469,6 +557,22 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      feeds_type: ["rss", "api"],
+      media_rating: [
+        "0",
+        "0.5",
+        "1",
+        "1.5",
+        "2",
+        "2.5",
+        "3",
+        "3.5",
+        "4",
+        "4.5",
+        "5",
+      ],
+      media_status: ["now", "skipped", "done", "wishlist"],
+      media_type: ["tv", "film", "game", "book", "podcast", "music", "other"],
       status: ["active", "inactive"],
       type: [
         "link",
