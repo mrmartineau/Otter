@@ -1,0 +1,48 @@
+GET http://localhost:5678/api
+
+###
+
+# RSS feed
+
+GET http://localhost:5678/api/rss?feed=https://letterboxd.com/mrmartineau/rss/
+
+###
+# Title AI rewriter
+
+POST http://localhost:5678/api/ai/title
+Content-Type: application/json
+
+{
+  "prompt": "ollama/ollama: Get up and running with OpenAI gpt-oss, DeepSeek-R1, Gemma 3 and other models."
+}
+
+###
+# Title AI rewriter
+
+POST http://localhost:5678/api/ai/title
+Content-Type: application/json
+
+{
+  "prompt": "Hi! I'm Zander, I make websites"
+}
+
+###
+# Description AI rewriter
+
+POST http://localhost:5678/api/ai/description
+Content-Type: application/json
+
+{
+  "prompt": "Get up and running with OpenAI gpt-oss, DeepSeek-R1, Gemma 3 and other models. - ollama/ollama"
+}
+
+###
+# Description AI rewriter with title
+
+POST http://localhost:5678/api/ai/description
+Content-Type: application/json
+
+{
+  "prompt": "Get up and running with OpenAI gpt-oss, DeepSeek-R1, Gemma 3 and other models. - zander/zander",
+  "title": "zander – Get up and running with OpenAI gpt-oss, DeepSeek-R1, Gemma 3 and other models on zander."
+}

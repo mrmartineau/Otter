@@ -1,0 +1,36 @@
+name: Deploy to Cloudflare
+
+env:
+  VITE_SUPABASE_URL: ${{secrets.VITE_SUPABASE_URL}}
+  VITE_SUPABASE_ANON_KEY: ${{secrets.VITE_SUPABASE_ANON_KEY}}
+  SUPABASE_SERVICE_KEY: ${{secrets.SUPABASE_SERVICE_KEY}}
+  BOT_MASTODON_ACCESS_TOKEN: ${{secrets.BOT_MASTODON_ACCESS_TOKEN}}
+  PERSONAL_MASTODON_ACCESS_TOKEN: ${{secrets.PERSONAL_MASTODON_ACCESS_TOKEN}}
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  Deploy-Production:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.0
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build site
+        run: pnpm build
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=otter-web
