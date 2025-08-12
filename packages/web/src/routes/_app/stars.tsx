@@ -36,6 +36,7 @@ function Page() {
       title={CONTENT.starsTitle}
       icon={<StarIcon weight="duotone" size={24} />}
       feedType="bookmarks"
+      from={`/stars`}
     />
   )
 }

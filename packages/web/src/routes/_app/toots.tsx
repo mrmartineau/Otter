@@ -61,6 +61,7 @@ function Page() {
       feedType="toots"
       subNav={subNav}
       showFeedOptions={false}
+      from={`/toots`}
     />
   )
 }

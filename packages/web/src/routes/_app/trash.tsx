@@ -44,6 +44,7 @@ function FeedPage() {
       icon={<TrashIcon weight="duotone" size={24} />}
       feedType="bookmarks"
       allowDeletion
+      from={`/trash`}
     />
   )
 }

@@ -1,21 +1,30 @@
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, type FileRouteTypes } from '@tanstack/react-router'
 import { useMemo } from 'react'
 
 interface UsePaginationModel {
   offset: number
   limit: number
   count: number
+  from?: FileRouteTypes['fullPaths']
 }
-export const usePagination = ({ offset, limit, count }: UsePaginationModel) => {
+
+export const usePagination = ({
+  offset,
+  limit,
+  count,
+  from = '/feed',
+}: UsePaginationModel) => {
   const navigate = useNavigate()
   const handleUpdateOffset = (newOffset: number) => {
     return navigate({
-      from: '/feed',
+      from,
       search: {
+        // @ts-expect-error Fix `search` typings
         limit: limit,
         offset: newOffset,
       },
-      to: '/feed',
+      to: from,
+      resetScroll: true,
     })
   }
   const hasOldItems = useMemo(

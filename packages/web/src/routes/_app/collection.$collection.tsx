@@ -1,9 +1,11 @@
 import { FolderIcon } from '@phosphor-icons/react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import { useCollectionsSubNav } from '@/hooks/useCollectionsSubNav'
 import type { Bookmark } from '@/types/db'
-import { getCollections } from '@/utils/fetching/collections'
+import { getCollectionsOptions } from '@/utils/fetching/collections'
+import { apiParameters } from '@/utils/fetching/apiParameters'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/_app/collection/$collection')({
   component: Page,
@@ -14,45 +16,47 @@ export const Route = createFileRoute('/_app/collection/$collection')({
       },
     ],
   }),
-  loader: async ({
-    // @ts-expect-error How do I type search params?
-    deps: { search },
-    params,
-  }): Promise<{
-    data: Bookmark[]
-    count: number
-    limit: number
-    offset: number
-    collection: string
-  }> => {
-    const bookmarks = await getCollections({
-      name: params.collection,
-      params: {
-        ...search,
-      },
-    })
-    const response = { ...bookmarks, ...search, collection: params.collection }
-    return response
+  loader: async (opts) => {
+    const bookmarks = await opts.context.queryClient.ensureQueryData(
+      getCollectionsOptions({
+        name: opts.params.collection,
+        // @ts-expect-error Fix `search` typings
+        params: opts.deps.search,
+      })
+    )
+    return bookmarks
   },
   loaderDeps: ({ search }) => ({ search }),
+  validateSearch: (search: Record<string, unknown>) => {
+    return apiParameters(search)
+  },
 })
 
 function Page() {
-  // @ts-expect-error How do I type useLoaderData?
-  const { data, count, limit, offset, collection } = Route.useLoaderData()
+  const collection = Route.useParams().collection
+  const search = useSearch({ from: '/_app/collection/$collection' })
+  const { data } = useSuspenseQuery(
+    getCollectionsOptions({
+      name: collection,
+      // @ts-expect-error Fix `search` typings
+      params: search,
+    })
+  )
+
   const subNav = useCollectionsSubNav(collection)
 
   return (
     <Feed
-      items={data as Bookmark[]}
-      count={count || 0}
-      limit={limit}
-      offset={offset}
+      items={data.data as Bookmark[]}
+      count={data.count || 0}
+      limit={search.limit}
+      offset={search.offset}
       allowGroupByDate={true}
       title={collection}
       icon={<FolderIcon weight="duotone" size={24} />}
       feedType="bookmarks"
       subNav={subNav}
+      from={`/collection/${collection}`}
     />
   )
 }

@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
@@ -34,11 +33,6 @@ import { Route as AppCollectionCollectionRouteImport } from './routes/_app/colle
 import { Route as AppBookmarkIdRouteImport } from './routes/_app/bookmark.$id'
 import { Route as AppBookmarkIdEditRouteImport } from './routes/_app/bookmark.$id.edit'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PublicRouteRoute = PublicRouteRouteImport.update({
   id: '/_public',
   getParentRoute: () => rootRouteImport,
@@ -154,7 +148,6 @@ const AppBookmarkIdEditRoute = AppBookmarkIdEditRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/about': typeof AboutRoute
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRoute
@@ -178,7 +171,6 @@ export interface FileRoutesByFullPath {
   '/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
 }
 export interface FileRoutesByTo {
-  '/about': typeof AboutRoute
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRoute
@@ -205,7 +197,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
   '/_public': typeof PublicRouteRouteWithChildren
-  '/about': typeof AboutRoute
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feed': typeof AppFeedRoute
@@ -231,7 +222,6 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/about'
     | '/settings'
     | '/dashboard'
     | '/feed'
@@ -255,7 +245,6 @@ export interface FileRouteTypes {
     | '/bookmark/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/about'
     | '/settings'
     | '/dashboard'
     | '/feed'
@@ -281,7 +270,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_public'
-    | '/about'
     | '/_app/settings'
     | '/_app/dashboard'
     | '/_app/feed'
@@ -308,18 +296,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
-  AboutRoute: typeof AboutRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_public': {
       id: '/_public'
       path: ''
@@ -568,7 +548,6 @@ const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   PublicRouteRoute: PublicRouteRouteWithChildren,
-  AboutRoute: AboutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

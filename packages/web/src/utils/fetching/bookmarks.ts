@@ -90,7 +90,7 @@ export const getBookmark = async ({ id }: BookmarkFetchingOptions) => {
 export const getBookmarkOptions = ({ id }: BookmarkFetchingOptions) => {
   return queryOptions({
     queryFn: () => getBookmark({ id }),
-    queryKey: ['bookmark', id],
+    queryKey: ['bookmarks', id],
     staleTime: 5 * 1000,
   })
 }

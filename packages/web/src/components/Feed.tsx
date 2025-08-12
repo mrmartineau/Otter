@@ -16,6 +16,7 @@ import { headingVariants } from './Heading'
 import { SidebarLink } from './SidebarLink'
 import { TootFeedItem } from './TootFeedItem'
 import { TweetFeedItem } from './TweetFeedItem'
+import type { FileRouteTypes } from '@tanstack/react-router'
 
 interface FeedProps {
   title: ReactNode
@@ -34,6 +35,7 @@ interface FeedProps {
   allowGroupByDate?: boolean
   feedType?: 'tweets' | 'bookmarks' | 'toots'
   showFeedOptions?: boolean
+  from?: FileRouteTypes['fullPaths']
 }
 
 export function isBookmark(item: FeedItemModel): item is Bookmark {
@@ -58,6 +60,7 @@ export const Feed = memo(
     allowGroupByDate = false,
     subNav,
     showFeedOptions = true,
+    from,
   }: FeedProps) => {
     const { starQuery, publicQuery, setStarQuery, setPublicQuery } =
       useFeedOptions()
@@ -70,11 +73,12 @@ export const Feed = memo(
       count,
       limit,
       offset,
+      from,
     })
     const { data: collectionsTags } = useQuery(getCollectionsTagsOptions())
 
     const handleToggleState = async (
-      column: 'public' | 'star',
+      column: 'public' | 'star'
     ): Promise<void> => {
       if (column === 'public') {
         setPublicQuery((prev) => !prev)
@@ -102,7 +106,7 @@ export const Feed = memo(
             <h3
               className={cn(
                 headingVariants({ variant: 'feedTitle' }),
-                'flex items-center gap-2xs',
+                'flex items-center gap-2xs'
               )}
             >
               {icon}
@@ -238,7 +242,7 @@ export const Feed = memo(
         ) : null}
       </div>
     )
-  },
+  }
 )
 
 Feed.displayName = 'Feed'

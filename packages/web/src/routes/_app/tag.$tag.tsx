@@ -36,6 +36,7 @@ function Page() {
       title={tag}
       icon={<HashIcon weight="duotone" size={24} />}
       feedType="bookmarks"
+      from={`/tag/${tag}`}
     />
   )
 }

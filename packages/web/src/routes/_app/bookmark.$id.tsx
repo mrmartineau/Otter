@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useMatchRoute } from '@tanstack/react-router'
 import { BookmarkFeedItem } from '@/components/BookmarkFeedItem'
-import { getBookmark } from '@/utils/fetching/bookmarks'
+import { getBookmarkOptions } from '@/utils/fetching/bookmarks'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/_app/bookmark/$id')({
   component: RouteComponent,
@@ -12,21 +13,20 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
       },
     ],
   }),
-  /* loader: async ({ params }: Promise<{
-    data: PostgrestResponseSuccess<
-      Database['public']['Tables']['bookmarks']['Row']
-    >
-  }>) => { */
-  loader: async ({ params }) => {
-    const { data } = await getBookmark({
-      id: params.id,
-    })
-    return data
+  loader: async (opts) => {
+    const bookmark = await opts.context.queryClient.ensureQueryData(
+      getBookmarkOptions({
+        id: opts.params.id,
+      })
+    )
+    return bookmark.data
   },
 })
 
 function RouteComponent() {
-  const bookmark = Route.useLoaderData()
+  const { data: bookmark } = useSuspenseQuery(
+    getBookmarkOptions({ id: Route.useParams().id })
+  )
   const matchRoute = useMatchRoute()
   const params = matchRoute({ to: '/bookmark/$id/edit' })
 
@@ -38,7 +38,7 @@ function RouteComponent() {
         <Outlet />
       ) : (
         // @ts-expect-error How do I get the proper types for this?
-        <BookmarkFeedItem {...bookmark} preventMarkdownClamping />
+        <BookmarkFeedItem {...bookmark.data} preventMarkdownClamping />
       )}
     </>
   )

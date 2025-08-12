@@ -47,6 +47,7 @@ function Page() {
       title={CONTENT.publicTitle}
       icon={<ArrowFatLinesUpIcon weight="duotone" size={24} />}
       feedType="bookmarks"
+      from={`/public`}
     />
   )
 }

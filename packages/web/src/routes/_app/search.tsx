@@ -51,6 +51,7 @@ function RouteComponent() {
       title={`${CONTENT.searchTitle}: ${q}`}
       icon={<MagnifyingGlassIcon weight="duotone" size={24} />}
       feedType="bookmarks"
+      from={`/search?q=${q}`}
     />
   )
 }

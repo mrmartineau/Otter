@@ -36,6 +36,7 @@ function Page() {
       title={CONTENT.topLinksTitle}
       icon={<ArrowFatLinesUpIcon weight="duotone" size={24} />}
       feedType="bookmarks"
+      from={`/top`}
     />
   )
 }

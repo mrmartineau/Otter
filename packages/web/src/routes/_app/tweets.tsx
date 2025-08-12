@@ -63,6 +63,7 @@ function Page() {
       feedType="tweets"
       subNav={subNav}
       showFeedOptions={false}
+      from={`/tweets`}
     />
   )
 }

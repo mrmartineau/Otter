@@ -39,6 +39,7 @@ function Page() {
       title={title(type)}
       icon={<TypeToIcon size={24} type={type as BookmarkType} />}
       feedType="bookmarks"
+      from={`/type/${type}`}
     />
   )
 }
