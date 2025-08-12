@@ -1,5 +1,3 @@
-@custom-media --bp2 (min-width: 768px);
-
 .otter-app-container {
   position: fixed;
   inset: 0px;
@@ -41,8 +39,7 @@
 }
 
 .otter-sidebar-pane {
-  transition:
-    opacity 0.25s var(--ease-in-out-3),
+  transition: opacity 0.25s var(--ease-in-out-3),
     transform 0.25s var(--ease-in-out-3);
   display: flex;
   flex-direction: column;

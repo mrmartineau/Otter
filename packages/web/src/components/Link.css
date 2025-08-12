@@ -80,7 +80,7 @@
     display: none;
   }
 
-  @media (--bp1) {
+  @media (min-width: 500px) {
     font-size: var(--step-2);
     .emoji {
       display: block;

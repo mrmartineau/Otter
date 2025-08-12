@@ -22,7 +22,7 @@
   margin-top: var(--space-m);
   gap: var(--space-m);
 
-  @media (--bp1) {
+  @media (min-width: 500px) {
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   }
 }
@@ -49,7 +49,7 @@
   gap: var(--space-xs);
   flex-direction: column;
 
-  @media (--bp1) {
+  @media (min-width: 500px) {
     flex-direction: row;
   }
 }

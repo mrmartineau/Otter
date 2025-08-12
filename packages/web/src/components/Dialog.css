@@ -45,7 +45,7 @@
   inset: 0;
   background-color: var(--overlay);
 
-  @media (--reducedMotionNoPref) {
+  @media (prefers-reduced-motion: no-preference) {
     animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
@@ -75,21 +75,21 @@
     max-height: 85vh;
     min-height: unset;
   }
-  @media (--reducedMotionNoPref) {
+  @media (prefers-reduced-motion: no-preference) {
     animation: contentShowFromCenter 150ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 .DialogContent--right {
   right: 0;
   bottom: 0;
-  @media (--reducedMotionNoPref) {
+  @media (prefers-reduced-motion: no-preference) {
     animation: contentShowFromRight 150ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 .DialogContent--left {
   left: 0;
   bottom: 0;
-  @media (--reducedMotionNoPref) {
+  @media (prefers-reduced-motion: no-preference) {
     animation: contentShowFromLeft 150ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 }

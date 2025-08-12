@@ -139,7 +139,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 
-  @media (--smallViewports) {
+  @media (--max-width: 767px) {
     &.showOnMobile {
       display: block;
     }
