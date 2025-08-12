@@ -3,11 +3,11 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Suspense } from 'react'
 import { Feed } from '@/components/Feed'
-import { Paragraph } from '@/components/Paragraph'
 import { CONTENT } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
 import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
+import { Loader } from '@/components/Loader'
 
 export const Route = createFileRoute('/_app/feed')({
   component: FeedPage,
@@ -38,7 +38,7 @@ function FeedPage() {
   const { data } = useSuspenseQuery(getBookmarksOptions(search))
 
   return (
-    <Suspense fallback={<Paragraph>Loading bookmarks...</Paragraph>}>
+    <Suspense fallback={<Loader />}>
       <Feed
         items={data.data as Bookmark[]}
         count={data.count || 0}

@@ -6,6 +6,8 @@ import {
 import { BookmarkForm } from '@/components/BookmarkForm'
 // import type { BaseBookmark } from '@/types/db'
 import { getBookmark } from '@/utils/fetching/bookmarks'
+import { Loader } from '@/components/Loader'
+import { Suspense } from 'react'
 
 /* type LoaderData = {
   bookmark: BaseBookmark
@@ -40,19 +42,21 @@ function RouteComponent() {
   const { bookmark, id } = Route.useLoaderData()
 
   return (
-    <BookmarkForm
-      type="edit"
-      initialValues={{
-        description: bookmark?.description,
-        image: bookmark?.image,
-        note: bookmark?.note,
-        star: bookmark?.star,
-        tags: bookmark?.tags,
-        title: bookmark?.title,
-        type: bookmark?.type,
-        url: bookmark?.url,
-      }}
-      id={id}
-    />
+    <Suspense fallback={<Loader />}>
+      <BookmarkForm
+        type="edit"
+        initialValues={{
+          description: bookmark?.description,
+          image: bookmark?.image,
+          note: bookmark?.note,
+          star: bookmark?.star,
+          tags: bookmark?.tags,
+          title: bookmark?.title,
+          type: bookmark?.type,
+          url: bookmark?.url,
+        }}
+        id={id}
+      />
+    </Suspense>
   )
 }

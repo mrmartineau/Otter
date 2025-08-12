@@ -1,4 +1,4 @@
-import { LinkType, typeChecker } from './type-checker'
+import { type LinkType, typeChecker } from './type-checker'
 
 export const linkType = (link: string, isReaderable?: boolean): LinkType => {
   // if known file or site type, return early and use the

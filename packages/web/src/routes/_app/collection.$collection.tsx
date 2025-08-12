@@ -6,6 +6,8 @@ import type { Bookmark } from '@/types/db'
 import { getCollectionsOptions } from '@/utils/fetching/collections'
 import { apiParameters } from '@/utils/fetching/apiParameters'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { Suspense } from 'react'
+import { Loader } from '@/components/Loader'
 
 export const Route = createFileRoute('/_app/collection/$collection')({
   component: Page,
@@ -46,17 +48,19 @@ function Page() {
   const subNav = useCollectionsSubNav(collection)
 
   return (
-    <Feed
-      items={data.data as Bookmark[]}
-      count={data.count || 0}
-      limit={search.limit}
-      offset={search.offset}
-      allowGroupByDate={true}
-      title={collection}
-      icon={<FolderIcon weight="duotone" size={24} />}
-      feedType="bookmarks"
-      subNav={subNav}
-      from={`/collection/${collection}`}
-    />
+    <Suspense fallback={<Loader />}>
+      <Feed
+        items={data.data as Bookmark[]}
+        count={data.count || 0}
+        limit={search.limit}
+        offset={search.offset}
+        allowGroupByDate={true}
+        title={collection}
+        icon={<FolderIcon weight="duotone" size={24} />}
+        feedType="bookmarks"
+        subNav={subNav}
+        from={`/collection/${collection}`}
+      />
+    </Suspense>
   )
 }

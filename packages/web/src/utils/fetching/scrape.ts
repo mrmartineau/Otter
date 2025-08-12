@@ -8,7 +8,7 @@ export const getScrapeData = async (url: string): Promise<MetadataResponse> => {
     }),
     { cache: 'force-cache' }
   )
-  const data = await response.json()
+  const data: MetadataResponse = await response.json()
 
   if (!data) {
     throw new Error('No metadata')

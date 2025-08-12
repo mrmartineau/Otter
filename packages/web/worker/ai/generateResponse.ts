@@ -1,6 +1,13 @@
-// import { generateText } from 'ai'
 import type { Context } from 'hono'
-// import { createWorkersAI } from 'workers-ai-provider'
+
+export type AiGenerateResponse = {
+  response: string
+  usage: {
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  }
+}
 
 export const generateResponse = async ({
   context,
@@ -16,12 +23,4 @@ export const generateResponse = async ({
   })
 
   return context.json(response)
-  // const workersai = createWorkersAI({ binding: context.env.AI })
-  // const result = await generateText({
-  //   model: workersai('@cf/openai/gpt-oss-20b'),
-  //   prompt: query,
-  //   system: systemPrompt,
-  // })
-
-  // return context.json(result.text)
 }

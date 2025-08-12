@@ -2,12 +2,12 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { Suspense } from 'react'
 import { FeedSimple } from '@/components/FeedSimple'
-import { Paragraph } from '@/components/Paragraph'
 import type { Bookmark, Toot } from '@/types/db'
 import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
 import { getDashboardOptions } from '@/utils/fetching/dashboard'
 import { getTootsOptions } from '@/utils/fetching/toots'
 import { randomElements } from '@/utils/random-array-elements'
+import { Loader } from '@/components/Loader'
 
 export const Route = createFileRoute('/_app/dashboard')({
   component: Index,
@@ -61,7 +61,7 @@ function Index() {
   )
 
   return (
-    <Suspense fallback={<Paragraph>Loading dashboard...</Paragraph>}>
+    <Suspense fallback={<Loader />}>
       <div className="flex flex-col gap-l">
         {dashboard?.recent?.length ? (
           <FeedSimple items={dashboard.recent} title="Recent" />

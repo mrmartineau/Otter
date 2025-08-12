@@ -1,6 +1,9 @@
 import { mutationOptions } from '@tanstack/react-query'
+import type { AiGenerateResponse } from '../../../worker/ai/generateResponse'
 
-export const rewriteTitle = async (title: string) => {
+export const rewriteTitle = async (
+  title: string
+): Promise<AiGenerateResponse> => {
   const response = await fetch('/api/ai/title', {
     body: JSON.stringify({ prompt: title }),
     method: 'POST',
@@ -21,7 +24,7 @@ export const rewriteTitleOptions = (title: string | null) => {
 export const rewriteDescription = async (
   description: string,
   title?: string
-) => {
+): Promise<AiGenerateResponse> => {
   const response = await fetch('/api/ai/description', {
     body: JSON.stringify({ prompt: description, title }),
     method: 'POST',

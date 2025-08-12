@@ -2,6 +2,8 @@ import { createFileRoute, Outlet, useMatchRoute } from '@tanstack/react-router'
 import { BookmarkFeedItem } from '@/components/BookmarkFeedItem'
 import { getBookmarkOptions } from '@/utils/fetching/bookmarks'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { Loader } from '@/components/Loader'
+import { Suspense } from 'react'
 
 export const Route = createFileRoute('/_app/bookmark/$id')({
   component: RouteComponent,
@@ -37,8 +39,10 @@ function RouteComponent() {
       {params ? (
         <Outlet />
       ) : (
-        // @ts-expect-error How do I get the proper types for this?
-        <BookmarkFeedItem {...bookmark.data} preventMarkdownClamping />
+        <Suspense fallback={<Loader />}>
+          {/* @ts-expect-error How do I get the proper types for this? */}
+          <BookmarkFeedItem {...bookmark.data} preventMarkdownClamping />
+        </Suspense>
       )}
     </>
   )

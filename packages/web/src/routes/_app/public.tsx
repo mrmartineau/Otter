@@ -6,6 +6,8 @@ import { CONTENT } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
 import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
+import { Suspense } from 'react'
+import { Loader } from '@/components/Loader'
 
 export const Route = createFileRoute('/_app/public')({
   component: Page,
@@ -38,16 +40,18 @@ function Page() {
   )
 
   return (
-    <Feed
-      items={data.data as Bookmark[]}
-      count={data.count || 0}
-      limit={search.limit}
-      offset={search.offset}
-      allowGroupByDate={true}
-      title={CONTENT.publicTitle}
-      icon={<ArrowFatLinesUpIcon weight="duotone" size={24} />}
-      feedType="bookmarks"
-      from={`/public`}
-    />
+    <Suspense fallback={<Loader />}>
+      <Feed
+        items={data.data as Bookmark[]}
+        count={data.count || 0}
+        limit={search.limit}
+        offset={search.offset}
+        allowGroupByDate={true}
+        title={CONTENT.publicTitle}
+        icon={<ArrowFatLinesUpIcon weight="duotone" size={24} />}
+        feedType="bookmarks"
+        from={`/public`}
+      />
+    </Suspense>
   )
 }

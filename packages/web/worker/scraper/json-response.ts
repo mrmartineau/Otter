@@ -14,7 +14,6 @@ const generateErrorJSONResponse = (error: unknown, url?: string) => {
   return generateJSONResponse({
     error: errorMessage,
     url,
-    ...error,
   })
 }
 

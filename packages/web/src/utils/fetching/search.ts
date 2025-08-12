@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 import { supabase } from '../supabase/client'
 import { type ApiParametersQuery, apiParameters } from './apiParameters'
+import { queryOptions } from '@tanstack/react-query'
 
 interface SearchFetchingOptions {
   params: Partial<ApiParametersQuery>
@@ -41,6 +42,17 @@ export const getSearchBookmarks = async ({
   return bookmarksSearch
 }
 
+export const getSearchBookmarksOptions = ({
+  searchTerm,
+  params,
+}: Pick<SearchFetchingOptions, 'searchTerm' | 'params'>) => {
+  return queryOptions({
+    queryFn: () => getSearchBookmarks({ searchTerm, params }),
+    queryKey: ['bookmarks', 'search', params],
+    staleTime: 5 * 1000,
+  })
+}
+
 export const getSearchTweets = async ({
   searchTerm,
   params,
@@ -66,6 +78,17 @@ export const getSearchTweets = async ({
   return tweetsSearch
 }
 
+export const getSearchTweetsOptions = ({
+  searchTerm,
+  params,
+}: Pick<SearchFetchingOptions, 'searchTerm' | 'params'>) => {
+  return queryOptions({
+    queryFn: () => getSearchTweets({ searchTerm, params }),
+    queryKey: ['tweets', 'search', params],
+    staleTime: 5 * 1000,
+  })
+}
+
 export const getSearchToots = async ({
   searchTerm,
   params,
@@ -89,4 +112,15 @@ export const getSearchToots = async ({
     .range(offset!, offset! + limit! - 1)
 
   return tweetsSearch
+}
+
+export const getSearchTootsOptions = ({
+  searchTerm,
+  params,
+}: Pick<SearchFetchingOptions, 'searchTerm' | 'params'>) => {
+  return queryOptions({
+    queryFn: () => getSearchToots({ searchTerm, params }),
+    queryKey: ['toots', 'search', params],
+    staleTime: 5 * 1000,
+  })
 }

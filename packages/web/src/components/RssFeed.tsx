@@ -66,9 +66,9 @@ export const RssFeed = ({ feedUrl }: RssFeedProps) => {
             feed: feedUrl,
             limit: 5,
           },
-        }),
+        })
       )
-      const data = await response.json()
+      const data: FeedResponse = await response.json()
 
       if (!data) {
         throw new Error('No data')

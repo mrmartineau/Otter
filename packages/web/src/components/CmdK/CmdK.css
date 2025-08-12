@@ -125,7 +125,7 @@
     cursor: not-allowed;
   }
   &:active {
-    transitionproperty: background;
+    transition-property: background;
     background: var(--theme5);
   }
   svg {
