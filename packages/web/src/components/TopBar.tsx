@@ -11,19 +11,19 @@ import { Link } from './Link'
 import './TopBar.css'
 import { useRouterState } from '@tanstack/react-router'
 import { Spinner } from './Spinner'
+import { FabAdd } from './FabAdd'
 
 interface TopBarProps extends ComponentProps<'header'> {
   children?: ReactNode
 }
 
 export const TopBar = ({ className, children, ...rest }: TopBarProps) => {
-  const topbarClass = cn(className, 'otter-top-bar')
   const { handleToggleSidebar } = useSidebar()
   const isLoading = useRouterState({ select: (s) => s.status === 'pending' })
 
   return (
-    <header className={topbarClass} {...rest}>
-      <Flex align="center" gap="2xs" className="top-bar-buttons">
+    <header className={cn(className, 'otter-top-bar')} {...rest}>
+      <Flex align="center" gap="s" className="top-bar-buttons">
         <IconButton
           aria-label="View navigation"
           data-testid="navButton"
@@ -38,9 +38,12 @@ export const TopBar = ({ className, children, ...rest }: TopBarProps) => {
         </Link>
         <Spinner show={isLoading} />
       </Flex>
-      <ErrorBoundary fallback={<div>Something went wrong</div>}>
-        <CmdK />
-      </ErrorBoundary>
+      <Flex align="center" gap="2xs" className="grow" justify="end">
+        <ErrorBoundary fallback={<div>Something went wrong</div>}>
+          <CmdK />
+        </ErrorBoundary>
+        <FabAdd />
+      </Flex>
     </header>
   )
 }

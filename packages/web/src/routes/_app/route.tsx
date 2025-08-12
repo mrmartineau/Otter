@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
 import { Container } from '@/components/Container'
-import { FabAdd } from '@/components/FabAdd'
 import { Sidebar } from '@/components/Sidebar'
 import { TopBar } from '@/components/TopBar'
 import { UserProvider } from '@/components/UserProvider'
@@ -39,7 +38,6 @@ function RouteComponent() {
             </div>
           </main>
         </div>
-        <FabAdd />
         <Toaster position="bottom-center" richColors />
       </div>
     </UserProvider>

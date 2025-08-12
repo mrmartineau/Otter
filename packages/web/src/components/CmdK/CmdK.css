@@ -76,20 +76,26 @@
 }
 
 .cmdk-button-label {
-  border: 1px solid currentColor;
-  color: var(--theme8);
-  border-radius: var(--radii-default);
-  margin-inline-start: var(--space-m);
-  position: absolute;
-  top: 50%;
-  right: var(--space-2xs);
-  transform: translateY(-50%);
-  height: 22px;
-  user-select: none;
-  pointer-events: none;
-  font-family: var(--font-mono);
-  font-size: var(--step--3);
-  padding-x: var(--space-3xs);
+  display: none;
+}
+@media (min-width: 768px) {
+  .cmdk-button-label {
+    display: block;
+    border: 1px solid currentColor;
+    color: var(--theme8);
+    border-radius: var(--radii-default);
+    margin-inline-start: var(--space-m);
+    position: absolute;
+    top: 50%;
+    right: var(--space-2xs);
+    transform: translateY(-50%);
+    height: 22px;
+    user-select: none;
+    pointer-events: none;
+    font-family: var(--font-mono);
+    font-size: var(--step--3);
+    padding-x: var(--space-3xs);
+  }
 }
 
 .cmdk-item {

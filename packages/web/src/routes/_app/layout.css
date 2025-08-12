@@ -8,7 +8,7 @@
 
 .otter-top-bar {
   display: flex;
-  gap: var(--space-m);
+  gap: var(--space-s);
   align-items: center;
   justify-content: space-between;
   width: 100%;

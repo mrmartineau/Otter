@@ -15,7 +15,7 @@ export const FabAdd = () => {
 
   return (
     <Link href={ROUTE_NEW_BOOKMARK} variant="fab" aria-label="Add new bookmark">
-      <PlusCircleIcon size="30" weight="duotone" color="currentColor" />
+      <PlusCircleIcon size="24" weight="duotone" color="currentColor" />
     </Link>
   )
 }

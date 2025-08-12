@@ -117,13 +117,9 @@
 
 .link-fab {
   --color: var(--theme12);
-  position: fixed;
-  bottom: var(--space-s);
-  right: var(--space-s);
-  z-index: var(--z-max);
-  border-radius: 50%;
-  height: 50px;
-  width: 50px;
+  border-radius: var(--radii-l);
+  height: 40px;
+  width: 40px;
   background-color: var(--accent8);
   display: inline-flex;
   align-items: center;
