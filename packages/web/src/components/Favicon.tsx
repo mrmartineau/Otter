@@ -6,9 +6,9 @@ interface FaviconProps {
 
 export const Favicon = ({ url }: FaviconProps) => {
   const urlDomain = simpleUrl(url)
-  // let favicon = `https://icons.duckduckgo.com/ip3/${urlDomain}.ico`
+  let favicon = `https://icons.duckduckgo.com/ip3/${urlDomain}.ico`
   // let favicon = `https://s2.googleusercontent.com/s2/favicons?domain=${urlDomain}&sz=128`
-  let favicon = `https://logo.clearbit.com/${urlDomain}`
+  // let favicon = `https://logo.clearbit.com/${urlDomain}`
   switch (urlDomain) {
     case 'producthunt.com':
       favicon = 'https://ph-static.imgix.net/ph-favicon.ico'
