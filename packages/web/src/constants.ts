@@ -5,6 +5,8 @@ import type { RequestOrder } from './types/api'
 export const REPO_URL = 'https://github.com/mrmartineau/Otter'
 
 export const ALLOW_SIGNUP = false
+
+export const TITLE_SEPARATOR = ' — '
 export const CONTENT = {
   accountSettingsTitle: 'Account, settings & integrations',
   addToLabel: 'Add to Otter',
@@ -22,6 +24,7 @@ export const CONTENT = {
   flatFeed: 'Flat',
   groupByDay: 'By day',
   integrationsSettingsTitle: 'Integrations',
+  newBookmarkTitle: 'New bookmark',
 
   // used in the feed popover
   latestRssItems: 'Latest RSS feed items',
@@ -46,7 +49,6 @@ export const CONTENT = {
   starsNav: 'Stars',
   starsTitle: 'Stars',
   tagsNav: 'Tags',
-  titleSeparator: ' — ',
   tootsLikeTitle: 'My liked toots',
   tootsMineTitle: 'My toots',
   tootsNav: 'Toots',
@@ -60,14 +62,13 @@ export const CONTENT = {
   tweetsNav: 'Tweets',
   tweetsTitle: 'Tweets',
   typesNav: 'Types',
-}
+} as const
 
-export const createTitle = (pageName?: string) => {
-  // @ts-ignore
-  const theTitle = pageName ? CONTENT[pageName] || pageName : ''
-  return `${theTitle ? `${theTitle}${CONTENT.titleSeparator}` : ''}${
-    CONTENT.appName
-  }`
+export const createTitle = (pageName?: keyof typeof CONTENT | string) => {
+  const theTitle = pageName
+    ? CONTENT[pageName as keyof typeof CONTENT] || pageName
+    : ''
+  return `${theTitle ? `${theTitle}${TITLE_SEPARATOR}` : ''}${CONTENT.appName}`
 }
 
 // Page Routes

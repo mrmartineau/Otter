@@ -2,7 +2,7 @@ import { ArrowFatLinesUpIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
-import { CONTENT } from '@/constants'
+import { CONTENT, createTitle } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
 import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/_app/public')({
   head: () => ({
     meta: [
       {
-        title: CONTENT.publicTitle,
+        title: createTitle('publicTitle'),
       },
     ],
   }),

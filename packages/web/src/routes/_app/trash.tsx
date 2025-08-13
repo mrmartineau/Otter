@@ -1,12 +1,19 @@
 import { TrashIcon } from '@phosphor-icons/react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
-import { CONTENT } from '@/constants'
+import { CONTENT, createTitle } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { getBookmarks } from '@/utils/fetching/bookmarks'
 
 export const Route = createFileRoute('/_app/trash')({
   component: FeedPage,
+  head: () => ({
+    meta: [
+      {
+        title: createTitle('trashTitle'),
+      },
+    ],
+  }),
   // validateSearch: (search: Record<string, unknown>): ApiParametersQuery => {
   //   return {
   //     filter: (search.filter as string) || '',
@@ -14,13 +21,6 @@ export const Route = createFileRoute('/_app/trash')({
   //     sort: (search.sort as ProductSearchSortOptions) || 'newest',
   //   }
   // },
-  head: () => ({
-    meta: [
-      {
-        title: 'Feed',
-      },
-    ],
-  }),
   // @ts-expect-error How do I type useLoaderData?
   loader: async ({ deps: { search } }) => {
     const bookmarks = await getBookmarks({ ...search, status: 'inactive' })

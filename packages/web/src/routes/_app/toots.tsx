@@ -2,7 +2,7 @@ import { MastodonLogoIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
-import { CONTENT } from '@/constants'
+import { CONTENT, createTitle } from '@/constants'
 import { getMetaOptions } from '@/utils/fetching/meta'
 import { getToots } from '@/utils/fetching/toots'
 
@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_app/toots')({
   head: () => ({
     meta: [
       {
-        title: CONTENT.starsTitle,
+        title: createTitle('tootsTitle'),
       },
     ],
   }),

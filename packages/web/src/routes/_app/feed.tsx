@@ -3,7 +3,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Suspense } from 'react'
 import { Feed } from '@/components/Feed'
-import { CONTENT } from '@/constants'
+import { CONTENT, createTitle } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
 import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/_app/feed')({
   head: () => ({
     meta: [
       {
-        title: 'Otter: Bookmarks Feed',
+        title: createTitle('feedTitle'),
       },
     ],
   }),

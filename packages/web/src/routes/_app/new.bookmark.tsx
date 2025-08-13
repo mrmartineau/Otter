@@ -1,9 +1,17 @@
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { BookmarkForm } from '@/components/BookmarkForm'
 import { getMetaOptions } from '@/utils/fetching/meta'
+import { createTitle } from '@/constants'
 
 export const Route = createFileRoute('/_app/new/bookmark')({
   component: RouteComponent,
+  head: () => ({
+    meta: [
+      {
+        title: createTitle('newBookmarkTitle'),
+      },
+    ],
+  }),
   loader: async (opts) => {
     const tags = await opts.context.queryClient.ensureQueryData(
       getMetaOptions()

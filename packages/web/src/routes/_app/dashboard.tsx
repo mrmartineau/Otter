@@ -8,13 +8,14 @@ import { getDashboardOptions } from '@/utils/fetching/dashboard'
 import { getTootsOptions } from '@/utils/fetching/toots'
 import { randomElements } from '@/utils/random-array-elements'
 import { Loader } from '@/components/Loader'
+import { createTitle } from '@/constants'
 
 export const Route = createFileRoute('/_app/dashboard')({
   component: Index,
   head: () => ({
     meta: [
       {
-        title: 'Otter: Dashboard',
+        title: createTitle('dashboardTitle'),
       },
     ],
   }),

@@ -1,7 +1,7 @@
 import { StarIcon } from '@phosphor-icons/react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
-import { CONTENT } from '@/constants'
+import { CONTENT, createTitle } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { getBookmarks } from '@/utils/fetching/bookmarks'
 
@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_app/stars')({
   head: () => ({
     meta: [
       {
-        title: CONTENT.starsTitle,
+        title: createTitle('starsTitle'),
       },
     ],
   }),
