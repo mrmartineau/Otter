@@ -80,7 +80,7 @@
 }
 @media (min-width: 768px) {
   .cmdk-button-label {
-    display: block;
+    display: flex;
     border: 1px solid currentColor;
     color: var(--theme8);
     border-radius: var(--radii-default);

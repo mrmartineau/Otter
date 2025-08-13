@@ -38,12 +38,12 @@ export const TopBar = ({ className, children, ...rest }: TopBarProps) => {
         </Link>
         <Spinner show={isLoading} />
       </Flex>
-      <Flex align="center" gap="2xs" className="grow" justify="end">
+      <div className="top-bar-search-container">
         <ErrorBoundary fallback={<div>Something went wrong</div>}>
           <CmdK />
         </ErrorBoundary>
         <FabAdd />
-      </Flex>
+      </div>
     </header>
   )
 }

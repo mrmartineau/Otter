@@ -1,11 +1,11 @@
 .sidebar-top {
-  column-gap: var(--space-xs);
-  flex-direction: column;
-  margin-bottom: var(--space-xs);
   display: none;
 
   @media (min-width: 768px) {
     display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-xs);
   }
 
   .link-logo {

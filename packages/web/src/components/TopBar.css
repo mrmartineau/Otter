@@ -3,3 +3,16 @@
     display: none;
   }
 }
+
+.top-bar-search-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  flex-grow: 1;
+
+  @media (min-width: 768px) {
+    justify-content: center;
+    margin-inline: auto;
+    flex-grow: 0;
+  }
+}
