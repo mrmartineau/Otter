@@ -66,7 +66,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       : `Created on ${createdDate.formatted}`
 
   const handleToggleState = async (
-    column: 'public' | 'star',
+    column: 'public' | 'star'
   ): Promise<void> => {
     const updateData =
       column === 'public' ? { public: !isPublic } : { star: !star }
@@ -259,13 +259,18 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               </Popover>
             ) : null}
 
-            <IconButton size="m" onClick={handleCopyUrl}>
-              <CopyIcon
-                aria-label="Copy URL to clipboard"
-                size={18}
-                weight="duotone"
-              />
-            </IconButton>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <IconButton size="m" onClick={handleCopyUrl}>
+                  <CopyIcon
+                    aria-label="Copy URL to clipboard"
+                    size={18}
+                    weight="duotone"
+                  />
+                </IconButton>
+              </TooltipTrigger>
+              <TooltipContent>Copy URL to clipboard</TooltipContent>
+            </Tooltip>
           </Flex>
 
           <FeedItemActions

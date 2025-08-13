@@ -43,6 +43,7 @@ import { BookmarkSearchItem } from './BookmarkSearchItem'
 import './CmdK.css'
 import { fetchSearch } from './fetchSearch'
 import { type AccessoryModel, Item } from './Item'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip'
 
 export type TweetSearchResponse = ApiResponse<Tweet[]>
 
@@ -115,18 +116,23 @@ export const CmdK = () => {
 
   return (
     <>
-      <Button
-        variant="cmdk"
-        aria-label="Search Otter"
-        onClick={toggleOpen}
-        className="h-10"
-      >
-        <MagnifyingGlassIcon weight="duotone" size="25" />
-        Search
-        <Flex align="center" justify="center" className="cmdk-button-label">
-          CMD+K
-        </Flex>
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="cmdk"
+            aria-label="Search Otter"
+            onClick={toggleOpen}
+            className="h-10"
+          >
+            <MagnifyingGlassIcon weight="duotone" size="25" />
+            Search
+            <Flex align="center" justify="center" className="cmdk-button-label">
+              CMD+K
+            </Flex>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Search Otter</TooltipContent>
+      </Tooltip>
       <Command.Dialog
         open={open}
         onOpenChange={(open) => {

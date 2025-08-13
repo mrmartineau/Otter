@@ -2,20 +2,33 @@ import { PlusCircleIcon } from '@phosphor-icons/react'
 import { useLocation } from '@tanstack/react-router'
 import { ROUTE_NEW_BOOKMARK } from '../constants'
 import { Link } from './Link'
+import { cn } from '@/utils/classnames'
+import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip'
 
 export const FabAdd = () => {
   const location = useLocation()
 
-  const hideFab =
+  const disableFab =
     location.pathname === `/new/bookmark` || location.pathname.includes('edit')
 
-  if (hideFab) {
-    return null
-  }
-
   return (
-    <Link href={ROUTE_NEW_BOOKMARK} variant="fab" aria-label="Add new bookmark">
-      <PlusCircleIcon size="24" weight="duotone" color="currentColor" />
-    </Link>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Link
+          href={ROUTE_NEW_BOOKMARK}
+          variant="fab"
+          aria-label="Add new bookmark"
+          onClick={(event) => {
+            if (disableFab) {
+              event.preventDefault()
+            }
+          }}
+          className={cn(disableFab && 'pointer-events-none opacity-30')}
+        >
+          <PlusCircleIcon size="24" weight="duotone" color="currentColor" />
+        </Link>
+      </TooltipTrigger>
+      <TooltipContent>Add new bookmark</TooltipContent>
+    </Tooltip>
   )
 }

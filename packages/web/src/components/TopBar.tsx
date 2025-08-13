@@ -12,6 +12,7 @@ import './TopBar.css'
 import { useRouterState } from '@tanstack/react-router'
 import { Spinner } from './Spinner'
 import { FabAdd } from './FabAdd'
+import { TooltipProvider } from './Tooltip'
 
 interface TopBarProps extends ComponentProps<'header'> {
   children?: ReactNode
@@ -39,10 +40,12 @@ export const TopBar = ({ className, children, ...rest }: TopBarProps) => {
         <Spinner show={isLoading} />
       </Flex>
       <div className="top-bar-search-container">
-        <ErrorBoundary fallback={<div>Something went wrong</div>}>
-          <CmdK />
-        </ErrorBoundary>
-        <FabAdd />
+        <TooltipProvider>
+          <ErrorBoundary fallback={<div>Something went wrong</div>}>
+            <CmdK />
+          </ErrorBoundary>
+          <FabAdd />
+        </TooltipProvider>
       </div>
     </header>
   )
