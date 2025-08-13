@@ -13,7 +13,14 @@
     <link rel="manifest" href="/manifest.json" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="loader flex items-center justify-center h-dvh">
+        <div class="flex flex-col items-center gap-2">
+          <img src="/icon.svg" alt="Otter" class="w-20 h-20" />
+          <div class="text-2xl font-bold">Loading Otter&hellip;</div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
