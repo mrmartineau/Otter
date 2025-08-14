@@ -39,7 +39,7 @@
   padding: var(--space-3xs) var(--space-2xs);
   column-gap: var(--space-m);
   border-radius: var(--radii-m);
-  line-height: var(--line-height-tight);
+  line-height: 18px;
 
   &:hover {
     color: var(--theme11);

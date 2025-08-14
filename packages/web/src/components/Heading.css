@@ -28,4 +28,9 @@
   font-variation-settings: 'wght' 500, 'wdth' 105;
   color: var(--theme11);
   margin-y: 0;
+  line-height: 26px;
+
+  svg {
+    display: inline-block;
+  }
 }

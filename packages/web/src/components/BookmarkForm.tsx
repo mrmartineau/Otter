@@ -31,9 +31,8 @@ import { getErrorMessage } from '../utils/get-error-message'
 import { type MatchTagsProps, matchTags } from '../utils/matchTags'
 import { supabase } from '../utils/supabase/client'
 import './BookmarkForm.css'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { queryClient } from '@/router'
 import {
   rewriteDescriptionOptions,
   rewriteTitleOptions,
@@ -91,7 +90,7 @@ export const BookmarkForm = ({
   const [possibleMatchingTags, setPossibleMatchingTags] = useState<string[]>([])
   const [isScraping, , setIsScraping] = useToggle(false)
   const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>()
-
+  const queryClient = useQueryClient()
   const { getValues, register, handleSubmit, setValue, watch } =
     useForm<BookmarkFormValues>({
       defaultValues: {
