@@ -1,20 +1,4 @@
 .feed-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: var(--space-2xs);
-  position: relative;
-  padding: var(--space-s);
-  border-radius: var(--radii-l);
-  transition: border 200ms var(--ease-in-out-1);
-  background-color: var(--theme2);
-  border: 1px solid var(--border);
-  color: var(--theme10);
-
-  &:hover,
-  &:focus-within {
-    border: 1px solid var(--theme4);
-  }
 }
 
 .feed-simple-grid {

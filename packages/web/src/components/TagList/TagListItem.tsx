@@ -4,7 +4,6 @@ import type { MetaTag } from '@/utils/fetching/meta'
 import { IconButton } from '../IconButton'
 import { SidebarLink } from '../SidebarLink'
 import { useUser } from '../UserProvider'
-import './TagList.css'
 
 interface PinUnpinTagProps {
   tag: string

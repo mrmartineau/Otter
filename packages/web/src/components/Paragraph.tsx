@@ -1,8 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { cn } from '@/utils/classnames'
 
-import './Paragraph.css'
-
 interface ParagraphProps extends ComponentProps<'p'> {
   children?: ReactNode
 }

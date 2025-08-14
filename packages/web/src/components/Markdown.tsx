@@ -5,12 +5,10 @@ import remarkBreaks from 'remark-breaks'
 import remarkGfm from 'remark-gfm'
 import remarkSqueezeParagraphs from 'remark-squeeze-paragraphs'
 import { remarkTruncateLinks } from 'remark-truncate-links'
-
 import { useToggle } from '../hooks/useToggle'
 import { Button } from './Button'
 import { Code, CodeBlock } from './CodeBlock'
 import { Link } from './Link'
-import './Markdown.css'
 import { Paragraph } from './Paragraph'
 
 interface MarkdownProps {
@@ -30,7 +28,7 @@ export const Markdown = ({
     function handleResize() {
       if (contentRef && contentRef.current && !preventClamping) {
         setClamped(
-          contentRef.current.scrollHeight > contentRef.current.clientHeight,
+          contentRef.current.scrollHeight > contentRef.current.clientHeight
         )
       }
     }

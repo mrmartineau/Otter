@@ -3,8 +3,6 @@ import { Slot as SlotPrimitive } from 'radix-ui'
 import type * as React from 'react'
 import { cn } from '@/utils/classnames'
 
-import './IconButton.css'
-
 const iconButtonVariants = cva('icon-button-base focus', {
   defaultVariants: {
     size: 'default',

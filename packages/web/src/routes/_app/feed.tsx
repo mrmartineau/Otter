@@ -3,11 +3,11 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Suspense } from 'react'
 import { Feed } from '@/components/Feed'
+import { Loader } from '@/components/Loader'
 import { CONTENT, createTitle } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
 import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
-import { Loader } from '@/components/Loader'
 
 export const Route = createFileRoute('/_app/feed')({
   component: FeedPage,
@@ -21,7 +21,7 @@ export const Route = createFileRoute('/_app/feed')({
   loader: async (opts) => {
     const bookmarks = await opts.context.queryClient.ensureQueryData(
       // @ts-expect-error Why is `search` not typed properly?
-      getBookmarksOptions(opts.deps.search),
+      getBookmarksOptions(opts.deps.search)
     )
     const response = { ...bookmarks }
     return response

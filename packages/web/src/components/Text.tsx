@@ -2,8 +2,6 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import type * as React from 'react'
 import { cn } from '@/utils/classnames'
 
-import './Text.css'
-
 const textVariants = cva('box-border', {
   variants: {
     variant: {
@@ -24,7 +22,7 @@ const Text = ({ className, variant, ...props }: TextProps) => {
         textVariants({
           className,
           variant,
-        }),
+        })
       )}
       {...props}
     />

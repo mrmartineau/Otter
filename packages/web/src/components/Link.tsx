@@ -3,8 +3,6 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import type * as React from 'react'
 import { cn } from '@/utils/classnames'
 
-import './Link.css'
-
 const linkVariants = cva(['link-base', 'focus'], {
   defaultVariants: {
     variant: 'default',

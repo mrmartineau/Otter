@@ -23,9 +23,8 @@ export const Route = createFileRoute('/_app/search')({
     // @ts-expect-error Fix `search` typings
     const { q, ...search } = opts.deps.search
     const { data } = await opts.context.queryClient.ensureQueryData(
-      getSearchBookmarksOptions({ params: search, searchTerm: q }),
+      getSearchBookmarksOptions({ params: search, searchTerm: q })
     )
-    console.log(`🚀 ~ data:`, data)
     return data
   },
   loaderDeps: ({ search }) => ({ search }),
@@ -41,7 +40,7 @@ function RouteComponent() {
   const { q, ...search } = useSearch({ from: '/_app/search' })
   const { data } = useSuspenseQuery(
     // @ts-expect-error Fix `search` typings
-    getSearchBookmarksOptions({ params: search, searchTerm: q }),
+    getSearchBookmarksOptions({ params: search, searchTerm: q })
   )
 
   return (

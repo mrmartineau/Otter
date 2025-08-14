@@ -3,7 +3,6 @@ import { NoteIcon, TwitterLogoIcon } from '@phosphor-icons/react'
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import type { Bookmark, Collection } from '../types/db'
 import { fullPath } from '../utils/fullPath'
-import './Feed.css'
 import { FeedItemFooter } from './FeedItemFooter'
 import { Flex } from './Flex'
 import { Link } from './Link'
@@ -20,7 +19,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
   const handleClickRegister = useClickBookmark()
 
   return (
-    <div className="feed-item">
+    <div className="card feed-item">
       <div className="feed-item-cols">
         <div className="feed-item-content">
           {url && title ? (

@@ -1,6 +1,7 @@
 // biome-ignore-all assist/source/useSortedKeys: order needs to be preserved
 export default {
   plugins: {
+    'postcss-import-ext-glob': {},
     'postcss-import': {},
     '@tailwindcss/nesting': {},
     '@csstools/postcss-global-data': {

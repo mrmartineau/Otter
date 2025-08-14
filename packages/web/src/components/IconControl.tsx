@@ -1,7 +1,5 @@
 import type { HTMLProps, ReactNode } from 'react'
 
-import './IconControl.css'
-
 export interface IconControlProps extends HTMLProps<HTMLInputElement> {
   children: ReactNode
   label: string

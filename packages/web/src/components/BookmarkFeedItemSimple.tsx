@@ -1,8 +1,6 @@
 import { NoteIcon } from '@phosphor-icons/react'
-
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import type { Bookmark } from '../types/db'
-import './Feed.css'
 import { FeedItemFooter } from './FeedItemFooter'
 import { Flex } from './Flex'
 import { Link } from './Link'

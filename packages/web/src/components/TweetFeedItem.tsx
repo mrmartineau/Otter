@@ -5,12 +5,10 @@ import { ROUTE_NEW_BOOKMARK } from '../constants'
 import type { Tweet, TweetUrls } from '../types/db'
 import { simpleUrl } from '../utils/simpleUrl'
 import { Favicon } from './Favicon'
-import './Feed.css'
 import { Flex } from './Flex'
 import { headingVariants } from './Heading'
 import { Link } from './Link'
 import { Markdown } from './Markdown'
-import './TootFeedItem.css'
 
 export interface TweetMediaVariant {
   bitrate?: number
@@ -39,7 +37,7 @@ export const TweetFeedItem = (props: Tweet) => {
   const tweetMedia = media as any[]
 
   return (
-    <div className="feed-item">
+    <div className="card feed-item">
       <div className="flex items-center gap-xs">
         {user_avatar ? (
           <img src={user_avatar} alt="" className="feed-avatar" />
@@ -115,7 +113,7 @@ export const TweetFeedItem = (props: Tweet) => {
                     // biome-ignore lint/a11y/useMediaCaption: No captions for tweets
                     <video
                       src={getBestQualityVideoVariant(
-                        item.video_info?.variants,
+                        item.video_info?.variants
                       )}
                       controls
                       className="max-w-full"

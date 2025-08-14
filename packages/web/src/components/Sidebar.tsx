@@ -1,4 +1,5 @@
 import {
+  ApertureIcon,
   ArrowFatLinesUpIcon,
   EyeIcon,
   GaugeIcon,
@@ -9,6 +10,8 @@ import {
   TwitterLogoIcon,
   UserCircleIcon,
 } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import { useRouterState } from '@tanstack/react-router'
 import { useRef } from 'react'
 import { useClickAway } from 'use-click-away'
 import {
@@ -17,6 +20,7 @@ import {
   ROUTE_DASHBOARD,
   ROUTE_FEED,
   ROUTE_HOME,
+  ROUTE_MEDIA,
   ROUTE_PUBLIC,
   ROUTE_SETTINGS_ACCOUNT,
   ROUTE_STARS,
@@ -25,16 +29,13 @@ import {
   ROUTE_TRASH,
   ROUTE_TWEETS_MINE,
 } from '@/constants'
+import { getMetaOptions } from '@/utils/fetching/meta'
 import { useSidebar } from '../hooks/useSidebar'
 import { CollectionList } from './CollectionList'
 import { Flex } from './Flex'
 import { Link } from './Link'
 import LogoutButton from './LogoutButton'
 import { MastodonLogo } from './MastodonLogo'
-import './Sidebar.css'
-import { useQuery } from '@tanstack/react-query'
-import { useRouterState } from '@tanstack/react-router'
-import { getMetaOptions } from '@/utils/fetching/meta'
 import { SidebarLink } from './SidebarLink'
 import { Spinner } from './Spinner'
 import { AllTags } from './TagList'
@@ -110,6 +111,10 @@ export const Sidebar = ({ version }: SidebarProps) => {
           <SidebarLink href={ROUTE_TWEETS_MINE} activePath="tweets">
             <TwitterLogoIcon size={18} weight="duotone" />
             {CONTENT.tweetsNav}
+          </SidebarLink>
+          <SidebarLink href={ROUTE_MEDIA} activePath="media">
+            <ApertureIcon size={18} weight="duotone" />
+            {CONTENT.mediaNav}
           </SidebarLink>
           <TypeList types={dbMeta?.types} />
           <AllTags tags={dbMeta?.tags} />

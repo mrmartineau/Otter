@@ -1,17 +1,18 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@import "./colors.css";
-@import "./vars.css";
-@import "./media.css";
-@import "./easings.css";
-@import "./utopia.css";
-@import "./fonts.css";
-@import "./typography.css";
-@import "./focus.css";
-@import "../components/DropDownMenu.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
+
+@import './colors.css';
+@import './vars.css';
+@import './media.css';
+@import './easings.css';
+@import './utopia.css';
+@import './fonts.css';
+@import './typography.css';
+@import './focus.css';
+@import '../routes/_app/layout.css';
+@import './components.css';
 
 :root {
   --radius: 0.625rem;

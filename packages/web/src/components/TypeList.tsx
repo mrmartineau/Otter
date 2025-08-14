@@ -1,5 +1,4 @@
 import title from 'title'
-
 import { CONTENT } from '../constants'
 import type { BookmarkType } from '../types/db'
 import type { MetaType } from '../utils/fetching/meta'

@@ -7,22 +7,20 @@ import {
   ShareNetworkIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import urlJoin from 'proper-url-join'
 import { DropdownMenu } from 'radix-ui'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/Button'
-
+import { getMetaOptions } from '@/utils/fetching/meta'
+import { filteredTags } from '@/utils/filteredTags'
+import { supabase } from '@/utils/supabase/client'
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import { useToggle } from '../hooks/useToggle'
 import type { BookmarkFeedItemProps } from './BookmarkFeedItem'
 import { BookmarkForm } from './BookmarkForm'
 import { Dialog, DialogContent, DialogTrigger } from './Dialog'
-import './FeedItemActions.css'
-import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import { getMetaOptions } from '@/utils/fetching/meta'
-import { filteredTags } from '@/utils/filteredTags'
-import { supabase } from '@/utils/supabase/client'
 
 interface FeedItemActionsProps extends BookmarkFeedItemProps {
   isInFeed?: boolean
@@ -74,7 +72,7 @@ export const FeedItemActions = ({
   }
 
   const handleShare = async (
-    platform?: 'twitter' | 'mastodon',
+    platform?: 'twitter' | 'mastodon'
   ): Promise<void> => {
     if (!url || !title) {
       return
@@ -102,7 +100,7 @@ export const FeedItemActions = ({
                 text: shareContent,
                 url,
               },
-            }),
+            })
           )
           break
         // case 'mastodon':
@@ -112,7 +110,7 @@ export const FeedItemActions = ({
               query: {
                 text: shareContent,
               },
-            }),
+            })
           )
           break
       }

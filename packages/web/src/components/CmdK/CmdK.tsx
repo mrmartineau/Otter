@@ -37,13 +37,12 @@ import {
 } from '../../constants'
 import type { ApiResponse } from '../../types/api'
 import { Flex } from '../Flex'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip'
 import { TypeToIcon } from '../TypeToIcon'
 import { useUser } from '../UserProvider'
 import { BookmarkSearchItem } from './BookmarkSearchItem'
-import './CmdK.css'
 import { fetchSearch } from './fetchSearch'
 import { type AccessoryModel, Item } from './Item'
-import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip'
 
 export type TweetSearchResponse = ApiResponse<Tweet[]>
 
@@ -51,7 +50,7 @@ export interface CmdKContextInterface {
   toggleOpen: DispatchWithoutAction
 }
 export const CmdKContext = createContext<CmdKContextInterface>(
-  {} as CmdKContextInterface,
+  {} as CmdKContextInterface
 )
 
 const sharedAccessories: AccessoryModel[] = [
@@ -206,7 +205,7 @@ export const CmdK = () => {
                       created_at={created_at}
                       isHoldingAltKeyDown={isHoldingAltKeyDown}
                     />
-                  ),
+                  )
                 )}
               </Command.Group>
             ) : null}

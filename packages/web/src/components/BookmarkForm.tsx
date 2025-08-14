@@ -1,4 +1,6 @@
 import { DownloadIcon, SparkleIcon } from '@phosphor-icons/react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import {
   type ComponentProps,
   type DispatchWithoutAction,
@@ -19,7 +21,10 @@ import {
   TooltipTrigger,
 } from '@/components/Tooltip'
 import { cn } from '@/utils/classnames'
-
+import {
+  rewriteDescriptionOptions,
+  rewriteTitleOptions,
+} from '@/utils/fetching/ai'
 import { CONTENT, DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER } from '../constants'
 import { useToggle } from '../hooks/useToggle'
 import type { MetadataResponse } from '../types/api'
@@ -30,13 +35,6 @@ import { fullPath } from '../utils/fullPath'
 import { getErrorMessage } from '../utils/get-error-message'
 import { type MatchTagsProps, matchTags } from '../utils/matchTags'
 import { supabase } from '../utils/supabase/client'
-import './BookmarkForm.css'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import {
-  rewriteDescriptionOptions,
-  rewriteTitleOptions,
-} from '@/utils/fetching/ai'
 import { Combobox } from './Combobox'
 import { FieldValueSuggestion } from './FieldValueSuggestion'
 import { Flex } from './Flex'
@@ -51,7 +49,7 @@ export interface ComboOption {
 }
 
 export const setComboboxValue = (
-  tags?: string[] | null,
+  tags?: string[] | null
 ): readonly ComboOption[] => {
   if (!tags) {
     return []
@@ -167,7 +165,7 @@ export const BookmarkForm = ({
     (data: MatchTagsProps) => {
       setPossibleMatchingTags(matchTags(data, tags))
     },
-    [tags],
+    [tags]
   )
 
   const handleScrape = useCallback(
@@ -204,7 +202,7 @@ export const BookmarkForm = ({
         setIsScraping(false)
       }
     },
-    [getValues, handleMatchTags, setIsScraping, setValue],
+    [getValues, handleMatchTags, setIsScraping, setValue]
   )
 
   useEffect(() => {
@@ -228,7 +226,7 @@ export const BookmarkForm = ({
         setPossibleMatchingItems(null)
       }
     },
-    [],
+    []
   )
 
   const handleCheckExistingItem = useCallback(
@@ -239,7 +237,7 @@ export const BookmarkForm = ({
         setPossibleMatchingItems(null)
       }
     },
-    [checkMatchingItems, isNew],
+    [checkMatchingItems, isNew]
   )
 
   // check for matching tags when content changes
@@ -405,7 +403,7 @@ export const BookmarkForm = ({
             onChange={(option) => {
               setValue(
                 'tags',
-                (option as ComboOption[]).map((item) => item.value),
+                (option as ComboOption[]).map((item) => item.value)
               )
             }}
             value={setComboboxValue(watchTags)}
@@ -430,7 +428,7 @@ export const BookmarkForm = ({
                     setValue('tags', [...existingTags, tag])
                     possibleMatchingTags[index]
                     setPossibleMatchingTags(
-                      possibleMatchingTags.filter((item) => item !== tag),
+                      possibleMatchingTags.filter((item) => item !== tag)
                     )
                   }}
                   type="button"

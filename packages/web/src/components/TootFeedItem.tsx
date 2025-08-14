@@ -2,17 +2,14 @@ import { LinkSimpleHorizontalIcon, PlusCircleIcon } from '@phosphor-icons/react'
 import clsx from 'clsx'
 import urlJoin from 'proper-url-join'
 import { cn } from '@/utils/classnames'
-
 import { ROUTE_NEW_BOOKMARK } from '../constants'
 import type { Toot, TootUrls } from '../types/db'
 import { simpleUrl } from '../utils/simpleUrl'
 import { Favicon } from './Favicon'
-import './Feed.css'
 import { Flex } from './Flex'
 import { headingVariants } from './Heading'
 import { Link } from './Link'
 import { Markdown } from './Markdown'
-import './TootFeedItem.css'
 
 export const TootFeedItem = (props: Toot) => {
   const { text, user_avatar, user_id, user_name, urls, toot_url, media } = props
@@ -27,7 +24,7 @@ export const TootFeedItem = (props: Toot) => {
   const tootMedia = media as any[]
 
   return (
-    <div className="feed-item">
+    <div className="card feed-item">
       <div className="feed-item-cols">
         <div className="feed-item-content">
           <div className="flex items-center gap-xs">
@@ -54,6 +51,7 @@ export const TootFeedItem = (props: Toot) => {
                 return (
                   <div key={item.id}>
                     {isVideoType ? (
+                      // biome-ignore lint/a11y/useMediaCaption: no need
                       <video src={item.url} controls className="max-w-full" />
                     ) : isPhotoType ? (
                       <img

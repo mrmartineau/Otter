@@ -24,10 +24,12 @@ export const CONTENT = {
   flatFeed: 'Flat',
   groupByDay: 'By day',
   integrationsSettingsTitle: 'Integrations',
-  newBookmarkTitle: 'New bookmark',
 
   // used in the feed popover
   latestRssItems: 'Latest RSS feed items',
+  mediaNav: 'Media',
+  mediaTitle: 'Media',
+  newBookmarkTitle: 'New bookmark',
   newDescription: 'Add new item',
   newerBtn: 'Newer',
   newTitle: 'New item',
@@ -86,6 +88,7 @@ export const ROUTE_TOOTS_MINE = '/toots'
 export const ROUTE_TOOTS_LIKES = '/toots/likes'
 export const ROUTE_TWEETS_MINE = '/tweets'
 export const ROUTE_TWEETS_LIKES = '/tweets/likes'
+export const ROUTE_MEDIA = '/media'
 
 // API Routes
 export const API_AUTH = '/api/auth.json'
