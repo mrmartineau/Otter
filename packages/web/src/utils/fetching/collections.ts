@@ -24,7 +24,7 @@ export const getCollections = async ({
       {
         collection_name: name,
       },
-      { count: 'exact' }
+      { count: 'exact' },
     )
     .range(offset!, offset! + limit! - 1)
 

@@ -36,12 +36,12 @@ export const getSearch = async (request: HonoRequest<'/api/search'>) => {
           limit: Number(searchParams.limit),
           offset: Number(searchParams.offset),
           path: request.url as string,
-        })
+        }),
       ),
       {
         headers: API_HEADERS,
         status: 200,
-      }
+      },
     )
   } catch (error) {
     const errorMessage = getErrorMessage(error)

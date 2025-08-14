@@ -23,7 +23,7 @@
   background-color: var(--background);
 
   &:hover,
-  &[aria-pressed='true'] {
+  &[aria-pressed="true"] {
     background-color: var(--theme3);
   }
 }
@@ -33,7 +33,7 @@
   border: 1px solid transparent;
 
   &:hover,
-  &[aria-pressed='true'] {
+  &[aria-pressed="true"] {
     color: var(--theme11);
     background-color: var(--theme3);
     border: 1px solid var(--theme4);
@@ -59,12 +59,14 @@
   }
 
   &:hover,
-  &[aria-pressed='true'] {
+  &[aria-pressed="true"] {
     background-color: var(--theme3);
     border-color: var(--theme8);
   }
   &:active {
-    box-shadow: inset 0 0 0 1px var(--theme4), 0 0 0 1px var(--theme4);
+    box-shadow:
+      inset 0 0 0 1px var(--theme4),
+      0 0 0 1px var(--theme4);
   }
 }
 

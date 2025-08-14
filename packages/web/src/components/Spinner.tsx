@@ -16,7 +16,7 @@ export function Spinner({
           'opacity-100 animate-spin duration-1000': show,
           'opacity-0': !show,
         },
-        wait
+        wait,
       )}
     >
       <SpinnerIcon weight="duotone" size={26} />

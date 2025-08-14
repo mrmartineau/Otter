@@ -66,7 +66,7 @@ export const RssFeed = ({ feedUrl }: RssFeedProps) => {
             feed: feedUrl,
             limit: 5,
           },
-        })
+        }),
       )
       const data: FeedResponse = await response.json()
 

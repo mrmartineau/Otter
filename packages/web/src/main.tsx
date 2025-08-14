@@ -19,6 +19,6 @@ if (rootElement) {
           </NuqsAdapter>
         </Suspense>
       </ErrorBoundary>
-    </StrictMode>
+    </StrictMode>,
   )
 }

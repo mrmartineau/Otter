@@ -74,7 +74,7 @@ export const FeedItemActions = ({
   }
 
   const handleShare = async (
-    platform?: 'twitter' | 'mastodon'
+    platform?: 'twitter' | 'mastodon',
   ): Promise<void> => {
     if (!url || !title) {
       return
@@ -102,7 +102,7 @@ export const FeedItemActions = ({
                 text: shareContent,
                 url,
               },
-            })
+            }),
           )
           break
         // case 'mastodon':
@@ -112,7 +112,7 @@ export const FeedItemActions = ({
               query: {
                 text: shareContent,
               },
-            })
+            }),
           )
           break
       }

@@ -119,14 +119,14 @@
     display: none;
   }
 
-  &[aria-selected='true'] {
+  &[aria-selected="true"] {
     background: var(--theme4);
     color: var(--theme11);
     .actionIcon {
       display: block;
     }
   }
-  &[aria-disabled='true'] {
+  &[aria-disabled="true"] {
     color: var(--theme7);
     cursor: not-allowed;
   }

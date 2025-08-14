@@ -51,7 +51,7 @@ export interface ComboOption {
 }
 
 export const setComboboxValue = (
-  tags?: string[] | null
+  tags?: string[] | null,
 ): readonly ComboOption[] => {
   if (!tags) {
     return []
@@ -167,7 +167,7 @@ export const BookmarkForm = ({
     (data: MatchTagsProps) => {
       setPossibleMatchingTags(matchTags(data, tags))
     },
-    [tags]
+    [tags],
   )
 
   const handleScrape = useCallback(
@@ -204,7 +204,7 @@ export const BookmarkForm = ({
         setIsScraping(false)
       }
     },
-    [getValues, handleMatchTags, setIsScraping, setValue]
+    [getValues, handleMatchTags, setIsScraping, setValue],
   )
 
   useEffect(() => {
@@ -228,7 +228,7 @@ export const BookmarkForm = ({
         setPossibleMatchingItems(null)
       }
     },
-    []
+    [],
   )
 
   const handleCheckExistingItem = useCallback(
@@ -239,7 +239,7 @@ export const BookmarkForm = ({
         setPossibleMatchingItems(null)
       }
     },
-    [checkMatchingItems, isNew]
+    [checkMatchingItems, isNew],
   )
 
   // check for matching tags when content changes
@@ -405,7 +405,7 @@ export const BookmarkForm = ({
             onChange={(option) => {
               setValue(
                 'tags',
-                (option as ComboOption[]).map((item) => item.value)
+                (option as ComboOption[]).map((item) => item.value),
               )
             }}
             value={setComboboxValue(watchTags)}
@@ -430,7 +430,7 @@ export const BookmarkForm = ({
                     setValue('tags', [...existingTags, tag])
                     possibleMatchingTags[index]
                     setPossibleMatchingTags(
-                      possibleMatchingTags.filter((item) => item !== tag)
+                      possibleMatchingTags.filter((item) => item !== tag),
                     )
                   }}
                   type="button"

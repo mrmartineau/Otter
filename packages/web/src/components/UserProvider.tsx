@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createContext,
   type ReactNode,
@@ -6,7 +6,6 @@ import {
   useContext,
   useMemo,
 } from 'react'
-import { queryClient } from '@/router'
 import type { UserProfile } from '@/types/db'
 import { getUserProfileOptions } from '@/utils/fetching/user'
 import { supabase } from '../utils/supabase/client'
@@ -46,6 +45,7 @@ interface UserProviderProps {
 
 export const UserProvider = ({ children }: UserProviderProps) => {
   const { data: userProfile } = useQuery(getUserProfileOptions())
+  const queryClient = useQueryClient()
 
   const profileData = userProfile?.data ?? null
 
@@ -63,7 +63,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         column = 'settings_pinned_tags'
         value = profileData?.settings_pinned_tags?.length
           ? profileData?.settings_pinned_tags.filter(
-              (item) => item !== action.payload
+              (item) => item !== action.payload,
             )
           : []
       }
@@ -73,7 +73,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         .match({ id: profileData?.id })
       queryClient.invalidateQueries({ queryKey: ['userProfile'] })
     },
-    [profileData]
+    [profileData, queryClient],
   )
 
   return (
@@ -84,7 +84,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
           id: profileData?.id,
           profile: profileData,
         }),
-        [handleUpdateUISettings, profileData]
+        [handleUpdateUISettings, profileData],
       )}
     >
       {children}

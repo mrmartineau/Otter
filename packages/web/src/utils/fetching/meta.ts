@@ -24,7 +24,7 @@ export type CollectionType =
   Database['public']['Views']['collection_tags_view']['Row']
 
 export const getDbMetadata = async (
-  supabaseClient: SupabaseClient<Database> = supabase
+  supabaseClient: SupabaseClient<Database> = supabase,
 ): Promise<DbMetaResponse> => {
   const [
     bookmarks,

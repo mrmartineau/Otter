@@ -2,7 +2,7 @@ import { mutationOptions } from '@tanstack/react-query'
 import type { AiGenerateResponse } from '../../../worker/ai/generateResponse'
 
 export const rewriteTitle = async (
-  title: string
+  title: string,
 ): Promise<AiGenerateResponse> => {
   const response = await fetch('/api/ai/title', {
     body: JSON.stringify({ prompt: title }),
@@ -23,7 +23,7 @@ export const rewriteTitleOptions = (title: string | null) => {
 
 export const rewriteDescription = async (
   description: string,
-  title?: string
+  title?: string,
 ): Promise<AiGenerateResponse> => {
   const response = await fetch('/api/ai/description', {
     body: JSON.stringify({ prompt: description, title }),
@@ -34,7 +34,7 @@ export const rewriteDescription = async (
 
 export const rewriteDescriptionOptions = (
   description: string | null,
-  title: string | undefined = ''
+  title: string | undefined = '',
 ) => {
   if (!description) {
     return null

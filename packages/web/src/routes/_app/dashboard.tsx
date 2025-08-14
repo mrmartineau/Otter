@@ -21,14 +21,14 @@ export const Route = createFileRoute('/_app/dashboard')({
   }),
   loader: async (opts) => {
     const dashboard = await opts.context.queryClient.ensureQueryData(
-      getDashboardOptions()
+      getDashboardOptions(),
     )
     const followUpBookmarks = await opts.context.queryClient.ensureQueryData(
       getBookmarksOptions({
         limit: 4,
         status: 'active',
         tag: 'follow-up',
-      })
+      }),
     )
     const toots = await opts.context.queryClient.ensureQueryData(
       getTootsOptions({
@@ -36,7 +36,7 @@ export const Route = createFileRoute('/_app/dashboard')({
         params: {
           limit: 4,
         },
-      })
+      }),
     )
     const response = { dashboard, followUpBookmarks, toots }
     return response
@@ -50,7 +50,7 @@ function Index() {
       limit: 4,
       status: 'active',
       tag: 'follow-up',
-    })
+    }),
   )
   const { data: toots } = useSuspenseQuery(
     getTootsOptions({
@@ -58,7 +58,7 @@ function Index() {
       params: {
         limit: 4,
       },
-    })
+    }),
   )
 
   return (

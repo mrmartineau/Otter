@@ -24,7 +24,7 @@ export interface ApiParametersReturn extends BaseApiParameters {
 }
 
 export const apiParameters = (
-  apiParams: Partial<ApiParametersQuery>
+  apiParams: Partial<ApiParametersQuery>,
 ): Partial<ApiParametersReturn> => {
   const limit = Number(apiParams?.limit) || DEFAULT_API_RESPONSE_LIMIT
   const offset = Number(apiParams?.offset) || 0

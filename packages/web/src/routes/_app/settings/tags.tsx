@@ -60,7 +60,7 @@ function RouteComponent() {
         to: '/settings/tags',
       })
     },
-    [user?.id, navigate]
+    [user?.id, navigate],
   )
 
   return (

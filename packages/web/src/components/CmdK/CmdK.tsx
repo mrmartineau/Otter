@@ -51,7 +51,7 @@ export interface CmdKContextInterface {
   toggleOpen: DispatchWithoutAction
 }
 export const CmdKContext = createContext<CmdKContextInterface>(
-  {} as CmdKContextInterface
+  {} as CmdKContextInterface,
 )
 
 const sharedAccessories: AccessoryModel[] = [
@@ -206,7 +206,7 @@ export const CmdK = () => {
                       created_at={created_at}
                       isHoldingAltKeyDown={isHoldingAltKeyDown}
                     />
-                  )
+                  ),
                 )}
               </Command.Group>
             ) : null}

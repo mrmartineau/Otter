@@ -66,7 +66,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       : `Created on ${createdDate.formatted}`
 
   const handleToggleState = async (
-    column: 'public' | 'star'
+    column: 'public' | 'star',
   ): Promise<void> => {
     const updateData =
       column === 'public' ? { public: !isPublic } : { star: !star }

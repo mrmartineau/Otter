@@ -7,7 +7,7 @@ import { type ApiParametersQuery, apiParameters } from './apiParameters'
 export const getBookmarks = async (
   params: Partial<ApiParametersQuery> = {},
   supabaseClient: SupabaseClient<Database> = supabase,
-  userId?: string
+  userId?: string,
 ) => {
   const {
     limit,

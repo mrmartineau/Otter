@@ -30,7 +30,9 @@
   h1,
   h2,
   h3 {
-    font-variation-settings: 'wght' 600, 'wdth' 105;
+    font-variation-settings:
+      "wght" 600,
+      "wdth" 105;
     line-height: 1.1;
     text-wrap: balance;
     font-family: var(--font-headings);
@@ -38,7 +40,9 @@
   }
 
   h4 {
-    font-variation-settings: 'wght' 400, 'wdth' 105;
+    font-variation-settings:
+      "wght" 400,
+      "wdth" 105;
     line-height: 1.1;
     text-wrap: balance;
     font-family: var(--font-headings);

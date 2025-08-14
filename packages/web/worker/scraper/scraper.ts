@@ -82,7 +82,7 @@ class Scraper {
   }
 
   async getMetadata(
-    options: GetMetadataOptions[]
+    options: GetMetadataOptions[],
   ): Promise<Record<string, string | string[]>> {
     const matches: Record<string, string | string[]> = {}
     const selectedSelectors: Record<string, boolean> = {}

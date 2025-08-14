@@ -7,7 +7,7 @@ export interface FollowShortUrlResponse {
 // This function follows a short URL and returns the final URL, use https://t.co/wy9S5P0Cd2 as an example.
 export const followShortUrl = async (
   urls: string[],
-  redirectCount = 0
+  redirectCount = 0,
 ): Promise<FollowShortUrlResponse> => {
   const fetchResponse = await fetch(urls[urls.length - 1], {
     headers: {

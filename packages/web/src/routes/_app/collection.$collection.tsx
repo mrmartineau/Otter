@@ -1,13 +1,13 @@
 import { FolderIcon } from '@phosphor-icons/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { Suspense } from 'react'
 import { Feed } from '@/components/Feed'
+import { Loader } from '@/components/Loader'
 import { useCollectionsSubNav } from '@/hooks/useCollectionsSubNav'
 import type { Bookmark } from '@/types/db'
-import { getCollectionsOptions } from '@/utils/fetching/collections'
 import { apiParameters } from '@/utils/fetching/apiParameters'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { Suspense } from 'react'
-import { Loader } from '@/components/Loader'
+import { getCollectionsOptions } from '@/utils/fetching/collections'
 
 export const Route = createFileRoute('/_app/collection/$collection')({
   component: Page,
@@ -24,7 +24,7 @@ export const Route = createFileRoute('/_app/collection/$collection')({
         name: opts.params.collection,
         // @ts-expect-error Fix `search` typings
         params: opts.deps.search,
-      })
+      }),
     )
     return bookmarks
   },
@@ -42,7 +42,7 @@ function Page() {
       name: collection,
       // @ts-expect-error Fix `search` typings
       params: search,
-    })
+    }),
   )
 
   const subNav = useCollectionsSubNav(collection)
