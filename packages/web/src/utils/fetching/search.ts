@@ -1,8 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { queryOptions } from '@tanstack/react-query'
 import type { Database } from '@/types/supabase'
 import { supabase } from '../supabase/client'
 import { type ApiParametersQuery, apiParameters } from './apiParameters'
-import { queryOptions } from '@tanstack/react-query'
 
 interface SearchFetchingOptions {
   params: Partial<ApiParametersQuery>
@@ -23,7 +23,7 @@ export const getSearchBookmarks = async ({
     .from('bookmarks')
     .select('*', { count: 'exact' })
     .or(
-      `title.ilike.*${searchTerm}*,url.ilike.*${searchTerm}*,description.ilike.*${searchTerm}*,note.ilike.*${searchTerm}*,tags.cs.{${searchTerm}}`
+      `title.ilike.*${searchTerm}*,url.ilike.*${searchTerm}*,description.ilike.*${searchTerm}*,note.ilike.*${searchTerm}*,tags.cs.{${searchTerm}}`,
     )
 
   if (userId) {
@@ -47,8 +47,8 @@ export const getSearchBookmarksOptions = ({
   params,
 }: Pick<SearchFetchingOptions, 'searchTerm' | 'params'>) => {
   return queryOptions({
-    queryFn: () => getSearchBookmarks({ searchTerm, params }),
-    queryKey: ['bookmarks', 'search', params],
+    queryFn: () => getSearchBookmarks({ params, searchTerm }),
+    queryKey: ['bookmarks', 'search', params, searchTerm],
     staleTime: 5 * 1000,
   })
 }
@@ -83,8 +83,8 @@ export const getSearchTweetsOptions = ({
   params,
 }: Pick<SearchFetchingOptions, 'searchTerm' | 'params'>) => {
   return queryOptions({
-    queryFn: () => getSearchTweets({ searchTerm, params }),
-    queryKey: ['tweets', 'search', params],
+    queryFn: () => getSearchTweets({ params, searchTerm }),
+    queryKey: ['tweets', 'search', params, searchTerm],
     staleTime: 5 * 1000,
   })
 }
@@ -119,8 +119,8 @@ export const getSearchTootsOptions = ({
   params,
 }: Pick<SearchFetchingOptions, 'searchTerm' | 'params'>) => {
   return queryOptions({
-    queryFn: () => getSearchToots({ searchTerm, params }),
-    queryKey: ['toots', 'search', params],
+    queryFn: () => getSearchToots({ params, searchTerm }),
+    queryKey: ['toots', 'search', params, searchTerm],
     staleTime: 5 * 1000,
   })
 }

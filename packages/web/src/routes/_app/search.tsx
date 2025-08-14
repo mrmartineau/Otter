@@ -1,13 +1,13 @@
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { Suspense } from 'react'
 import { Feed } from '@/components/Feed'
+import { Loader } from '@/components/Loader'
 import { CONTENT } from '@/constants'
 import type { Bookmark } from '@/types/db'
-import { getSearchBookmarksOptions } from '@/utils/fetching/search'
 import { apiParameters } from '@/utils/fetching/apiParameters'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { Suspense } from 'react'
-import { Loader } from '@/components/Loader'
+import { getSearchBookmarksOptions } from '@/utils/fetching/search'
 
 export const Route = createFileRoute('/_app/search')({
   component: RouteComponent,
@@ -23,7 +23,7 @@ export const Route = createFileRoute('/_app/search')({
     // @ts-expect-error Fix `search` typings
     const { q, ...search } = opts.deps.search
     const { data } = await opts.context.queryClient.ensureQueryData(
-      getSearchBookmarksOptions({ searchTerm: q, params: search })
+      getSearchBookmarksOptions({ params: search, searchTerm: q }),
     )
     console.log(`🚀 ~ data:`, data)
     return data
@@ -41,7 +41,7 @@ function RouteComponent() {
   const { q, ...search } = useSearch({ from: '/_app/search' })
   const { data } = useSuspenseQuery(
     // @ts-expect-error Fix `search` typings
-    getSearchBookmarksOptions({ searchTerm: q, params: search })
+    getSearchBookmarksOptions({ params: search, searchTerm: q }),
   )
 
   return (
