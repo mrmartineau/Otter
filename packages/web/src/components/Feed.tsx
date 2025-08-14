@@ -1,5 +1,6 @@
 import { EyeIcon, StarIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
+import type { FileRouteTypes } from '@tanstack/react-router'
 import { memo, type ReactNode } from 'react'
 import { Button } from '@/components/Button'
 import { CONTENT, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
@@ -7,7 +8,6 @@ import { useFeedOptions } from '@/hooks/useFeedOptions'
 import { type FeedItemModel, useGroupByDate } from '@/hooks/useGroupByDate'
 import { usePagination } from '@/hooks/usePagination'
 import { getCollectionsTagsOptions } from '@/utils/fetching/collections'
-import { useRealtimeFeed } from '../hooks/useRealtime'
 import type { Bookmark, Toot, Tweet } from '../types/db'
 import { cn } from '../utils/classnames'
 import { BookmarkFeedItem } from './BookmarkFeedItem'
@@ -16,7 +16,6 @@ import { headingVariants } from './Heading'
 import { SidebarLink } from './SidebarLink'
 import { TootFeedItem } from './TootFeedItem'
 import { TweetFeedItem } from './TweetFeedItem'
-import type { FileRouteTypes } from '@tanstack/react-router'
 
 interface FeedProps {
   title: ReactNode
@@ -64,16 +63,12 @@ export const Feed = memo(
   }: FeedProps) => {
     const { starQuery, publicQuery, setStarQuery, setPublicQuery } =
       useFeedOptions()
-    const realtimeItems = useRealtimeFeed({
-      initialData: items,
-      isTrash: allowDeletion,
-    })
-    const { groupByDate, groupedItems } = useGroupByDate(realtimeItems)
+    const { groupByDate, groupedItems } = useGroupByDate(items)
     const { handleUpdateOffset, hasOldItems, hasNewItems } = usePagination({
       count,
+      from,
       limit,
       offset,
-      from,
     })
     const { data: collectionsTags } = useQuery(getCollectionsTagsOptions())
 
@@ -188,8 +183,8 @@ export const Feed = memo(
           </div>
         ) : (
           <div className="mt-m grid gap-m">
-            {realtimeItems?.length ? (
-              realtimeItems.map((item) => {
+            {items?.length ? (
+              items.map((item) => {
                 if (!item) {
                   return null
                 }

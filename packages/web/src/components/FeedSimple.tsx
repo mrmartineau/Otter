@@ -1,6 +1,5 @@
 import { memo, type ReactNode } from 'react'
 import type { FeedItemModel } from '../hooks/useGroupByDate'
-import { useRealtimeFeed } from '../hooks/useRealtime'
 import { cn } from '../utils/classnames'
 import { BookmarkFeedItem } from './BookmarkFeedItem'
 import { isToot, isTweet } from './Feed'
@@ -15,12 +14,7 @@ interface FeedSimpleProps {
 }
 
 export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
-  const realtimeItems = useRealtimeFeed({
-    initialData: items,
-    isTrash: false,
-  })
-
-  if (!realtimeItems?.length) {
+  if (!items?.length) {
     return null
   }
 
@@ -29,7 +23,7 @@ export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
       <h3
         className={cn(
           headingVariants({ variant: 'feedTitle' }),
-          'flex items-center gap-2xs',
+          'flex items-center gap-2xs'
         )}
       >
         {icon}
@@ -37,7 +31,7 @@ export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
       </h3>
 
       <div className="feed-simple-grid">
-        {realtimeItems.map((item) => {
+        {items.map((item) => {
           if (!item) {
             return null
           }

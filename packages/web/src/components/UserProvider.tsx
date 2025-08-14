@@ -1,8 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
-import { createContext, type ReactNode, useCallback, useContext } from 'react'
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useMemo,
+} from 'react'
+import { queryClient } from '@/router'
 import type { UserProfile } from '@/types/db'
 import { getUserProfileOptions } from '@/utils/fetching/user'
-import { useRealtimeProfile } from '../hooks/useRealtime'
 import { supabase } from '../utils/supabase/client'
 
 export type UseUpdateReturn = (action: UIStateAction) => void
@@ -40,12 +46,8 @@ interface UserProviderProps {
 
 export const UserProvider = ({ children }: UserProviderProps) => {
   const { data: userProfile } = useQuery(getUserProfileOptions())
-  // replace with normal profile fetch and useQuery
-  // invalidate when userProfile changes
 
-  // TODO: replace this with React Query implementation
-  // @ts-expect-error This will be refactored
-  const realtimeProfile = useRealtimeProfile(userProfile)
+  const profileData = userProfile?.data ?? null
 
   const handleUpdateUISettings = useCallback(
     async (action: UIStateAction) => {
@@ -54,34 +56,36 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
       if (action.type === 'pinnedTagAdd') {
         column = 'settings_pinned_tags'
-        value = realtimeProfile?.settings_pinned_tags?.length
-          ? [...realtimeProfile.settings_pinned_tags, action.payload]
+        value = profileData?.settings_pinned_tags?.length
+          ? [...profileData.settings_pinned_tags, action.payload]
           : [action.payload]
       } else if (action.type === 'pinnedTagRemove') {
         column = 'settings_pinned_tags'
-        value = realtimeProfile?.settings_pinned_tags?.length
-          ? realtimeProfile?.settings_pinned_tags.filter(
-              (item) => item !== action.payload,
+        value = profileData?.settings_pinned_tags?.length
+          ? profileData?.settings_pinned_tags.filter(
+              (item) => item !== action.payload
             )
           : []
       }
       await supabase
         .from('profiles')
         .update({ [column]: value, updated_at: new Date().toISOString() })
-        // @ts-expect-error How do I type search params?
-        .match({ id: userProfile?.id })
+        .match({ id: profileData?.id })
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] })
     },
-    [realtimeProfile?.settings_pinned_tags, userProfile],
+    [profileData]
   )
 
   return (
     <UserContext.Provider
-      value={{
-        handleUpdateUISettings,
-        // @ts-expect-error This will be refactored
-        id: userProfile?.id,
-        profile: realtimeProfile,
-      }}
+      value={useMemo(
+        () => ({
+          handleUpdateUISettings,
+          id: profileData?.id,
+          profile: profileData,
+        }),
+        [handleUpdateUISettings, profileData]
+      )}
     >
       {children}
     </UserContext.Provider>
