@@ -1,12 +1,12 @@
 import { HashIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { getCollectionsTagsOptions } from '@/utils/fetching/collections'
 import { getTagsOptions } from '@/utils/fetching/tags'
 
 export const useCollectionsSubNav = (collection: string) => {
-  const { data: dbMetaTags } = useQuery(getTagsOptions())
-  const { data: collectionTags } = useQuery(getCollectionsTagsOptions())
+  const { data: dbMetaTags } = useSuspenseQuery(getTagsOptions())
+  const { data: collectionTags } = useSuspenseQuery(getCollectionsTagsOptions())
 
   const subNav = useMemo(() => {
     const matchingCollection =

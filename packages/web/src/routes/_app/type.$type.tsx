@@ -1,9 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { Suspense } from 'react'
 import title from 'title'
 import { Feed } from '@/components/Feed'
+import { Loader } from '@/components/Loader'
 import { TypeToIcon } from '@/components/TypeToIcon'
 import type { Bookmark, BookmarkType } from '@/types/db'
-import { getBookmarks } from '@/utils/fetching/bookmarks'
+import { apiParameters } from '@/utils/fetching/apiParameters'
+import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
 
 export const Route = createFileRoute('/_app/type/$type')({
   component: Page,
@@ -16,30 +20,38 @@ export const Route = createFileRoute('/_app/type/$type')({
       },
     ],
   }),
-  // @ts-expect-error How do I type useLoaderData?
-  loader: async ({ deps: { search }, params }) => {
-    const bookmarks = await getBookmarks({ ...search, type: params.type })
-    const response = { ...bookmarks, ...search, type: params.type }
-    return response
+  loader: async (opts) => {
+    const bookmarks = await opts.context.queryClient.ensureQueryData(
+      // @ts-expect-error Why is `search` not typed properly?
+      getBookmarksOptions({ ...opts.deps.search, type: opts.params.type })
+    )
+    return bookmarks
   },
   loaderDeps: ({ search }) => ({ search }),
+  validateSearch: (search: Record<string, unknown>) => {
+    return apiParameters(search)
+  },
 })
 
 function Page() {
-  // @ts-expect-error How do I type useLoaderData?
-  const { data, count, limit, offset, type } = Route.useLoaderData()
+  const type = Route.useParams().type
+  const search = useSearch({ from: '/_app/type/$type' })
+  // @ts-expect-error Fix `search` typings
+  const { data } = useSuspenseQuery(getBookmarksOptions({ ...search, type }))
 
   return (
-    <Feed
-      items={data as Bookmark[]}
-      count={count || 0}
-      limit={limit}
-      offset={offset}
-      allowGroupByDate={true}
-      title={title(type)}
-      icon={<TypeToIcon size={24} type={type as BookmarkType} />}
-      feedType="bookmarks"
-      from={`/type/${type}`}
-    />
+    <Suspense fallback={<Loader />}>
+      <Feed
+        items={data.data as Bookmark[]}
+        count={data.count || 0}
+        limit={search.limit}
+        offset={search.offset}
+        allowGroupByDate={true}
+        title={title(type)}
+        icon={<TypeToIcon size={24} type={type as BookmarkType} />}
+        feedType="bookmarks"
+        from={`/type/${type}`}
+      />
+    </Suspense>
   )
 }

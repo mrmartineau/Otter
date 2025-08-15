@@ -1,5 +1,5 @@
 import { EyeIcon, StarIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import type { FileRouteTypes } from '@tanstack/react-router'
 import { memo, type ReactNode } from 'react'
 import { Button } from '@/components/Button'
@@ -70,10 +70,12 @@ export const Feed = memo(
       limit,
       offset,
     })
-    const { data: collectionsTags } = useQuery(getCollectionsTagsOptions())
+    const { data: collectionsTags } = useSuspenseQuery(
+      getCollectionsTagsOptions()
+    )
 
     const handleToggleState = async (
-      column: 'public' | 'star',
+      column: 'public' | 'star'
     ): Promise<void> => {
       if (column === 'public') {
         setPublicQuery((prev) => !prev)
@@ -101,7 +103,7 @@ export const Feed = memo(
             <h3
               className={cn(
                 headingVariants({ variant: 'feedTitle' }),
-                'flex items-center gap-2xs',
+                'flex items-center gap-2xs'
               )}
             >
               {icon}
@@ -237,7 +239,7 @@ export const Feed = memo(
         ) : null}
       </div>
     )
-  },
+  }
 )
 
 Feed.displayName = 'Feed'

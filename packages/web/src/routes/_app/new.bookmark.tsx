@@ -1,7 +1,10 @@
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { Suspense } from 'react'
 import { BookmarkForm } from '@/components/BookmarkForm'
-import { getMetaOptions } from '@/utils/fetching/meta'
+import { Loader } from '@/components/Loader'
 import { createTitle } from '@/constants'
+import { getMetaOptions } from '@/utils/fetching/meta'
 
 export const Route = createFileRoute('/_app/new/bookmark')({
   component: RouteComponent,
@@ -14,7 +17,7 @@ export const Route = createFileRoute('/_app/new/bookmark')({
   }),
   loader: async (opts) => {
     const tags = await opts.context.queryClient.ensureQueryData(
-      getMetaOptions(),
+      getMetaOptions()
     )
     const response = { tags }
     return response
@@ -28,15 +31,17 @@ export const Route = createFileRoute('/_app/new/bookmark')({
 })
 
 function RouteComponent() {
-  const { tags } = Route.useLoaderData()
   const searchParams = useSearch({ from: '/_app/new/bookmark' })
+  const { data } = useSuspenseQuery(getMetaOptions())
   return (
-    <BookmarkForm
-      type="new"
-      initialValues={{
-        url: searchParams.url,
-      }}
-      tags={tags?.tags}
-    />
+    <Suspense fallback={<Loader />}>
+      <BookmarkForm
+        type="new"
+        initialValues={{
+          url: searchParams.url,
+        }}
+        tags={data?.tags}
+      />
+    </Suspense>
   )
 }

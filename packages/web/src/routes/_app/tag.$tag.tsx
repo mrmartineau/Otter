@@ -1,8 +1,10 @@
 import { HashIcon } from '@phosphor-icons/react'
-import { createFileRoute } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import type { Bookmark } from '@/types/db'
-import { getBookmarks } from '@/utils/fetching/bookmarks'
+import { apiParameters } from '@/utils/fetching/apiParameters'
+import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
 
 export const Route = createFileRoute('/_app/tag/$tag')({
   component: Page,
@@ -13,25 +15,32 @@ export const Route = createFileRoute('/_app/tag/$tag')({
       },
     ],
   }),
-  // @ts-expect-error How do I type useLoaderData?
-  loader: async ({ deps: { search }, params }) => {
-    const bookmarks = await getBookmarks({ ...search, tag: params.tag })
-    const response = { ...bookmarks, ...search, tag: params.tag }
-    return response
+
+  loader: async (opts) => {
+    const bookmarks = await opts.context.queryClient.ensureQueryData(
+      // @ts-expect-error Why is `search` not typed properly?
+      getBookmarksOptions({ ...opts.deps.search, tag: opts.params.tag })
+    )
+    return bookmarks
   },
   loaderDeps: ({ search }) => ({ search }),
+  validateSearch: (search: Record<string, unknown>) => {
+    return apiParameters(search)
+  },
 })
 
 function Page() {
-  // @ts-expect-error How do I type useLoaderData?
-  const { data, count, limit, offset, tag } = Route.useLoaderData()
+  const tag = Route.useParams().tag
+  const search = useSearch({ from: '/_app/tag/$tag' })
+  // @ts-expect-error Fix `search` typings
+  const { data } = useSuspenseQuery(getBookmarksOptions({ ...search, tag }))
 
   return (
     <Feed
-      items={data as Bookmark[]}
-      count={count || 0}
-      limit={limit}
-      offset={offset}
+      items={data.data as Bookmark[]}
+      count={data.count || 0}
+      limit={search.limit}
+      offset={search.offset}
       allowGroupByDate={true}
       title={tag}
       icon={<HashIcon weight="duotone" size={24} />}

@@ -1,23 +1,8 @@
-import {
-  createFileRoute,
-  // type RegisteredRouter,
-  // type RouteById,
-} from '@tanstack/react-router'
-import { BookmarkForm } from '@/components/BookmarkForm'
-// import type { BaseBookmark } from '@/types/db'
-import { getBookmark } from '@/utils/fetching/bookmarks'
-import { Loader } from '@/components/Loader'
+import { createFileRoute } from '@tanstack/react-router'
 import { Suspense } from 'react'
-
-/* type LoaderData = {
-  bookmark: BaseBookmark
-  id: string
-} */
-
-/* type LoaderData = RouteById<
-  RegisteredRouter['routeTree'],
-  '/_app/bookmark/$id/edit'
->['types']['loaderData'] */
+import { BookmarkForm } from '@/components/BookmarkForm'
+import { Loader } from '@/components/Loader'
+import { getBookmark } from '@/utils/fetching/bookmarks'
 
 export const Route = createFileRoute('/_app/bookmark/$id/edit')({
   component: RouteComponent,

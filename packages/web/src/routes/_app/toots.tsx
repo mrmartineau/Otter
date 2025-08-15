@@ -1,10 +1,11 @@
 import { MastodonLogoIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import { CONTENT, createTitle } from '@/constants'
+import { apiParameters } from '@/utils/fetching/apiParameters'
 import { getMetaOptions } from '@/utils/fetching/meta'
-import { getToots } from '@/utils/fetching/toots'
+import { getTootsOptions } from '@/utils/fetching/toots'
 
 export const Route = createFileRoute('/_app/toots')({
   component: Page,
@@ -15,21 +16,29 @@ export const Route = createFileRoute('/_app/toots')({
       },
     ],
   }),
-  // @ts-expect-error How do I type useLoaderData?
-  loader: async ({ deps: { search } }) => {
-    const { data } = await getToots({
-      ...search,
-      likes: search?.liked ?? false,
-    })
-    const response = { toots: data, ...search }
-    return response
+  loader: async (opts) => {
+    // @ts-expect-error Fix `search` typings
+    const { liked, ...search } = opts.deps.search
+    const toots = await opts.context.queryClient.ensureQueryData(
+      getTootsOptions({ likes: liked, params: search })
+    )
+    return toots
   },
   loaderDeps: ({ search }) => ({ search }),
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      ...apiParameters(search),
+      liked: search.liked as boolean,
+    }
+  },
 })
 
 function Page() {
-  const { toots, count, limit, offset, liked } = Route.useLoaderData()
-  const { data: dbMeta } = useQuery(getMetaOptions())
+  const { liked, ...search } = useSearch({ from: '/_app/toots' })
+  const { data: dbMeta } = useSuspenseQuery(getMetaOptions())
+  const { data } = useSuspenseQuery(
+    getTootsOptions({ likes: liked, params: search })
+  )
 
   const subNav = [
     {
@@ -51,10 +60,10 @@ function Page() {
 
   return (
     <Feed
-      items={toots}
-      count={count || 0}
-      limit={limit}
-      offset={offset}
+      items={data.data}
+      count={data.count || 0}
+      limit={search.limit}
+      offset={search.offset}
       allowGroupByDate={true}
       title={CONTENT.tootsTitle}
       icon={<MastodonLogoIcon size={24} />}

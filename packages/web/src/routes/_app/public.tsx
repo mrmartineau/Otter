@@ -1,13 +1,13 @@
-import { ArrowFatLinesUpIcon } from '@phosphor-icons/react'
+import { EyeIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { Suspense } from 'react'
 import { Feed } from '@/components/Feed'
+import { Loader } from '@/components/Loader'
 import { CONTENT, createTitle } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
 import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
-import { Suspense } from 'react'
-import { Loader } from '@/components/Loader'
 
 export const Route = createFileRoute('/_app/public')({
   component: Page,
@@ -21,10 +21,9 @@ export const Route = createFileRoute('/_app/public')({
   loader: async (opts) => {
     const bookmarks = await opts.context.queryClient.ensureQueryData(
       // @ts-expect-error Why is `search` not typed properly?
-      getBookmarksOptions({ ...opts.deps.search, public: true }),
+      getBookmarksOptions({ ...opts.deps.search, public: true })
     )
-    const response = { ...bookmarks }
-    return response
+    return bookmarks
   },
   loaderDeps: ({ search }) => ({ search }),
   validateSearch: (search: Record<string, unknown>) => {
@@ -36,7 +35,7 @@ function Page() {
   const search = useSearch({ from: '/_app/public' })
   const { data } = useSuspenseQuery(
     // @ts-expect-error Fix `search` typings
-    getBookmarksOptions({ ...search, public: true }),
+    getBookmarksOptions({ ...search, public: true })
   )
 
   return (
@@ -48,7 +47,7 @@ function Page() {
         offset={search.offset}
         allowGroupByDate={true}
         title={CONTENT.publicTitle}
-        icon={<ArrowFatLinesUpIcon weight="duotone" size={24} />}
+        icon={<EyeIcon weight="fill" size={24} />}
         feedType="bookmarks"
         from={`/public`}
       />

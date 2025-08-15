@@ -44,3 +44,14 @@ export type UserProfile = Database['public']['Tables']['profiles']['Row']
 
 export type Collection =
   Database['public']['Views']['collection_tags_view']['Row']
+
+export type Media = Database['public']['Tables']['media']['Row']
+export type MediaInsert = Database['public']['Tables']['media']['Insert']
+export type MediaUpdate = Database['public']['Tables']['media']['Update']
+export type MediaType = Database['public']['Enums']['media_type']
+
+export interface MediaFilters {
+  search?: string
+  type?: MediaType
+  status?: Database['public']['Enums']['media_status']
+}

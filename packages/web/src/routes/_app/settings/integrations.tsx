@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import urlJoin from 'proper-url-join'
 import { CodeBlock } from '@/components/CodeBlock'
@@ -18,7 +18,7 @@ export const Route = createFileRoute('/_app/settings/integrations')({
 })
 
 function RouteComponent() {
-  const { data: apiKey } = useQuery({
+  const { data: apiKey } = useSuspenseQuery({
     ...getUserProfileOptions(),
     select: (data) => data.data?.api_key,
   })

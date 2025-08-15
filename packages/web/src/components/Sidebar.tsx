@@ -10,7 +10,7 @@ import {
   TwitterLogoIcon,
   UserCircleIcon,
 } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useRouterState } from '@tanstack/react-router'
 import { useRef } from 'react'
 import { useClickAway } from 'use-click-away'
@@ -47,7 +47,7 @@ interface SidebarProps {
 
 export const Sidebar = ({ version }: SidebarProps) => {
   const { handleCloseSidebar } = useSidebar()
-  const { data: dbMeta } = useQuery(getMetaOptions())
+  const { data: dbMeta } = useSuspenseQuery(getMetaOptions())
   const isLoading = useRouterState({ select: (s) => s.status === 'pending' })
 
   const sidebarRef = useRef(null)

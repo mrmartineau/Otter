@@ -1,5 +1,5 @@
 import { TwitterLogoIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import { CONTENT, createTitle } from '@/constants'
@@ -29,7 +29,7 @@ export const Route = createFileRoute('/_app/tweets')({
 
 function Page() {
   const { tweets, count, limit, offset, liked } = Route.useLoaderData()
-  const { data: dbMeta } = useQuery(getMetaOptions())
+  const { data: dbMeta } = useSuspenseQuery(getMetaOptions())
 
   const subNav = [
     {

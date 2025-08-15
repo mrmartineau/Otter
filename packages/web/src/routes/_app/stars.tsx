@@ -1,9 +1,14 @@
 import { StarIcon } from '@phosphor-icons/react'
-import { createFileRoute } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { Suspense } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import { Feed } from '@/components/Feed'
+import { Loader } from '@/components/Loader'
 import { CONTENT, createTitle } from '@/constants'
 import type { Bookmark } from '@/types/db'
-import { getBookmarks } from '@/utils/fetching/bookmarks'
+import { apiParameters } from '@/utils/fetching/apiParameters'
+import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
 
 export const Route = createFileRoute('/_app/stars')({
   component: Page,
@@ -14,29 +19,41 @@ export const Route = createFileRoute('/_app/stars')({
       },
     ],
   }),
-  // @ts-expect-error How do I type useLoaderData?
-  loader: async ({ deps: { search } }) => {
-    const bookmarks = await getBookmarks({ ...search, star: true })
-    const response = { ...bookmarks, ...search }
-    return response
+  loader: async (opts) => {
+    const bookmarks = await opts.context.queryClient.ensureQueryData(
+      // @ts-expect-error Why is `search` not typed properly?
+      getBookmarksOptions({ ...opts.deps.search, star: true })
+    )
+    return bookmarks
   },
   loaderDeps: ({ search }) => ({ search }),
+  validateSearch: (search: Record<string, unknown>) => {
+    return apiParameters(search)
+  },
 })
 
 function Page() {
-  const { data, count, limit, offset } = Route.useLoaderData()
+  const search = useSearch({ from: '/_app/stars' })
+  const { data } = useSuspenseQuery(
+    // @ts-expect-error Fix `search` typings
+    getBookmarksOptions({ ...search, star: true })
+  )
 
   return (
-    <Feed
-      items={data as Bookmark[]}
-      count={count || 0}
-      limit={limit}
-      offset={offset}
-      allowGroupByDate={true}
-      title={CONTENT.starsTitle}
-      icon={<StarIcon weight="duotone" size={24} />}
-      feedType="bookmarks"
-      from={`/stars`}
-    />
+    <ErrorBoundary fallback={<div>Error</div>}>
+      <Suspense fallback={<Loader />}>
+        <Feed
+          items={data.data as Bookmark[]}
+          count={data.count || 0}
+          limit={search.limit}
+          offset={search.offset}
+          allowGroupByDate={true}
+          title={CONTENT.starsTitle}
+          icon={<StarIcon weight="duotone" size={24} />}
+          feedType="bookmarks"
+          from={`/stars`}
+        />
+      </Suspense>
+    </ErrorBoundary>
   )
 }

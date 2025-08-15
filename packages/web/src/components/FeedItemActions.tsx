@@ -7,11 +7,11 @@ import {
   ShareNetworkIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import urlJoin from 'proper-url-join'
 import { DropdownMenu } from 'radix-ui'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Button } from '@/components/Button'
 import { getMetaOptions } from '@/utils/fetching/meta'
 import { filteredTags } from '@/utils/filteredTags'
@@ -21,6 +21,7 @@ import { useToggle } from '../hooks/useToggle'
 import type { BookmarkFeedItemProps } from './BookmarkFeedItem'
 import { BookmarkForm } from './BookmarkForm'
 import { Dialog, DialogContent, DialogTrigger } from './Dialog'
+import { Loader } from './Loader'
 
 interface FeedItemActionsProps extends BookmarkFeedItemProps {
   isInFeed?: boolean
@@ -43,7 +44,7 @@ export const FeedItemActions = ({
   const navigate = useNavigate()
   const handleClickRegister = useClickBookmark()
   const [canShare, setCanShare] = useState<boolean>(false)
-  const { data: bookmarkTags } = useQuery(getMetaOptions())
+  const { data: bookmarkTags } = useSuspenseQuery(getMetaOptions())
 
   const handleArchiveBookmark = async () => {
     if (window.confirm('Do you really want to trash this bookmark?')) {
@@ -238,22 +239,24 @@ export const FeedItemActions = ({
               </Button>
             </DialogTrigger>
             <DialogContent placement="right" width="l">
-              <BookmarkForm
-                type="edit"
-                initialValues={{
-                  description,
-                  image,
-                  note,
-                  star,
-                  tags,
-                  title,
-                  type,
-                  url,
-                }}
-                id={id}
-                onSubmit={handleSubmit}
-                tags={bookmarkTags?.tags}
-              />
+              <Suspense fallback={<Loader />}>
+                <BookmarkForm
+                  type="edit"
+                  initialValues={{
+                    description,
+                    image,
+                    note,
+                    star,
+                    tags,
+                    title,
+                    type,
+                    url,
+                  }}
+                  id={id}
+                  onSubmit={handleSubmit}
+                  tags={bookmarkTags?.tags}
+                />
+              </Suspense>
             </DialogContent>
           </Dialog>
         </>

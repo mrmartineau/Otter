@@ -1,9 +1,9 @@
-import { createFileRoute, Outlet, useMatchRoute } from '@tanstack/react-router'
-import { BookmarkFeedItem } from '@/components/BookmarkFeedItem'
-import { getBookmarkOptions } from '@/utils/fetching/bookmarks'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Loader } from '@/components/Loader'
+import { createFileRoute, Outlet, useMatchRoute } from '@tanstack/react-router'
 import { Suspense } from 'react'
+import { BookmarkFeedItem } from '@/components/BookmarkFeedItem'
+import { Loader } from '@/components/Loader'
+import { getBookmarkOptions } from '@/utils/fetching/bookmarks'
 
 export const Route = createFileRoute('/_app/bookmark/$id')({
   component: RouteComponent,
@@ -19,7 +19,7 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
     const bookmark = await opts.context.queryClient.ensureQueryData(
       getBookmarkOptions({
         id: opts.params.id,
-      }),
+      })
     )
     return bookmark.data
   },
@@ -27,7 +27,7 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
 
 function RouteComponent() {
   const { data: bookmark } = useSuspenseQuery(
-    getBookmarkOptions({ id: Route.useParams().id }),
+    getBookmarkOptions({ id: Route.useParams().id })
   )
   const matchRoute = useMatchRoute()
   const params = matchRoute({ to: '/bookmark/$id/edit' })
