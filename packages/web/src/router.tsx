@@ -4,7 +4,9 @@ import { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { Suspense } from 'react'
 import { AuthProvider, useSession } from './components/AuthProvider'
+import { FullLoader } from './components/Loader'
 import { routeTree } from './routeTree.gen'
 
 export const queryClient = new QueryClient({
@@ -23,18 +25,13 @@ const router = createRouter({
     queryClient,
     session: null,
   },
+  defaultPendingComponent: () => <FullLoader />,
   defaultPreload: 'intent',
   // Since we're using React Query, we don't want loader calls to ever be stale
   // This will ensure that the loader is always called when the route is preloaded or visited
   defaultPreloadStaleTime: 0,
   routeTree,
   scrollRestoration: true,
-  // TODO
-  // defaultPendingComponent: () => (
-  //   <div className={`p-2 text-2xl`}>
-  //     <Spinner />
-  //   </div>
-  // ),
   // defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
 })
 
@@ -52,7 +49,9 @@ export const Router = () => {
       persistOptions={{ persister: asyncStoragePersister }}
     >
       <AuthProvider>
-        <RouterProvider router={router} context={{ queryClient, session }} />
+        <Suspense fallback={<FullLoader />}>
+          <RouterProvider router={router} context={{ queryClient, session }} />
+        </Suspense>
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} position="left" />
     </PersistQueryClientProvider>
