@@ -39,8 +39,7 @@
 }
 
 .otter-sidebar-pane {
-  transition:
-    opacity 0.25s var(--ease-in-out-3),
+  transition: opacity 0.25s var(--ease-in-out-3),
     transform 0.25s var(--ease-in-out-3);
   display: flex;
   flex-direction: column;
@@ -114,4 +113,5 @@
   overflow-y: scroll;
   padding-top: var(--space-m);
   padding-bottom: var(--space-xl);
+  min-height: 100%;
 }

@@ -1,8 +1,7 @@
 import { NuqsAdapter } from 'nuqs/adapters/react'
-import { StrictMode, Suspense } from 'react'
+import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
-import { FullLoader } from './components/Loader'
 import { Router } from './router'
 
 // biome-ignore lint/style/noNonNullAssertion: we can be sure that the root element exists
@@ -13,11 +12,9 @@ if (rootElement) {
   root.render(
     <StrictMode>
       <ErrorBoundary fallback={<div>Something went wrong</div>}>
-        <Suspense fallback={<FullLoader />}>
-          <NuqsAdapter>
-            <Router />
-          </NuqsAdapter>
-        </Suspense>
+        <NuqsAdapter>
+          <Router />
+        </NuqsAdapter>
       </ErrorBoundary>
     </StrictMode>
   )

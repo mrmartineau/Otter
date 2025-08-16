@@ -4,9 +4,11 @@ import { cn } from '@/utils/classnames'
 export function Spinner({
   show,
   wait = 'delay-100',
+  size = 26,
 }: {
   show?: boolean
   wait?: `delay-${number}`
+  size?: number
 }) {
   return (
     <div
@@ -19,7 +21,7 @@ export function Spinner({
         wait
       )}
     >
-      <SpinnerIcon weight="duotone" size={26} />
+      <SpinnerIcon weight="duotone" size={size} />
     </div>
   )
 }

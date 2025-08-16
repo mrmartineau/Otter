@@ -2,6 +2,7 @@ import { ListBulletsIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
+import { FullLoader } from '@/components/Loader'
 import { CONTENT, createTitle } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
@@ -25,6 +26,7 @@ export const Route = createFileRoute('/_app/feed')({
     return response
   },
   loaderDeps: ({ search }) => ({ search }),
+  pendingComponent: () => <FullLoader />,
   validateSearch: (search: Record<string, unknown>) => {
     return apiParameters(search)
   },
