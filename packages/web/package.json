@@ -81,7 +81,6 @@
     "postcss-custom-media": "^11.0.6",
     "postcss-extend-rule": "^4.0.0",
     "postcss-import": "^16.1.1",
-    "postcss-import-ext-glob": "^2.1.1",
     "postcss-nested": "^7.0.2",
     "postcss-preset-env": "^10.2.4",
     "tailwindcss": "^4.1.11",
