@@ -1,4 +1,4 @@
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   createContext,
   type ReactNode,
@@ -7,8 +7,10 @@ import {
   useMemo,
 } from 'react'
 import type { UserProfile } from '@/types/db'
-import { getUserProfileOptions } from '@/utils/fetching/user'
-import { supabase } from '../utils/supabase/client'
+import {
+  getUserProfileOptions,
+  updateUserMutation,
+} from '@/utils/fetching/user'
 
 export type UseUpdateReturn = (action: UIStateAction) => void
 export type UIStateAction =
@@ -45,12 +47,16 @@ interface UserProviderProps {
 
 export const UserProvider = ({ children }: UserProviderProps) => {
   const { data: userProfile } = useSuspenseQuery(getUserProfileOptions())
-  const queryClient = useQueryClient()
+  const updateUser = updateUserMutation()
 
   const profileData = userProfile?.data ?? null
 
   const handleUpdateUISettings = useCallback(
     async (action: UIStateAction) => {
+      if (!profileData) {
+        return
+      }
+
       let column = action.type
       let value = action.payload
 
@@ -67,13 +73,14 @@ export const UserProvider = ({ children }: UserProviderProps) => {
             )
           : []
       }
-      await supabase
-        .from('profiles')
-        .update({ [column]: value, updated_at: new Date().toISOString() })
-        .match({ id: profileData?.id })
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] })
+
+      await updateUser.mutate({
+        column,
+        id: profileData.id,
+        value,
+      })
     },
-    [profileData, queryClient]
+    [profileData, updateUser]
   )
 
   return (
