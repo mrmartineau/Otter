@@ -1,0 +1,15 @@
+{
+  "background_color": "hsl(60 6% 9%)",
+  "description": "Bookmarking app by Zander Martineau",
+  "display": "minimal-ui",
+  "icons": [
+    {
+      "sizes": "1200x1200",
+      "src": "/apple-icon.png",
+      "type": "image/png"
+    }
+  ],
+  "name": "Otter",
+  "short_name": "Otter",
+  "start_url": "https://otter3.zander.wtf"
+}

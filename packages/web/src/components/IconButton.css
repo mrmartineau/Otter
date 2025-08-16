@@ -1,0 +1,34 @@
+.icon-button-base {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition: 200ms var(--ease-in-out-1);
+  transition-property: background-color, border-color, color, opacity;
+  border-radius: var(--radii-m);
+  padding: 2px;
+
+  &:hover,
+  &[aria-pressed="true"] {
+    background-color: var(--theme6);
+    color: var(--theme10);
+  }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  svg {
+    pointer-events: none;
+  }
+}
+
+.icon-button-taglist {
+  background-color: var(--theme5);
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  display: none;
+  transform: translateY(-50%);
+  z-index: 1;
+}

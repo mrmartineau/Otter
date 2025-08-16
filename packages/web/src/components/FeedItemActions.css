@@ -1,0 +1,10 @@
+.feed-item-actions {
+  display: flex;
+  gap: var(--space-3xs);
+  transition: all 0.2s ease-in-out;
+
+  @media (pointer: coarse) {
+    margin-left: -7px;
+    margin-bottom: -8px;
+  }
+}

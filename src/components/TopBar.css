@@ -1,5 +1,0 @@
-.top-bar-buttons {
-  @media (--bp2) {
-    display: none;
-  }
-}
