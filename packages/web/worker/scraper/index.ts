@@ -8,10 +8,6 @@ import { linkType } from './link-type'
 import Scraper from './scraper'
 import { scraperRules } from './scraper-rules'
 
-// addEventListener('fetch', (event: FetchEvent) => {
-//   event.respondWith(handleScrape(event.request))
-// })
-
 type JSONValue =
   | string
   | number
@@ -35,7 +31,7 @@ export const handleScrape = async (request: HonoRequest) => {
 
   if (!url) {
     return generateErrorJSONResponse(
-      'Please provide a `url` query parameter, e.g. ?url=https://example.com',
+      'Please provide a `url` query parameter, e.g. ?url=https://example.com'
     )
   }
 

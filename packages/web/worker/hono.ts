@@ -9,10 +9,6 @@ import { handleScrape } from './scraper'
 import { getSearch } from './search/search'
 import { sendToots } from './toots/sendToots'
 
-// export interface Env {
-//   AI: Ai
-// }
-
 export const app = new Hono().basePath('/api')
 
 app.get('/', (c) => {
@@ -34,11 +30,9 @@ app.get('/search', async (c) => {
 app.post('/toot', async (c) => {
   return await sendToots(c.req)
 })
-
 app.get('/scrape', async (c) => {
   return await handleScrape(c.req)
 })
-
 app.post('/ai/title', async (context) => {
   const { prompt } = await context.req.json()
   return await generateResponse({
@@ -47,7 +41,6 @@ app.post('/ai/title', async (context) => {
     systemPrompt: titleSystemPrompt,
   })
 })
-
 app.post('/ai/description', async (context) => {
   const { title, prompt } = await context.req.json()
   return await generateResponse({
@@ -56,7 +49,6 @@ app.post('/ai/description', async (context) => {
     systemPrompt: descriptionSystemPrompt(title),
   })
 })
-
 app.get('/rss', async (c) => {
   const feed = c.req.query('feed')
   const isValidUrl = new URL(feed ?? '')
@@ -70,7 +62,7 @@ app.get('/rss', async (c) => {
     {
       error: 'Feed not found',
     },
-    404,
+    404
   )
 })
 
