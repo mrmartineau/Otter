@@ -30,7 +30,7 @@ import { FeedItemActions } from './FeedItemActions'
 import { Flex } from './Flex'
 import { IconButton } from './IconButton'
 import { Link } from './Link'
-import { Paragraph } from './Paragraph'
+import { Loader } from './Loader'
 import { Popover, PopoverContent, PopoverTrigger } from './Popover'
 import { RssFeed } from './RssFeed'
 import { TypeToIcon } from './TypeToIcon'
@@ -66,7 +66,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       : `Created on ${createdDate.formatted}`
 
   const handleToggleState = async (
-    column: 'public' | 'star',
+    column: 'public' | 'star'
   ): Promise<void> => {
     const updateData =
       column === 'public' ? { public: !isPublic } : { star: !star }
@@ -252,7 +252,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                   </IconButton>
                 </PopoverTrigger>
                 <PopoverContent>
-                  <Suspense fallback={<Paragraph>Loading...</Paragraph>}>
+                  <Suspense fallback={<Loader />}>
                     <RssFeed feedUrl={fullPath(url, feed)} />
                   </Suspense>
                 </PopoverContent>

@@ -1,9 +1,7 @@
 import { FolderIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { Suspense } from 'react'
 import { Feed } from '@/components/Feed'
-import { Loader } from '@/components/Loader'
 import { useCollectionsSubNav } from '@/hooks/useCollectionsSubNav'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
@@ -47,19 +45,17 @@ function Page() {
   const subNav = useCollectionsSubNav(collection)
 
   return (
-    <Suspense fallback={<Loader />}>
-      <Feed
-        items={data.data as Bookmark[]}
-        count={data.count || 0}
-        limit={search.limit}
-        offset={search.offset}
-        allowGroupByDate={true}
-        title={collection}
-        icon={<FolderIcon weight="duotone" size={24} />}
-        feedType="bookmarks"
-        subNav={subNav}
-        from={`/collection/${collection}`}
-      />
-    </Suspense>
+    <Feed
+      items={data.data as Bookmark[]}
+      count={data.count || 0}
+      limit={search.limit}
+      offset={search.offset}
+      allowGroupByDate={true}
+      title={collection}
+      icon={<FolderIcon weight="duotone" size={24} />}
+      feedType="bookmarks"
+      subNav={subNav}
+      from={`/collection/${collection}`}
+    />
   )
 }

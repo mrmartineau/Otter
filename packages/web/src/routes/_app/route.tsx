@@ -7,6 +7,9 @@ import { UserProvider } from '@/components/UserProvider'
 import pkg from '../../../package.json'
 import { ROUTE_SIGNIN } from '../../constants'
 import './layout.css'
+import { Suspense } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
+import { Loader } from '@/components/Loader'
 import { getSession } from '@/utils/fetching/user'
 
 export const Route = createFileRoute('/_app')({
@@ -33,7 +36,11 @@ function RouteComponent() {
           <main id="main" className="otter-content-pane">
             <div className="otter-content-pane-inner">
               <Container>
-                <Outlet />
+                <ErrorBoundary fallback={<div>Error</div>}>
+                  <Suspense fallback={<Loader />}>
+                    <Outlet />
+                  </Suspense>
+                </ErrorBoundary>
               </Container>
             </div>
           </main>

@@ -1,9 +1,7 @@
 import { ListBulletsIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { Suspense } from 'react'
 import { Feed } from '@/components/Feed'
-import { Loader } from '@/components/Loader'
 import { CONTENT, createTitle } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
@@ -38,17 +36,15 @@ function FeedPage() {
   const { data } = useSuspenseQuery(getBookmarksOptions(search))
 
   return (
-    <Suspense fallback={<Loader />}>
-      <Feed
-        items={data.data as Bookmark[]}
-        count={data.count || 0}
-        limit={search.limit}
-        offset={search.offset}
-        allowGroupByDate={true}
-        title={CONTENT.feedTitle}
-        icon={<ListBulletsIcon weight="duotone" size={24} />}
-        feedType="bookmarks"
-      />
-    </Suspense>
+    <Feed
+      items={data.data as Bookmark[]}
+      count={data.count || 0}
+      limit={search.limit}
+      offset={search.offset}
+      allowGroupByDate={true}
+      title={CONTENT.feedTitle}
+      icon={<ListBulletsIcon weight="duotone" size={24} />}
+      feedType="bookmarks"
+    />
   )
 }

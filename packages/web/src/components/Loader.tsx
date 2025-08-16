@@ -1,5 +1,7 @@
+import { Spinner } from './Spinner'
+
 export const Loader = () => {
-  return <div>Loading...</div>
+  return <Spinner show />
 }
 
 export const FullLoader = () => {

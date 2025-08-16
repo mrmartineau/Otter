@@ -1,5 +1,5 @@
-import { cn } from '@/utils/classnames'
 import { SpinnerIcon } from '@phosphor-icons/react'
+import { cn } from '@/utils/classnames'
 
 export function Spinner({
   show,
@@ -13,10 +13,10 @@ export function Spinner({
       className={cn(
         `inline-block px-3 transition`,
         {
-          'opacity-100 animate-spin duration-1000': show,
           'opacity-0': !show,
+          'opacity-100 animate-spin duration-1000': show,
         },
-        wait,
+        wait
       )}
     >
       <SpinnerIcon weight="duotone" size={26} />

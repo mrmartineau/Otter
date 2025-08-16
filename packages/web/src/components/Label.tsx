@@ -8,8 +8,8 @@ const Label = ({
 }: ComponentProps<typeof LabelPrimitive.Root>) => (
   <LabelPrimitive.Root
     className={cn(
-      'flex items-center gap-xs text-step--1 font-normal leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-      className,
+      'flex items-center gap-xs text-step--1 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+      className
     )}
     {...props}
   />

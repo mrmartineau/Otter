@@ -1,6 +1,7 @@
 @import '../components/CmdK/CmdK.css';
 @import '../components/TagList/TagList.css';
 @import '../components/Button.css';
+@import '../components/BookmarkForm.css';
 @import '../components/Card.css';
 @import '../components/CodeBlock.css';
 @import '../components/Container.css';
@@ -14,8 +15,6 @@
 @import '../components/Input.css';
 @import '../components/Link.css';
 @import '../components/Markdown.css';
-@import '../components/MediaCard.css';
-@import '../components/MediaForm.css';
 @import '../components/Paragraph.css';
 @import '../components/Sidebar.css';
 @import '../components/Text.css';

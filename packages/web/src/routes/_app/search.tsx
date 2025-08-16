@@ -1,9 +1,7 @@
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { Suspense } from 'react'
 import { Feed } from '@/components/Feed'
-import { Loader } from '@/components/Loader'
 import { CONTENT } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
@@ -44,18 +42,16 @@ function RouteComponent() {
   )
 
   return (
-    <Suspense fallback={<Loader />}>
-      <Feed
-        items={data.data as Bookmark[]}
-        count={data.count || 0}
-        limit={search.limit}
-        offset={search.offset}
-        allowGroupByDate={true}
-        title={`${CONTENT.searchTitle}: ${q}`}
-        icon={<MagnifyingGlassIcon weight="duotone" size={24} />}
-        feedType="bookmarks"
-        from={`/search?q=${q}`}
-      />
-    </Suspense>
+    <Feed
+      items={data.data as Bookmark[]}
+      count={data.count || 0}
+      limit={search.limit}
+      offset={search.offset}
+      allowGroupByDate={true}
+      title={`${CONTENT.searchTitle}: ${q}`}
+      icon={<MagnifyingGlassIcon weight="duotone" size={24} />}
+      feedType="bookmarks"
+      from={`/search?q=${q}`}
+    />
   )
 }
