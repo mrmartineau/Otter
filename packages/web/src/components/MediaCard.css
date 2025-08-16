@@ -1,0 +1,7 @@
+.media-card-title {
+  align-items: flex-start;
+  gap: var(--space-xs);
+  font-size: var(--step--1); 
+  font-variation-settings: 'wght' 500, 'wdth' 105;
+  color: var(--theme11);
+}

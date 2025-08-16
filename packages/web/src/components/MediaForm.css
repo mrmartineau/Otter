@@ -1,0 +1,15 @@
+.media-form {
+  max-width: 600px;
+}
+
+/* .media-form .radio {
+  @apply mr-2;
+} */
+
+.media-form .select {
+  /* @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100; */
+}
+
+.media-form .select:focus {
+  /* @apply outline-none ring-2 ring-blue-500 border-blue-500; */
+}
