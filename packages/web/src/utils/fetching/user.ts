@@ -108,9 +108,9 @@ export const updateUserMutation = () => {
 
       return { previousProfile }
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] })
+    onSettled: async () => {
       toast.success('User settings updated successfully')
+      await queryClient.invalidateQueries({ queryKey: ['userProfile'] })
     },
   })
 }

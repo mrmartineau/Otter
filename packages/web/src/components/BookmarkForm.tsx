@@ -140,7 +140,7 @@ export const BookmarkForm = ({
           .match({ id })
         toast.success('Item edited')
       }
-      queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+      await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
       onSubmit?.()
     } catch (err) {
       console.error(err)
