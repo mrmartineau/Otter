@@ -26,9 +26,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build site
-        run: pnpm build
+        run: pnpm web:build
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: pages deploy dist --project-name=otter-web
+          command: pages deploy packages/web/dist --project-name=otter-web
