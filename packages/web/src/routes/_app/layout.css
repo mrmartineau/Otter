@@ -1,12 +1,12 @@
 .otter-app-container {
-  position: fixed;
-  inset: 0px;
+  position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .otter-top-bar {
+  position: sticky;
+  top: 0;
   display: flex;
   gap: var(--space-s);
   align-items: center;
@@ -17,7 +17,6 @@
   min-height: var(--header-height);
   margin-left: auto;
   padding-x: var(--space-2xs);
-  position: relative;
   z-index: var(--z-2);
   border-bottom: 1px solid var(--border);
   background-color: var(--background);
@@ -31,14 +30,19 @@
     }
   }
 }
+
 .otter-primary-pane {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-  margin-top: calc(-1 * var(--header-height));
+  @media (min-width: 768px) {
+    flex: 1;
+    display: flex;
+    margin-top: calc(-1 * var(--header-height));
+  }
 }
 
 .otter-sidebar-pane {
+  position: fixed;
+  top: 0;
+  height: 100dvh;
   transition: opacity 0.25s var(--ease-in-out-3),
     transform 0.25s var(--ease-in-out-3);
   display: flex;
@@ -52,7 +56,6 @@
   z-index: var(--z-2);
   padding: var(--space-xs);
   margin-top: var(--header-height);
-  position: absolute;
   height: calc(100dvh - var(--header-height));
   transform: translateX(calc(-1 * var(--sidebar-width)));
   background-color: var(--theme2);
@@ -102,15 +105,14 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  padding-top: var(--header-height);
 
   @media (min-width: 768px) {
+    padding-top: var(--header-height);
     margin-inline-start: var(--sidebar-width);
   }
 }
 
 .otter-content-pane-inner {
-  overflow-y: scroll;
   padding-top: var(--space-m);
   padding-bottom: var(--space-xl);
   min-height: 100%;

@@ -7,6 +7,7 @@ env:
   BOT_MASTODON_ACCESS_TOKEN: ${{secrets.BOT_MASTODON_ACCESS_TOKEN}}
   PERSONAL_MASTODON_ACCESS_TOKEN: ${{secrets.PERSONAL_MASTODON_ACCESS_TOKEN}}
   CLOUDFLARE_API_TOKEN: ${{secrets.CLOUDFLARE_API_TOKEN}}
+  CLOUDFLARE_ACCOUNT_ID: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
 
 on:
   push:
@@ -23,14 +24,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10.8.0
       - name: Install dependencies
         run: pnpm install
       - name: Build site
-        run: pnpm build
+        run: pnpm web:build
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: pages deploy dist --project-name=otter-web
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy packages/web/dist --project-name=otter-web

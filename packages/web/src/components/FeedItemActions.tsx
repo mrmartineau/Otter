@@ -7,7 +7,7 @@ import {
   ShareNetworkIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import urlJoin from 'proper-url-join'
 import { DropdownMenu } from 'radix-ui'
@@ -45,6 +45,7 @@ export const FeedItemActions = ({
   const handleClickRegister = useClickBookmark()
   const [canShare, setCanShare] = useState<boolean>(false)
   const { data: bookmarkTags } = useSuspenseQuery(getMetaOptions())
+  const queryClient = useQueryClient()
 
   const handleArchiveBookmark = async () => {
     if (window.confirm('Do you really want to trash this bookmark?')) {
@@ -55,6 +56,7 @@ export const FeedItemActions = ({
           status: 'inactive',
         })
         .match({ id })
+      await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
     }
   }
   const handleUnArchiveBookmark = async () => {
@@ -65,10 +67,12 @@ export const FeedItemActions = ({
         status: 'active',
       })
       .match({ id })
+    await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
   }
   const handleDeleteBookmark = async () => {
     if (window.confirm('Do you really want to delete this bookmark forever?')) {
       await supabase.from('bookmarks').delete().match({ id })
+      await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
     }
   }
 
