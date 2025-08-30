@@ -4,7 +4,7 @@
   },
   "homepage": "https://github.com/mrmartineau/otter-3",
   "name": "@mrmartineau/otter",
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@10.15.0",
   "private": true,
   "repository": {
     "type": "git",
