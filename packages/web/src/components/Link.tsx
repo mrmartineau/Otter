@@ -28,12 +28,13 @@ export interface LinkProps
   isActive?: boolean
 }
 
-const Link = ({ className, variant, isActive, ...props }: LinkProps) => {
+const Link = ({ className, variant, isActive, href, ...props }: LinkProps) => {
   return (
     <TanstackLink
       className={cn(linkVariants({ className, variant }), {
         'is-active': isActive,
       })}
+      to={href}
       {...props}
     />
   )
