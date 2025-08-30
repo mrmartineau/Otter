@@ -2,7 +2,7 @@
 # https://marketplace.visualstudio.com/items?itemName=humao.rest-client
 
 # Variables
-@base_url = http://localhost:5678/api
+@base_url = https://otter3.zander.wtf/api
 @token = {{$dotenv SUPABASE_USER_API_KEY}}
 
 ###
@@ -38,7 +38,7 @@ Authorization: Bearer {{token}}
 ###
 
 # By tag
-GET {{base_url}}/bookmarks?tag=react
+GET {{base_url}}/bookmarks?tag=dev:react
 Authorization: Bearer {{token}}
 
 ###

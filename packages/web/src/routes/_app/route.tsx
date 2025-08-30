@@ -4,10 +4,9 @@ import { Container } from '@/components/Container'
 import { Sidebar } from '@/components/Sidebar'
 import { TopBar } from '@/components/TopBar'
 import { UserProvider } from '@/components/UserProvider'
+import { getSession } from '@/utils/fetching/user'
 import pkg from '../../../package.json'
 import { ROUTE_SIGNIN } from '../../constants'
-import './layout.css'
-import { getSession } from '@/utils/fetching/user'
 
 export const Route = createFileRoute('/_app')({
   beforeLoad: async () => {

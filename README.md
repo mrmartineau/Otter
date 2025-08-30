@@ -1,7 +1,7 @@
 <div align="center">
 
   <h1><img
-        src="https://raw.githubusercontent.com/mrmartineau/Otter/main/public/otter-logo.svg"
+        src="https://raw.githubusercontent.com/mrmartineau/Otter/refs/heads/main/packages/web/public/otter-logo.svg"
         width="90"
         height="90"
       /><br/>Otter</h1>

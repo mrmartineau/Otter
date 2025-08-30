@@ -4,13 +4,14 @@
   },
   "homepage": "https://github.com/mrmartineau/otter-3",
   "name": "@mrmartineau/otter",
-  "packageManager": "pnpm@10.14.0",
+  "packageManager": "pnpm@10.15.0",
   "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mrmartineau/otter-3.git"
   },
   "scripts": {
+    "chrome-extension:build": "pnpm --filter=@mrmartineau/otter-chrome-extension run build",
     "format": "pnpm exec biome format --write",
     "lint": "pnpm exec biome lint",
     "preview": "vite preview",

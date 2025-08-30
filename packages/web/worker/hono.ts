@@ -12,7 +12,7 @@ import { sendToots } from './toots/sendToots'
 export const app = new Hono().basePath('/api')
 
 app.get('/', (c) => {
-  return c.text('Otter API')
+  return c.text('Otter API', 200)
 })
 
 app.post('/new', async (c) => {

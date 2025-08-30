@@ -6,7 +6,7 @@ export const getScrapeData = async (url: string): Promise<MetadataResponse> => {
     urlJoin('/api/scrape', {
       query: { cleanUrl: 'true', url: url.toString() },
     }),
-    { cache: 'force-cache' },
+    { cache: 'force-cache' }
   )
   const data: MetadataResponse = await response.json()
 
