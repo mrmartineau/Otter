@@ -11,9 +11,7 @@ import { IconControl } from './IconControl'
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from './Select'
@@ -123,6 +121,7 @@ export const MediaForm = ({
             placeholder="Enter media name"
             {...register('name', { required: true })}
             autoFocus
+            autoComplete="off"
           />
         </FormGroup>
 
