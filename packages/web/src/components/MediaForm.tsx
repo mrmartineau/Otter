@@ -7,6 +7,17 @@ import { FormGroup } from '@/components/FormGroup'
 import { Input } from '@/components/Input'
 import type { MediaInsert } from '@/types/db'
 import { cn } from '@/utils/classnames'
+import { IconControl } from './IconControl'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from './Select'
+import { MediaTypeToIcon } from './TypeToIcon'
 
 export interface ComboOption {
   label: string
@@ -91,16 +102,16 @@ export const MediaForm = ({
                 'music',
                 'other',
               ] as const
-            ).map((typeValue) => (
-              <label key={typeValue} className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  value={typeValue}
-                  {...register('type')}
-                  className="radio mr-2"
-                />
-                <span className="capitalize">{typeValue}</span>
-              </label>
+            ).map((type) => (
+              <IconControl
+                key={type}
+                type="radio"
+                value={type}
+                label={type}
+                {...register('type')}
+              >
+                <MediaTypeToIcon type={type} />
+              </IconControl>
             ))}
           </Flex>
         </FormGroup>
@@ -144,15 +155,23 @@ export const MediaForm = ({
 
         {/* STATUS */}
         <FormGroup label="Status" name="status">
-          <select id="status" {...register('status')} className="select">
-            {(['wishlist', 'now', 'skipped', 'done'] as const).map(
-              (statusValue) => (
-                <option key={statusValue} value={statusValue}>
+          <Select
+            {...register('status')}
+            onValueChange={(value) => {
+              setValue('status', value as 'wishlist' | 'now' | 'done')
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a status" />
+            </SelectTrigger>
+            <SelectContent>
+              {(['wishlist', 'now', 'done'] as const).map((statusValue) => (
+                <SelectItem key={statusValue} value={statusValue}>
                   {statusValue.charAt(0).toUpperCase() + statusValue.slice(1)}
-                </option>
-              )
-            )}
-          </select>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </FormGroup>
 
         {/* RATING */}

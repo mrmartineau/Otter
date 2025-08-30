@@ -13,8 +13,8 @@ const getStatusColor = (status: string) => {
       return 'border-blue-200 text-blue-200'
     case 'now':
       return 'border-green-200 text-green-200'
-    case 'skipped':
-      return 'border-yellow-200 text-yellow-200'
+    // case 'skipped':
+    //   return 'border-yellow-200 text-yellow-200'
     case 'done':
       return 'border-purple-200 text-purple-200'
     default:
@@ -52,8 +52,8 @@ export const MediaColumn = ({
       )}
       {...rest}
     >
-      <div className={cn('column-header p-4 border-b', getStatusColor(status))}>
-        <h3 className="font-semibold">{titleFmt(title)}</h3>
+      <div className={cn('column-header p-2 border-b', getStatusColor(status))}>
+        <h3 className="font-semibold text-lg">{titleFmt(title)}</h3>
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {media.length} items
         </span>

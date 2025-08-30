@@ -10,19 +10,20 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { PlusIcon } from '@phosphor-icons/react'
+import { CircleIcon, PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 import { Button } from '@/components/Button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/Dialog'
+import { IconControl } from '@/components/IconControl'
 import { Input } from '@/components/Input'
 import { MediaCard } from '@/components/MediaCard'
 import { MediaColumn } from '@/components/MediaColumn'
 import { MediaForm } from '@/components/MediaForm'
+import { MediaTypeToIcon } from '@/components/TypeToIcon'
 import { createTitle } from '@/constants'
 import type { Media, MediaFilters } from '@/types/db'
-import type { Database } from '@/types/supabase'
 import {
   getMediaOptions,
   useCreateMedia,
@@ -155,7 +156,7 @@ function RouteComponent() {
     return
 
     // If dropping on a status column
-    if (['wishlist', 'now', 'skipped', 'done'].includes(overId)) {
+    /* if (['wishlist', 'now', 'skipped', 'done'].includes(overId)) {
       const newStatus = overId as Database['public']['Enums']['media_status']
 
       if (activeMedia.status !== newStatus) {
@@ -165,7 +166,7 @@ function RouteComponent() {
           status: newStatus,
         })
       }
-    }
+    } */
   }
 
   const handleCreateMedia = (formData: any) => {
@@ -203,7 +204,6 @@ function RouteComponent() {
   const columns = [
     { status: 'wishlist' as const, title: 'Wishlist' },
     { status: 'now' as const, title: 'Now' },
-    { status: 'skipped' as const, title: 'Skipped' },
     { status: 'done' as const, title: 'Done' },
   ]
 
@@ -222,68 +222,39 @@ function RouteComponent() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Media</h1>
-        <Dialog
-          open={isDialogOpen}
-          onOpenChange={(open) => {
-            setIsDialogOpen(open)
-            if (!open) {
-              setEditingMedia(null)
-            }
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button>
-              <PlusIcon size={18} />
-              Add Media
-            </Button>
-          </DialogTrigger>
-          <DialogContent placement="right" width="l">
-            <MediaForm
-              type={editingMedia ? 'edit' : 'new'}
-              initialValues={editingMedia || undefined}
-              platforms={platforms}
-              onFormSubmit={
-                editingMedia ? handleUpdateMedia : handleCreateMedia
-              }
-            />
-          </DialogContent>
-        </Dialog>
       </div>
 
       {/* Filters */}
-      <div className="space-y-4">
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <Input
-              placeholder="Search by name, platform, or type..."
-              value={filters.search || ''}
-              onChange={(e) =>
-                setFilters({ ...filters, search: e.target.value })
-              }
-            />
+      <div className="flex gap-4 justify-between flex-wrap">
+        <div className="space-y-4">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Input
+                placeholder="Search by name, platform, or type..."
+                value={filters.search || ''}
+                onChange={(e) =>
+                  setFilters({ ...filters, search: e.target.value })
+                }
+              />
+            </div>
           </div>
-        </div>
-
-        <div className="flex gap-4">
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-medium">Type:</span>
-            <div className="flex gap-2">
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="type"
-                  value=""
-                  checked={!filters.type}
-                  onChange={() =>
-                    setFilters({
-                      ...filters,
-                      type: undefined,
-                    })
-                  }
-                  className="radio"
-                />
-                <span className="text-sm">All</span>
-              </label>
+          <div className="flex gap-4">
+            <div className="flex items-center gap-4 flex-wrap">
+              <IconControl
+                type="checkbox"
+                value=""
+                label="All"
+                name="types"
+                onChange={() =>
+                  setFilters({
+                    ...filters,
+                    type: undefined,
+                  })
+                }
+                checked={!filters.type}
+              >
+                <CircleIcon size={18} weight="duotone" />
+              </IconControl>
               {(
                 [
                   'tv',
@@ -295,50 +266,79 @@ function RouteComponent() {
                   'other',
                 ] as const
               ).map((type) => (
-                <label key={type} className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="type"
-                    value={type}
-                    checked={filters.type === type}
-                    onChange={(e) =>
-                      setFilters({
-                        ...filters,
-                        type: e.target.checked ? type : undefined,
-                      })
-                    }
-                    className="radio"
-                  />
-                  <span className="text-sm capitalize">{type}</span>
-                </label>
+                <IconControl
+                  key={type}
+                  type="radio"
+                  value={type}
+                  label={type}
+                  name="types"
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      type: e.currentTarget.checked ? type : undefined,
+                    })
+                  }
+                  checked={filters.type === type}
+                >
+                  <MediaTypeToIcon type={type} />
+                </IconControl>
               ))}
             </div>
           </div>
         </div>
+        <div>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              setIsDialogOpen(open)
+              if (!open) {
+                setEditingMedia(null)
+              }
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <PlusIcon size={18} weight="bold" />
+                Add Media
+              </Button>
+            </DialogTrigger>
+            <DialogContent placement="right" width="l">
+              <MediaForm
+                type={editingMedia ? 'edit' : 'new'}
+                initialValues={editingMedia || undefined}
+                platforms={platforms}
+                onFormSubmit={
+                  editingMedia ? handleUpdateMedia : handleCreateMedia
+                }
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
-      <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        collisionDetection={closestCenter}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 h-[calc(100vh-300px)]">
-          {columns.map(({ status, title }) => (
-            <MediaColumn
-              key={status}
-              status={status}
-              title={title}
-              media={mediaByStatus[status]}
-              onEdit={handleEditMedia}
-            />
-          ))}
-        </div>
-
-        <DragOverlay>
-          {activeMedia ? <MediaCard media={activeMedia} /> : null}
-        </DragOverlay>
-      </DndContext>
+      <div className="overflow-x-scroll w-full">
+        <DndContext
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          collisionDetection={closestCenter}
+        >
+          <div className="media-columns min-w-0">
+            {columns.map(({ status, title }) => (
+              <MediaColumn
+                key={status}
+                status={status}
+                title={title}
+                media={mediaByStatus[status]}
+                onEdit={handleEditMedia}
+              />
+            ))}
+          </div>
+          <DragOverlay>
+            {activeMedia ? <MediaCard media={activeMedia} /> : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
     </div>
   )
 }

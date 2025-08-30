@@ -1,12 +1,18 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { PencilIcon, TrashIcon } from '@phosphor-icons/react'
+import {
+  PencilIcon,
+  StarHalfIcon,
+  StarIcon,
+  TrashIcon,
+} from '@phosphor-icons/react'
 import type { ComponentProps } from 'react'
 import type { Media } from '@/types/db'
 import { cn } from '@/utils/classnames'
 import { useDeleteMedia } from '@/utils/fetching/media'
 import { Flex } from './Flex'
 import { IconButton } from './IconButton'
+import { Rating } from './Rating'
 import {
   Tooltip,
   TooltipContent,
@@ -14,11 +20,6 @@ import {
   TooltipTrigger,
 } from './Tooltip'
 import { MediaTypeToIcon } from './TypeToIcon'
-
-const getRatingDisplay = (rating: string | null) => {
-  if (!rating) return null
-  return '⭐'.repeat(Math.floor(parseFloat(rating)))
-}
 
 interface MediaCardProps extends ComponentProps<'div'> {
   media: Media
@@ -78,11 +79,7 @@ export const MediaCard = ({
     >
       <div className="media-card-title">{media.name}</div>
 
-      {media.rating ? (
-        <div className="text-xs text-yellow-500">
-          {getRatingDisplay(media.rating)}
-        </div>
-      ) : null}
+      {media.rating ? <Rating rating={media.rating} /> : null}
 
       {media.media_id ? (
         <div className="text-xs text-gray-500 dark:text-gray-500">
