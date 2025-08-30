@@ -1,0 +1,73 @@
+:root {
+  --color: #edecec;
+}
+
+body {
+  background-color: #161615;
+  color: var(--color);
+  width: 90%;
+  max-width: 400px;
+  margin: 0 auto;
+  font-size: 1rem;
+}
+
+fieldset {
+  border: 0;
+  margin: 20px 0;
+  padding: 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input:not([type='radio']),
+textarea {
+  display: block;
+  width: 100%;
+  appearance: none;
+  background-color: #222320;
+  color: var(--color);
+  border-radius: 0.5rem;
+  border: 2px solid #3e3e3a;
+  padding: 6px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+textarea {
+  height: 100px;
+}
+
+button {
+  all: unset;
+  background-color: #717069;
+  color: var(--color);
+  border-radius: 0.5rem;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: bold;
+}
+button:hover {
+  background-color: #7f7e77;
+}
+
+a,
+a:link,
+a:visited {
+  color: #7b66dc;
+  text-decoration: none;
+  text-decoration-line: none;
+  text-underline-offset: 3px;
+  text-decoration-color: #6e56cf;
+}
+
+a,
+a:hover,
+a:active {
+  color: #7b66dc;
+  text-decoration-color: #2c2250;
+}

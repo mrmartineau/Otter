@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "proper-url-join": "^2.1.1"
+  },
+  "description": "My Chrome Extension",
+  "devDependencies": {
+    "@types/chrome": "^0.0.193",
+    "copy-webpack-plugin": "^10.2.4",
+    "css-loader": "^6.7.1",
+    "file-loader": "^6.2.0",
+    "mini-css-extract-plugin": "^2.6.1",
+    "prettier": "^2.7.1",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-merge": "^5.8.0"
+  },
+  "name": "@mrmartineau/otter-chrome-extension",
+  "private": true,
+  "scripts": {
+    "build": "webpack --mode=production --config config/webpack.config.js",
+    "format": "prettier --write --ignore-unknown \"{config,public,src}/**/*.{html,css,js,ts,json}\"",
+    "watch": "webpack --mode=development --watch --config config/webpack.config.js"
+  },
+  "version": "0.1.0"
+}
