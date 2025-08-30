@@ -2,7 +2,7 @@
 # https://marketplace.visualstudio.com/items?itemName=humao.rest-client
 
 # Variables
-@base_url = https://otter3.zander.wtf/api
+@base_url = http://localhost:5678/api
 @token = {{$dotenv SUPABASE_USER_API_KEY}}
 
 ###
