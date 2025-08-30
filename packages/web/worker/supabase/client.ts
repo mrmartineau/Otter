@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { HonoRequest } from 'hono'
 import type { Database } from '@/types/supabase'
@@ -11,10 +12,11 @@ type AuthenticatedClient = {
   user: Database['public']['Tables']['profiles']['Row']
 }
 
-export const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_KEY
+// @ts-expect-error - TODO: fix this
+const supabaseServiceKey = env.SUPABASE_SERVICE_KEY
 
 export const createAuthenticatedClient = async (
-  request: HonoRequest,
+  request: HonoRequest
 ): Promise<AuthenticatedClient | Response> => {
   const authHeader = request.header('Authorization')
   if (!authHeader || !authHeader.startsWith('Bearer ')) {

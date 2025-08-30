@@ -62,7 +62,7 @@ export const sendToots = async (request: HonoRequest) => {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       method: 'POST',
-    },
+    }
   )
 
   // send mastodon toot to bot account
@@ -77,7 +77,7 @@ export const sendToots = async (request: HonoRequest) => {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       method: 'POST',
-    },
+    }
   )
 
   return new Response('Toots sent!')

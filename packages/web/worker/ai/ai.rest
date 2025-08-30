@@ -1,15 +1,13 @@
-GET http://localhost:5678/api
+# This file can be used to test the API locally in conjunction with the REST Client VS Code extension.
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
 
-###
+# Variables
+@base_url = http://localhost:5678/api
+@token = {{$dotenv SUPABASE_USER_API_KEY}}
 
-# RSS feed
-
-GET http://localhost:5678/api/rss?feed=https://letterboxd.com/mrmartineau/rss/
-
-###
 # Title AI rewriter
 
-POST http://localhost:5678/api/ai/title
+POST {{base_url}}/ai/title
 Content-Type: application/json
 
 {
@@ -19,7 +17,7 @@ Content-Type: application/json
 ###
 # Title AI rewriter
 
-POST http://localhost:5678/api/ai/title
+POST {{base_url}}/ai/title
 Content-Type: application/json
 
 {
@@ -29,7 +27,7 @@ Content-Type: application/json
 ###
 # Description AI rewriter
 
-POST http://localhost:5678/api/ai/description
+POST {{base_url}}/ai/description
 Content-Type: application/json
 
 {
@@ -39,10 +37,15 @@ Content-Type: application/json
 ###
 # Description AI rewriter with title
 
-POST http://localhost:5678/api/ai/description
+POST {{base_url}}/ai/description
 Content-Type: application/json
 
 {
   "prompt": "Get up and running with OpenAI gpt-oss, DeepSeek-R1, Gemma 3 and other models. - zander/zander",
   "title": "zander – Get up and running with OpenAI gpt-oss, DeepSeek-R1, Gemma 3 and other models on zander."
 }
+
+###
+
+GET {{base_url}}/bookmarks
+Content-Type: application/json
