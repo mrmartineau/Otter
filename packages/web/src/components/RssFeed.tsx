@@ -1,9 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import urlJoin from 'proper-url-join'
-import { useEffect, useState } from 'react'
 import { cn } from '@/utils/classnames'
 import { getRssOptions } from '@/utils/fetching/rss'
-import { API_RSS, CONTENT } from '../constants'
+import { CONTENT } from '../constants'
 import { headingVariants } from './Heading'
 import { Link } from './Link'
 
@@ -57,9 +55,7 @@ interface RssFeedProps {
   feedUrl: string
 }
 export const RssFeed = ({ feedUrl }: RssFeedProps) => {
-  console.log(`🚀 ~ RssFeed ~ feedUrl:`, feedUrl)
   const { data: feed } = useQuery(getRssOptions(feedUrl))
-  console.log(`🚀 ~ RssFeed ~ feed:`, feed)
 
   const entries = feed?.entries?.slice(0, 5) || []
 

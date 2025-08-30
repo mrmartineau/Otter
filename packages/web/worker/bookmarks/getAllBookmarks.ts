@@ -1,4 +1,4 @@
-import type { Env, HonoRequest } from 'hono'
+import type { HonoRequest } from 'hono'
 import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { apiResponseGenerator } from '@/utils/fetching/apiResponse'
 import { getBookmarks } from '@/utils/fetching/bookmarks'
