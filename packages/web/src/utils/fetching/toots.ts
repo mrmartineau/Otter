@@ -6,7 +6,10 @@ interface TootsFetchingOptions {
   params: Partial<Pick<ApiParametersQuery, 'limit' | 'offset' | 'order'>>
   likes: boolean
 }
-export const getToots = async ({ params, likes }: TootsFetchingOptions) => {
+export const getToots = async ({
+  params,
+  likes = false,
+}: TootsFetchingOptions) => {
   const { limit, offset, order } = apiParameters(params)
 
   const supabaseResponse = await supabase
