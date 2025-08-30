@@ -1,0 +1,18 @@
+# This file can be used to test the API locally in conjunction with the REST Client VS Code extension.
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+# Variables
+@base_url = http://localhost:5678/api
+@token = {{$dotenv SUPABASE_USER_API_KEY}}
+
+# RSS feed
+
+GET {{base_url}}/rss?feed=https://letterboxd.com/mrmartineau/rss/
+
+###
+
+GET {{base_url}}/rss?feed=https://zander.wtf/blog.rss.xml
+
+###
+
+GET http://localhost:5678/api/rss?feed=https://zander.wtf/blog.rss.xml

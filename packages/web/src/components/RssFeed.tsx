@@ -1,7 +1,8 @@
+import { useQuery } from '@tanstack/react-query'
 import urlJoin from 'proper-url-join'
 import { useEffect, useState } from 'react'
 import { cn } from '@/utils/classnames'
-
+import { getRssOptions } from '@/utils/fetching/rss'
 import { API_RSS, CONTENT } from '../constants'
 import { headingVariants } from './Heading'
 import { Link } from './Link'
@@ -56,43 +57,29 @@ interface RssFeedProps {
   feedUrl: string
 }
 export const RssFeed = ({ feedUrl }: RssFeedProps) => {
-  const [feed, setFeed] = useState<FeedResponse>()
+  console.log(`🚀 ~ RssFeed ~ feedUrl:`, feedUrl)
+  const { data: feed } = useQuery(getRssOptions(feedUrl))
+  console.log(`🚀 ~ RssFeed ~ feed:`, feed)
 
-  useEffect(() => {
-    const fetchFeed = async () => {
-      const response = await fetch(
-        urlJoin(API_RSS, {
-          query: {
-            feed: feedUrl,
-            limit: 5,
-          },
-        }),
-      )
-      const data: FeedResponse = await response.json()
-
-      if (!data) {
-        throw new Error('No data')
-      }
-
-      setFeed(data)
-    }
-    fetchFeed()
-  }, [feedUrl])
+  const entries = feed?.entries?.slice(0, 5) || []
 
   return (
     <>
       <h5 className={cn('mt-0!', headingVariants({ variant: 'date' }))}>
         {CONTENT.latestRssItems}
       </h5>
-      {feed?.items?.length ? (
+      {entries?.length ? (
         <ol className="max-w-260 mb-0 list-inside list-decimal pl-0">
-          {feed?.items.map(({ link, title, guid }) => (
-            <li key={guid} className="text-sm">
-              <Link href={link} className="!inline">
-                {title}
-              </Link>
-            </li>
-          ))}
+          {entries.map(({ link, title, guid }, index) => {
+            const key = guid ? guid['#text'] : index
+            return (
+              <li key={key} className="text-sm">
+                <Link href={link} className="!inline">
+                  {title}
+                </Link>
+              </li>
+            )
+          })}
         </ol>
       ) : (
         'Loading...'
