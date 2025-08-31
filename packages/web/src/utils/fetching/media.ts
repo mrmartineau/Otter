@@ -5,10 +5,23 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import type { MediaFilters, MediaInsert, MediaUpdate } from '@/types/db'
+import type {
+  Media,
+  MediaFilters,
+  MediaInsert,
+  MediaStatus,
+  MediaUpdate,
+} from '@/types/db'
 import type { Database } from '@/types/supabase'
 import { getErrorMessage } from '../get-error-message'
 import { supabase } from '../supabase/client'
+
+const groupMediaByStatus = (media: Media[]) => {
+  return Object.groupBy(media, (item) => item.status ?? 'wishlist') as Record<
+    NonNullable<Media['status']>,
+    Media[]
+  >
+}
 
 export const getMedia = async (
   filters: MediaFilters = {},
@@ -42,7 +55,10 @@ export const getMedia = async (
     throw supabaseResponse.error
   }
 
-  return supabaseResponse
+  return {
+    ...supabaseResponse,
+    data: groupMediaByStatus(supabaseResponse.data ?? []),
+  }
 }
 
 export const getMediaOptions = (filters: MediaFilters = {}) => {
@@ -97,12 +113,20 @@ export const useCreateMedia = () => {
 
       return response
     },
-    onError: (error, _, context) => {
+    onError: (
+      error,
+      _,
+      context:
+        | { previousData?: Array<[readonly unknown[], unknown]> }
+        | undefined
+    ) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]) => {
-          queryClient.setQueryData(queryKey, data)
-        })
+        context.previousData.forEach(
+          ([queryKey, data]: [readonly unknown[], unknown]) => {
+            queryClient.setQueryData(queryKey, data)
+          }
+        )
       }
 
       const errorMessage = getErrorMessage(error)
@@ -115,7 +139,7 @@ export const useCreateMedia = () => {
 
       const previousData = queryClient.getQueriesData({ queryKey: ['media'] })
 
-      queryClient.setQueriesData({ queryKey: ['media'] }, (old) => {
+      queryClient.setQueriesData({ queryKey: ['media'] }, (old: any) => {
         if (!old?.data) {
           return old
         }
@@ -163,9 +187,9 @@ export const useUpdateMedia = () => {
 
       return response
     },
-    onError: (error, variables, context) => {
+    onError: (error, _variables, context: any) => {
       if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]) => {
+        context.previousData.forEach(([queryKey, data]: [any, any]) => {
           queryClient.setQueryData(queryKey, data)
         })
       }
@@ -180,14 +204,14 @@ export const useUpdateMedia = () => {
 
       const previousData = queryClient.getQueriesData({ queryKey: ['media'] })
 
-      queryClient.setQueriesData({ queryKey: ['media'] }, (old) => {
+      queryClient.setQueriesData({ queryKey: ['media'] }, (old: any) => {
         if (!old?.data) {
           return old
         }
 
         return {
           ...old,
-          data: old.data.map((item) =>
+          data: old.data.map((item: any) =>
             item.id === id
               ? {
                   ...item,
@@ -215,30 +239,25 @@ export const useUpdateMediaStatus = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      status,
-      sortOrder,
-    }: {
-      id: number
-      status: Database['public']['Enums']['media_status']
-      sortOrder?: number
-    }) => {
-      const updateData: MediaUpdate = {
-        modified_at: new Date().toISOString(),
+    mutationFn: async (
+      items: Array<{
+        id: number
+        status: MediaStatus
+        sortOrder?: number
+      }>
+    ) => {
+      const now = new Date().toISOString()
+      const payload = items.map(({ id, status, sortOrder }) => ({
+        id,
+        modified_at: now,
+        sort_order: sortOrder,
         status,
-      }
-
-      if (sortOrder !== undefined) {
-        updateData.sort_order = sortOrder
-      }
+      }))
 
       const response = await supabase
         .from('media')
-        .update(updateData)
-        .eq('id', id)
+        .upsert(payload, { onConflict: 'id' })
         .select()
-        .single()
 
       if (response.error) {
         throw response.error
@@ -251,34 +270,6 @@ export const useUpdateMediaStatus = () => {
       toast.error('Failed to update media status', {
         description: errorMessage,
       })
-    },
-    onMutate: async ({ id, status, sortOrder }) => {
-      await queryClient.cancelQueries({ queryKey: ['media'] })
-
-      const previousMedia = queryClient.getQueryData(['media'])
-
-      queryClient.setQueryData(['media'], (old: any) => {
-        if (!old || !old.data) {
-          return old
-        }
-
-        return {
-          ...old,
-          data: old.data.map((item: any) =>
-            item.id === id
-              ? {
-                  ...item,
-                  modified_at: new Date().toISOString(),
-                  sort_order:
-                    sortOrder !== undefined ? sortOrder : item.sort_order,
-                  status,
-                }
-              : item
-          ),
-        }
-      })
-
-      return { previousMedia }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] })
@@ -299,7 +290,7 @@ export const useDeleteMedia = () => {
 
       return response
     },
-    onError: (error, id, context) => {
+    onError: (error, _id, context) => {
       if (context?.previousMedia) {
         queryClient.setQueryData(['media'], context.previousMedia)
       }

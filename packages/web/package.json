@@ -1,8 +1,9 @@
 {
   "dependencies": {
+    "@dnd-kit/abstract": "^0.1.21",
     "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/sortable": "^10.0.0",
-    "@dnd-kit/utilities": "^3.2.2",
+    "@dnd-kit/helpers": "^0.1.21",
+    "@dnd-kit/react": "^0.1.21",
     "@phosphor-icons/react": "^2.1.10",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@supabase/supabase-js": "^2.56.1",

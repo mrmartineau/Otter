@@ -1,35 +1,31 @@
-import {
-  closestCenter,
-  DndContext,
-  type DragEndEvent,
-  DragOverlay,
-  type DragStartEvent,
-  MouseSensor,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core'
+import { move } from '@dnd-kit/helpers'
+import { DragDropProvider, KeyboardSensor, PointerSensor } from '@dnd-kit/react'
 import { CircleIcon, PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/Button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/Dialog'
 import { IconControl } from '@/components/IconControl'
 import { Input } from '@/components/Input'
-import { MediaCard } from '@/components/MediaCard'
 import { MediaColumn } from '@/components/MediaColumn'
 import { MediaForm } from '@/components/MediaForm'
 import { MediaTypeToIcon } from '@/components/TypeToIcon'
 import { createTitle } from '@/constants'
 import type { Media, MediaFilters } from '@/types/db'
+import type { Database } from '@/types/supabase'
 import {
   getMediaOptions,
   useCreateMedia,
   useUpdateMedia,
   useUpdateMediaStatus,
 } from '@/utils/fetching/media'
+
+const columns = [
+  { status: 'wishlist' as const, title: 'Wishlist' },
+  { status: 'now' as const, title: 'Now' },
+  { status: 'done' as const, title: 'Done' },
+]
 
 export const Route = createFileRoute('/_app/media')({
   component: RouteComponent,
@@ -50,25 +46,13 @@ export const Route = createFileRoute('/_app/media')({
 
 function RouteComponent() {
   const [filters, setFilters] = useState<MediaFilters>({})
-  const [activeId, setActiveId] = useState<number | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingMedia, setEditingMedia] = useState<Media | null>(null)
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(MouseSensor),
-    useSensor(TouchSensor)
-    // useSensor(KeyboardSensor, {
-    //   coordinateGetter,
-    // })
-  )
-
   const { data: mediaResponse } = useSuspenseQuery(getMediaOptions())
-  const allMedia = mediaResponse?.data || []
+  const allMedia = mediaResponse?.data
+  const [media, setMedia] = useState(allMedia)
+  const previousItems = useRef(media)
 
   const createMediaMutation = useCreateMedia()
   const updateMediaMutation = useUpdateMedia()
@@ -76,98 +60,33 @@ function RouteComponent() {
 
   // Filter media based on search and type filters
   const filteredMedia = useMemo(() => {
-    return allMedia.filter((item) => {
-      // Search filter
-      if (filters.search) {
-        const searchTerm = filters.search.toLowerCase()
-        const matchesSearch =
-          item.name?.toLowerCase().includes(searchTerm) ||
-          item.platform?.toLowerCase().includes(searchTerm) ||
-          item.type?.toLowerCase().includes(searchTerm)
+    const result = {} as typeof media
 
-        if (!matchesSearch) return false
-      }
+    Object.entries(media).forEach(([status, items]) => {
+      result[status as keyof typeof media] = items.filter((item) => {
+        if (filters.search) {
+          const searchTerm = filters.search.toLowerCase()
+          const matchesSearch =
+            item.name?.toLowerCase().includes(searchTerm) ||
+            item.platform?.toLowerCase().includes(searchTerm) ||
+            item.type?.toLowerCase().includes(searchTerm)
 
-      // Type filter
-      if (filters.type && item.type !== filters.type) {
-        return false
-      }
+          if (!matchesSearch) {
+            return false
+          }
+        }
 
-      return true
-    })
-  }, [allMedia, filters])
+        // Type filter
+        if (filters.type && item.type !== filters.type) {
+          return false
+        }
 
-  // Group media by status
-  const mediaByStatus = useMemo(() => {
-    const grouped = {
-      done: [] as Media[],
-      now: [] as Media[],
-      skipped: [] as Media[],
-      wishlist: [] as Media[],
-    }
-
-    filteredMedia.forEach((item) => {
-      const status = item.status || 'wishlist'
-      if (grouped[status as keyof typeof grouped]) {
-        grouped[status as keyof typeof grouped].push(item)
-      }
+        return true
+      })
     })
 
-    return grouped
-  }, [filteredMedia])
-
-  const activeMedia = useMemo(() => {
-    return filteredMedia.find((item) => item.id === activeId)
-  }, [activeId, filteredMedia])
-
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as number)
-  }
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over, collisions } = event
-    console.log(`🚀 ~ handleDragEnd:`, collisions)
-    setActiveId(null)
-
-    // https://github.com/clauderic/dnd-kit/blob/master/stories/2%20-%20Presets/Sortable/MultipleContainers.tsx
-    // if (active.id in media && over?.id) {
-    //   setContainers((containers) => {
-    //     const activeIndex = containers.indexOf(active.id)
-    //     const overIndex = containers.indexOf(over.id)
-
-    //     return arrayMove(containers, activeIndex, overIndex)
-    //   })
-    // }
-    // arrayMove()
-
-    if (!over) {
-      return
-    }
-
-    const activeId = active.id as number
-    const overId = over.id as string
-
-    // Find the media item being dragged
-    const activeMedia = allMedia.find((item) => item.id === activeId)
-    if (!activeMedia) {
-      return
-    }
-
-    return
-
-    // If dropping on a status column
-    /* if (['wishlist', 'now', 'skipped', 'done'].includes(overId)) {
-      const newStatus = overId as Database['public']['Enums']['media_status']
-
-      if (activeMedia.status !== newStatus) {
-        updateMediaStatusMutation.mutate({
-          id: activeId,
-          // sortOrder:,
-          status: newStatus,
-        })
-      }
-    } */
-  }
+    return result
+  }, [media, filters])
 
   const handleCreateMedia = (formData: any) => {
     createMediaMutation.mutate(formData, {
@@ -201,22 +120,18 @@ function RouteComponent() {
     )
   }
 
-  const columns = [
-    { status: 'wishlist' as const, title: 'Wishlist' },
-    { status: 'now' as const, title: 'Now' },
-    { status: 'done' as const, title: 'Done' },
-  ]
-
   // Get unique platforms for the form
   const platforms = useMemo(() => {
     const platformSet = new Set<string>()
-    allMedia.forEach((item) => {
-      if (item.platform) {
-        platformSet.add(item.platform)
-      }
+    Object.values(media).forEach((item) => {
+      item.forEach((item) => {
+        if (item.platform) {
+          platformSet.add(item.platform)
+        }
+      })
     })
-    return Array.from(platformSet).sort()
-  }, [allMedia])
+    return Array.from(platformSet).toSorted()
+  }, [media])
 
   return (
     <div className="space-y-6">
@@ -317,11 +232,70 @@ function RouteComponent() {
       </div>
 
       <div className="overflow-x-scroll w-full">
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          collisionDetection={closestCenter}
+        <DragDropProvider
+          onDragStart={() => {
+            previousItems.current = media
+          }}
+          onDragOver={(event) => {
+            setMedia((items) => move(items, event))
+          }}
+          onDragEnd={(event) => {
+            const { source } = event.operation
+            if (!source) {
+              return
+            }
+
+            if (event.canceled) {
+              if (source.type === 'item') {
+                setMedia(previousItems.current)
+              }
+
+              return
+            }
+
+            // Determine which columns changed compared to the snapshot from drag start
+            const prev = previousItems.current || {}
+            const next = media || {}
+
+            const statuses = new Set([
+              ...Object.keys(prev ?? {}),
+              ...Object.keys(next ?? {}),
+            ]) as Set<keyof typeof next>
+
+            const batched: Array<{
+              id: number
+              status: Database['public']['Enums']['media_status']
+              sortOrder: number
+            }> = []
+
+            statuses.forEach((statusKey) => {
+              const prevIds = (prev[statusKey] ?? []).map((i) => i.id)
+              const nextItems = next[statusKey] ?? []
+              const nextIds = nextItems.map((i) => i.id)
+
+              const changed =
+                prevIds.length !== nextIds.length ||
+                prevIds.some((id, idx) => id !== nextIds[idx])
+
+              if (!changed) return
+
+              nextItems.forEach((item, index) => {
+                batched.push({
+                  id: item.id,
+                  sortOrder: index,
+                  status:
+                    statusKey as Database['public']['Enums']['media_status'],
+                })
+              })
+            })
+
+            if (batched.length > 0) {
+              updateMediaStatusMutation.mutate(batched)
+            }
+          }}
+          sensors={[PointerSensor, KeyboardSensor]}
+          // https://next.dndkit.com/extend/plugins
+          // plugins={[AutoScroller, Accessibility]}
         >
           <div className="media-columns min-w-0">
             {columns.map(({ status, title }) => (
@@ -329,15 +303,12 @@ function RouteComponent() {
                 key={status}
                 status={status}
                 title={title}
-                media={mediaByStatus[status]}
+                media={filteredMedia[status]}
                 onEdit={handleEditMedia}
               />
             ))}
           </div>
-          <DragOverlay>
-            {activeMedia ? <MediaCard media={activeMedia} /> : null}
-          </DragOverlay>
-        </DndContext>
+        </DragDropProvider>
       </div>
     </div>
   )

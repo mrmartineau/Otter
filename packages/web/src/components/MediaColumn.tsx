@@ -1,5 +1,5 @@
-import { useDroppable } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CollisionPriority } from '@dnd-kit/abstract'
+import { useDroppable } from '@dnd-kit/react'
 import type { ComponentProps } from 'react'
 import titleFmt from 'title'
 import type { Media } from '@/types/db'
@@ -37,15 +37,26 @@ export const MediaColumn = ({
   onEdit,
   ...rest
 }: MediaColumnProps) => {
-  const { setNodeRef, isOver, over, active } = useDroppable({
+  // const { setNodeRef, isOver, over, active } = useDroppable({
+  //   id: status,
+  // })
+
+  const { isDropTarget, ref } = useDroppable({
+    accept: 'item',
+    collisionPriority: CollisionPriority.Low,
     id: status,
+    type: 'column',
   })
 
-  const isOverContainer = status === over?.id
+  // const droppable = useDroppable({
+  //   id: status,
+  // })
+
+  const isOverContainer = isDropTarget
 
   return (
     <div
-      ref={setNodeRef}
+      ref={ref}
       className={cn(
         'media-column flex flex-col gap-4 h-full min-h-[500px]',
         className
@@ -60,16 +71,16 @@ export const MediaColumn = ({
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        <SortableContext
-          items={media.map((m) => m.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className={cn('space-y-3', { 'bg-red-400': isOverContainer })}>
-            {media.map((item) => (
-              <MediaCard key={item.id} media={item} onEdit={onEdit} />
-            ))}
-          </div>
-        </SortableContext>
+        <div className={cn('space-y-3', { 'bg-red-400': isOverContainer })}>
+          {media.map((item) => (
+            <MediaCard
+              key={item.id}
+              media={item}
+              onEdit={onEdit}
+              status={status}
+            />
+          ))}
+        </div>
 
         {media.length === 0 ? (
           <div className="text-center text-base py-8">

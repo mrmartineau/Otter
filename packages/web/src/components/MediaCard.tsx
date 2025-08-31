@@ -1,13 +1,7 @@
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import {
-  PencilIcon,
-  StarHalfIcon,
-  StarIcon,
-  TrashIcon,
-} from '@phosphor-icons/react'
+import { useSortable } from '@dnd-kit/react/sortable'
+import { PencilIcon, TrashIcon } from '@phosphor-icons/react'
 import type { ComponentProps } from 'react'
-import type { Media } from '@/types/db'
+import type { Media, MediaStatus } from '@/types/db'
 import { cn } from '@/utils/classnames'
 import { useDeleteMedia } from '@/utils/fetching/media'
 import { Flex } from './Flex'
@@ -24,37 +18,53 @@ import { MediaTypeToIcon } from './TypeToIcon'
 interface MediaCardProps extends ComponentProps<'div'> {
   media: Media
   onEdit?: (media: Media) => void
+  status?: MediaStatus
 }
-function always() {
-  return true
-}
+// function always() {
+//   return true
+// }
 
 export const MediaCard = ({
   media,
   className,
   onEdit,
+  status,
   ...rest
 }: MediaCardProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-    data,
-    index,
-    newIndex,
-  } = useSortable({ animateLayoutChanges: always, id: media.id })
+  // const {
+  //   attributes,
+  //   listeners,
+  //   setNodeRef,
+  //   transform,
+  //   transition,
+  //   isDragging,
+  //   data,
+  //   index,
+  //   newIndex,
+  // } = useSortable({ animateLayoutChanges: always, id: media.id })
+
+  // const { ref, isDragging, isDropping } = useSortable({
+  //   group:,
+  //   id: media.id,
+  //   index: media.sort_order ?? 0,
+  // })
+
+  const { ref, isDragging } = useSortable({
+    accept: 'item',
+    group: status,
+    id: media.id,
+    index: media.sort_order ?? 0,
+    type: 'item',
+  })
   // console.log(`🚀 ~ MediaCard ~ data:`, data.sortable.index, index, newIndex)
   // const index = data.sortable.index
 
   const deleteMedia = useDeleteMedia()
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
+  // const style = {
+  //   transform: CSS.Transform.toString(transform),
+  //   transition,
+  // }
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -65,17 +75,17 @@ export const MediaCard = ({
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
+      ref={ref}
+      // style={style}
       className={cn(
         'card media-card cursor-grab active:cursor-grabbing',
-        isDragging && 'opacity-50',
+        isDragging && 'media-card-dragging',
         className
       )}
-      {...attributes}
-      {...listeners}
+      // {...attributes}
+      // {...listeners}
       {...rest}
-      data-index={index}
+      data-index={media.sort_order ?? 0}
     >
       <div className="media-card-title">{media.name}</div>
 
