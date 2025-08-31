@@ -5,7 +5,7 @@ import { Combobox } from '@/components/Combobox'
 import { Flex } from '@/components/Flex'
 import { FormGroup } from '@/components/FormGroup'
 import { Input } from '@/components/Input'
-import type { MediaInsert } from '@/types/db'
+import type { MediaInsert, MediaStatus } from '@/types/db'
 import { cn } from '@/utils/classnames'
 import { IconControl } from './IconControl'
 import {
@@ -57,15 +57,12 @@ export const MediaForm = ({
   const { register, handleSubmit, setValue, watch } = useForm<MediaInsert>({
     defaultValues: {
       status: 'wishlist',
-      type: 'other',
+      type: 'tv',
       ...initialValues,
     },
   })
 
-  // const watchType = watch('type')
   const watchPlatform = watch('platform')
-  // const watchStatus = watch('status')
-  // const watchRating = watch('rating')
 
   const transformedPlatformsForCombobox = platforms.map((platform) => ({
     label: platform,
@@ -87,6 +84,7 @@ export const MediaForm = ({
         onSubmit={handleSubmit(handleSubmitForm)}
         className={mediaFormClass}
       >
+        <input type="hidden" {...register('sort_order')} value={0} />
         {/* TYPE */}
         <FormGroup label="Type" name="type">
           <Flex gap="xs" wrap="wrap" justify="start">
@@ -157,7 +155,7 @@ export const MediaForm = ({
           <Select
             {...register('status')}
             onValueChange={(value) => {
-              setValue('status', value as 'wishlist' | 'now' | 'done')
+              setValue('status', value as MediaStatus)
             }}
           >
             <SelectTrigger className="w-[180px]">

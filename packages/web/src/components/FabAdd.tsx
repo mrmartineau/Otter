@@ -1,8 +1,8 @@
 import { PlusCircleIcon } from '@phosphor-icons/react'
 import { useLocation } from '@tanstack/react-router'
+import { cn } from '@/utils/classnames'
 import { ROUTE_NEW_BOOKMARK } from '../constants'
 import { Link } from './Link'
-import { cn } from '@/utils/classnames'
 import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip'
 
 export const FabAdd = () => {

@@ -16,11 +16,13 @@ import type { Database } from '@/types/supabase'
 import { getErrorMessage } from '../get-error-message'
 import { supabase } from '../supabase/client'
 
+export type GroupedMedia = Record<NonNullable<Media['status']>, Media[]>
+
 const groupMediaByStatus = (media: Media[]) => {
-  return Object.groupBy(media, (item) => item.status ?? 'wishlist') as Record<
-    NonNullable<Media['status']>,
-    Media[]
-  >
+  return Object.groupBy(
+    media,
+    (item) => item.status ?? 'wishlist'
+  ) as GroupedMedia
 }
 
 export const getMedia = async (
@@ -113,54 +115,11 @@ export const useCreateMedia = () => {
 
       return response
     },
-    onError: (
-      error,
-      _,
-      context:
-        | { previousData?: Array<[readonly unknown[], unknown]> }
-        | undefined
-    ) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      if (context?.previousData) {
-        context.previousData.forEach(
-          ([queryKey, data]: [readonly unknown[], unknown]) => {
-            queryClient.setQueryData(queryKey, data)
-          }
-        )
-      }
-
+    onError: (error) => {
       const errorMessage = getErrorMessage(error)
       toast.error('Failed to create media item', {
         description: errorMessage,
       })
-    },
-    onMutate: async (data: MediaInsert) => {
-      await queryClient.cancelQueries({ queryKey: ['media'] })
-
-      const previousData = queryClient.getQueriesData({ queryKey: ['media'] })
-
-      queryClient.setQueriesData({ queryKey: ['media'] }, (old: any) => {
-        if (!old?.data) {
-          return old
-        }
-
-        const optimisticItem = {
-          ...data,
-          created_at: new Date().toISOString(),
-          id: Date.now(), // Temporary ID
-          modified_at: new Date().toISOString(),
-        }
-
-        return {
-          ...old,
-          data: [optimisticItem, ...old.data],
-        }
-      })
-
-      return { previousData }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['media'] })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] })
@@ -187,50 +146,15 @@ export const useUpdateMedia = () => {
 
       return response
     },
-    onError: (error, _variables, context: any) => {
-      if (context?.previousData) {
-        context.previousData.forEach(([queryKey, data]: [any, any]) => {
-          queryClient.setQueryData(queryKey, data)
-        })
-      }
-
+    onError: (error) => {
       const errorMessage = getErrorMessage(error)
       toast.error('Failed to update media item', {
         description: errorMessage,
       })
     },
-    onMutate: async ({ id, data }) => {
-      await queryClient.cancelQueries({ queryKey: ['media'] })
-
-      const previousData = queryClient.getQueriesData({ queryKey: ['media'] })
-
-      queryClient.setQueriesData({ queryKey: ['media'] }, (old: any) => {
-        if (!old?.data) {
-          return old
-        }
-
-        return {
-          ...old,
-          data: old.data.map((item: any) =>
-            item.id === id
-              ? {
-                  ...item,
-                  ...data,
-                  modified_at: new Date().toISOString(),
-                }
-              : item
-          ),
-        }
-      })
-
-      return { previousData }
-    },
-    onSettled: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['media'] })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media'] })
-      toast.success('Media item updated successfully')
+      toast.success(`${data?.data.name} updated successfully`)
     },
   })
 }
@@ -290,32 +214,11 @@ export const useDeleteMedia = () => {
 
       return response
     },
-    onError: (error, _id, context) => {
-      if (context?.previousMedia) {
-        queryClient.setQueryData(['media'], context.previousMedia)
-      }
+    onError: (error) => {
       const errorMessage = getErrorMessage(error)
       toast.error('Failed to delete media item', {
         description: errorMessage,
       })
-    },
-    onMutate: async (id: number) => {
-      await queryClient.cancelQueries({ queryKey: ['media'] })
-
-      const previousMedia = queryClient.getQueryData(['media'])
-
-      queryClient.setQueryData(['media'], (old: any) => {
-        if (!old || !old.data) {
-          return old
-        }
-
-        return {
-          ...old,
-          data: old.data.filter((item: any) => item.id !== id),
-        }
-      })
-
-      return { previousMedia }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] })

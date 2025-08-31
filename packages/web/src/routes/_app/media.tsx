@@ -1,9 +1,9 @@
 import { move } from '@dnd-kit/helpers'
 import { DragDropProvider, KeyboardSensor, PointerSensor } from '@dnd-kit/react'
-import { CircleIcon, PlusIcon } from '@phosphor-icons/react'
+import { CircleIcon, PlusCircleIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/Button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/Dialog'
 import { IconControl } from '@/components/IconControl'
@@ -12,8 +12,13 @@ import { MediaColumn } from '@/components/MediaColumn'
 import { MediaForm } from '@/components/MediaForm'
 import { MediaTypeToIcon } from '@/components/TypeToIcon'
 import { createTitle } from '@/constants'
-import type { Media, MediaFilters } from '@/types/db'
-import type { Database } from '@/types/supabase'
+import type {
+  Media,
+  MediaFilters,
+  MediaInsert,
+  MediaStatus,
+  MediaUpdate,
+} from '@/types/db'
 import {
   getMediaOptions,
   useCreateMedia,
@@ -48,15 +53,19 @@ function RouteComponent() {
   const [filters, setFilters] = useState<MediaFilters>({})
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingMedia, setEditingMedia] = useState<Media | null>(null)
-
   const { data: mediaResponse } = useSuspenseQuery(getMediaOptions())
   const allMedia = mediaResponse?.data
   const [media, setMedia] = useState(allMedia)
   const previousItems = useRef(media)
-
   const createMediaMutation = useCreateMedia()
   const updateMediaMutation = useUpdateMedia()
   const updateMediaStatusMutation = useUpdateMediaStatus()
+
+  useEffect(() => {
+    if (allMedia) {
+      setMedia(allMedia)
+    }
+  }, [allMedia])
 
   // Filter media based on search and type filters
   const filteredMedia = useMemo(() => {
@@ -88,7 +97,7 @@ function RouteComponent() {
     return result
   }, [media, filters])
 
-  const handleCreateMedia = (formData: any) => {
+  const handleCreateMedia = (formData: MediaInsert) => {
     createMediaMutation.mutate(formData, {
       onSuccess: () => {
         setIsDialogOpen(false)
@@ -101,7 +110,7 @@ function RouteComponent() {
     setIsDialogOpen(true)
   }
 
-  const handleUpdateMedia = (formData: any) => {
+  const handleUpdateMedia = (formData: MediaUpdate) => {
     if (!editingMedia) {
       return
     }
@@ -213,11 +222,11 @@ function RouteComponent() {
           >
             <DialogTrigger asChild>
               <Button variant="outline">
-                <PlusIcon size={18} weight="bold" />
+                <PlusCircleIcon size={18} weight="duotone" />
                 Add Media
               </Button>
             </DialogTrigger>
-            <DialogContent placement="right" width="l">
+            <DialogContent placement="center" width="m">
               <MediaForm
                 type={editingMedia ? 'edit' : 'new'}
                 initialValues={editingMedia || undefined}
@@ -231,7 +240,7 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className="overflow-x-scroll w-full">
+      <div className="overflow-x-auto w-full">
         <DragDropProvider
           onDragStart={() => {
             previousItems.current = media
@@ -264,7 +273,7 @@ function RouteComponent() {
 
             const batched: Array<{
               id: number
-              status: Database['public']['Enums']['media_status']
+              status: MediaStatus
               sortOrder: number
             }> = []
 
@@ -283,8 +292,7 @@ function RouteComponent() {
                 batched.push({
                   id: item.id,
                   sortOrder: index,
-                  status:
-                    statusKey as Database['public']['Enums']['media_status'],
+                  status: statusKey as MediaStatus,
                 })
               })
             })
