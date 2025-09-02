@@ -37,20 +37,12 @@ export const MediaColumn = ({
   onEdit,
   ...rest
 }: MediaColumnProps) => {
-  // const { setNodeRef, isOver, over, active } = useDroppable({
-  //   id: status,
-  // })
-
   const { isDropTarget, ref } = useDroppable({
     accept: 'item',
     collisionPriority: CollisionPriority.Low,
     id: status,
     type: 'column',
   })
-
-  // const droppable = useDroppable({
-  //   id: status,
-  // })
 
   const isOverContainer = isDropTarget
 
@@ -71,7 +63,7 @@ export const MediaColumn = ({
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        <div className={cn('space-y-3', { 'bg-red-400': isOverContainer })}>
+        <div className={cn('space-y-3', { 'bg-gray-400': isOverContainer })}>
           {media.map((item) => (
             <MediaCard
               key={item.id}
