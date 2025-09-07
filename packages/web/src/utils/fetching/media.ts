@@ -5,11 +5,13 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { MediaSearchItem } from 'worker/media/mediaSearch'
 import type {
   Media,
   MediaFilters,
   MediaInsert,
   MediaStatus,
+  MediaType,
   MediaUpdate,
 } from '@/types/db'
 import type { Database } from '@/types/supabase'
@@ -224,5 +226,33 @@ export const useDeleteMedia = () => {
       queryClient.invalidateQueries({ queryKey: ['media'] })
       toast.success('Media item deleted successfully')
     },
+  })
+}
+
+const getMediaSearch = async ({
+  query,
+  type,
+}: {
+  query: string
+  type: MediaType
+}) => {
+  const response = await fetch(`/api/media-search?query=${query}&type=${type}`)
+  const data = await response.json()
+  return data as MediaSearchItem[]
+}
+
+export const getMediaSearchOptions = ({
+  query,
+  type,
+}: {
+  query: string | undefined
+  type: MediaType | undefined | null
+}) => {
+  return queryOptions({
+    enabled: !!query && !!type,
+    // @ts-expect-error - This will only run if query and type are defined
+    queryFn: () => getMediaSearch({ query, type }),
+    queryKey: ['media', query, type],
+    staleTime: 5 * 1000,
   })
 }

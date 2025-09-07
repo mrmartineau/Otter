@@ -1,0 +1,30 @@
+# This file can be used to test the API locally in conjunction with the REST Client VS Code extension.
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+# Variables
+@base_url = http://localhost:5678/api
+@token = {{$dotenv SUPABASE_USER_API_KEY}}
+
+###
+
+# book search
+GET {{base_url}}/media-search?type=book&query=the+lord+of+the+rings
+Authorization: Bearer {{token}}
+
+###
+
+# podcast search
+GET {{base_url}}/media-search?type=podcast&query=hard+fork
+Authorization: Bearer {{token}}
+
+###
+
+# game search
+GET {{base_url}}/media-search?type=game&query=the+last+of+us
+Authorization: Bearer {{token}}
+
+###
+
+# tv search
+GET {{base_url}}/media-search?type=tv&query=the+last+of+us
+Authorization: Bearer {{token}}

@@ -4,6 +4,10 @@ import type { Media, MediaStatus, MediaType } from '@/types/db'
 import { getErrorMessage } from '@/utils/get-error-message'
 import { createAuthenticatedClient } from '../supabase/client'
 
+type GroupedMedia = Partial<
+  Record<MediaType, Partial<Record<MediaStatus, Media[]>>>
+>
+
 /**
  * GET /api/media
  * Returns media items grouped by type, then by status, ordered by sort_order.
@@ -61,10 +65,8 @@ export const getMedia = async (request: HonoRequest<'/api/media'>) => {
       : statusOrder
 
     // Group items by type, then by status. Build keys dynamically
-    type Grouped = Partial<
-      Record<MediaType, Partial<Record<MediaStatus, Media[]>>>
-    >
-    const grouped: Grouped = {}
+
+    const grouped: GroupedMedia = {}
 
     for (const item of data || []) {
       const mediaType: MediaType = (item.type as MediaType) || 'other'

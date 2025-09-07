@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.0.1 (cd38da5)"
@@ -135,6 +135,7 @@ export type Database = {
         Row: {
           created_at: string
           id: number
+          image: string | null
           media_id: string | null
           modified_at: string | null
           name: string
@@ -143,10 +144,12 @@ export type Database = {
           sort_order: number | null
           status: Database["public"]["Enums"]["media_status"] | null
           type: Database["public"]["Enums"]["media_type"] | null
+          user: string | null
         }
         Insert: {
           created_at?: string
           id?: number
+          image?: string | null
           media_id?: string | null
           modified_at?: string | null
           name?: string
@@ -155,10 +158,12 @@ export type Database = {
           sort_order?: number | null
           status?: Database["public"]["Enums"]["media_status"] | null
           type?: Database["public"]["Enums"]["media_type"] | null
+          user?: string | null
         }
         Update: {
           created_at?: string
           id?: number
+          image?: string | null
           media_id?: string | null
           modified_at?: string | null
           name?: string
@@ -167,6 +172,7 @@ export type Database = {
           sort_order?: number | null
           status?: Database["public"]["Enums"]["media_status"] | null
           type?: Database["public"]["Enums"]["media_type"] | null
+          user?: string | null
         }
         Relationships: []
       }
@@ -417,7 +423,7 @@ export type Database = {
         }[]
       }
       update_bookmark_tags: {
-        Args: { old_tag: string; new_tag: string; user_id: string }
+        Args: { new_tag: string; old_tag: string; user_id: string }
         Returns: undefined
       }
     }

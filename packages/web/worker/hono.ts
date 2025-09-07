@@ -6,6 +6,7 @@ import { titleSystemPrompt } from './ai/title'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
 import { getNewBookmark, postNewBookmark } from './bookmarks/new'
 import { getMedia } from './media/media'
+import { getMediaSearch } from './media/mediaSearch'
 import { feedToJson } from './rss/rss-to-json'
 import { handleScrape } from './scraper'
 import { getSearch } from './search/search'
@@ -31,6 +32,9 @@ app.get('/search', async (c) => {
 })
 app.get('/media', async (c) => {
   return await getMedia(c.req)
+})
+app.get('/media-search', async (c) => {
+  return await getMediaSearch(c.req)
 })
 app.post('/toot', async (c) => {
   return await sendToots(c.req)
