@@ -47,7 +47,7 @@ const getTvSearch = async (query: string): Promise<MediaSearchItem[]> => {
 const getBookSearch = async (query: string): Promise<MediaSearchItem[]> => {
   try {
     const response = await fetch(
-      `https://openlibrary.org/search.json?title=${query}&_spellcheck_count=0&limit=10&fields=key,cover_i,title,subtitle,author_name,editions,name&mode=everything`
+      `https://openlibrary.org/search.json?q=${query}&limit=10&fields=key,cover_i,title,subtitle,author_name,editions,name&mode=everything&lang=en&sort=new`
     )
     const data = await response.json<{
       docs: {

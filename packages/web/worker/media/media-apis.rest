@@ -9,7 +9,7 @@
 
 # Books
 # Use the `editions.docs[0].cover_i` field to get the cover image
-GET https://openlibrary.org/search.json?title=casino%20royale&_spellcheck_count=0&limit=10&fields=key,cover_i,title,subtitle,author_name,editions,name&mode=everything
+GET https://openlibrary.org/search.json?q=the%20trading%20game&_spellcheck_count=0&limit=10&fields=key,cover_i,title,subtitle,author_name,editions,name&mode=everything&lang=en&sort=new
 
 ###
 # GET https://covers.openlibrary.org/b/id/15110328-M.jpg?default=https://openlibrary.org/static/images/icons/avatar_book-sm.png

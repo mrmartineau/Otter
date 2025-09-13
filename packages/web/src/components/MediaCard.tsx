@@ -96,14 +96,20 @@ export const MediaCard = ({
       <TooltipProvider delayDuration={800} skipDelayDuration={500}>
         <div className="feed-item-footer">
           <Flex align="center" gapX="2xs" gapY="2xs" wrap="wrap">
-            <div className="shrink-0">
-              <MediaTypeToIcon
-                type={media.type ?? 'other'}
-                size="16"
-                className="inline-block"
-              />{' '}
-              {media.type ?? 'other'}
-            </div>
+            {media.type ? (
+              <div className="shrink-0">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <MediaTypeToIcon
+                      type={media.type}
+                      size="16"
+                      className="inline-block"
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>{media.type}</TooltipContent>
+                </Tooltip>
+              </div>
+            ) : null}
             {media.platform ? <div>{media.platform}</div> : null}
             {onEdit ? (
               <Tooltip>

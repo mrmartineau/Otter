@@ -8,7 +8,7 @@
 ###
 
 # book search
-GET {{base_url}}/media-search?type=book&query=the+lord+of+the+rings
+GET {{base_url}}/media-search?type=book&query=the+trading+game
 Authorization: Bearer {{token}}
 
 ###
