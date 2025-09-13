@@ -4,11 +4,10 @@
   align-items: center;
   transition: 200ms var(--ease-in-out-1);
   transition-property: background-color, border-color, color, opacity;
-  border-radius: var(--radii-m);
   padding: 2px;
 
   &:hover,
-  &[aria-pressed="true"] {
+  &[aria-pressed='true'] {
     background-color: var(--theme6);
     color: var(--theme10);
   }

@@ -60,8 +60,8 @@ export const DialogContent = ({
     >
       <div className="sticky top-0">
         <DialogPrimitive.Close asChild>
-          <IconButton className="z-3 absolute right-0 top-0">
-            <XIcon size="18" />
+          <IconButton className="z-3 absolute right-0 top-0" shape="circle">
+            <XIcon size="18" weight="bold" />
           </IconButton>
         </DialogPrimitive.Close>
       </div>

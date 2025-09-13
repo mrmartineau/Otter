@@ -1,0 +1,9 @@
+.media-form {
+  max-width: 600px;
+}
+
+.media-form-columns {
+  display: grid;
+  grid-template-columns: 100px 2fr 1.5fr;
+  gap: var(--spacing-s);
+}

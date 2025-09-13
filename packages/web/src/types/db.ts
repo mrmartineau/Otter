@@ -49,6 +49,7 @@ export type Media = Database['public']['Tables']['media']['Row']
 export type MediaInsert = Database['public']['Tables']['media']['Insert']
 export type MediaUpdate = Database['public']['Tables']['media']['Update']
 export type MediaType = Database['public']['Enums']['media_type']
+export type MediaStatus = Database['public']['Enums']['media_status']
 
 export interface MediaFilters {
   search?: string

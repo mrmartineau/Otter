@@ -1,4 +1,5 @@
 import {
+  ApertureIcon,
   ArrowFatLinesUpIcon,
   EyeIcon,
   GaugeIcon,
@@ -19,6 +20,7 @@ import {
   ROUTE_DASHBOARD,
   ROUTE_FEED,
   ROUTE_HOME,
+  ROUTE_MEDIA,
   ROUTE_PUBLIC,
   ROUTE_SETTINGS_ACCOUNT,
   ROUTE_STARS,
@@ -116,6 +118,10 @@ export const Sidebar = ({ version }: SidebarProps) => {
             collections={dbMeta?.collections}
             tags={dbMeta?.tags}
           />
+          <SidebarLink href={ROUTE_MEDIA} activePath="media">
+            <ApertureIcon size={18} weight="duotone" />
+            {CONTENT.mediaNav}
+          </SidebarLink>
         </Flex>
       </div>
 

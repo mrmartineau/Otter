@@ -1,0 +1,14 @@
+.media-card-title {
+  align-items: flex-start;
+  gap: var(--space-xs);
+  font-size: var(--step--1);
+  font-variation-settings: 'wght' 500, 'wdth' 105;
+  color: var(--theme11);
+}
+
+.media-card-dragging {
+  opacity: 0.5;
+  transform: scale(1.02);
+  box-shadow: inset 0px 0px 1px rgba(0, 0, 0, 0.5),
+    -1px 0 15px 0 rgba(34, 33, 81, 0.01), 0px 15px 15px 0 rgba(34, 33, 81, 0.25);
+}

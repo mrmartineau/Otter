@@ -14,6 +14,7 @@ import {
   MicrophoneIcon,
   NewspaperClippingIcon,
   NotepadIcon,
+  QuestionIcon,
   TelevisionIcon,
   VideoCameraIcon,
 } from '@phosphor-icons/react'
@@ -220,7 +221,7 @@ export const MediaTypeToIcon = ({
       )
     case 'other':
       return (
-        <BarbellIcon
+        <QuestionIcon
           aria-label="Other"
           weight="duotone"
           size={18}
