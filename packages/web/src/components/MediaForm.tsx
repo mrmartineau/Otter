@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { useDebounce } from '@uidotdev/usehooks'
 import type { ComponentProps } from 'react'
 import { useForm } from 'react-hook-form'
+import { useDebounceValue } from 'usehooks-ts'
 import { Button } from '@/components/Button'
 import { Combobox } from '@/components/Combobox'
 import { Flex } from '@/components/Flex'
@@ -57,6 +57,7 @@ export const MediaForm = ({
 
   const { register, handleSubmit, setValue, watch } = useForm<MediaInsert>({
     defaultValues: {
+      name: '',
       status: 'wishlist',
       type: 'tv',
       ...initialValues,
@@ -66,13 +67,15 @@ export const MediaForm = ({
   const watchPlatform = watch('platform')
   const watchType = watch('type')
   const watchName = watch('name')
-  const [debouncedType, debouncedName] = useDebounce(
-    [watchType, watchName],
-    1000
-  )
+  const [debouncedName] = useDebounceValue(watchName, 1000)
   const { data: mediaSearch } = useSuspenseQuery(
-    getMediaSearchOptions({ query: debouncedName, type: debouncedType })
+    getMediaSearchOptions({
+      query: debouncedName,
+      type: watchType,
+    })
   )
+
+  const limitedMediaSearch = mediaSearch?.data?.slice(0, 3)
 
   const transformedPlatformsForCombobox = platforms.map((platform) => ({
     label: platform,
@@ -221,8 +224,8 @@ export const MediaForm = ({
           </div>
 
           <div className="flex flex-col gap-s">
-            {mediaSearch?.length ? (
-              mediaSearch?.map((item) => {
+            {limitedMediaSearch?.length ? (
+              limitedMediaSearch?.map((item) => {
                 return (
                   <Button
                     variant="outline"

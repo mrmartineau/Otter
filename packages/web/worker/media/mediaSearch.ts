@@ -22,12 +22,17 @@ const getTvSearch = async (query: string): Promise<MediaSearchItem[]> => {
           id: string
           image: { medium: string }
           name: string
+          externals: {
+            tvrage: string
+            thetvdb: string
+            imdb: string
+          }
         }
       }[]
     >()
     return data?.map((item) => {
       return {
-        id: item.show.id,
+        id: item.show.externals.thetvdb,
         image: item.show?.image?.medium,
         title: item.show.name,
         type: 'tv',
@@ -53,9 +58,14 @@ const getBookSearch = async (query: string): Promise<MediaSearchItem[]> => {
       }[]
     }>()
     return data?.docs?.map((item) => {
+      const image = item?.cover_i
+        ? `https://covers.openlibrary.org/b/id/${item?.cover_i}-M.jpg`
+        : `https://placehold.co/600x600?font=Poppins&text=${encodeURI(
+            item.title
+          )}`
       return {
         id: item?.cover_i,
-        image: `https://covers.openlibrary.org/b/id/${item?.editions[0]?.cover_i}-M.jpg?default=https://openlibrary.org/static/images/icons/avatar_book-sm.png`,
+        image,
         maker: item?.author_name?.[0],
         title: item.title,
         type: 'book',
@@ -104,14 +114,15 @@ const getPodcastSearch = async (query: string): Promise<MediaSearchItem[]> => {
         artworkUrl600: string
         artistName: string
         name: string
+        trackId: string
       }[]
     }>()
     return data?.results?.map((item) => {
       return {
-        id: item.trackName,
+        id: item.trackId,
         image: item.artworkUrl600,
         maker: item.artistName,
-        title: item.name,
+        title: item.trackName,
         type: 'podcast',
       }
     })
@@ -151,7 +162,12 @@ export const getMediaSearch = async (
       break
   }
 
-  return new Response(JSON.stringify(results), {
+  const response = {
+    count: results.length,
+    data: results,
+  }
+
+  return new Response(JSON.stringify(response), {
     headers: API_HEADERS,
     status: 200,
   })

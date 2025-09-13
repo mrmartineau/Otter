@@ -238,7 +238,10 @@ const getMediaSearch = async ({
 }) => {
   const response = await fetch(`/api/media-search?query=${query}&type=${type}`)
   const data = await response.json()
-  return data as MediaSearchItem[]
+  return data as {
+    count: number
+    data: MediaSearchItem[]
+  }
 }
 
 export const getMediaSearchOptions = ({
@@ -253,6 +256,6 @@ export const getMediaSearchOptions = ({
     // @ts-expect-error - This will only run if query and type are defined
     queryFn: () => getMediaSearch({ query, type }),
     queryKey: ['media', query, type],
-    staleTime: 5 * 1000,
+    // staleTime: 5 * 1000, //
   })
 }

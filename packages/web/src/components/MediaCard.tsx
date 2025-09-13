@@ -76,26 +76,22 @@ export const MediaCard = ({
   return (
     <div
       ref={ref}
-      // style={style}
       className={cn(
         'card media-card cursor-grab active:cursor-grabbing',
         isDragging && 'media-card-dragging',
         className
       )}
-      // {...attributes}
-      // {...listeners}
       {...rest}
       data-index={media.sort_order ?? 0}
+      data-media-id={media.media_id}
     >
-      <div className="media-card-title">{media.name}</div>
+      {media.image ? (
+        <img src={media.image} alt={media.name} className="rounded-md" />
+      ) : (
+        <div className="media-card-title">{media.name}</div>
+      )}
 
       {media.rating ? <Rating rating={media.rating} /> : null}
-
-      {media.media_id ? (
-        <div className="text-xs text-gray-500 dark:text-gray-500">
-          ID: {media.media_id}
-        </div>
-      ) : null}
 
       <TooltipProvider delayDuration={800} skipDelayDuration={500}>
         <div className="feed-item-footer">
