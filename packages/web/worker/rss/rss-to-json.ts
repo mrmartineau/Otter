@@ -27,7 +27,7 @@ const options = {
 const parser = new XMLParser(options)
 
 export const feedToJson = async (
-  feedUrl: string
+  feedUrl: string,
 ): Promise<Feed | undefined> => {
   const req = await fetch(feedUrl)
   const xmlData = await req.text()
@@ -73,7 +73,7 @@ function reformatData(d: any): Feed {
           title: title,
           ...rest,
         }
-      }
+      },
     )
   } else {
     result.feed = {
@@ -109,7 +109,7 @@ function reformatData(d: any): Feed {
           title: title,
           ...rest,
         }
-      }
+      },
     )
   }
 

@@ -71,7 +71,7 @@ app.get('/rss', async (c) => {
     {
       error: 'Feed not found',
     },
-    404
+    404,
   )
 })
 

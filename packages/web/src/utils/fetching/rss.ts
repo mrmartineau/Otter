@@ -6,7 +6,7 @@ export const getRss = async (url: string) => {
   const response = await fetch(
     urlJoin('/api/rss', {
       query: { feed: url },
-    })
+    }),
   )
   const data: Feed = await response.json()
 

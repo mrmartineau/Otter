@@ -7,7 +7,7 @@
   padding: 2px;
 
   &:hover,
-  &[aria-pressed='true'] {
+  &[aria-pressed="true"] {
     background-color: var(--theme6);
     color: var(--theme10);
   }

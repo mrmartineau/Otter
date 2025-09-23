@@ -69,7 +69,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         column = 'settings_pinned_tags'
         value = profileData?.settings_pinned_tags?.length
           ? profileData?.settings_pinned_tags.filter(
-              (item) => item !== action.payload
+              (item) => item !== action.payload,
             )
           : []
       }
@@ -80,7 +80,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         value,
       })
     },
-    [profileData, updateUser]
+    [profileData, updateUser],
   )
 
   return (
@@ -91,7 +91,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
           id: profileData?.id,
           profile: profileData,
         }),
-        [handleUpdateUISettings, profileData]
+        [handleUpdateUISettings, profileData],
       )}
     >
       {children}

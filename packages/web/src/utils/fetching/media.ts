@@ -23,13 +23,13 @@ export type GroupedMedia = Record<NonNullable<Media['status']>, Media[]>
 const groupMediaByStatus = (media: Media[]) => {
   return Object.groupBy(
     media,
-    (item) => item.status ?? 'wishlist'
+    (item) => item.status ?? 'wishlist',
   ) as GroupedMedia
 }
 
 export const getMedia = async (
   filters: MediaFilters = {},
-  supabaseClient: SupabaseClient<Database> = supabase
+  supabaseClient: SupabaseClient<Database> = supabase,
 ) => {
   let query = supabaseClient
     .from('media')
@@ -41,7 +41,7 @@ export const getMedia = async (
   if (filters.search) {
     const searchTerm = filters.search.toLowerCase()
     query = query.or(
-      `name.ilike.%${searchTerm}%,platform.ilike.%${searchTerm}%,type.ilike.%${searchTerm}%`
+      `name.ilike.%${searchTerm}%,platform.ilike.%${searchTerm}%,type.ilike.%${searchTerm}%`,
     )
   }
 
@@ -170,7 +170,7 @@ export const useUpdateMediaStatus = () => {
         id: number
         status: MediaStatus
         sortOrder?: number
-      }>
+      }>,
     ) => {
       const now = new Date().toISOString()
       const payload = items.map(({ id, status, sortOrder }) => ({

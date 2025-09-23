@@ -22,7 +22,7 @@ export const Route = createFileRoute('/_app/collection/$collection')({
         name: opts.params.collection,
         // @ts-expect-error Fix `search` typings
         params: opts.deps.search,
-      })
+      }),
     )
     return bookmarks
   },
@@ -40,7 +40,7 @@ function Page() {
       name: collection,
       // @ts-expect-error Fix `search` typings
       params: search,
-    })
+    }),
   )
   const subNav = useCollectionsSubNav(collection)
 

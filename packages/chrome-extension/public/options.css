@@ -23,7 +23,7 @@ label {
   font-weight: bold;
 }
 
-input:not([type='radio']),
+input:not([type="radio"]),
 textarea {
   display: block;
   width: 100%;

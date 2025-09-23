@@ -16,6 +16,6 @@ if (rootElement) {
           <Router />
         </NuqsAdapter>
       </ErrorBoundary>
-    </StrictMode>
+    </StrictMode>,
   )
 }

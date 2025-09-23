@@ -39,7 +39,7 @@ export const getUserProfileOptions = () => {
 
 export const getUserProfileByApiKey = async (
   apiKey: string,
-  supabaseClient: SupabaseClient<Database> = supabase
+  supabaseClient: SupabaseClient<Database> = supabase,
 ) => {
   const supabaseResponse = await supabaseClient
     .from('profiles')
@@ -103,7 +103,7 @@ export const updateUserMutation = () => {
               updated_at: new Date().toISOString(),
             },
           }
-        }
+        },
       )
 
       return { previousProfile }

@@ -25,7 +25,7 @@ export interface ComboOption {
 }
 
 export const setComboboxValue = (
-  platforms?: string[] | null
+  platforms?: string[] | null,
 ): readonly ComboOption[] => {
   if (!platforms) {
     return []
@@ -72,7 +72,7 @@ export const MediaForm = ({
     getMediaSearchOptions({
       query: debouncedName,
       type: watchType,
-    })
+    }),
   )
 
   const limitedMediaSearch = mediaSearch?.data?.slice(0, 3)
@@ -156,7 +156,7 @@ export const MediaForm = ({
                 onChange={(option) => {
                   setValue(
                     'platform',
-                    (option as ComboOption[])[0]?.value || ''
+                    (option as ComboOption[])[0]?.value || '',
                   )
                 }}
                 value={

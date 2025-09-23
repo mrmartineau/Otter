@@ -51,7 +51,7 @@ export const MediaColumn = ({
       ref={ref}
       className={cn(
         'media-column flex flex-col gap-4 h-full min-h-[500px]',
-        className
+        className,
       )}
       {...rest}
     >

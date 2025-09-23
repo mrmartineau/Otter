@@ -21,7 +21,7 @@ export const Route = createFileRoute('/_app/type/$type')({
   loader: async (opts) => {
     const bookmarks = await opts.context.queryClient.ensureQueryData(
       // @ts-expect-error Why is `search` not typed properly?
-      getBookmarksOptions({ ...opts.deps.search, type: opts.params.type })
+      getBookmarksOptions({ ...opts.deps.search, type: opts.params.type }),
     )
     return bookmarks
   },

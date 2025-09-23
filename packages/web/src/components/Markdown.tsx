@@ -28,7 +28,7 @@ export const Markdown = ({
     function handleResize() {
       if (contentRef && contentRef.current && !preventClamping) {
         setClamped(
-          contentRef.current.scrollHeight > contentRef.current.clientHeight
+          contentRef.current.scrollHeight > contentRef.current.clientHeight,
         )
       }
     }

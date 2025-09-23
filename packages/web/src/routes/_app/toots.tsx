@@ -20,7 +20,7 @@ export const Route = createFileRoute('/_app/toots')({
     // @ts-expect-error Fix `search` typings
     const { liked, ...search } = opts.deps.search
     const toots = await opts.context.queryClient.ensureQueryData(
-      getTootsOptions({ likes: liked, params: search })
+      getTootsOptions({ likes: liked, params: search }),
     )
     return toots
   },
@@ -37,7 +37,7 @@ function Page() {
   const { liked, ...search } = useSearch({ from: '/_app/toots' })
   const { data: dbMeta } = useSuspenseQuery(getMetaOptions())
   const { data } = useSuspenseQuery(
-    getTootsOptions({ likes: liked, params: search })
+    getTootsOptions({ likes: liked, params: search }),
   )
 
   const subNav = [

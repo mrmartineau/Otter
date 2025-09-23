@@ -13,7 +13,11 @@ const getTvMetadata = async (query: string): Promise<MediaMetadataItem[]> => {
     const response = await fetch(
       `https://api.tvmaze.com/search/shows?q=${query}`
     )
-    const data = await response.json()
+    const data = (await response.json()) as {
+      id: string
+      image: { medium: string }
+      name: string
+    }[]
     return data?.map((item) => {
       return {
         id: item.id,
@@ -33,7 +37,16 @@ const getBookMetadata = async (query: string) => {
     const response = await fetch(
       `https://openlibrary.org/search.json?title=${query}&_spellcheck_count=0&limit=10&fields=key,cover_i,title,subtitle,author_name,editions,name&mode=everything`
     )
-    const data = await response.json()
+    const data = (await response.json()) as {
+      docs: {
+        id: string
+        editions: { cover_i: string }[]
+        title: string
+        subtitle: string
+        author_name: string
+        name: string
+      }[]
+    }
     return data?.docs?.map((item) => {
       return {
         id: item.id,
@@ -54,7 +67,9 @@ const getGameMetadata = async (query: string) => {
     const response = await fetch(
       `https://api.gamebrain.co/v1/games?query=${query}&api-key=${process.env.MEDIA_GAMEBRAIN_API_KEY}`
     )
-    const data = await response.json()
+    const data = (await response.json()) as {
+      results: { id: string; image: string; name: string }[]
+    }
     return data?.results?.map((item) => {
       return {
         id: item.id,
@@ -74,7 +89,9 @@ const getPodcastMetadata = async (query: string) => {
     const response = await fetch(
       `https://itunes.apple.com/search?term=${query}&entity=podcast&limit=10`
     )
-    const data = await response.json()
+    const data = (await response.json()) as {
+      results: { trackName: string; artworkUrl600: string; name: string }[]
+    }
     return data?.results?.map((item) => {
       return {
         id: item.trackName,

@@ -12,7 +12,7 @@ import { createAuthenticatedClient } from '../supabase/client'
  * It uses the Supabase service key environment variable to authenticate via an Authorization header (Bearer token)
  */
 export const getAllBookmarks = async (
-  request: HonoRequest<'/api/bookmarks'>
+  request: HonoRequest<'/api/bookmarks'>,
 ) => {
   try {
     const searchParams = searchParamsToObject(request.url)
@@ -21,7 +21,7 @@ export const getAllBookmarks = async (
     const { data, count, error } = await getBookmarks(
       searchParams,
       client,
-      user.id
+      user.id,
     )
 
     if (error) {
@@ -36,12 +36,12 @@ export const getAllBookmarks = async (
           limit: Number(searchParams.limit) || DEFAULT_API_RESPONSE_LIMIT,
           offset: Number(searchParams.offset) || 0,
           path: request.url as string,
-        })
+        }),
       ),
       {
         headers: API_HEADERS,
         status: 200,
-      }
+      },
     )
   } catch (error) {
     const errorMessage = getErrorMessage(error)
@@ -54,7 +54,7 @@ export const getAllBookmarks = async (
       {
         headers: API_HEADERS,
         status: 400,
-      }
+      },
     )
   }
 }

@@ -1,10 +1,10 @@
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-const PATHS = require('./paths');
+const PATHS = require('./paths')
 
 // used in the module rules and in the stats exlude list
-const IMAGE_TYPES = /\.(png|jpe?g|gif|svg)$/i;
+const IMAGE_TYPES = /\.(png|jpe?g|gif|svg)$/i
 
 // To re-use webpack configuration across templates,
 // CLI maintains a common webpack configuration file - `webpack.common.js`.
@@ -61,6 +61,6 @@ const common = {
     errors: true,
     excludeAssets: [IMAGE_TYPES],
   },
-};
+}
 
-module.exports = common;
+module.exports = common

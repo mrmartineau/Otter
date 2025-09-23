@@ -17,7 +17,7 @@ export const Route = createFileRoute('/_app/new/bookmark')({
   }),
   loader: async (opts) => {
     const tags = await opts.context.queryClient.ensureQueryData(
-      getMetaOptions()
+      getMetaOptions(),
     )
     const response = { tags }
     return response

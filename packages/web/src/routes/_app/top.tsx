@@ -19,7 +19,7 @@ export const Route = createFileRoute('/_app/top')({
   loader: async (opts) => {
     const bookmarks = await opts.context.queryClient.ensureQueryData(
       // @ts-expect-error Why is `search` not typed properly?
-      getBookmarksOptions({ ...opts.deps.search, top: true })
+      getBookmarksOptions({ ...opts.deps.search, top: true }),
     )
     return bookmarks
   },
@@ -33,7 +33,7 @@ function Page() {
   const search = useSearch({ from: '/_app/top' })
   const { data } = useSuspenseQuery(
     // @ts-expect-error Fix `search` typings
-    getBookmarksOptions({ ...search, top: true })
+    getBookmarksOptions({ ...search, top: true }),
   )
 
   return (

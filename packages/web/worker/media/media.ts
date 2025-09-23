@@ -60,7 +60,7 @@ export const getMedia = async (request: HonoRequest<'/api/media'>) => {
           .split(',')
           .map((s) => s.trim() as MediaStatus)
           .filter((s): s is MediaStatus =>
-            (statusOrder as readonly string[]).includes(s)
+            (statusOrder as readonly string[]).includes(s),
           ) as readonly MediaStatus[])
       : statusOrder
 
@@ -138,7 +138,7 @@ export const getMedia = async (request: HonoRequest<'/api/media'>) => {
       {
         headers: API_HEADERS,
         status: 400,
-      }
+      },
     )
   }
 }

@@ -113,7 +113,7 @@ export const TweetFeedItem = (props: Tweet) => {
                     // biome-ignore lint/a11y/useMediaCaption: No captions for tweets
                     <video
                       src={getBestQualityVideoVariant(
-                        item.video_info?.variants
+                        item.video_info?.variants,
                       )}
                       controls
                       className="max-w-full"

@@ -72,7 +72,7 @@ export const postNewBookmark = async (request: HonoRequest<'/api/new'>) => {
       {
         headers: API_HEADERS,
         status: 400,
-      }
+      },
     )
   }
 }

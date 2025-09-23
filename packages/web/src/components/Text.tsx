@@ -22,7 +22,7 @@ const Text = ({ className, variant, ...props }: TextProps) => {
         textVariants({
           className,
           variant,
-        })
+        }),
       )}
       {...props}
     />
