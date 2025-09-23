@@ -1,0 +1,126 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "author": "mrmartineau",
+  "categories": [
+    "Applications",
+    "Productivity"
+  ],
+  "commands": [
+    {
+      "description": "Search Otter",
+      "interval": "10m",
+      "mode": "view",
+      "name": "search",
+      "subtitle": "Otter",
+      "title": "Search Bookmarks"
+    },
+    {
+      "description": "View recent Otter items",
+      "interval": "10m",
+      "mode": "view",
+      "name": "recent",
+      "subtitle": "Otter",
+      "title": "Recent Bookmarks"
+    },
+    {
+      "description": "Add new bookmark",
+      "mode": "view",
+      "name": "add",
+      "subtitle": "Otter",
+      "title": "Add Bookmark"
+    },
+    {
+      "description": "View recent Otter items",
+      "interval": "5m",
+      "mode": "menu-bar",
+      "name": "menubar",
+      "title": "View Recent Bookmarks"
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.103.1",
+    "@raycast/utils": "^2.2.1",
+    "@supabase/supabase-js": "catalog:",
+    "node-fetch": "^3.3.2",
+    "proper-url-join": "catalog:",
+    "run-applescript": "^7.1.0",
+    "tiny-relative-date": "catalog:",
+    "title": "catalog:"
+  },
+  "description": "Companion bookmarking utility for Otter bookmarks",
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.35.0",
+    "@raycast/eslint-config": "^2.0.4",
+    "@types/node": "^24.5.1",
+    "@types/proper-url-join": "^2.1.5",
+    "@types/react": "^19.1.13",
+    "eslint": "^9.35.0",
+    "react-devtools": "^6.1.5",
+    "typescript": "catalog:"
+  },
+  "icon": "command-icon.png",
+  "license": "MIT",
+  "name": "otter-raycast",
+  "preferences": [
+    {
+      "description": "Your email on otter.zander.wtf",
+      "name": "loginEmail",
+      "placeholder": "joe@doe.com",
+      "required": true,
+      "title": "Email",
+      "type": "textfield"
+    },
+    {
+      "description": "Your password on otter.zander.wtf",
+      "name": "loginPassword",
+      "placeholder": "********",
+      "required": true,
+      "title": "Password",
+      "type": "password"
+    },
+    {
+      "default": "https://otter.zander.wtf",
+      "description": "e.g. https://otter.zander.wtf",
+      "name": "otterBasePath",
+      "required": true,
+      "title": "Otter Instance URL",
+      "type": "textfield"
+    },
+    {
+      "default": "",
+      "description": "Find this in your Supabase project API settings. e.g. https://ffpbylcvwtyozyrplqic.supabase.co",
+      "name": "supabaseUrl",
+      "required": true,
+      "title": "Supabase Project URL",
+      "type": "textfield"
+    },
+    {
+      "default": "",
+      "description": "Find this in your Supabase project API settings",
+      "name": "supabaseAnonKey",
+      "required": true,
+      "title": "Supabase Anon API Key",
+      "type": "textfield"
+    },
+    {
+      "default": true,
+      "description": "Show detail view to side or list view",
+      "label": "Show detail view",
+      "name": "showDetailView",
+      "required": true,
+      "title": "Show Detail View to Side or List View",
+      "type": "checkbox"
+    }
+  ],
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "lint": "ray lint",
+    "lint:fix": "ray lint --fix",
+    "publish": "npx @raycast/api@latest publish",
+    "supabase:types": "npx supabase gen types typescript --project-id \"ffpbylcvwtyozyrplqic\" > src/supabase-types.ts"
+  },
+  "subtitle": "Otter",
+  "title": "Otter Bookmarks"
+}

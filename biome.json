@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
   "assist": {
     "actions": {
       "source": {
@@ -13,9 +13,10 @@
     "ignoreUnknown": false,
     "includes": [
       "**",
-      "!packages/**/dist/**",
+      "!packages/**/dist",
       "!packages/web/src/routeTree.gen.ts",
-      "!packages/web/src/types/supabase.ts"
+      "!packages/web/src/types/supabase.ts",
+      "!packages/chrome-extension"
     ]
   },
   "formatter": {

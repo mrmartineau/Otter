@@ -3,7 +3,12 @@ packages:
 
 catalog:
   '@cloudflare/vite-plugin': ^1.13.0
-  '@cloudflare/workers-types': ^4.20250912.0
+  '@cloudflare/workers-types': ^4.20250913.0
+  '@supabase/supabase-js': 2.57.4
+  proper-url-join: ^2.1.2
+  tiny-relative-date: ^2.0.2
+  title: ^4.0.1
+  typescript: ^5.9.2
   vite: ^7.1.5
   vitest: ^3.2.4
   wrangler: ^4.36.0

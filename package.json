@@ -1,10 +1,10 @@
 {
   "devDependencies": {
-    "@biomejs/biome": "2.1.3"
+    "@biomejs/biome": "2.2.4"
   },
   "homepage": "https://github.com/mrmartineau/otter-3",
   "name": "@mrmartineau/otter",
-  "packageManager": "pnpm@10.15.0",
+  "packageManager": "pnpm@10.16.1",
   "private": true,
   "repository": {
     "type": "git",
@@ -15,6 +15,7 @@
     "format": "pnpm exec biome format --write",
     "lint": "pnpm exec biome lint",
     "preview": "vite preview",
+    "raycast:dev": "pnpm --filter=otter-raycast run dev",
     "type-check": "tsc --noEmit",
     "web:build": "pnpm --filter=@mrmartineau/otter-web run build",
     "web:dev": "pnpm --filter=@mrmartineau/otter-web run dev"
