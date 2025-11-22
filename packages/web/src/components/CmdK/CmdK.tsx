@@ -50,7 +50,7 @@ export interface CmdKContextInterface {
   toggleOpen: DispatchWithoutAction
 }
 export const CmdKContext = createContext<CmdKContextInterface>(
-  {} as CmdKContextInterface,
+  {} as CmdKContextInterface
 )
 
 const sharedAccessories: AccessoryModel[] = [
@@ -205,7 +205,7 @@ export const CmdK = () => {
                       created_at={created_at}
                       isHoldingAltKeyDown={isHoldingAltKeyDown}
                     />
-                  ),
+                  )
                 )}
               </Command.Group>
             ) : null}
@@ -217,7 +217,7 @@ export const CmdK = () => {
                   return (
                     <Item
                       key={`tag-all-${tag}`}
-                      to={`/tag/${encodeURIComponent(tag)}`}
+                      to={`/tag/${tag}`}
                       value={`tag-${tag}`}
                       image={
                         <HashIcon weight="duotone" aria-label={`Tag: ${tag}`} />
@@ -235,7 +235,7 @@ export const CmdK = () => {
                   return (
                     <Item
                       key={`tag-pinned-${item}`}
-                      to={`/tag/${encodeURIComponent(item)}`}
+                      to={`/tag/${item}`}
                       value={`tag-pinned-${item}`}
                       image={
                         <HashIcon
@@ -259,7 +259,7 @@ export const CmdK = () => {
                   return (
                     <Item
                       key={`collection-${collection}`}
-                      to={`/collection/${encodeURIComponent(collection)}`}
+                      to={`/collection/${collection}`}
                       value={`collection-${collection}`}
                       image={
                         <CardsIcon

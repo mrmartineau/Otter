@@ -47,9 +47,9 @@ export const TagListItem = ({ tag, count, pinned }: TagListItemProps) => {
   return (
     <div className="tagListItem">
       <SidebarLink
-        href={`/tag/${encodeURIComponent(tag)}`}
+        href={`/tag/${tag}`}
         count={count || 0}
-        activePath={`/tag/${encodeURIComponent(tag)}`}
+        activePath={`/tag/${tag}`}
       >
         {pinned ? (
           <CheckCircleIcon aria-label="Pinned" size={18} weight="fill" />

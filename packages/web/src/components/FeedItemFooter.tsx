@@ -66,7 +66,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       : `Created on ${createdDate.formatted}`
 
   const handleToggleState = async (
-    column: 'public' | 'star',
+    column: 'public' | 'star'
   ): Promise<void> => {
     const updateData =
       column === 'public' ? { public: !isPublic } : { star: !star }
@@ -104,7 +104,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                   {matchingCollections.map(({ collection }) => (
                     <li key={collection}>
                       <Link
-                        href={urlJoin('/collection', encodeURIComponent(collection))}
+                        href={urlJoin('/collection', collection)}
                         variant="tag"
                       >
                         {collection}
@@ -120,7 +120,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                   </li>
                   {tags.map((tag) => (
                     <li id={tag} key={tag}>
-                      <Link href={urlJoin('/tag', encodeURIComponent(tag))} variant="tag">
+                      <Link href={urlJoin('/tag', tag)} variant="tag">
                         {tag}
                       </Link>
                     </li>
