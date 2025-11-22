@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_app/search')({
   head: ({ search }) => ({
     meta: [
       {
-        title: `${CONTENT.searchTitle}: ${decodeURIComponent(search?.q || '')}`,
+        title: `${CONTENT.searchTitle}: ${search?.q || ''}`,
       },
     ],
   }),
@@ -21,7 +21,7 @@ export const Route = createFileRoute('/_app/search')({
     // @ts-expect-error Fix `search` typings
     const { q, ...search } = opts.deps.search
     const { data } = await opts.context.queryClient.ensureQueryData(
-      getSearchBookmarksOptions({ params: search, searchTerm: q }),
+      getSearchBookmarksOptions({ params: search, searchTerm: q })
     )
     return data
   },
@@ -38,7 +38,7 @@ function RouteComponent() {
   const { q, ...search } = useSearch({ from: '/_app/search' })
   const { data } = useSuspenseQuery(
     // @ts-expect-error Fix `search` typings
-    getSearchBookmarksOptions({ params: search, searchTerm: q }),
+    getSearchBookmarksOptions({ params: search, searchTerm: q })
   )
 
   return (
@@ -51,7 +51,7 @@ function RouteComponent() {
       title={`${CONTENT.searchTitle}: ${q}`}
       icon={<MagnifyingGlassIcon weight="duotone" size={24} />}
       feedType="bookmarks"
-      from={`/search?q=${q}`}
+      from={`/search?q=${encodeURIComponent(q)}`}
     />
   )
 }

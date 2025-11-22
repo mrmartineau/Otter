@@ -2,6 +2,7 @@ import { EyeIcon, StarIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import type { FileRouteTypes } from '@tanstack/react-router'
 import { memo, type ReactNode } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import { Button } from '@/components/Button'
 import { CONTENT, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { useFeedOptions } from '@/hooks/useFeedOptions'
@@ -71,11 +72,11 @@ export const Feed = memo(
       offset,
     })
     const { data: collectionsTags } = useSuspenseQuery(
-      getCollectionsTagsOptions(),
+      getCollectionsTagsOptions()
     )
 
     const handleToggleState = async (
-      column: 'public' | 'star',
+      column: 'public' | 'star'
     ): Promise<void> => {
       if (column === 'public') {
         setPublicQuery((prev) => !prev)
@@ -103,7 +104,7 @@ export const Feed = memo(
             <h3
               className={cn(
                 headingVariants({ variant: 'feedTitle' }),
-                'flex items-center gap-2xs',
+                'flex items-center gap-2xs'
               )}
             >
               {icon}
@@ -157,26 +158,28 @@ export const Feed = memo(
                   <h3 className={headingVariants({ variant: 'date' })}>
                     {groupedItem.date}
                   </h3>
-                  <div className="grid gap-m">
-                    {groupedItem?.items?.map((item) => {
-                      if (!item) {
-                        return null
-                      }
-                      if (isTweet(item)) {
-                        return <TweetFeedItem {...item} key={item.id} />
-                      } else if (isToot(item)) {
-                        return <TootFeedItem {...item} key={item.id} />
-                      }
-                      return (
-                        <BookmarkFeedItem
-                          {...item}
-                          allowDeletion={allowDeletion}
-                          collections={collectionsTags ?? []}
-                          key={item.id}
-                        />
-                      )
-                    })}
-                  </div>
+                  <ErrorBoundary fallback={<div>Something went wrong</div>}>
+                    <div className="grid gap-m">
+                      {groupedItem?.items?.map((item) => {
+                        if (!item) {
+                          return null
+                        }
+                        if (isTweet(item)) {
+                          return <TweetFeedItem {...item} key={item.id} />
+                        } else if (isToot(item)) {
+                          return <TootFeedItem {...item} key={item.id} />
+                        }
+                        return (
+                          <BookmarkFeedItem
+                            {...item}
+                            allowDeletion={allowDeletion}
+                            collections={collectionsTags ?? []}
+                            key={item.id}
+                          />
+                        )
+                      })}
+                    </div>
+                  </ErrorBoundary>
                 </div>
               ))
             ) : (
@@ -239,7 +242,7 @@ export const Feed = memo(
         ) : null}
       </div>
     )
-  },
+  }
 )
 
 Feed.displayName = 'Feed'

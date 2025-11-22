@@ -104,7 +104,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                   {matchingCollections.map(({ collection }) => (
                     <li key={collection}>
                       <Link
-                        href={urlJoin('/collection', collection)}
+                        href={urlJoin('/collection', encodeURIComponent(collection))}
                         variant="tag"
                       >
                         {collection}
@@ -120,7 +120,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                   </li>
                   {tags.map((tag) => (
                     <li id={tag} key={tag}>
-                      <Link href={urlJoin('/tag', tag)} variant="tag">
+                      <Link href={urlJoin('/tag', encodeURIComponent(tag))} variant="tag">
                         {tag}
                       </Link>
                     </li>

@@ -217,7 +217,7 @@ export const CmdK = () => {
                   return (
                     <Item
                       key={`tag-all-${tag}`}
-                      to={`/tag/${tag}`}
+                      to={`/tag/${encodeURIComponent(tag)}`}
                       value={`tag-${tag}`}
                       image={
                         <HashIcon weight="duotone" aria-label={`Tag: ${tag}`} />
@@ -235,7 +235,7 @@ export const CmdK = () => {
                   return (
                     <Item
                       key={`tag-pinned-${item}`}
-                      to={`/tag/${item}`}
+                      to={`/tag/${encodeURIComponent(item)}`}
                       value={`tag-pinned-${item}`}
                       image={
                         <HashIcon
@@ -259,7 +259,7 @@ export const CmdK = () => {
                   return (
                     <Item
                       key={`collection-${collection}`}
-                      to={`/collection/${collection}`}
+                      to={`/collection/${encodeURIComponent(collection)}`}
                       value={`collection-${collection}`}
                       image={
                         <CardsIcon

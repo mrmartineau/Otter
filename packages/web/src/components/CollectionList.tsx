@@ -52,8 +52,8 @@ export const CollectionList = ({ collections, tags }: TypeListProps) => (
                 return (
                   <SidebarLink
                     count={item.count}
-                    href={`/collection/${item.collection}`}
-                    activePath={`/collection/${item.collection}`}
+                    href={`/collection/${encodeURIComponent(item.collection)}`}
+                    activePath={`/collection/${encodeURIComponent(item.collection)}`}
                     key={item.collection}
                   >
                     <FolderIcon

@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_app/tag/$tag')({
   head: ({ params }) => ({
     meta: [
       {
-        title: `Tag: #${decodeURIComponent(params.tag)}`,
+        title: `Tag: #${params.tag}`,
       },
     ],
   }),
@@ -19,7 +19,7 @@ export const Route = createFileRoute('/_app/tag/$tag')({
   loader: async (opts) => {
     const bookmarks = await opts.context.queryClient.ensureQueryData(
       // @ts-expect-error Why is `search` not typed properly?
-      getBookmarksOptions({ ...opts.deps.search, tag: opts.params.tag }),
+      getBookmarksOptions({ ...opts.deps.search, tag: opts.params.tag })
     )
     return bookmarks
   },
@@ -45,7 +45,7 @@ function Page() {
       title={tag}
       icon={<HashIcon weight="duotone" size={24} />}
       feedType="bookmarks"
-      from={`/tag/${tag}`}
+      from={`/tag/${encodeURIComponent(tag)}`}
     />
   )
 }

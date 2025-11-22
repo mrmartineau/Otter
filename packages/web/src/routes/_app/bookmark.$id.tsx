@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Outlet, useMatchRoute } from '@tanstack/react-router'
+import { ErrorBoundary } from 'react-error-boundary'
 import { BookmarkFeedItem } from '@/components/BookmarkFeedItem'
 import { getBookmarkOptions } from '@/utils/fetching/bookmarks'
 
@@ -17,7 +18,7 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
     const bookmark = await opts.context.queryClient.ensureQueryData(
       getBookmarkOptions({
         id: opts.params.id,
-      }),
+      })
     )
     return bookmark.data
   },
@@ -25,7 +26,7 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
 
 function RouteComponent() {
   const { data: bookmark } = useSuspenseQuery(
-    getBookmarkOptions({ id: Route.useParams().id }),
+    getBookmarkOptions({ id: Route.useParams().id })
   )
   const matchRoute = useMatchRoute()
   const params = matchRoute({ to: '/bookmark/$id/edit' })
@@ -37,8 +38,10 @@ function RouteComponent() {
       {params ? (
         <Outlet />
       ) : (
-        // @ts-expect-error How do I get the proper types for this?
-        <BookmarkFeedItem {...bookmark.data} preventMarkdownClamping />
+        <ErrorBoundary fallback={<div>Something went wrong</div>}>
+          {/* @ts-expect-error How do I get the proper types for this? */}
+          <BookmarkFeedItem {...bookmark.data} preventMarkdownClamping />
+        </ErrorBoundary>
       )}
     </>
   )

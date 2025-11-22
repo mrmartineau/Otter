@@ -12,7 +12,7 @@ export const Route = createFileRoute('/_app/collection/$collection')({
   head: ({ params }) => ({
     meta: [
       {
-        title: `Collection: ${decodeURIComponent(params.collection)}`,
+        title: `Collection: ${params.collection}`,
       },
     ],
   }),
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/_app/collection/$collection')({
         name: opts.params.collection,
         // @ts-expect-error Fix `search` typings
         params: opts.deps.search,
-      }),
+      })
     )
     return bookmarks
   },
@@ -40,7 +40,7 @@ function Page() {
       name: collection,
       // @ts-expect-error Fix `search` typings
       params: search,
-    }),
+    })
   )
   const subNav = useCollectionsSubNav(collection)
 
@@ -55,7 +55,7 @@ function Page() {
       icon={<FolderIcon weight="duotone" size={24} />}
       feedType="bookmarks"
       subNav={subNav}
-      from={`/collection/${collection}`}
+      from={`/collection/${encodeURIComponent(collection)}`}
     />
   )
 }

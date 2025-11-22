@@ -117,7 +117,7 @@ export const RESP_USER_GUEST = {
   guest: true,
 }
 
-export const DEFAULT_API_RESPONSE_LIMIT = 20
+export const DEFAULT_API_RESPONSE_LIMIT = 19
 export const DEFAULT_API_RESPONSE_ORDER: RequestOrder = 'desc'
 export const MINIMUM_CLICK_COUNT = 1
 

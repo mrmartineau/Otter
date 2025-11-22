@@ -1,4 +1,5 @@
 import { memo, type ReactNode } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import type { FeedItemModel } from '../hooks/useGroupByDate'
 import { cn } from '../utils/classnames'
 import { BookmarkFeedItem } from './BookmarkFeedItem'
@@ -23,7 +24,7 @@ export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
       <h3
         className={cn(
           headingVariants({ variant: 'feedTitle' }),
-          'flex items-center gap-2xs',
+          'flex items-center gap-2xs'
         )}
       >
         {icon}
@@ -41,7 +42,12 @@ export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
             return <TootFeedItem {...item} key={item.id} />
           }
           return (
-            <BookmarkFeedItem {...item} allowDeletion={false} key={item.id} />
+            <ErrorBoundary
+              fallback={<div>Something went wrong</div>}
+              key={item.id}
+            >
+              <BookmarkFeedItem {...item} allowDeletion={false} />
+            </ErrorBoundary>
           )
         })}
       </div>
