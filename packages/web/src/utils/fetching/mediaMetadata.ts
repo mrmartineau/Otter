@@ -65,7 +65,9 @@ const getBookMetadata = async (query: string) => {
 const getGameMetadata = async (query: string) => {
   try {
     const response = await fetch(
-      `https://api.gamebrain.co/v1/games?query=${query}&api-key=${process.env.MEDIA_GAMEBRAIN_API_KEY}`
+      `https://api.gamebrain.co/v1/games?query=${query}&api-key=${
+        import.meta.env.MEDIA_GAMEBRAIN_API_KEY
+      }`
     )
     const data = (await response.json()) as {
       results: { id: string; image: string; name: string }[]
