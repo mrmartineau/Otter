@@ -6,25 +6,25 @@ import {
   PencilIcon,
   ShareNetworkIcon,
   TrashIcon,
-} from '@phosphor-icons/react'
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import urlJoin from 'proper-url-join'
-import { DropdownMenu } from 'radix-ui'
-import { Suspense, useEffect, useState } from 'react'
-import { Button } from '@/components/Button'
-import { getMetaOptions } from '@/utils/fetching/meta'
-import { filteredTags } from '@/utils/filteredTags'
-import { supabase } from '@/utils/supabase/client'
-import { useClickBookmark } from '../hooks/useClickBookmark'
-import { useToggle } from '../hooks/useToggle'
-import type { BookmarkFeedItemProps } from './BookmarkFeedItem'
-import { BookmarkForm } from './BookmarkForm'
-import { Dialog, DialogContent, DialogTrigger } from './Dialog'
-import { Loader } from './Loader'
+} from "@phosphor-icons/react";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import urlJoin from "proper-url-join";
+import { DropdownMenu } from "radix-ui";
+import { Suspense } from "react";
+import { Button } from "@/components/Button";
+import { getMetaOptions } from "@/utils/fetching/meta";
+import { filteredTags } from "@/utils/filteredTags";
+import { supabase } from "@/utils/supabase/client";
+import { useClickBookmark } from "../hooks/useClickBookmark";
+import { useToggle } from "../hooks/useToggle";
+import type { BookmarkFeedItemProps } from "./BookmarkFeedItem";
+import { BookmarkForm } from "./BookmarkForm";
+import { Dialog, DialogContent, DialogTrigger } from "./Dialog";
+import { Loader } from "./Loader";
 
 interface FeedItemActionsProps extends BookmarkFeedItemProps {
-  isInFeed?: boolean
+  isInFeed?: boolean;
 }
 
 export const FeedItemActions = ({
@@ -40,108 +40,101 @@ export const FeedItemActions = ({
   allowDeletion = false,
   isInFeed = true,
 }: FeedItemActionsProps) => {
-  const [isToggled, , setToggleState] = useToggle()
-  const navigate = useNavigate()
-  const handleClickRegister = useClickBookmark()
-  const [canShare, setCanShare] = useState<boolean>(false)
-  const { data: bookmarkTags } = useSuspenseQuery(getMetaOptions())
-  const queryClient = useQueryClient()
+  const [isToggled, , setToggleState] = useToggle();
+  const navigate = useNavigate();
+  const handleClickRegister = useClickBookmark();
+  const { data: bookmarkTags } = useSuspenseQuery(getMetaOptions());
+  const queryClient = useQueryClient();
 
   const handleArchiveBookmark = async () => {
-    if (window.confirm('Do you really want to trash this bookmark?')) {
+    if (window.confirm("Do you really want to trash this bookmark?")) {
       await supabase
-        .from('bookmarks')
+        .from("bookmarks")
         .update({
           modified_at: new Date().toISOString(),
-          status: 'inactive',
+          status: "inactive",
         })
-        .match({ id })
-      await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+        .match({ id });
+      await queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
     }
-  }
+  };
   const handleUnArchiveBookmark = async () => {
     await supabase
-      .from('bookmarks')
+      .from("bookmarks")
       .update({
         modified_at: new Date().toISOString(),
-        status: 'active',
+        status: "active",
       })
-      .match({ id })
-    await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
-  }
+      .match({ id });
+    await queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+  };
   const handleDeleteBookmark = async () => {
-    if (window.confirm('Do you really want to delete this bookmark forever?')) {
-      await supabase.from('bookmarks').delete().match({ id })
-      await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+    if (window.confirm("Do you really want to delete this bookmark forever?")) {
+      await supabase.from("bookmarks").delete().match({ id });
+      await queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
     }
-  }
+  };
 
   const handleShare = async (
-    platform?: 'twitter' | 'mastodon',
+    platform?: "twitter" | "mastodon",
   ): Promise<void> => {
-    if (!url || !title) {
-      return
+    if (!navigator.share || !url || !title) {
+      return;
     }
-    const filteredTagsString = filteredTags(tags || [])
+    const filteredTagsString = filteredTags(tags || []);
     const tagsString =
-      filteredTagsString.length > 0 ? `${filteredTagsString}` : ''
+      filteredTagsString.length > 0 ? `${filteredTagsString}` : "";
     const descriptionString =
-      description && description.length > 0 ? ` - ${description}` : ''
-    const shareContent = `"${title}"${descriptionString}\n${url}\n${tagsString}`
+      description && description.length > 0 ? ` - ${description}` : "";
+    const shareContent = `"${title}"${descriptionString}\n${url}\n${tagsString}`;
 
     try {
       await navigator.share({
         text: shareContent,
         url,
-      })
+      });
     } catch (err) {
       switch (platform) {
-        case 'twitter':
+        case "twitter":
           window.open(
-            urlJoin('https://twitter.com/intent/tweet', {
+            urlJoin("https://twitter.com/intent/tweet", {
               query: {
                 original_referer: window.location.href,
-                source: 'tweetbutton',
+                source: "tweetbutton",
                 text: shareContent,
                 url,
               },
             }),
-          )
-          break
+          );
+          break;
         // case 'mastodon':
         default:
           window.open(
-            urlJoin('https://main.elk.zone/intent/post', {
+            urlJoin("https://main.elk.zone/intent/post", {
               query: {
                 text: shareContent,
               },
             }),
-          )
-          break
+          );
+          break;
       }
     }
-  }
+  };
 
   const handleSubmit = () => {
-    setToggleState(false)
-  }
+    setToggleState(false);
+  };
 
   const handleDeepLink = () => {
-    navigate({ to: urlJoin('/bookmark', id) })
-  }
+    navigate({ to: urlJoin("/bookmark", id) });
+  };
 
   const handleNavigateToBookmark = () => {
     if (url) {
-      handleClickRegister(id)
-      window.open(url, '_blank')
+      handleClickRegister(id);
+      window.open(url, "_blank");
     }
-  }
-
-  useEffect(() => {
-    if (window?.navigator?.canShare({ text: '' })) {
-      setCanShare(true)
-    }
-  }, [])
+  };
 
   return (
     <div className="feed-item-actions">
@@ -169,7 +162,7 @@ export const FeedItemActions = ({
                   </div>
                 </DropdownMenu.Item>
               ) : null}
-              {canShare ? (
+              {navigator?.share ? (
                 <DropdownMenu.Item
                   className="DropdownMenuItem"
                   onClick={() => handleShare()}
@@ -183,7 +176,7 @@ export const FeedItemActions = ({
                 <>
                   <DropdownMenu.Item
                     className="DropdownMenuItem"
-                    onClick={() => handleShare('mastodon')}
+                    onClick={() => handleShare("mastodon")}
                   >
                     Share on Mastodon
                     <div className="DropdownMenuItem-rightSlot">
@@ -192,7 +185,7 @@ export const FeedItemActions = ({
                   </DropdownMenu.Item>
                   <DropdownMenu.Item
                     className="DropdownMenuItem"
-                    onClick={() => handleShare('twitter')}
+                    onClick={() => handleShare("twitter")}
                   >
                     Share on Twitter
                     <div className="DropdownMenuItem-rightSlot">
@@ -229,13 +222,13 @@ export const FeedItemActions = ({
           <Dialog
             open={isToggled}
             onOpenChange={(open) => {
-              setToggleState(open)
+              setToggleState(open);
             }}
           >
             <DialogTrigger
               asChild
               onClick={() => {
-                setToggleState(true)
+                setToggleState(true);
               }}
             >
               <Button variant="ghost" size="xs">
@@ -277,5 +270,5 @@ export const FeedItemActions = ({
         </>
       )}
     </div>
-  )
-}
+  );
+};
