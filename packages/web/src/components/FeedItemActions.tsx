@@ -78,7 +78,7 @@ export const FeedItemActions = ({
   const handleShare = async (
     platform?: "twitter" | "mastodon",
   ): Promise<void> => {
-    if (!navigator.share || !url || !title) {
+    if (!url || !title) {
       return;
     }
     const filteredTagsString = filteredTags(tags || []);
@@ -88,13 +88,8 @@ export const FeedItemActions = ({
       description && description.length > 0 ? ` - ${description}` : "";
     const shareContent = `"${title}"${descriptionString}\n${url}\n${tagsString}`;
 
-    try {
-      await navigator.share({
-        text: shareContent,
-        url,
-      });
-    } catch (err) {
-      switch (platform) {
+    const openFallback = (sharePlatform?: "twitter" | "mastodon") => {
+      switch (sharePlatform) {
         case "twitter":
           window.open(
             urlJoin("https://twitter.com/intent/tweet", {
@@ -118,7 +113,23 @@ export const FeedItemActions = ({
           );
           break;
       }
+    };
+
+    // Check if Web Share API is available and functional
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({
+          text: shareContent,
+          url,
+        });
+        return;
+      } catch {
+        // User cancelled or share failed, fall through to fallback
+      }
     }
+
+    // Fallback for browsers without Web Share API (e.g., Firefox desktop)
+    openFallback(platform);
   };
 
   const handleSubmit = () => {
@@ -162,7 +173,7 @@ export const FeedItemActions = ({
                   </div>
                 </DropdownMenu.Item>
               ) : null}
-              {navigator?.share ? (
+              {typeof navigator?.share === "function" ? (
                 <DropdownMenu.Item
                   className="DropdownMenuItem"
                   onClick={() => handleShare()}
