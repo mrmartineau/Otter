@@ -20,9 +20,6 @@ interface MediaCardProps extends ComponentProps<'div'> {
   onEdit?: (media: Media) => void
   status?: MediaStatus
 }
-// function always() {
-//   return true
-// }
 
 export const MediaCard = ({
   media,
@@ -31,24 +28,6 @@ export const MediaCard = ({
   status,
   ...rest
 }: MediaCardProps) => {
-  // const {
-  //   attributes,
-  //   listeners,
-  //   setNodeRef,
-  //   transform,
-  //   transition,
-  //   isDragging,
-  //   data,
-  //   index,
-  //   newIndex,
-  // } = useSortable({ animateLayoutChanges: always, id: media.id })
-
-  // const { ref, isDragging, isDropping } = useSortable({
-  //   group:,
-  //   id: media.id,
-  //   index: media.sort_order ?? 0,
-  // })
-
   const { ref, isDragging } = useSortable({
     accept: 'item',
     group: status,
@@ -60,11 +39,6 @@ export const MediaCard = ({
   // const index = data.sortable.index
 
   const deleteMedia = useDeleteMedia()
-
-  // const style = {
-  //   transform: CSS.Transform.toString(transform),
-  //   transition,
-  // }
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -79,7 +53,7 @@ export const MediaCard = ({
       className={cn(
         'card media-card cursor-grab active:cursor-grabbing',
         isDragging && 'media-card-dragging',
-        className,
+        className
       )}
       {...rest}
       data-index={media.sort_order ?? 0}

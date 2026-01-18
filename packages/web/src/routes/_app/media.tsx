@@ -43,7 +43,7 @@ export const Route = createFileRoute('/_app/media')({
   }),
   loader: async (opts) => {
     const media = await opts.context.queryClient.ensureQueryData(
-      getMediaOptions(),
+      getMediaOptions()
     )
     return media
   },
@@ -125,7 +125,7 @@ function RouteComponent() {
           setIsDialogOpen(false)
           setEditingMedia(null)
         },
-      },
+      }
     )
   }
 
@@ -248,29 +248,46 @@ function RouteComponent() {
           onDragOver={(event) => {
             setMedia((items) => move(items, event))
           }}
+          /**
+           * Handler for when a drag-and-drop operation ends.
+           *
+           * This function updates the local `media` state and backend to reflect changes
+           * in the ordering and status of media items after a drag.
+           *
+           * Steps:
+           * 1. If there is no source of the operation, do nothing.
+           * 2. If the operation was canceled and an item was involved, revert the media state to its previous state.
+           * 3. Compare the state of items (by column/status) before and after the drag to detect what actually changed.
+           * 4. For each column with changed order or content, create an update for each item reflecting its new sort order and status.
+           * 5. If any changes were detected, batch the update to the backend with `updateMediaStatusMutation.mutate`.
+           */
           onDragEnd={(event) => {
             const { source } = event.operation
             if (!source) {
+              // No source information, abort.
               return
             }
 
             if (event.canceled) {
+              // If the drag was canceled, and the item was being dragged,
+              // revert to the previous state.
               if (source.type === 'item') {
                 setMedia(previousItems.current)
               }
-
               return
             }
 
-            // Determine which columns changed compared to the snapshot from drag start
+            // Get the previous and current state of media columns
             const prev = previousItems.current || {}
             const next = media || {}
 
+            // Collect all keys representing media statuses (columns)
             const statuses = new Set([
               ...Object.keys(prev ?? {}),
               ...Object.keys(next ?? {}),
             ]) as Set<keyof typeof next>
 
+            // Prepare a batch of updates for items with changed positions or statuses
             const batched: Array<{
               id: number
               status: MediaStatus
@@ -278,16 +295,19 @@ function RouteComponent() {
             }> = []
 
             statuses.forEach((statusKey) => {
+              // For each status/column, gather the previous and next IDs
               const prevIds = (prev[statusKey] ?? []).map((i) => i.id)
               const nextItems = next[statusKey] ?? []
               const nextIds = nextItems.map((i) => i.id)
 
+              // Detect whether this column changed (length, order, or content)
               const changed =
                 prevIds.length !== nextIds.length ||
                 prevIds.some((id, idx) => id !== nextIds[idx])
 
               if (!changed) return
 
+              // For all changed items in this column, record their new status and order
               nextItems.forEach((item, index) => {
                 batched.push({
                   id: item.id,
@@ -297,6 +317,7 @@ function RouteComponent() {
               })
             })
 
+            // If any changes were detected, update them in the backend
             if (batched.length > 0) {
               updateMediaStatusMutation.mutate(batched)
             }
