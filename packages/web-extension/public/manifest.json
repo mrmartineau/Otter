@@ -1,0 +1,50 @@
+{
+  "action": {},
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "_execute_action": {
+      "description": "Save to Otter",
+      "suggested_key": {
+        "default": "Ctrl+Shift+D",
+        "mac": "Command+Shift+D"
+      }
+    },
+    "quick-save": {
+      "description": "Quick save to Otter",
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      }
+    }
+  },
+  "content_scripts": [
+    {
+      "js": ["contentScript.js"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_idle"
+    }
+  ],
+  "description": "A Chrome Extension for Otter bookmarks",
+  "icons": {
+    "16": "icons/icon_16.png",
+    "32": "icons/icon_32.png",
+    "48": "icons/icon_48.png",
+    "128": "icons/icon_128.png"
+  },
+  "manifest_version": 3,
+  "name": "Otter",
+  "options_page": "options.html",
+  "permissions": [
+    "commands",
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "webNavigation",
+    "system.display",
+    "contextMenus"
+  ],
+  "version": "0.2.0"
+}
