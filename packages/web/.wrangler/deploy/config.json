@@ -1,1 +1,1 @@
-{ "auxiliaryWorkers": [], "configPath": "../../dist/otter_web/wrangler.json" }
+{ "auxiliaryWorkers": [], "configPath": "../../wrangler.jsonc" }
