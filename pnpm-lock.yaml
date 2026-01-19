@@ -323,6 +323,43 @@ importers:
         specifier: 'catalog:'
         version: 4.50.0(@cloudflare/workers-types@4.20251121.0)
 
+  packages/web-extension:
+    dependencies:
+      proper-url-join:
+        specifier: ^2.1.1
+        version: 2.1.2
+      webextension-polyfill:
+        specifier: ^0.10.0
+        version: 0.10.0
+    devDependencies:
+      '@types/chrome':
+        specifier: ^0.0.193
+        version: 0.0.193
+      copy-webpack-plugin:
+        specifier: ^10.2.4
+        version: 10.2.4(webpack@5.101.3)
+      css-loader:
+        specifier: ^6.7.1
+        version: 6.11.0(webpack@5.101.3)
+      file-loader:
+        specifier: ^6.2.0
+        version: 6.2.0(webpack@5.101.3)
+      mini-css-extract-plugin:
+        specifier: ^2.6.1
+        version: 2.9.4(webpack@5.101.3)
+      prettier:
+        specifier: ^2.7.1
+        version: 2.8.8
+      webpack:
+        specifier: ^5.73.0
+        version: 5.101.3(webpack-cli@4.10.0)
+      webpack-cli:
+        specifier: ^4.10.0
+        version: 4.10.0(webpack@5.101.3)
+      webpack-merge:
+        specifier: ^5.8.0
+        version: 5.10.0
+
 packages:
 
   '@acemir/cssom@0.9.23':
@@ -6099,6 +6136,9 @@ packages:
   watchpack@2.4.4:
     resolution: {integrity: sha512-c5EGNOiyxxV5qmTtAB7rbiXxi1ooX1pQKMLX/MIabJjRA0SJBQOjKF+KSVfHkr9U1cADPon0mRiVe/riyaiDUA==}
     engines: {node: '>=10.13.0'}
+
+  webextension-polyfill@0.10.0:
+    resolution: {integrity: sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==}
 
   webidl-conversions@8.0.0:
     resolution: {integrity: sha512-n4W4YFyz5JzOfQeA8oN7dUYpR+MBP3PIUsn2jLjWXwK5ASUzt0Jc/A5sAUZoCYFJRGF0FBKJ+1JjN43rNdsQzA==}
@@ -12604,6 +12644,8 @@ snapshots:
     dependencies:
       glob-to-regexp: 0.4.1
       graceful-fs: 4.2.11
+
+  webextension-polyfill@0.10.0: {}
 
   webidl-conversions@8.0.0: {}
 
