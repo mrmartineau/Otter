@@ -1,0 +1,10 @@
+{
+  "extension_description": {
+    "description": "Description of what the extension does.",
+    "message": "This is Otter. You should tell us what your extension does here."
+  },
+  "extension_name": {
+    "description": "The display name for the extension.",
+    "message": "Otter"
+  }
+}

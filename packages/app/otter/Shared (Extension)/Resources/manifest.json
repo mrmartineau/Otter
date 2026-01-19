@@ -1,0 +1,34 @@
+{
+  "action": {
+    "default_icon": "images/toolbar-icon.svg",
+    "default_popup": "popup.html"
+  },
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "default_locale": "en",
+  "description": "__MSG_extension_description__",
+  "host_permissions": ["<all_urls>"],
+
+  "icons": {
+    "48": "images/48x48.png",
+    "96": "images/128x128.png",
+    "128": "images/128x128.png",
+    "256": "images/256x256.png",
+    "512": "images/512x512.png"
+  },
+  "manifest_version": 3,
+
+  "name": "__MSG_extension_name__",
+
+  "permissions": ["tabs"],
+  "version": "1.0"
+}
