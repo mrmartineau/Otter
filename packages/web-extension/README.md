@@ -82,7 +82,7 @@ This extension uses the WebExtensions API with a polyfill to ensure compatibilit
 
 - **Chrome**: Uses native `chrome.*` APIs
 - **Firefox**: Uses `browser.*` APIs with webextension-polyfill
-- **Manifest V3**: Both browsers support Manifest V3
+- **Manifest V3**: Chrome uses service workers, Firefox uses background scripts
 
 ### Key Compatibility Features
 
@@ -402,6 +402,9 @@ Modify browser-specific manifests in `manifests/` directory:
 #### Firefox-specific Settings
 ```json
 {
+  "background": {
+    "scripts": ["background.js"]
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "your-extension@example.com",
@@ -410,6 +413,7 @@ Modify browser-specific manifests in `manifests/` directory:
   }
 }
 ```
+**Note**: Firefox requires `background.scripts` instead of `background.service_worker` even in Manifest V3.
 
 ## Publishing
 

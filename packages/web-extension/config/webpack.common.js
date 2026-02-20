@@ -1,10 +1,10 @@
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-const PATHS = require("./paths");
+const PATHS = require('./paths')
 
 // used in the module rules and in the stats exlude list
-const IMAGE_TYPES = /\.(png|jpe?g|gif|svg)$/i;
+const IMAGE_TYPES = /\.(png|jpe?g|gif|svg)$/i
 
 // To re-use webpack configuration across templates,
 // CLI maintains a common webpack configuration file - `webpack.common.js`.
@@ -16,17 +16,17 @@ const common = {
       // Help webpack in understanding CSS files imported in .js files
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
       // Check for images imported in .js files and
       {
         test: IMAGE_TYPES,
         use: [
           {
-            loader: "file-loader",
+            loader: 'file-loader',
             options: {
-              name: "[name].[ext]",
-              outputPath: "images",
+              name: '[name].[ext]',
+              outputPath: 'images',
             },
           },
         ],
@@ -35,7 +35,7 @@ const common = {
   },
   output: {
     // the filename template for entry chunks
-    filename: "[name].js",
+    filename: '[name].js',
     // the build folder to output bundles and assets in.
     path: PATHS.build,
   },
@@ -44,14 +44,14 @@ const common = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          context: "public",
-          from: "**/*",
+          context: 'public',
+          from: '**/*',
         },
       ],
     }),
     // Extract CSS into separate files
     new MiniCssExtractPlugin({
-      filename: "[name].css",
+      filename: '[name].css',
     }),
   ],
   stats: {
@@ -61,6 +61,6 @@ const common = {
     errors: true,
     excludeAssets: [IMAGE_TYPES],
   },
-};
+}
 
-module.exports = common;
+module.exports = common

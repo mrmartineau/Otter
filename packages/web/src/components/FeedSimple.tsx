@@ -24,7 +24,7 @@ export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
       <h3
         className={cn(
           headingVariants({ variant: 'feedTitle' }),
-          'flex items-center gap-2xs'
+          'flex items-center gap-2xs',
         )}
       >
         {icon}
