@@ -53,7 +53,7 @@ export const MediaCard = ({
       className={cn(
         'card media-card cursor-grab active:cursor-grabbing',
         isDragging && 'media-card-dragging',
-        className
+        className,
       )}
       {...rest}
       data-index={media.sort_order ?? 0}

@@ -1,6 +1,6 @@
-import "./popup.css";
-import { browserAPI } from "./browser-api.js";
-(() => {
+import './popup.css'
+import { browserAPI } from './browser-api.js'
+;(() => {
   // We will make use of Storage API to get and store `count` value
   // More information on Storage API can we found at
   // https://developer.chrome.com/extensions/storage
@@ -10,9 +10,9 @@ import { browserAPI } from "./browser-api.js";
   // https://developer.chrome.com/extensions/declare_permissions
   const counterStorage = {
     get: (cb) => {
-      browserAPI.storage.sync.get(["count"], (result) => {
-        cb(result.count);
-      });
+      browserAPI.storage.sync.get(['count'], (result) => {
+        cb(result.count)
+      })
     },
     set: (value, cb) => {
       browserAPI.storage.sync.set(
@@ -20,47 +20,47 @@ import { browserAPI } from "./browser-api.js";
           count: value,
         },
         () => {
-          cb();
-        }
-      );
+          cb()
+        },
+      )
     },
-  };
+  }
 
   function setupCounter(initialValue = 0) {
-    document.getElementById("counter").innerHTML = initialValue;
+    document.getElementById('counter').innerHTML = initialValue
 
-    document.getElementById("incrementBtn").addEventListener("click", () => {
+    document.getElementById('incrementBtn').addEventListener('click', () => {
       updateCounter({
-        type: "INCREMENT",
-      });
-    });
+        type: 'INCREMENT',
+      })
+    })
 
-    document.getElementById("decrementBtn").addEventListener("click", () => {
+    document.getElementById('decrementBtn').addEventListener('click', () => {
       updateCounter({
-        type: "DECREMENT",
-      });
-    });
+        type: 'DECREMENT',
+      })
+    })
   }
 
   function updateCounter({ type }) {
     counterStorage.get((count) => {
-      let newCount;
+      let newCount
 
-      if (type === "INCREMENT") {
-        newCount = count + 1;
-      } else if (type === "DECREMENT") {
-        newCount = count - 1;
+      if (type === 'INCREMENT') {
+        newCount = count + 1
+      } else if (type === 'DECREMENT') {
+        newCount = count - 1
       } else {
-        newCount = count;
+        newCount = count
       }
 
       counterStorage.set(newCount, () => {
-        document.getElementById("counter").innerHTML = newCount;
+        document.getElementById('counter').innerHTML = newCount
 
         // Communicate with content script of
         // active tab by sending a message
         browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          const tab = tabs[0];
+          const tab = tabs[0]
 
           browserAPI.tabs.sendMessage(
             tab.id,
@@ -68,43 +68,43 @@ import { browserAPI } from "./browser-api.js";
               payload: {
                 count: newCount,
               },
-              type: "COUNT",
+              type: 'COUNT',
             },
             (response) => {
-              console.log("Current count value passed to contentScript file");
-            }
-          );
-        });
-      });
-    });
+              console.log('Current count value passed to contentScript file')
+            },
+          )
+        })
+      })
+    })
   }
 
   function restoreCounter() {
     // Restore count value
     counterStorage.get((count) => {
-      if (typeof count === "undefined") {
+      if (typeof count === 'undefined') {
         // Set counter value as 0
         counterStorage.set(0, () => {
-          setupCounter(0);
-        });
+          setupCounter(0)
+        })
       } else {
-        setupCounter(count);
+        setupCounter(count)
       }
-    });
+    })
   }
 
-  document.addEventListener("DOMContentLoaded", restoreCounter);
+  document.addEventListener('DOMContentLoaded', restoreCounter)
 
   // Communicate with background file by sending a message
   browserAPI.runtime.sendMessage(
     {
       payload: {
-        message: "Hello, my name is Pop. I am from Popup.",
+        message: 'Hello, my name is Pop. I am from Popup.',
       },
-      type: "GREETINGS",
+      type: 'GREETINGS',
     },
     (response) => {
-      console.log(response.message);
-    }
-  );
-})();
+      console.log(response.message)
+    },
+  )
+})()

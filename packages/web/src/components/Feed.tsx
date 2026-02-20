@@ -72,11 +72,11 @@ export const Feed = memo(
       offset,
     })
     const { data: collectionsTags } = useSuspenseQuery(
-      getCollectionsTagsOptions()
+      getCollectionsTagsOptions(),
     )
 
     const handleToggleState = async (
-      column: 'public' | 'star'
+      column: 'public' | 'star',
     ): Promise<void> => {
       if (column === 'public') {
         setPublicQuery((prev) => !prev)
@@ -104,7 +104,7 @@ export const Feed = memo(
             <h3
               className={cn(
                 headingVariants({ variant: 'feedTitle' }),
-                'flex items-center gap-2xs'
+                'flex items-center gap-2xs',
               )}
             >
               {icon}
@@ -242,7 +242,7 @@ export const Feed = memo(
         ) : null}
       </div>
     )
-  }
+  },
 )
 
 Feed.displayName = 'Feed'

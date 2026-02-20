@@ -14,22 +14,23 @@ export type MediaSearchItem = {
 const getTvSearch = async (query: string): Promise<MediaSearchItem[]> => {
   try {
     const response = await fetch(
-      `https://api.tvmaze.com/search/shows?q=${query}`
+      `https://api.tvmaze.com/search/shows?q=${query}`,
     )
-    const data = await response.json<
-      {
-        show: {
-          id: string
-          image: { medium: string }
-          name: string
-          externals: {
-            tvrage: string
-            thetvdb: string
-            imdb: string
+    const data =
+      await response.json<
+        {
+          show: {
+            id: string
+            image: { medium: string }
+            name: string
+            externals: {
+              tvrage: string
+              thetvdb: string
+              imdb: string
+            }
           }
-        }
-      }[]
-    >()
+        }[]
+      >()
     return data?.map((item) => {
       return {
         id: item.show.externals.thetvdb,
@@ -47,7 +48,7 @@ const getTvSearch = async (query: string): Promise<MediaSearchItem[]> => {
 const getBookSearch = async (query: string): Promise<MediaSearchItem[]> => {
   try {
     const response = await fetch(
-      `https://openlibrary.org/search.json?q=${query}&limit=10&fields=key,cover_i,title,subtitle,author_name,editions,name&mode=everything&lang=en&sort=new`
+      `https://openlibrary.org/search.json?q=${query}&limit=10&fields=key,cover_i,title,subtitle,author_name,editions,name&mode=everything&lang=en&sort=new`,
     )
     const data = await response.json<{
       docs: {
@@ -61,7 +62,7 @@ const getBookSearch = async (query: string): Promise<MediaSearchItem[]> => {
       const image = item?.cover_i
         ? `https://covers.openlibrary.org/b/id/${item?.cover_i}-M.jpg`
         : `https://placehold.co/600x600?font=Poppins&text=${encodeURI(
-            item.title
+            item.title,
           )}`
       return {
         id: item?.cover_i,
@@ -82,7 +83,7 @@ const getGameSearch = async (query: string): Promise<MediaSearchItem[]> => {
     const response = await fetch(
       `https://api.gamebrain.co/v1/games?query=${query}&api-key=${
         import.meta.env.MEDIA_GAMEBRAIN_API_KEY
-      }`
+      }`,
     )
     const data = await response.json<{
       results: {
@@ -108,7 +109,7 @@ const getGameSearch = async (query: string): Promise<MediaSearchItem[]> => {
 const getPodcastSearch = async (query: string): Promise<MediaSearchItem[]> => {
   try {
     const response = await fetch(
-      `https://itunes.apple.com/search?term=${query}&entity=podcast&limit=10`
+      `https://itunes.apple.com/search?term=${query}&entity=podcast&limit=10`,
     )
     const data = await response.json<{
       results: {
@@ -135,7 +136,7 @@ const getPodcastSearch = async (query: string): Promise<MediaSearchItem[]> => {
 }
 
 export const getMediaSearch = async (
-  request: HonoRequest<'/api/media-search'>
+  request: HonoRequest<'/api/media-search'>,
 ) => {
   const searchParams = new URL(request.url).searchParams
   const type = searchParams.get('type')
