@@ -9,10 +9,13 @@ import pkg from '../../../package.json'
 import { ROUTE_SIGNIN } from '../../constants'
 
 export const Route = createFileRoute('/_app')({
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const session = await getSession()
     if (!session) {
-      throw redirect({ to: ROUTE_SIGNIN })
+      throw redirect({
+        to: ROUTE_SIGNIN,
+        search: { redirect: location.href },
+      })
     }
   },
   component: RouteComponent,

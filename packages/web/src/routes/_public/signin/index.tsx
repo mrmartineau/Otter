@@ -11,6 +11,7 @@ import { supabase } from '@/utils/supabase/client'
 type SigninSearch = {
   error?: string
   message?: string
+  redirect?: string
 }
 
 export const Route = createFileRoute('/_public/signin/')({
@@ -19,6 +20,7 @@ export const Route = createFileRoute('/_public/signin/')({
     return {
       error: (search.error as string) || '',
       message: (search.message as string) || '',
+      redirect: (search.redirect as string) || '',
     }
   },
 })
@@ -29,6 +31,7 @@ function RouteComponent() {
   const searchParams = useSearch({ from: '/_public/signin/' })
   const error = searchParams?.error
   const message = searchParams?.message
+  const redirectTo = searchParams?.redirect
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -52,6 +55,9 @@ function RouteComponent() {
     }
 
     setIsLoading(false)
+    if (redirectTo) {
+      return navigate({ to: redirectTo })
+    }
     return navigate({ to: ROUTE_HOME })
   }
 
