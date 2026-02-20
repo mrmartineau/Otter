@@ -9,11 +9,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return (await result)[0]
       }
       return await new Promise((resolve) =>
-        api.tabs.query(query, (tabs) => resolve(tabs[0]))
+        api.tabs.query(query, (tabs) => resolve(tabs[0])),
       )
     } catch (_) {
       return await new Promise((resolve) =>
-        api.tabs.query(query, (tabs) => resolve(tabs[0]))
+        api.tabs.query(query, (tabs) => resolve(tabs[0])),
       )
     }
   }

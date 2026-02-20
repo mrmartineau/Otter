@@ -5,7 +5,8 @@
   },
 
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
   },
 
   "content_scripts": [
@@ -29,6 +30,6 @@
 
   "name": "__MSG_extension_name__",
 
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "activeTab"],
   "version": "1.0"
 }
