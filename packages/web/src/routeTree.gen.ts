@@ -29,6 +29,7 @@ import { Route as AppTagTagRouteImport } from './routes/_app/tag.$tag'
 import { Route as AppSettingsTagsRouteImport } from './routes/_app/settings/tags'
 import { Route as AppSettingsIntegrationsRouteImport } from './routes/_app/settings/integrations'
 import { Route as AppSettingsAccountRouteImport } from './routes/_app/settings/account'
+import { Route as AppOauthConsentRouteImport } from './routes/_app/oauth/consent'
 import { Route as AppNewBookmarkRouteImport } from './routes/_app/new.bookmark'
 import { Route as AppCollectionCollectionRouteImport } from './routes/_app/collection.$collection'
 import { Route as AppBookmarkIdRouteImport } from './routes/_app/bookmark.$id'
@@ -132,6 +133,11 @@ const AppSettingsAccountRoute = AppSettingsAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AppSettingsRouteRoute,
 } as any)
+const AppOauthConsentRoute = AppOauthConsentRouteImport.update({
+  id: '/oauth/consent',
+  path: '/oauth/consent',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppNewBookmarkRoute = AppNewBookmarkRouteImport.update({
   id: '/new/bookmark',
   path: '/new/bookmark',
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
   '/new/bookmark': typeof AppNewBookmarkRoute
+  '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
   '/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/settings/tags': typeof AppSettingsTagsRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
   '/new/bookmark': typeof AppNewBookmarkRoute
+  '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
   '/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/settings/tags': typeof AppSettingsTagsRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/_app/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/_app/collection/$collection': typeof AppCollectionCollectionRoute
   '/_app/new/bookmark': typeof AppNewBookmarkRoute
+  '/_app/oauth/consent': typeof AppOauthConsentRoute
   '/_app/settings/account': typeof AppSettingsAccountRoute
   '/_app/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/_app/settings/tags': typeof AppSettingsTagsRoute
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/bookmark/$id'
     | '/collection/$collection'
     | '/new/bookmark'
+    | '/oauth/consent'
     | '/settings/account'
     | '/settings/integrations'
     | '/settings/tags'
@@ -270,6 +280,7 @@ export interface FileRouteTypes {
     | '/bookmark/$id'
     | '/collection/$collection'
     | '/new/bookmark'
+    | '/oauth/consent'
     | '/settings/account'
     | '/settings/integrations'
     | '/settings/tags'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/_app/bookmark/$id'
     | '/_app/collection/$collection'
     | '/_app/new/bookmark'
+    | '/_app/oauth/consent'
     | '/_app/settings/account'
     | '/_app/settings/integrations'
     | '/_app/settings/tags'
@@ -452,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsAccountRouteImport
       parentRoute: typeof AppSettingsRouteRoute
     }
+    '/_app/oauth/consent': {
+      id: '/_app/oauth/consent'
+      path: '/oauth/consent'
+      fullPath: '/oauth/consent'
+      preLoaderRoute: typeof AppOauthConsentRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/new/bookmark': {
       id: '/_app/new/bookmark'
       path: '/new/bookmark'
@@ -525,6 +544,7 @@ interface AppRouteRouteChildren {
   AppBookmarkIdRoute: typeof AppBookmarkIdRouteWithChildren
   AppCollectionCollectionRoute: typeof AppCollectionCollectionRoute
   AppNewBookmarkRoute: typeof AppNewBookmarkRoute
+  AppOauthConsentRoute: typeof AppOauthConsentRoute
   AppTagTagRoute: typeof AppTagTagRoute
   AppTypeTypeRoute: typeof AppTypeTypeRoute
 }
@@ -544,6 +564,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppBookmarkIdRoute: AppBookmarkIdRouteWithChildren,
   AppCollectionCollectionRoute: AppCollectionCollectionRoute,
   AppNewBookmarkRoute: AppNewBookmarkRoute,
+  AppOauthConsentRoute: AppOauthConsentRoute,
   AppTagTagRoute: AppTagTagRoute,
   AppTypeTypeRoute: AppTypeTypeRoute,
 }
