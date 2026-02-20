@@ -29,7 +29,7 @@ export const usePagination = ({
   }
   const hasOldItems = useMemo(
     () => Number(offset) + Number(limit) < Number(count),
-    [offset, limit, count]
+    [offset, limit, count],
   )
   const hasNewItems = useMemo(() => Number(offset) > 0, [offset])
 

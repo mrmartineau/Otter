@@ -18,7 +18,7 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
     const bookmark = await opts.context.queryClient.ensureQueryData(
       getBookmarkOptions({
         id: opts.params.id,
-      })
+      }),
     )
     return bookmark.data
   },
@@ -26,7 +26,7 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
 
 function RouteComponent() {
   const { data: bookmark } = useSuspenseQuery(
-    getBookmarkOptions({ id: Route.useParams().id })
+    getBookmarkOptions({ id: Route.useParams().id }),
   )
   const matchRoute = useMatchRoute()
   const params = matchRoute({ to: '/bookmark/$id/edit' })

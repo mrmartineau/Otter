@@ -43,7 +43,7 @@ export const Route = createFileRoute('/_app/media')({
   }),
   loader: async (opts) => {
     const media = await opts.context.queryClient.ensureQueryData(
-      getMediaOptions()
+      getMediaOptions(),
     )
     return media
   },
@@ -125,7 +125,7 @@ function RouteComponent() {
           setIsDialogOpen(false)
           setEditingMedia(null)
         },
-      }
+      },
     )
   }
 
