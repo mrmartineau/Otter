@@ -33,7 +33,6 @@
   "name": "Otter",
   "options_page": "options.html",
   "permissions": [
-    "commands",
     "storage",
     "activeTab",
     "scripting",
