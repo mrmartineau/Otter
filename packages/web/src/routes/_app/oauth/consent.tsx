@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
@@ -18,10 +18,9 @@ export const Route = createFileRoute('/_app/oauth/consent')({
 
 function RouteComponent() {
   const { authorization_id } = Route.useSearch()
-  const navigate = useNavigate()
   const [authDetails, setAuthDetails] = useState<{
     client: { name: string }
-    redirect_uri: string
+    redirect_uri?: string
     scope?: string
   } | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -64,7 +63,7 @@ function RouteComponent() {
       return
     }
 
-    window.location.href = data.redirect_to
+    window.location.href = data.redirect_url
   }
 
   if (isLoading) {
