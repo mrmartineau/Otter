@@ -160,6 +160,7 @@ const AppBookmarkIdEditRoute = AppBookmarkIdEditRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof PublicIndexRoute
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRoute
@@ -171,7 +172,6 @@ export interface FileRoutesByFullPath {
   '/top': typeof AppTopRoute
   '/trash': typeof AppTrashRoute
   '/tweets': typeof AppTweetsRoute
-  '/': typeof PublicIndexRoute
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
   '/new/bookmark': typeof AppNewBookmarkRoute
@@ -181,10 +181,11 @@ export interface FileRoutesByFullPath {
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
   '/type/$type': typeof AppTypeTypeRoute
-  '/signin': typeof PublicSigninIndexRoute
+  '/signin/': typeof PublicSigninIndexRoute
   '/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof PublicIndexRoute
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRoute
@@ -196,7 +197,6 @@ export interface FileRoutesByTo {
   '/top': typeof AppTopRoute
   '/trash': typeof AppTrashRoute
   '/tweets': typeof AppTweetsRoute
-  '/': typeof PublicIndexRoute
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
   '/new/bookmark': typeof AppNewBookmarkRoute
@@ -240,6 +240,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/settings'
     | '/dashboard'
     | '/feed'
@@ -251,7 +252,6 @@ export interface FileRouteTypes {
     | '/top'
     | '/trash'
     | '/tweets'
-    | '/'
     | '/bookmark/$id'
     | '/collection/$collection'
     | '/new/bookmark'
@@ -261,10 +261,11 @@ export interface FileRouteTypes {
     | '/settings/tags'
     | '/tag/$tag'
     | '/type/$type'
-    | '/signin'
+    | '/signin/'
     | '/bookmark/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/settings'
     | '/dashboard'
     | '/feed'
@@ -276,7 +277,6 @@ export interface FileRouteTypes {
     | '/top'
     | '/trash'
     | '/tweets'
-    | '/'
     | '/bookmark/$id'
     | '/collection/$collection'
     | '/new/bookmark'
@@ -327,14 +327,14 @@ declare module '@tanstack/react-router' {
     '/_public': {
       id: '/_public'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof PublicRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
       id: '/_app'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AppRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -425,7 +425,7 @@ declare module '@tanstack/react-router' {
     '/_public/signin/': {
       id: '/_public/signin/'
       path: '/signin'
-      fullPath: '/signin'
+      fullPath: '/signin/'
       preLoaderRoute: typeof PublicSigninIndexRouteImport
       parentRoute: typeof PublicRouteRoute
     }

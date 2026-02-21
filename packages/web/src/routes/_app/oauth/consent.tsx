@@ -1,3 +1,7 @@
+import type {
+  OAuthAuthorizationDetails,
+  OAuthRedirect,
+} from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/Button'
@@ -18,11 +22,9 @@ export const Route = createFileRoute('/_app/oauth/consent')({
 
 function RouteComponent() {
   const { authorization_id } = Route.useSearch()
-  const [authDetails, setAuthDetails] = useState<{
-    client: { name: string }
-    redirect_uri?: string
-    scope?: string
-  } | null>(null)
+  const [authDetails, setAuthDetails] = useState<
+    OAuthAuthorizationDetails | OAuthRedirect | null
+  >(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -82,7 +84,14 @@ function RouteComponent() {
     )
   }
 
-  if (!authDetails) return null
+  if (!authDetails) {
+    return null
+  }
+
+  if (!('client' in authDetails)) {
+    window.location.href = authDetails.redirect_url
+    return null
+  }
 
   return (
     <Container variant="auth">
