@@ -4,6 +4,7 @@ import type { ComponentProps, ReactNode } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { cn } from '@/utils/classnames'
 import { ROUTE_HOME } from '../constants'
+import { useIsBookmarklet } from '../hooks/useIsBookmarklet'
 import { useSidebar } from '../hooks/useSidebar'
 import { CmdK } from './CmdK'
 import { FabAdd } from './FabAdd'
@@ -20,6 +21,7 @@ interface TopBarProps extends ComponentProps<'header'> {
 export const TopBar = ({ className, children, ...rest }: TopBarProps) => {
   const { handleToggleSidebar } = useSidebar()
   const isLoading = useRouterState({ select: (s) => s.status === 'pending' })
+  const isBookmarklet = useIsBookmarklet()
 
   return (
     <header className={cn(className, 'otter-top-bar')} {...rest}>
@@ -38,14 +40,16 @@ export const TopBar = ({ className, children, ...rest }: TopBarProps) => {
         </Link>
         <Spinner show={isLoading} />
       </Flex>
-      <div className="top-bar-search-container">
-        <TooltipProvider>
-          <ErrorBoundary fallback={<div>Something went wrong</div>}>
-            <CmdK />
-          </ErrorBoundary>
-          <FabAdd />
-        </TooltipProvider>
-      </div>
+      {!isBookmarklet && (
+        <div className="top-bar-search-container">
+          <TooltipProvider>
+            <ErrorBoundary fallback={<div>Something went wrong</div>}>
+              <CmdK />
+            </ErrorBoundary>
+            <FabAdd />
+          </TooltipProvider>
+        </div>
+      )}
     </header>
   )
 }
