@@ -20,6 +20,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/Tooltip'
+import { useIsBookmarklet } from '@/hooks/useIsBookmarklet'
+import { useIsMobile } from '@/hooks/useMobile'
 import { cn } from '@/utils/classnames'
 import {
   rewriteDescriptionOptions,
@@ -263,9 +265,14 @@ export const BookmarkForm = ({
     }
   }, [handleCheckExistingItem, watchUrl])
 
+  const isBookmarklet = useIsBookmarklet()
+  const isMobile = useIsMobile()
+
   return (
     <div className="bookmark-form" {...rest}>
-      <h2 className="mb-s">{isNew ? CONTENT.newTitle : CONTENT.editTitle}</h2>
+      {isBookmarklet && !isMobile ? (
+        <h2 className="mb-s">{isNew ? CONTENT.newTitle : CONTENT.editTitle}</h2>
+      ) : null}
       <form
         onSubmit={handleSubmit(handleSubmitForm)}
         className={bookmarkformClass}
@@ -337,11 +344,7 @@ export const BookmarkForm = ({
               </TooltipProvider>
             }
           >
-            <Textarea
-              id="title"
-              {...register('title')}
-              className="min-h-[41px]"
-            ></Textarea>
+            <Input id="title" {...register('title')} />
             {watchTitle !== scrapeResponse?.title ? (
               <FieldValueSuggestion
                 fieldId="title"

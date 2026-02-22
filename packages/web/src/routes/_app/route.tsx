@@ -13,8 +13,8 @@ export const Route = createFileRoute('/_app')({
     const session = await getSession()
     if (!session) {
       throw redirect({
-        to: ROUTE_SIGNIN,
         search: { redirect: location.href },
+        to: ROUTE_SIGNIN,
       })
     }
   },
@@ -26,9 +26,6 @@ function RouteComponent() {
     <UserProvider>
       <div className="otter-app-container">
         <TopBar />
-        <a href="#main" className="skip-link">
-          Skip to content
-        </a>
         <div className="otter-primary-pane">
           <Sidebar version={pkg.version} />
           <div className="otter-sidebar-pane-overlay" />

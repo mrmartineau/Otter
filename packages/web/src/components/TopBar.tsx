@@ -2,6 +2,7 @@ import { ListIcon } from '@phosphor-icons/react'
 import { useRouterState } from '@tanstack/react-router'
 import type { ComponentProps, ReactNode } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useIsMobile } from '@/hooks/useMobile'
 import { cn } from '@/utils/classnames'
 import { ROUTE_HOME } from '../constants'
 import { useIsBookmarklet } from '../hooks/useIsBookmarklet'
@@ -22,6 +23,11 @@ export const TopBar = ({ className, children, ...rest }: TopBarProps) => {
   const { handleToggleSidebar } = useSidebar()
   const isLoading = useRouterState({ select: (s) => s.status === 'pending' })
   const isBookmarklet = useIsBookmarklet()
+  const isMobile = useIsMobile()
+
+  if (isBookmarklet && isMobile) {
+    return null
+  }
 
   return (
     <header className={cn(className, 'otter-top-bar')} {...rest}>
@@ -40,16 +46,14 @@ export const TopBar = ({ className, children, ...rest }: TopBarProps) => {
         </Link>
         <Spinner show={isLoading} />
       </Flex>
-      {!isBookmarklet && (
-        <div className="top-bar-search-container">
-          <TooltipProvider>
-            <ErrorBoundary fallback={<div>Something went wrong</div>}>
-              <CmdK />
-            </ErrorBoundary>
-            <FabAdd />
-          </TooltipProvider>
-        </div>
-      )}
+      <div className="top-bar-search-container">
+        <TooltipProvider>
+          <ErrorBoundary fallback={<div>Something went wrong</div>}>
+            <CmdK />
+          </ErrorBoundary>
+          <FabAdd />
+        </TooltipProvider>
+      </div>
     </header>
   )
 }
