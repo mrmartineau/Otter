@@ -5,6 +5,12 @@ import { generateResponse } from './ai/generateResponse'
 import { titleSystemPrompt } from './ai/title'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
 import { getNewBookmark, postNewBookmark } from './bookmarks/new'
+import {
+	handleMcpDelete,
+	handleMcpGet,
+	handleMcpOptions,
+	handleMcpPost,
+} from './mcp/handler'
 import { getMedia } from './media/media'
 import { getMediaSearch } from './media/mediaSearch'
 import { feedToJson } from './rss/rss-to-json'
@@ -57,6 +63,18 @@ app.post('/ai/description', async (context) => {
     prompt,
     systemPrompt: descriptionSystemPrompt(title),
   })
+})
+app.post('/mcp', async (c) => {
+	return await handleMcpPost(c)
+})
+app.get('/mcp', (c) => {
+	return handleMcpGet(c)
+})
+app.delete('/mcp', (c) => {
+	return handleMcpDelete(c)
+})
+app.options('/mcp', (c) => {
+	return handleMcpOptions(c)
 })
 app.get('/rss', async (c) => {
   const feed = c.req.query('feed')
