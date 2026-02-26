@@ -6,10 +6,10 @@ import { titleSystemPrompt } from './ai/title'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
 import { getNewBookmark, postNewBookmark } from './bookmarks/new'
 import {
-	handleMcpDelete,
-	handleMcpGet,
-	handleMcpOptions,
-	handleMcpPost,
+  handleMcpDelete,
+  handleMcpGet,
+  handleMcpOptions,
+  handleMcpPost,
 } from './mcp/handler'
 import { getMedia } from './media/media'
 import { getMediaSearch } from './media/mediaSearch'
@@ -65,16 +65,16 @@ app.post('/ai/description', async (context) => {
   })
 })
 app.post('/mcp', async (c) => {
-	return await handleMcpPost(c)
+  return await handleMcpPost(c)
 })
 app.get('/mcp', (c) => {
-	return handleMcpGet(c)
+  return handleMcpGet(c)
 })
 app.delete('/mcp', (c) => {
-	return handleMcpDelete(c)
+  return handleMcpDelete(c)
 })
 app.options('/mcp', (c) => {
-	return handleMcpOptions(c)
+  return handleMcpOptions(c)
 })
 app.get('/rss', async (c) => {
   const feed = c.req.query('feed')

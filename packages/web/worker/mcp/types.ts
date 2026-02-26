@@ -1,23 +1,23 @@
 // JSON-RPC 2.0 types for MCP Streamable HTTP transport
 
 export interface JsonRpcRequest {
-	jsonrpc: '2.0'
-	method: string
-	params?: Record<string, unknown>
-	id?: string | number
+  jsonrpc: '2.0'
+  method: string
+  params?: Record<string, unknown>
+  id?: string | number
 }
 
 export interface JsonRpcResponse {
-	jsonrpc: '2.0'
-	id: string | number | null
-	result?: unknown
-	error?: JsonRpcError
+  jsonrpc: '2.0'
+  id: string | number | null
+  result?: unknown
+  error?: JsonRpcError
 }
 
 export interface JsonRpcError {
-	code: number
-	message: string
-	data?: unknown
+  code: number
+  message: string
+  data?: unknown
 }
 
 // Standard JSON-RPC 2.0 error codes
@@ -34,55 +34,55 @@ export const MCP_SERVER_VERSION = '1.0.0'
 
 // MCP tool result types
 export interface TextContent {
-	type: 'text'
-	text: string
+  type: 'text'
+  text: string
 }
 
 export interface CallToolResult {
-	content: TextContent[]
-	isError?: boolean
+  content: TextContent[]
+  isError?: boolean
 }
 
 // MCP tool definition
 export interface McpToolDefinition {
-	name: string
-	description: string
-	inputSchema: {
-		type: 'object'
-		properties: Record<string, unknown>
-		required?: string[]
-	}
+  name: string
+  description: string
+  inputSchema: {
+    type: 'object'
+    properties: Record<string, unknown>
+    required?: string[]
+  }
 }
 
 // Helper to create a JSON-RPC success response
 export const jsonRpcSuccess = (
-	id: string | number | null,
-	result: unknown,
+  id: string | number | null,
+  result: unknown,
 ): JsonRpcResponse => ({
-	jsonrpc: '2.0',
-	id,
-	result,
+  jsonrpc: '2.0',
+  id,
+  result,
 })
 
 // Helper to create a JSON-RPC error response
 export const jsonRpcError = (
-	id: string | number | null,
-	code: number,
-	message: string,
-	data?: unknown,
+  id: string | number | null,
+  code: number,
+  message: string,
+  data?: unknown,
 ): JsonRpcResponse => ({
-	jsonrpc: '2.0',
-	id,
-	error: { code, message, ...(data !== undefined && { data }) },
+  jsonrpc: '2.0',
+  id,
+  error: { code, message, ...(data !== undefined && { data }) },
 })
 
 // Helper to create a successful tool result
 export const toolResult = (text: string): CallToolResult => ({
-	content: [{ type: 'text', text }],
+  content: [{ type: 'text', text }],
 })
 
 // Helper to create an error tool result
 export const toolError = (text: string): CallToolResult => ({
-	content: [{ type: 'text', text }],
-	isError: true,
+  content: [{ type: 'text', text }],
+  isError: true,
 })
