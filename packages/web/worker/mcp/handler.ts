@@ -5,23 +5,23 @@ import {
   INTERNAL_ERROR,
   INVALID_PARAMS,
   INVALID_REQUEST,
+  type JsonRpcRequest,
+  type JsonRpcResponse,
+  jsonRpcError,
+  jsonRpcSuccess,
   MCP_PROTOCOL_VERSION,
   MCP_SERVER_NAME,
   MCP_SERVER_VERSION,
   METHOD_NOT_FOUND,
   PARSE_ERROR,
-  type JsonRpcRequest,
-  type JsonRpcResponse,
-  jsonRpcError,
-  jsonRpcSuccess,
   toolError,
 } from './types'
 
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers':
     'Content-Type, Accept, Authorization, Mcp-Session-Id',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Origin': '*',
 }
 
 const JSON_HEADERS = {
@@ -104,8 +104,8 @@ export const handleMcpPost = async (c: Context) => {
       return c.body(null, 204, CORS_HEADERS)
     }
     return new Response(JSON.stringify(responses), {
-      status: 200,
       headers: JSON_HEADERS,
+      status: 200,
     })
   }
 
@@ -190,8 +190,8 @@ async function dispatch(
   switch (method) {
     case 'initialize':
       return {
-        protocolVersion: MCP_PROTOCOL_VERSION,
         capabilities: { tools: {} },
+        protocolVersion: MCP_PROTOCOL_VERSION,
         serverInfo: {
           name: MCP_SERVER_NAME,
           version: MCP_SERVER_VERSION,
@@ -252,7 +252,7 @@ class JsonRpcException extends Error {
 
 function jsonResponse(c: Context, data: JsonRpcResponse) {
   return new Response(JSON.stringify(data), {
-    status: 200,
     headers: JSON_HEADERS,
+    status: 200,
   })
 }
