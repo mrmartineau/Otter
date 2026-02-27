@@ -26,14 +26,14 @@ async function getAccessToken(): Promise<string> {
   const refreshToken = env.YOUTUBE_REFRESH_TOKEN
 
   const response = await fetch(YOUTUBE_TOKEN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       client_id: clientId,
       client_secret: clientSecret,
-      refresh_token: refreshToken,
       grant_type: 'refresh_token',
+      refresh_token: refreshToken,
     }),
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    method: 'POST',
   })
 
   if (!response.ok) {
@@ -53,9 +53,9 @@ async function fetchLikedVideosPage(
   pageToken?: string,
 ): Promise<YouTubePlaylistItemsResponse> {
   const params = new URLSearchParams({
-    playlistId: 'LL',
-    part: 'snippet',
     maxResults: String(MAX_RESULTS_PER_PAGE),
+    part: 'snippet',
+    playlistId: 'LL',
   })
   if (pageToken) {
     params.set('pageToken', pageToken)
@@ -67,9 +67,7 @@ async function fetchLikedVideosPage(
 
   if (!response.ok) {
     const error = await response.text()
-    throw new Error(
-      `YouTube API error (${response.status}): ${error}`,
-    )
+    throw new Error(`YouTube API error (${response.status}): ${error}`)
   }
 
   return (await response.json()) as YouTubePlaylistItemsResponse
@@ -78,7 +76,11 @@ async function fetchLikedVideosPage(
 function getBestThumbnail(
   thumbnails: YouTubePlaylistItem['snippet']['thumbnails'],
 ): string | null {
-  const preferred = thumbnails.maxres ?? thumbnails.high ?? thumbnails.medium ?? thumbnails.default
+  const preferred =
+    thumbnails.maxres ??
+    thumbnails.high ??
+    thumbnails.medium ??
+    thumbnails.default
   return preferred?.url ?? null
 }
 
@@ -118,7 +120,9 @@ export async function fetchAndStoreYouTubeLikes(): Promise<void> {
   const { data: user } = await getUserProfileByApiKey(apiKey, client)
 
   if (!user) {
-    console.error('YouTube likes sync: could not resolve user from OTTER_API_KEY')
+    console.error(
+      'YouTube likes sync: could not resolve user from OTTER_API_KEY',
+    )
     return
   }
 
@@ -159,16 +163,12 @@ export async function fetchAndStoreYouTubeLikes(): Promise<void> {
       .select('url')
       .in('url', urls)
 
-    const existingUrls = new Set(
-      existingBookmarks?.map((b) => b.url) ?? [],
-    )
+    const existingUrls = new Set(existingBookmarks?.map((b) => b.url) ?? [])
 
     // Filter to only new items
     const newItems = validItems.filter(
       (item) =>
-        !existingUrls.has(
-          buildCanonicalUrl(item.snippet.resourceId.videoId),
-        ),
+        !existingUrls.has(buildCanonicalUrl(item.snippet.resourceId.videoId)),
     )
 
     // If we found existing items, we've caught up — insert new ones and stop
@@ -181,14 +181,14 @@ export async function fetchAndStoreYouTubeLikes(): Promise<void> {
           : null
 
         return {
-          url: buildCanonicalUrl(item.snippet.resourceId.videoId),
-          title: item.snippet.title,
           description,
           image: getBestThumbnail(item.snippet.thumbnails),
-          type: 'video' as const,
           star: false,
           status: 'active' as const,
           tags: ['like:youtube'],
+          title: item.snippet.title,
+          type: 'video' as const,
+          url: buildCanonicalUrl(item.snippet.resourceId.videoId),
           user: user.id,
         }
       })
