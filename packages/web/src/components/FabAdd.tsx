@@ -1,5 +1,7 @@
 import { PlusCircleIcon } from '@phosphor-icons/react'
 import { useLocation } from '@tanstack/react-router'
+import useSound from 'use-sound'
+import switchOnSfx from '@/assets/sounds/switch-on.mp3'
 import { cn } from '@/utils/classnames'
 import { ROUTE_NEW_BOOKMARK } from '../constants'
 import { Link } from './Link'
@@ -7,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip'
 
 export const FabAdd = () => {
   const location = useLocation()
+  const [playSwitchOn] = useSound(switchOnSfx)
 
   const disableFab =
     location.pathname === `/new/bookmark` || location.pathname.includes('edit')
@@ -21,6 +24,8 @@ export const FabAdd = () => {
           onClick={(event) => {
             if (disableFab) {
               event.preventDefault()
+            } else {
+              playSwitchOn()
             }
           }}
           className={cn(disableFab && 'pointer-events-none opacity-30')}

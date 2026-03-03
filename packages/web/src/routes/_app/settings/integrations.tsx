@@ -34,7 +34,6 @@ function RouteComponent() {
     <article className="flow">
       <h3>Bluesky</h3>
       {userId ? <BlueskySettings userId={userId} /> : null}
-
       <h3>API key</h3>
       <CodeBlock>{apiKey}</CodeBlock>
       <h3>Bookmarklet</h3>

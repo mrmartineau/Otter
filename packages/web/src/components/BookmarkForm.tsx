@@ -11,6 +11,9 @@ import {
 } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import useSound from 'use-sound'
+import buy01Sfx from '@/assets/sounds/buy-01.mp3'
+import buy02Sfx from '@/assets/sounds/buy-02.mp3'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { Textarea } from '@/components/Textarea'
@@ -91,6 +94,8 @@ export const BookmarkForm = ({
   const [isScraping, , setIsScraping] = useToggle(false)
   const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>()
   const queryClient = useQueryClient()
+  const [playAdd] = useSound(buy01Sfx)
+  const [playEdit] = useSound(buy02Sfx)
   const { getValues, register, handleSubmit, setValue, watch } =
     useForm<BookmarkFormValues>({
       defaultValues: {
@@ -132,6 +137,7 @@ export const BookmarkForm = ({
         await supabase.from('bookmarks').insert([{ ...formData }], {
           defaultToNull: true,
         })
+        playAdd()
         toast.success('Item added')
         navigate({ to: '/feed' })
       } else {
@@ -140,6 +146,7 @@ export const BookmarkForm = ({
           // @ts-ignore
           .update({ ...formData, modified_at: new Date() })
           .match({ id })
+        playEdit()
         toast.success('Item edited')
       }
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })

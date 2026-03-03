@@ -1,6 +1,9 @@
 import { CaretUpDownIcon } from '@phosphor-icons/react'
 import { Collapsible as CollapsiblePrimitive } from 'radix-ui'
 import { type ComponentProps, useCallback } from 'react'
+import useSound from 'use-sound'
+import switchOffSfx from '@/assets/sounds/switch-off.mp3'
+import switchOnSfx from '@/assets/sounds/switch-on.mp3'
 import { Button } from '@/components/Button'
 
 import { Flex } from './Flex'
@@ -17,14 +20,17 @@ export const Collapsible = ({
   ...props
 }: CollapsibleProps1) => {
   const { profile, handleUpdateUISettings } = useUser()
+  const [playSwitchOn] = useSound(switchOnSfx, { volume: 0.3 })
+  const [playSwitchOff] = useSound(switchOffSfx, { volume: 0.3 })
   const handleOpenChange = useCallback(
     (open: boolean) => {
+      open ? playSwitchOn() : playSwitchOff()
       handleUpdateUISettings({
         payload: open,
         type: `settings_${stateKey}_visible`,
       })
     },
-    [handleUpdateUISettings, stateKey],
+    [handleUpdateUISettings, stateKey, playSwitchOn, playSwitchOff],
   )
 
   return (

@@ -23,16 +23,16 @@ export const Route = createFileRoute('/_app/new/bookmark')({
     return response
   },
   loaderDeps: ({ search }) => ({
-    url: search.url,
     bookmarklet: search.bookmarklet,
+    url: search.url,
   }),
   validateSearch: (search: {
     url?: string
     bookmarklet?: string
   }): { url?: string; bookmarklet?: string } => {
     return {
-      url: search.url,
       bookmarklet: search.bookmarklet,
+      url: search.url,
     }
   },
 })

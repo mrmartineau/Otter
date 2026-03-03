@@ -12,8 +12,8 @@
   },
   "scripts": {
     "chrome-extension:build": "pnpm --filter=@mrmartineau/otter-chrome-extension run build",
-    "format": "pnpm exec biome format --write",
-    "lint": "pnpm exec biome lint",
+    "format": "biome format --write .",
+    "lint": "biome lint",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "web:build": "pnpm --filter=@mrmartineau/otter-web run build",

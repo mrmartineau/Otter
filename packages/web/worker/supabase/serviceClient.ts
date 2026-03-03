@@ -9,6 +9,6 @@ import { supabaseUrl } from '@/utils/supabase/client'
  * (e.g. webhook handlers).
  */
 export const createServiceClient = () => {
-	// @ts-expect-error - env typing
-	return createClient<Database>(supabaseUrl, env.SUPABASE_SERVICE_KEY)
+  // @ts-expect-error - env typing
+  return createClient<Database>(supabaseUrl, env.SUPABASE_SERVICE_KEY)
 }

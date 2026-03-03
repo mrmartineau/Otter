@@ -11,7 +11,13 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 import urlJoin from 'proper-url-join'
 import { Suspense, useMemo } from 'react'
+import { toast } from 'sonner'
 import title from 'title'
+import useSound from 'use-sound'
+import popOffSfx from '@/assets/sounds/pop-off.mp3'
+import popOnSfx from '@/assets/sounds/pop-on.mp3'
+import popUpOffSfx from '@/assets/sounds/pop-up-off.mp3'
+import popUpOnSfx from '@/assets/sounds/pop-up-on.mp3'
 import {
   Tooltip,
   TooltipContent,
@@ -19,7 +25,6 @@ import {
   TooltipTrigger,
 } from '@/components/Tooltip'
 import { MINIMUM_CLICK_COUNT } from '@/constants'
-import { toast } from 'sonner'
 import { supabase } from '@/utils/supabase/client'
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import { getRelativeDate } from '../utils/dates'
@@ -61,6 +66,10 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
   } = props
   const queryClient = useQueryClient()
   const handleClickRegister = useClickBookmark()
+  const [playPopOn] = useSound(popOnSfx, { volume: 0.3 })
+  const [playPopOff] = useSound(popOffSfx, { volume: 0.3 })
+  const [playPopUpOn] = useSound(popUpOnSfx, { volume: 0.3 })
+  const [playPopUpOff] = useSound(popUpOffSfx, { volume: 0.3 })
   const createdDate = getRelativeDate(created_at)
   const modifiedDate = getRelativeDate(modified_at)
   const dateTooltip =
@@ -81,9 +90,19 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       })
       .match({ id })
     await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
-    const label = column === 'public'
-      ? (!isPublic ? 'Made public' : 'Made private')
-      : (!star ? 'Starred' : 'Unstarred')
+    const label =
+      column === 'public'
+        ? !isPublic
+          ? 'Made public'
+          : 'Made private'
+        : !star
+          ? 'Starred'
+          : 'Unstarred'
+    if (column === 'public') {
+      !isPublic ? playPopOn() : playPopOff()
+    } else {
+      !star ? playPopUpOn() : playPopUpOff()
+    }
     toast.success(label, {
       description: props.title || undefined,
     })
