@@ -15,6 +15,7 @@ import { Suspense } from 'react'
 import { Button } from '@/components/Button'
 import { getMetaOptions } from '@/utils/fetching/meta'
 import { filteredTags } from '@/utils/filteredTags'
+import { toast } from 'sonner'
 import { supabase } from '@/utils/supabase/client'
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import { useToggle } from '../hooks/useToggle'
@@ -56,6 +57,7 @@ export const FeedItemActions = ({
         })
         .match({ id })
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+      toast.success('Moved to trash')
     }
   }
   const handleUnArchiveBookmark = async () => {
@@ -67,11 +69,13 @@ export const FeedItemActions = ({
       })
       .match({ id })
     await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+    toast.success('Restored from trash')
   }
   const handleDeleteBookmark = async () => {
     if (window.confirm('Do you really want to delete this bookmark forever?')) {
       await supabase.from('bookmarks').delete().match({ id })
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+      toast.success('Permanently deleted')
     }
   }
 

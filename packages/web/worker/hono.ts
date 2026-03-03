@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { descriptionSystemPrompt } from './ai/description'
 import { generateResponse } from './ai/generateResponse'
 import { titleSystemPrompt } from './ai/title'
+import { sendBlueskyPost } from './bluesky/sendBlueskyPost'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
 import { getNewBookmark, postNewBookmark } from './bookmarks/new'
 import {
@@ -44,6 +45,9 @@ app.get('/media-search', async (c) => {
 })
 app.post('/toot', async (c) => {
   return await sendToots(c.req)
+})
+app.post('/bluesky', async (c) => {
+  return await sendBlueskyPost(c.req)
 })
 app.get('/scrape', async (c) => {
   return await handleScrape(c.req)

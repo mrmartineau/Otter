@@ -8,6 +8,7 @@ import {
   RssSimpleIcon,
   StarIcon,
 } from '@phosphor-icons/react'
+import { useQueryClient } from '@tanstack/react-query'
 import urlJoin from 'proper-url-join'
 import { Suspense, useMemo } from 'react'
 import title from 'title'
@@ -18,6 +19,7 @@ import {
   TooltipTrigger,
 } from '@/components/Tooltip'
 import { MINIMUM_CLICK_COUNT } from '@/constants'
+import { toast } from 'sonner'
 import { supabase } from '@/utils/supabase/client'
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import { getRelativeDate } from '../utils/dates'
@@ -57,6 +59,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
     allowDeletion = false,
     collections,
   } = props
+  const queryClient = useQueryClient()
   const handleClickRegister = useClickBookmark()
   const createdDate = getRelativeDate(created_at)
   const modifiedDate = getRelativeDate(modified_at)
@@ -77,6 +80,13 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
         modified_at: new Date().toISOString(),
       })
       .match({ id })
+    await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+    const label = column === 'public'
+      ? (!isPublic ? 'Made public' : 'Made private')
+      : (!star ? 'Starred' : 'Unstarred')
+    toast.success(label, {
+      description: props.title || undefined,
+    })
   }
 
   const matchingCollections = useMemo(() => {
@@ -88,6 +98,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       return
     }
     navigator.clipboard.writeText(url)
+    toast.success('URL copied to clipboard')
   }
 
   return (

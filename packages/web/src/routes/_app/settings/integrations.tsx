@@ -5,6 +5,7 @@ import { CodeBlock } from '@/components/CodeBlock'
 import { Link } from '@/components/Link'
 import { CONTENT } from '@/constants'
 import { getUserProfileOptions } from '@/utils/fetching/user'
+import { BlueskySettings } from './-bluesky-settings'
 
 export const Route = createFileRoute('/_app/settings/integrations')({
   component: RouteComponent,
@@ -18,10 +19,9 @@ export const Route = createFileRoute('/_app/settings/integrations')({
 })
 
 function RouteComponent() {
-  const { data: apiKey } = useSuspenseQuery({
-    ...getUserProfileOptions(),
-    select: (data) => data.data?.api_key,
-  })
+  const { data: userProfile } = useSuspenseQuery(getUserProfileOptions())
+  const apiKey = userProfile.data?.api_key
+  const userId = userProfile.data?.id
   const url = urlJoin(window.location.origin, 'new/bookmark', {
     query: {
       bookmarklet: 'true',
@@ -32,18 +32,9 @@ function RouteComponent() {
 
   return (
     <article className="flow">
-      {/* <Heading variant="h4" as="h4">
-          Raycast extensions
-        </Heading>
-        <Paragraph>Search for Otter on the Raycast store</Paragraph>
-        <Heading variant="h4" as="h4">
-          API info
-        </Heading>
-        <Paragraph>This Postman collection</Paragraph>
-        <Heading variant="h4" as="h4">
-          Using IFTTT to add new bookmarks
-        </Heading>
-        <Paragraph></Paragraph> */}
+      <h3>Bluesky</h3>
+      {userId ? <BlueskySettings userId={userId} /> : null}
+
       <h3>API key</h3>
       <CodeBlock>{apiKey}</CodeBlock>
       <h3>Bookmarklet</h3>

@@ -46,6 +46,7 @@ export type Database = {
       }
       bookmarks: {
         Row: {
+          bluesky_post_uri: string | null
           click_count: number
           created_at: string
           description: string | null
@@ -65,6 +66,7 @@ export type Database = {
           user: string | null
         }
         Insert: {
+          bluesky_post_uri?: string | null
           click_count?: number
           created_at?: string
           description?: string | null
@@ -84,6 +86,7 @@ export type Database = {
           user?: string | null
         }
         Update: {
+          bluesky_post_uri?: string | null
           click_count?: number
           created_at?: string
           description?: string | null
@@ -232,6 +235,44 @@ export type Database = {
           tag?: string
         }
         Relationships: []
+      }
+      user_integrations: {
+        Row: {
+          user_id: string
+          bluesky_enabled: boolean
+          bluesky_handle: string | null
+          bluesky_app_password: string | null
+          bluesky_last_error: string | null
+          created_at: string
+          updated_at: string | null
+        }
+        Insert: {
+          user_id: string
+          bluesky_enabled?: boolean
+          bluesky_handle?: string | null
+          bluesky_app_password?: string | null
+          bluesky_last_error?: string | null
+          created_at?: string
+          updated_at?: string | null
+        }
+        Update: {
+          user_id?: string
+          bluesky_enabled?: boolean
+          bluesky_handle?: string | null
+          bluesky_app_password?: string | null
+          bluesky_last_error?: string | null
+          created_at?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_integrations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       toots: {
         Row: {

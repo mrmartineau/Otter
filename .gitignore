@@ -29,3 +29,5 @@ packages/*/build
 
 # cursor
 .cursor/
+
+.wrangler
