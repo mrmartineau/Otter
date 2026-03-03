@@ -14,7 +14,9 @@ export default defineConfig({
     }),
     react(),
     tailwindcss(),
-    atlas(),
+    atlas({
+      styles: ['./src/styles/globals.css'],
+    }),
     cloudflare(),
   ],
   resolve: {
