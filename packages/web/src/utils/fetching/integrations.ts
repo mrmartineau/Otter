@@ -12,7 +12,7 @@ export const getIntegrationOptions = (userId: string) => {
 			const { data, error } = await supabase
 				.from('user_integrations')
 				.select(
-					'user_id, bluesky_enabled, bluesky_handle, bluesky_last_error, created_at, updated_at',
+					'user_id, bluesky_enabled, bluesky_handle, bluesky_last_error, bluesky_post_prefix, bluesky_post_suffix, created_at, updated_at',
 				)
 				.match({ user_id: userId })
 				.single()
@@ -35,6 +35,8 @@ interface UpsertBlueskyParams {
 	handle: string
 	appPassword: string
 	enabled: boolean
+	postPrefix: string
+	postSuffix: string
 }
 
 export const useUpsertBlueskyMutation = () => {
@@ -46,6 +48,8 @@ export const useUpsertBlueskyMutation = () => {
 			handle,
 			appPassword,
 			enabled,
+			postPrefix,
+			postSuffix,
 		}: UpsertBlueskyParams) => {
 			const { error } = await supabase.from('user_integrations').upsert(
 				{
@@ -54,6 +58,8 @@ export const useUpsertBlueskyMutation = () => {
 					bluesky_app_password: appPassword,
 					bluesky_enabled: enabled,
 					bluesky_last_error: null,
+					bluesky_post_prefix: postPrefix || null,
+					bluesky_post_suffix: postSuffix || null,
 					updated_at: new Date().toISOString(),
 				},
 				{ onConflict: 'user_id' },

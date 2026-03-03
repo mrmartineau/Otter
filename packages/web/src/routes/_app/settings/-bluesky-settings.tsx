@@ -15,6 +15,8 @@ import {
 interface BlueskyFormValues {
 	handle: string
 	appPassword: string
+	postPrefix: string
+	postSuffix: string
 }
 
 interface BlueskySettingsProps {
@@ -40,6 +42,8 @@ export const BlueskySettings = ({ userId }: BlueskySettingsProps) => {
 		values: {
 			handle: integration?.bluesky_handle ?? '',
 			appPassword: '',
+			postPrefix: integration?.bluesky_post_prefix ?? '',
+			postSuffix: integration?.bluesky_post_suffix ?? '',
 		},
 	})
 
@@ -49,6 +53,8 @@ export const BlueskySettings = ({ userId }: BlueskySettingsProps) => {
 			handle: values.handle,
 			appPassword: values.appPassword,
 			enabled: true,
+			postPrefix: values.postPrefix,
+			postSuffix: values.postSuffix,
 		})
 		setShowPassword(false)
 	}
@@ -142,6 +148,32 @@ export const BlueskySettings = ({ userId }: BlueskySettingsProps) => {
 							autoComplete="off"
 						/>
 					)}
+				</FormGroup>
+
+				<FormGroup
+					label="Post prefix"
+					name="postPrefix"
+					note="Text added before each post"
+				>
+					<Input
+						id="postPrefix"
+						type="text"
+						placeholder="e.g. 🔖"
+						{...register('postPrefix')}
+					/>
+				</FormGroup>
+
+				<FormGroup
+					label="Post suffix"
+					name="postSuffix"
+					note="Text added after each post"
+				>
+					<Input
+						id="postSuffix"
+						type="text"
+						placeholder="e.g. #bookmarks"
+						{...register('postSuffix')}
+					/>
 				</FormGroup>
 
 				<div className="flex items-center gap-s">

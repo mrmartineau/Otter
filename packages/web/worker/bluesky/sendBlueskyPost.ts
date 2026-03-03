@@ -1,4 +1,5 @@
 import { env } from 'cloudflare:workers'
+import { strifx, when } from '@mrmartineau/strifx'
 import { AtpAgent, RichText } from '@atproto/api'
 import type { HonoRequest } from 'hono'
 import { errorResponse } from '@/utils/fetching/errorResponse'
@@ -90,13 +91,7 @@ export const sendBlueskyPost = async (request: HonoRequest) => {
 
 		// Compose the post text
 		const filteredTagsString = filteredTags(body.record.tags ?? [])
-		const tagsString =
-			filteredTagsString.length > 0 ? `\n${filteredTagsString}` : ''
-		const descriptionString =
-			body.record.description?.length > 0
-				? ` — ${body.record.description}`
-				: ''
-		const postText = `${body.record.title ?? ''}${descriptionString}${tagsString}`
+		const postText = strifx`${when(integration.bluesky_post_prefix, { suffix: ' ' })}${body.record.title ?? ''}${when(body.record.description, { prefix: ' — ' })}${when(filteredTagsString, { test: (v: string) => v.length > 0, prefix: '\n' })}${when(integration.bluesky_post_suffix, { prefix: '\n' })}`
 
 		// Parse rich text for facets (links, mentions, hashtags)
 		const richText = new RichText({ text: postText })

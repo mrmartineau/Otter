@@ -243,6 +243,8 @@ export type Database = {
           bluesky_handle: string | null
           bluesky_app_password: string | null
           bluesky_last_error: string | null
+          bluesky_post_prefix: string | null
+          bluesky_post_suffix: string | null
           created_at: string
           updated_at: string | null
         }
@@ -252,6 +254,8 @@ export type Database = {
           bluesky_handle?: string | null
           bluesky_app_password?: string | null
           bluesky_last_error?: string | null
+          bluesky_post_prefix?: string | null
+          bluesky_post_suffix?: string | null
           created_at?: string
           updated_at?: string | null
         }
@@ -261,6 +265,8 @@ export type Database = {
           bluesky_handle?: string | null
           bluesky_app_password?: string | null
           bluesky_last_error?: string | null
+          bluesky_post_prefix?: string | null
+          bluesky_post_suffix?: string | null
           created_at?: string
           updated_at?: string | null
         }

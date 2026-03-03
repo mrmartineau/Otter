@@ -81,6 +81,9 @@ importers:
       '@dnd-kit/react':
         specifier: ^0.1.21
         version: 0.1.21(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@mrmartineau/strifx':
+        specifier: ^0.2.0
+        version: 0.2.0(react@19.2.4)
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1525,6 +1528,14 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@mrmartineau/strifx@0.2.0':
+    resolution: {integrity: sha512-ISUVkT3kcS9KOY4gpbRU1JDcu6pkAxOXZaHphdaHtLCV+cn621cZUBGHCpI++STJpuwynbr6OOfPg9SMPhc5zw==}
+    peerDependencies:
+      react: '>=18.0.0'
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -7404,6 +7415,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@mrmartineau/strifx@0.2.0(react@19.2.4)':
+    optionalDependencies:
+      react: 19.2.4
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
