@@ -177,6 +177,8 @@ export const BookmarkForm = ({
       toast.message('Uh oh! Something went wrong.', {
         description: 'There was a problem with your request. Please try again.',
       })
+    } finally {
+      setFormSubmitting(false)
     }
   }
 
