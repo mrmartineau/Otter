@@ -35,6 +35,7 @@ import { Route as AppOauthConsentRouteImport } from './routes/_app/oauth/consent
 import { Route as AppNewBookmarkRouteImport } from './routes/_app/new.bookmark'
 import { Route as AppCollectionCollectionRouteImport } from './routes/_app/collection.$collection'
 import { Route as AppBookmarkIdRouteImport } from './routes/_app/bookmark.$id'
+import { Route as AppNewBookmarkConfirmationRouteImport } from './routes/_app/new.bookmark.confirmation'
 import { Route as AppBookmarkIdEditRouteImport } from './routes/_app/bookmark.$id.edit'
 
 const TermsRoute = TermsRouteImport.update({
@@ -165,6 +166,12 @@ const AppBookmarkIdRoute = AppBookmarkIdRouteImport.update({
   path: '/bookmark/$id',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppNewBookmarkConfirmationRoute =
+  AppNewBookmarkConfirmationRouteImport.update({
+    id: '/confirmation',
+    path: '/confirmation',
+    getParentRoute: () => AppNewBookmarkRoute,
+  } as any)
 const AppBookmarkIdEditRoute = AppBookmarkIdEditRouteImport.update({
   id: '/edit',
   path: '/edit',
@@ -188,7 +195,7 @@ export interface FileRoutesByFullPath {
   '/tweets': typeof AppTweetsRoute
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
-  '/new/bookmark': typeof AppNewBookmarkRoute
+  '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
   '/settings/integrations': typeof AppSettingsIntegrationsRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/type/$type': typeof AppTypeTypeRoute
   '/signin/': typeof PublicSigninIndexRoute
   '/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
+  '/new/bookmark/confirmation': typeof AppNewBookmarkConfirmationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
@@ -215,7 +223,7 @@ export interface FileRoutesByTo {
   '/tweets': typeof AppTweetsRoute
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
-  '/new/bookmark': typeof AppNewBookmarkRoute
+  '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
   '/settings/integrations': typeof AppSettingsIntegrationsRoute
@@ -224,6 +232,7 @@ export interface FileRoutesByTo {
   '/type/$type': typeof AppTypeTypeRoute
   '/signin': typeof PublicSigninIndexRoute
   '/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
+  '/new/bookmark/confirmation': typeof AppNewBookmarkConfirmationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -245,7 +254,7 @@ export interface FileRoutesById {
   '/_public/': typeof PublicIndexRoute
   '/_app/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/_app/collection/$collection': typeof AppCollectionCollectionRoute
-  '/_app/new/bookmark': typeof AppNewBookmarkRoute
+  '/_app/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/_app/oauth/consent': typeof AppOauthConsentRoute
   '/_app/settings/account': typeof AppSettingsAccountRoute
   '/_app/settings/integrations': typeof AppSettingsIntegrationsRoute
@@ -254,6 +263,7 @@ export interface FileRoutesById {
   '/_app/type/$type': typeof AppTypeTypeRoute
   '/_public/signin/': typeof PublicSigninIndexRoute
   '/_app/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
+  '/_app/new/bookmark/confirmation': typeof AppNewBookmarkConfirmationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -283,6 +293,7 @@ export interface FileRouteTypes {
     | '/type/$type'
     | '/signin/'
     | '/bookmark/$id/edit'
+    | '/new/bookmark/confirmation'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/type/$type'
     | '/signin'
     | '/bookmark/$id/edit'
+    | '/new/bookmark/confirmation'
   id:
     | '__root__'
     | '/_app'
@@ -339,6 +351,7 @@ export interface FileRouteTypes {
     | '/_app/type/$type'
     | '/_public/signin/'
     | '/_app/bookmark/$id/edit'
+    | '/_app/new/bookmark/confirmation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -532,6 +545,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookmarkIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/new/bookmark/confirmation': {
+      id: '/_app/new/bookmark/confirmation'
+      path: '/confirmation'
+      fullPath: '/new/bookmark/confirmation'
+      preLoaderRoute: typeof AppNewBookmarkConfirmationRouteImport
+      parentRoute: typeof AppNewBookmarkRoute
+    }
     '/_app/bookmark/$id/edit': {
       id: '/_app/bookmark/$id/edit'
       path: '/edit'
@@ -569,6 +589,18 @@ const AppBookmarkIdRouteWithChildren = AppBookmarkIdRoute._addFileChildren(
   AppBookmarkIdRouteChildren,
 )
 
+interface AppNewBookmarkRouteChildren {
+  AppNewBookmarkConfirmationRoute: typeof AppNewBookmarkConfirmationRoute
+}
+
+const AppNewBookmarkRouteChildren: AppNewBookmarkRouteChildren = {
+  AppNewBookmarkConfirmationRoute: AppNewBookmarkConfirmationRoute,
+}
+
+const AppNewBookmarkRouteWithChildren = AppNewBookmarkRoute._addFileChildren(
+  AppNewBookmarkRouteChildren,
+)
+
 interface AppRouteRouteChildren {
   AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
@@ -583,7 +615,7 @@ interface AppRouteRouteChildren {
   AppTweetsRoute: typeof AppTweetsRoute
   AppBookmarkIdRoute: typeof AppBookmarkIdRouteWithChildren
   AppCollectionCollectionRoute: typeof AppCollectionCollectionRoute
-  AppNewBookmarkRoute: typeof AppNewBookmarkRoute
+  AppNewBookmarkRoute: typeof AppNewBookmarkRouteWithChildren
   AppOauthConsentRoute: typeof AppOauthConsentRoute
   AppTagTagRoute: typeof AppTagTagRoute
   AppTypeTypeRoute: typeof AppTypeTypeRoute
@@ -603,7 +635,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppTweetsRoute: AppTweetsRoute,
   AppBookmarkIdRoute: AppBookmarkIdRouteWithChildren,
   AppCollectionCollectionRoute: AppCollectionCollectionRoute,
-  AppNewBookmarkRoute: AppNewBookmarkRoute,
+  AppNewBookmarkRoute: AppNewBookmarkRouteWithChildren,
   AppOauthConsentRoute: AppOauthConsentRoute,
   AppTagTagRoute: AppTagTagRoute,
   AppTypeTypeRoute: AppTypeTypeRoute,

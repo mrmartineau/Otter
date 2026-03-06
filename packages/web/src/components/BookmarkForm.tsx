@@ -30,7 +30,11 @@ import {
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import useSound from 'use-sound'
-import { CONTENT, DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER } from '../constants'
+import {
+  CONTENT,
+  DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER,
+  ROUTE_NEW_BOOKMARK_CONFIRMATION,
+} from '../constants'
 import { useToggle } from '../hooks/useToggle'
 import type { MetadataResponse } from '../types/api'
 import type { Bookmark, BookmarkFormValues } from '../types/db'
@@ -134,21 +138,27 @@ export const BookmarkForm = ({
 
     try {
       if (isNew) {
-        const { data } = await supabase
+        const { data: insertedBookmark, error } = await supabase
           .from('bookmarks')
           .insert([{ ...formData }], {
             defaultToNull: true,
           })
           .select('id')
+          .single()
+        if (error) {
+          throw error
+        }
         playAdd()
-        toast.success('Item added')
-        if (isBookmarklet && data?.[0]?.id) {
+        if (isBookmarklet && insertedBookmark?.id) {
           navigate({
-            params: { id: data[0].id },
-            search: { bookmarklet: 'true' },
-            to: '/bookmark/$id',
+            search: {
+              bookmarklet: isBookmarklet ? 'true' : undefined,
+              id: insertedBookmark.id,
+            },
+            to: ROUTE_NEW_BOOKMARK_CONFIRMATION,
           })
         } else {
+          toast.success('Item added')
           navigate({ to: '/feed' })
         }
       } else {
@@ -167,6 +177,8 @@ export const BookmarkForm = ({
       toast.message('Uh oh! Something went wrong.', {
         description: 'There was a problem with your request. Please try again.',
       })
+    } finally {
+      setFormSubmitting(false)
     }
   }
 
@@ -242,7 +254,7 @@ export const BookmarkForm = ({
           url_input: url.hostname,
         })
         setPossibleMatchingItems(data as Bookmark[])
-      } catch (err) {
+      } catch {
         setPossibleMatchingItems(null)
       }
     },
