@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as RecentRouteImport } from './routes/recent'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
@@ -41,6 +42,11 @@ import { Route as AppBookmarkIdEditRouteImport } from './routes/_app/bookmark.$i
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecentRoute = RecentRouteImport.update({
+  id: '/recent',
+  path: '/recent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -181,6 +187,7 @@ const AppBookmarkIdEditRoute = AppBookmarkIdEditRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/privacy': typeof PrivacyRoute
+  '/recent': typeof RecentRoute
   '/terms': typeof TermsRoute
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/privacy': typeof PrivacyRoute
+  '/recent': typeof RecentRoute
   '/terms': typeof TermsRoute
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteRouteWithChildren
   '/_public': typeof PublicRouteRouteWithChildren
   '/privacy': typeof PrivacyRoute
+  '/recent': typeof RecentRoute
   '/terms': typeof TermsRoute
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/privacy'
+    | '/recent'
     | '/terms'
     | '/settings'
     | '/dashboard'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/privacy'
+    | '/recent'
     | '/terms'
     | '/settings'
     | '/dashboard'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_public'
     | '/privacy'
+    | '/recent'
     | '/terms'
     | '/_app/settings'
     | '/_app/dashboard'
@@ -358,6 +370,7 @@ export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
+  RecentRoute: typeof RecentRoute
   TermsRoute: typeof TermsRoute
 }
 
@@ -368,6 +381,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recent': {
+      id: '/recent'
+      path: '/recent'
+      fullPath: '/recent'
+      preLoaderRoute: typeof RecentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -663,6 +683,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   PublicRouteRoute: PublicRouteRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
+  RecentRoute: RecentRoute,
   TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport

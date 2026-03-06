@@ -1,4 +1,5 @@
 import {
+  ArrowRightIcon,
   BookmarkSimpleIcon,
   BrainIcon,
   BrowserIcon,
@@ -13,12 +14,23 @@ import {
   TagIcon,
   UserCircleIcon,
 } from '@phosphor-icons/react'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/Button'
 import { Flex } from '@/components/Flex'
 import { Link } from '@/components/Link'
+import { PublicBookmarkItem } from '@/components/PublicBookmarkItem'
+import type { Bookmark } from '@/types/db'
+import { getRecentPublicBookmarksOptions } from '@/utils/fetching/recentPublicBookmarks'
 import { useSession } from '../../components/AuthProvider'
-import { CONTENT, ROUTE_HOME, ROUTE_SIGNIN } from '../../constants'
+import {
+  CONTENT,
+  ROUTE_HOME,
+  ROUTE_RECENT,
+  ROUTE_SIGNIN,
+} from '../../constants'
+
+const RECENT_PREVIEW_LIMIT = 5
 
 export const Route = createFileRoute('/_public/')({
   component: Index,
@@ -26,6 +38,9 @@ export const Route = createFileRoute('/_public/')({
     if (context.session !== null) {
       throw redirect({ to: ROUTE_HOME })
     }
+    await context.queryClient.ensureQueryData(
+      getRecentPublicBookmarksOptions({ limit: RECENT_PREVIEW_LIMIT }),
+    )
   },
 })
 
@@ -103,6 +118,10 @@ function Index() {
     navigate({ to: ROUTE_HOME })
   }
 
+  const { data: recentBookmarks } = useSuspenseQuery(
+    getRecentPublicBookmarksOptions({ limit: RECENT_PREVIEW_LIMIT }),
+  )
+
   return (
     <div className="min-h-screen">
       {/* Hero */}
@@ -144,6 +163,26 @@ function Index() {
         </Flex>
       </section>
 
+      {/* Recent public bookmarks */}
+      {recentBookmarks.data?.length ? (
+        <section className="max-w-[1000px] mx-auto px-s pb-3xl">
+          <h2 className="text-step-1 mb-m">Recent public bookmarks</h2>
+          <div className="grid gap-m">
+            {recentBookmarks.data.map((item: Bookmark) => (
+              <PublicBookmarkItem {...item} key={item.id} />
+            ))}
+          </div>
+          <Flex justify="center" className="mt-m">
+            <Button asChild variant="outline">
+              <a href={ROUTE_RECENT}>
+                View all
+                <ArrowRightIcon weight="bold" width="16" height="16" />
+              </a>
+            </Button>
+          </Flex>
+        </section>
+      ) : null}
+
       {/* Features */}
       <section className="max-w-[1000px] mx-auto px-s pb-3xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-m">
@@ -168,7 +207,7 @@ function Index() {
       </section>
 
       {/* Footer */}
-      <footer className="text-center pb-l px-s text-step--1 text-[var(--text)]">
+      <footer className="text-center pb-l px-s text-step--1">
         <Flex align="center" justify="center" gap="s" wrap="wrap">
           <span>
             Made by{' '}

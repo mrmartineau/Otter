@@ -5,6 +5,7 @@ import { generateResponse } from './ai/generateResponse'
 import { titleSystemPrompt } from './ai/title'
 import { sendBlueskyPost } from './bluesky/sendBlueskyPost'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
+import { getRecentPublicBookmarks } from './bookmarks/getRecentPublicBookmarks'
 import { getNewBookmark, postNewBookmark } from './bookmarks/new'
 import {
   handleMcpDelete,
@@ -33,6 +34,9 @@ app.get('/new', async (c) => {
 })
 app.get('/bookmarks', async (c) => {
   return await getAllBookmarks(c.req)
+})
+app.get('/recent', async (c) => {
+  return await getRecentPublicBookmarks(c.req)
 })
 app.get('/search', async (c) => {
   return await getSearch(c.req)
