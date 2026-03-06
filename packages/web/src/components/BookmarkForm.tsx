@@ -141,14 +141,14 @@ export const BookmarkForm = ({
           })
           .select('id')
         playAdd()
-        toast.success('Item added')
         if (isBookmarklet && data?.[0]?.id) {
           navigate({
             params: { id: data[0].id },
             search: { bookmarklet: 'true' },
-            to: '/bookmark/$id',
+            to: '/new/bookmark/confirmation',
           })
         } else {
+          toast.success('Item added')
           navigate({ to: '/feed' })
         }
       } else {
