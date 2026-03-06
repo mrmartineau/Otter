@@ -1,17 +1,3 @@
-import { DownloadIcon, SparkleIcon } from '@phosphor-icons/react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import {
-  type ComponentProps,
-  type DispatchWithoutAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import useSound from 'use-sound'
 import buy01Sfx from '@/assets/sounds/buy-01.mp3'
 import buy02Sfx from '@/assets/sounds/buy-02.mp3'
 import { Button } from '@/components/Button'
@@ -30,6 +16,20 @@ import {
   rewriteDescriptionOptions,
   rewriteTitleOptions,
 } from '@/utils/fetching/ai'
+import { DownloadIcon, SparkleIcon } from '@phosphor-icons/react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import {
+  type ComponentProps,
+  type DispatchWithoutAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import useSound from 'use-sound'
 import { CONTENT, DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER } from '../constants'
 import { useToggle } from '../hooks/useToggle'
 import type { MetadataResponse } from '../types/api'
@@ -134,12 +134,23 @@ export const BookmarkForm = ({
 
     try {
       if (isNew) {
-        await supabase.from('bookmarks').insert([{ ...formData }], {
-          defaultToNull: true,
-        })
+        const { data } = await supabase
+          .from('bookmarks')
+          .insert([{ ...formData }], {
+            defaultToNull: true,
+          })
+          .select('id')
         playAdd()
         toast.success('Item added')
-        navigate({ to: '/feed' })
+        if (isBookmarklet && data?.[0]?.id) {
+          navigate({
+            params: { id: data[0].id },
+            search: { bookmarklet: 'true' },
+            to: '/bookmark/$id',
+          })
+        } else {
+          navigate({ to: '/feed' })
+        }
       } else {
         await supabase
           .from('bookmarks')

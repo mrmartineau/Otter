@@ -22,6 +22,13 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
     )
     return bookmark.data
   },
+  validateSearch: (search: {
+    bookmarklet?: string
+  }): { bookmarklet?: string } => {
+    return {
+      bookmarklet: search.bookmarklet,
+    }
+  },
 })
 
 function RouteComponent() {
