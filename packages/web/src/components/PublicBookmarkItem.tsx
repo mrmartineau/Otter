@@ -19,7 +19,12 @@ export const PublicBookmarkItem = (props: Bookmark) => {
         <div className="feed-item-content">
           {url && title ? (
             <div>
-              <a href={url} className="link-base link-feed-title" target="_blank" rel="noopener noreferrer">
+              <a
+                href={url}
+                className="link-base link-feed-title"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {title}
               </a>
             </div>

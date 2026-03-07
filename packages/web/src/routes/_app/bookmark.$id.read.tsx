@@ -1,7 +1,4 @@
-import {
-  ArrowLeftIcon,
-  ArrowSquareOutIcon,
-} from '@phosphor-icons/react'
+import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import urlJoin from 'proper-url-join'
@@ -18,7 +15,9 @@ interface ScrapeContentResult {
   domain: string
 }
 
-const isScrapeContentResult = (value: unknown): value is ScrapeContentResult => {
+const isScrapeContentResult = (
+  value: unknown,
+): value is ScrapeContentResult => {
   if (!value || typeof value !== 'object') return false
   const candidate = value as Record<string, unknown>
   return (
@@ -110,9 +109,7 @@ function RouteComponent() {
           ) : null}
         </Flex>
 
-        {title ? (
-          <h1 className="mt-m text-step-2 font-bold">{title}</h1>
-        ) : null}
+        {title ? <h1 className="mt-m text-step-2 font-bold">{title}</h1> : null}
 
         {content?.content ? (
           <Markdown preventClamping>{content.content}</Markdown>
