@@ -1,0 +1,116 @@
+import './polyfill'
+import Defuddle from 'defuddle'
+import type { HonoRequest } from 'hono'
+import { parseHTML } from 'linkedom'
+import TurndownService from 'turndown'
+import { generateErrorJSONResponse, generateJSONResponse } from './json-response'
+
+const MAX_SIZE = 5 * 1024 * 1024 // 5MB
+
+export interface ScrapeContentResponse {
+  title: string
+  author: string
+  published: string
+  description: string
+  domain: string
+  content: string
+  wordCount: number
+  source: string
+  favicon?: string
+  image?: string
+  site?: string
+}
+
+async function fetchAndParse(targetUrl: string): Promise<ScrapeContentResponse> {
+  const response = await fetch(targetUrl, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; OtterBot/1.0)',
+      Accept: 'text/html,application/xhtml+xml',
+    },
+    redirect: 'follow',
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch: ${response.status} ${response.statusText}`,
+    )
+  }
+
+  const contentType = response.headers.get('content-type') || ''
+  if (
+    !contentType.includes('text/html') &&
+    !contentType.includes('application/xhtml+xml')
+  ) {
+    throw new Error(`Not an HTML page (content-type: ${contentType})`)
+  }
+
+  const contentLength = response.headers.get('content-length')
+  if (contentLength && parseInt(contentLength) > MAX_SIZE) {
+    throw new Error(
+      `Page too large (${Math.round(parseInt(contentLength) / 1024 / 1024)}MB, max 5MB)`,
+    )
+  }
+
+  const html = await response.text()
+  if (html.length > MAX_SIZE) {
+    throw new Error(
+      `Page too large (${Math.round(html.length / 1024 / 1024)}MB, max 5MB)`,
+    )
+  }
+
+  const { document } = parseHTML(html)
+
+  // Stub missing APIs for defuddle in Workers environment
+  const doc = document as any
+  if (!doc.styleSheets) doc.styleSheets = []
+  if (doc.defaultView && !doc.defaultView.getComputedStyle) {
+    doc.defaultView.getComputedStyle = () => ({ display: '' })
+  }
+
+  const defuddle = new Defuddle(document as any, {
+    url: targetUrl,
+  })
+  const result = defuddle.parse()
+
+  const turndown = new TurndownService({
+    headingStyle: 'atx',
+    codeBlockStyle: 'fenced',
+  })
+  const markdown = turndown.turndown(result.content || '')
+
+  return {
+    title: result.title || '',
+    author: result.author || '',
+    published: result.published || '',
+    description: result.description || '',
+    domain: result.domain || '',
+    content: markdown,
+    wordCount: result.wordCount || 0,
+    source: targetUrl,
+    favicon: result.favicon,
+    image: result.image,
+    site: result.site,
+  }
+}
+
+export const handleScrapeContent = async (request: HonoRequest) => {
+  const searchParams = new URL(request.url).searchParams
+  let url = searchParams.get('url')
+
+  if (!url) {
+    return generateErrorJSONResponse(
+      'Please provide a `url` query parameter, e.g. ?url=https://example.com',
+    )
+  }
+
+  if (!url.match(/^[a-zA-Z]+:\/\//)) {
+    url = 'https://' + url
+  }
+
+  try {
+    const result = await fetchAndParse(url)
+    return generateJSONResponse(result)
+  } catch (error) {
+    return generateErrorJSONResponse(error, url)
+  }
+}

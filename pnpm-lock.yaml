@@ -111,6 +111,9 @@ importers:
       '@tanstack/react-router-devtools':
         specifier: ^1.161.3
         version: 1.161.3(@tanstack/react-router@1.161.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@tanstack/router-core@1.161.3)(csstype@3.2.3)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@types/turndown':
+        specifier: ^5.0.6
+        version: 5.0.6
       change-case:
         specifier: ^5.4.4
         version: 5.4.4
@@ -126,6 +129,9 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
+      defuddle:
+        specifier: ^0.10.0
+        version: 0.10.0(jsdom@28.1.0)
       email-validator:
         specifier: ^2.0.4
         version: 2.0.4
@@ -147,6 +153,9 @@ importers:
       isomorphic-dompurify:
         specifier: ^2.36.0
         version: 2.36.0
+      linkedom:
+        specifier: ^0.18.12
+        version: 0.18.12
       lodash.throttle:
         specifier: ^4.1.1
         version: 4.1.1
@@ -219,6 +228,9 @@ importers:
       top-user-agents:
         specifier: ^2.1.95
         version: 2.1.95
+      turndown:
+        specifier: ^7.2.2
+        version: 7.2.2
       unique-random-array:
         specifier: ^4.0.0
         version: 4.0.0
@@ -1531,6 +1543,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@mixmark-io/domino@2.2.0':
+    resolution: {integrity: sha512-Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==}
 
   '@mrmartineau/strifx@0.2.0':
     resolution: {integrity: sha512-ISUVkT3kcS9KOY4gpbRU1JDcu6pkAxOXZaHphdaHtLCV+cn621cZUBGHCpI++STJpuwynbr6OOfPg9SMPhc5zw==}
@@ -2869,6 +2884,9 @@ packages:
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
 
+  '@types/turndown@5.0.6':
+    resolution: {integrity: sha512-ru00MoyeeouE5BX4gRL+6m/BsDfbRayOskWqUvh7CLGW+UXxHQItqALa38kKnOiZPqJrtzJUgAC2+F0rL1S4Pg==}
+
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
 
@@ -2992,6 +3010,10 @@ packages:
     peerDependenciesMeta:
       webpack-dev-server:
         optional: true
+
+  '@xmldom/xmldom@0.8.11':
+    resolution: {integrity: sha512-cQzWCtO6C8TQiYl1ruKNn2U6Ao4o4WBBcbL61yJl84x+j5sOWWFU9X7DpND8XZG3daDppSsigMdfAIl2upQBRw==}
+    engines: {node: '>=10.0.0'}
 
   '@xtuc/ieee754@1.2.0':
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}
@@ -3482,6 +3504,9 @@ packages:
     resolution: {integrity: sha512-0LrrStPOdJj+SPCCrGhzryycLjwcgUSHBtxNA8aIDxf0GLsRh1cKYhB00Gd1lDOS4yGH69+SNn13+TWbVHETFQ==}
     engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0, npm: '>=7.0.0'}
 
+  cssom@0.5.0:
+    resolution: {integrity: sha512-iKuQcq+NdHqlAcwUY0o/HL69XQrUaQdMjmStJ8JFmUaiiQErlhrmuigkg/CU4E2J0IyUKUrMAgl36TvN67MqTw==}
+
   cssstyle@6.0.1:
     resolution: {integrity: sha512-IoJs7La+oFp/AB033wBStxNOJt4+9hHMxsXUPANcoXL2b3W4DZKghlJ2cI/eyeRZIQ9ysvYEorVhjrcYctWbog==}
     engines: {node: '>=20'}
@@ -3531,6 +3556,12 @@ packages:
   decode-uri-component@0.2.2:
     resolution: {integrity: sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==}
     engines: {node: '>=0.10'}
+
+  defuddle@0.10.0:
+    resolution: {integrity: sha512-a43juTtHv6Vs4+sxvahVLM5NxoyDsarO1Ag3UxLORI4Fo/nsNFwzDxuQBvosKVGTIRxCwN/mfnWAzNXmQfieqw==}
+    hasBin: true
+    peerDependencies:
+      jsdom: ^24.0.0
 
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
@@ -3939,8 +3970,14 @@ packages:
   html-entities@2.6.0:
     resolution: {integrity: sha512-kig+rMn/QOVRvr7c86gQ8lWXq+Hkv6CbAH1hLu+RG338StTpE8Z0b44SDVaqVu7HGKf27frdmUYEs9hTUX/cLQ==}
 
+  html-escaper@3.0.3:
+    resolution: {integrity: sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ==}
+
   html-url-attributes@3.0.1:
     resolution: {integrity: sha512-ol6UPyBWqsrO6EJySPz2O7ZSr856WDrEzM5zMqp+FJJLGMW35cLYmmZnl0vztAZxRUoNZJFTCohfjuIJ8I4QBQ==}
+
+  htmlparser2@10.1.0:
+    resolution: {integrity: sha512-VTZkM9GWRAtEpveh7MSF6SjjrpNVNNVJfFup7xTY3UpFtm67foy9HDVXneLtFVt4pMz5kZtgNcvCniNFb1hlEQ==}
 
   http-errors@2.0.1:
     resolution: {integrity: sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ==}
@@ -4313,6 +4350,15 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
+  linkedom@0.18.12:
+    resolution: {integrity: sha512-jalJsOwIKuQJSeTvsgzPe9iJzyfVaEJiEXl+25EkKevsULHvMJzpNqwvj1jOESWdmgKDiXObyjOYwlUqG7wo1Q==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      canvas: '>= 2'
+    peerDependenciesMeta:
+      canvas:
+        optional: true
+
   loader-runner@4.3.0:
     resolution: {integrity: sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg==}
     engines: {node: '>=6.11.5'}
@@ -4366,6 +4412,9 @@ packages:
   match-words@1.0.0:
     resolution: {integrity: sha512-gFA6Cem/jDO/JvggVN065KASOTLWoaI9CcpSsTGAWsO2ufCuD+paGS4AWXU2vmKY9Mtxw0zfFxQX2XAckZf8aw==}
     engines: {node: '>=0.10.0'}
+
+  mathml-to-latex@1.5.0:
+    resolution: {integrity: sha512-rrWn0eEvcEcdMM4xfHcSGIy+i01DX9byOdXTLWg+w1iJ6O6ohP5UXY1dVzNUZLhzfl3EGcRekWLhY7JT5Omaew==}
 
   mdast-squeeze-paragraphs@6.0.0:
     resolution: {integrity: sha512-6NDbJPTg0M0Ye+TlYwX1KJ1LFbp515P2immRJyJQhc9Na9cetHzSoHNYIQcXpANEAP1sm9yd/CTZU2uHqR5A+w==}
@@ -5707,6 +5756,10 @@ packages:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
 
+  temml@0.13.1:
+    resolution: {integrity: sha512-/fL1utq8QUD9YpcLeZHPRnp9Cbzbexq5hZl5uSBhf8mNYiKkcS4eYbLidDB+/nF8C+RHAcBQbKw2bKoS83mz1Q==}
+    engines: {node: '>=18.13.0'}
+
   terser-webpack-plugin@5.3.14:
     resolution: {integrity: sha512-vkZjpUjb6OMS7dhV+tILUW6BhpDR7P2L/aQSAv+Uwk+m8KATX9EccViHTJR2qDtACKPIYndLGCyl3FMo+r2LMw==}
     engines: {node: '>= 10.13.0'}
@@ -5828,6 +5881,9 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
+  turndown@7.2.2:
+    resolution: {integrity: sha512-1F7db8BiExOKxjSMU2b7if62D/XOyQyZbPKq/nUwopfgnHlqXHqQ0lvfUTeUIr1lZJzOPFn43dODyMSIfvWRKQ==}
+
   tw-animate-css@1.4.0:
     resolution: {integrity: sha512-7bziOlRqH0hJx80h/3mbicLW7o8qLsH5+RaLR2t+OHM3D0JlWGODQKQ4cxbK7WlvmUxpcj6Kgu6EKqjrGFe3QQ==}
 
@@ -5843,6 +5899,9 @@ packages:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  uhyphen@0.2.0:
+    resolution: {integrity: sha512-qz3o9CHXmJJPGBdqzab7qAYuW8kQGKNEuoHFYrBwV6hWIMcpAmxDLXojcHfFr9US1Pe6zUswEIJIbLI610fuqA==}
 
   uint8arrays@3.0.0:
     resolution: {integrity: sha512-HRCx0q6O9Bfbp+HHSfQQKD7wU70+lydKVt4EghkdOvlK/NlrF90z+eXV34mUd48rNvVJXwkrMSPpCATkct8fJA==}
@@ -7427,6 +7486,8 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@mixmark-io/domino@2.2.0': {}
+
   '@mrmartineau/strifx@0.2.0(react@19.2.4)':
     optionalDependencies:
       react: 19.2.4
@@ -8797,6 +8858,8 @@ snapshots:
   '@types/trusted-types@2.0.7':
     optional: true
 
+  '@types/turndown@5.0.6': {}
+
   '@types/unist@2.0.11': {}
 
   '@types/unist@3.0.3': {}
@@ -8959,6 +9022,9 @@ snapshots:
   '@webpack-cli/serve@1.7.0(webpack-cli@4.10.0)':
     dependencies:
       webpack-cli: 4.10.0(webpack@5.101.3)
+
+  '@xmldom/xmldom@0.8.11':
+    optional: true
 
   '@xtuc/ieee754@1.2.0': {}
 
@@ -9505,6 +9571,8 @@ snapshots:
     dependencies:
       css-tree: 2.2.1
 
+  cssom@0.5.0: {}
+
   cssstyle@6.0.1:
     dependencies:
       '@asamuzakjp/css-color': 4.1.2
@@ -9542,6 +9610,15 @@ snapshots:
       character-entities: 2.0.2
 
   decode-uri-component@0.2.2: {}
+
+  defuddle@0.10.0(jsdom@28.1.0):
+    dependencies:
+      commander: 12.1.0
+      jsdom: 28.1.0
+    optionalDependencies:
+      mathml-to-latex: 1.5.0
+      temml: 0.13.1
+      turndown: 7.2.2
 
   depd@2.0.0: {}
 
@@ -9938,7 +10015,16 @@ snapshots:
 
   html-entities@2.6.0: {}
 
+  html-escaper@3.0.3: {}
+
   html-url-attributes@3.0.1: {}
+
+  htmlparser2@10.1.0:
+    dependencies:
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      domutils: 3.2.2
+      entities: 7.0.1
 
   http-errors@2.0.1:
     dependencies:
@@ -10300,6 +10386,14 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
+  linkedom@0.18.12:
+    dependencies:
+      css-select: 5.2.2
+      cssom: 0.5.0
+      html-escaper: 3.0.3
+      htmlparser2: 10.1.0
+      uhyphen: 0.2.0
+
   loader-runner@4.3.0: {}
 
   loader-utils@2.0.4:
@@ -10347,6 +10441,11 @@ snapshots:
   match-words@1.0.0:
     dependencies:
       word-regex: 0.1.2
+
+  mathml-to-latex@1.5.0:
+    dependencies:
+      '@xmldom/xmldom': 0.8.11
+    optional: true
 
   mdast-squeeze-paragraphs@6.0.0:
     dependencies:
@@ -12169,6 +12268,9 @@ snapshots:
 
   tapable@2.3.0: {}
 
+  temml@0.13.1:
+    optional: true
+
   terser-webpack-plugin@5.3.14(webpack@5.101.3):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.30
@@ -12268,6 +12370,10 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
+  turndown@7.2.2:
+    dependencies:
+      '@mixmark-io/domino': 2.2.0
+
   tw-animate-css@1.4.0: {}
 
   type-detect@4.0.8: {}
@@ -12275,6 +12381,8 @@ snapshots:
   type-fest@0.7.1: {}
 
   typescript@5.9.3: {}
+
+  uhyphen@0.2.0: {}
 
   uint8arrays@3.0.0:
     dependencies:

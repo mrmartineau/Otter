@@ -1,4 +1,5 @@
 import {
+  ArticleIcon,
   CalendarIcon,
   CardsIcon,
   CopyIcon,
@@ -301,6 +302,21 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               </TooltipTrigger>
               <TooltipContent>Copy URL to clipboard</TooltipContent>
             </Tooltip>
+
+            {type === 'article' ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link href={`/bookmark/${id}/read`}>
+                    <ArticleIcon
+                      aria-label="Read article"
+                      size={18}
+                      weight="duotone"
+                    />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>Read article</TooltipContent>
+              </Tooltip>
+            ) : null}
           </Flex>
 
           <FeedItemActions
