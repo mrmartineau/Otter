@@ -37,6 +37,7 @@ import { Route as AppNewBookmarkRouteImport } from './routes/_app/new.bookmark'
 import { Route as AppCollectionCollectionRouteImport } from './routes/_app/collection.$collection'
 import { Route as AppBookmarkIdRouteImport } from './routes/_app/bookmark.$id'
 import { Route as AppNewBookmarkConfirmationRouteImport } from './routes/_app/new.bookmark.confirmation'
+import { Route as AppBookmarkIdReadRouteImport } from './routes/_app/bookmark.$id.read'
 import { Route as AppBookmarkIdEditRouteImport } from './routes/_app/bookmark.$id.edit'
 
 const TermsRoute = TermsRouteImport.update({
@@ -178,6 +179,11 @@ const AppNewBookmarkConfirmationRoute =
     path: '/confirmation',
     getParentRoute: () => AppNewBookmarkRoute,
   } as any)
+const AppBookmarkIdReadRoute = AppBookmarkIdReadRouteImport.update({
+  id: '/read',
+  path: '/read',
+  getParentRoute: () => AppBookmarkIdRoute,
+} as any)
 const AppBookmarkIdEditRoute = AppBookmarkIdEditRouteImport.update({
   id: '/edit',
   path: '/edit',
@@ -211,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/type/$type': typeof AppTypeTypeRoute
   '/signin/': typeof PublicSigninIndexRoute
   '/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
+  '/bookmark/$id/read': typeof AppBookmarkIdReadRoute
   '/new/bookmark/confirmation': typeof AppNewBookmarkConfirmationRoute
 }
 export interface FileRoutesByTo {
@@ -240,6 +247,7 @@ export interface FileRoutesByTo {
   '/type/$type': typeof AppTypeTypeRoute
   '/signin': typeof PublicSigninIndexRoute
   '/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
+  '/bookmark/$id/read': typeof AppBookmarkIdReadRoute
   '/new/bookmark/confirmation': typeof AppNewBookmarkConfirmationRoute
 }
 export interface FileRoutesById {
@@ -272,6 +280,7 @@ export interface FileRoutesById {
   '/_app/type/$type': typeof AppTypeTypeRoute
   '/_public/signin/': typeof PublicSigninIndexRoute
   '/_app/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
+  '/_app/bookmark/$id/read': typeof AppBookmarkIdReadRoute
   '/_app/new/bookmark/confirmation': typeof AppNewBookmarkConfirmationRoute
 }
 export interface FileRouteTypes {
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/type/$type'
     | '/signin/'
     | '/bookmark/$id/edit'
+    | '/bookmark/$id/read'
     | '/new/bookmark/confirmation'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -332,6 +342,7 @@ export interface FileRouteTypes {
     | '/type/$type'
     | '/signin'
     | '/bookmark/$id/edit'
+    | '/bookmark/$id/read'
     | '/new/bookmark/confirmation'
   id:
     | '__root__'
@@ -363,6 +374,7 @@ export interface FileRouteTypes {
     | '/_app/type/$type'
     | '/_public/signin/'
     | '/_app/bookmark/$id/edit'
+    | '/_app/bookmark/$id/read'
     | '/_app/new/bookmark/confirmation'
   fileRoutesById: FileRoutesById
 }
@@ -572,6 +584,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppNewBookmarkConfirmationRouteImport
       parentRoute: typeof AppNewBookmarkRoute
     }
+    '/_app/bookmark/$id/read': {
+      id: '/_app/bookmark/$id/read'
+      path: '/read'
+      fullPath: '/bookmark/$id/read'
+      preLoaderRoute: typeof AppBookmarkIdReadRouteImport
+      parentRoute: typeof AppBookmarkIdRoute
+    }
     '/_app/bookmark/$id/edit': {
       id: '/_app/bookmark/$id/edit'
       path: '/edit'
@@ -599,10 +618,12 @@ const AppSettingsRouteRouteWithChildren =
 
 interface AppBookmarkIdRouteChildren {
   AppBookmarkIdEditRoute: typeof AppBookmarkIdEditRoute
+  AppBookmarkIdReadRoute: typeof AppBookmarkIdReadRoute
 }
 
 const AppBookmarkIdRouteChildren: AppBookmarkIdRouteChildren = {
   AppBookmarkIdEditRoute: AppBookmarkIdEditRoute,
+  AppBookmarkIdReadRoute: AppBookmarkIdReadRoute,
 }
 
 const AppBookmarkIdRouteWithChildren = AppBookmarkIdRoute._addFileChildren(

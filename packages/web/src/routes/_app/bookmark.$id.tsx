@@ -36,13 +36,13 @@ function RouteComponent() {
     getBookmarkOptions({ id: Route.useParams().id }),
   )
   const matchRoute = useMatchRoute()
-  const params = matchRoute({ to: '/bookmark/$id/edit' })
+  const isChildRoute =
+    matchRoute({ to: '/bookmark/$id/edit' }) ||
+    matchRoute({ to: '/bookmark/$id/read' })
 
-  // this feels weird, but it's a workaround to get the edit page to work
-  // the edit page is a child route, so it needs to be rendered here through the use of `Outlet`
   return (
     <>
-      {params ? (
+      {isChildRoute ? (
         <Outlet />
       ) : (
         <ErrorBoundary fallback={<div>Something went wrong</div>}>

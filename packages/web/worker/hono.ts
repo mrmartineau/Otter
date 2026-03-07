@@ -17,6 +17,7 @@ import { getMedia } from './media/media'
 import { getMediaSearch } from './media/mediaSearch'
 import { feedToJson } from './rss/rss-to-json'
 import { handleScrape } from './scraper'
+import { handleScrapeContent } from './scraper/scrape-content'
 import { getSearch } from './search/search'
 import { sendToots } from './toots/sendToots'
 
@@ -54,7 +55,10 @@ app.post('/bluesky', async (c) => {
   return await sendBlueskyPost(c.req)
 })
 app.get('/scrape', async (c) => {
-  return await handleScrape(c.req)
+  return await handleScrapeContent(c.req)
+})
+app.get('/scrape-content', async (c) => {
+  return await handleScrapeContent(c.req)
 })
 app.post('/ai/title', async (context) => {
   const { prompt } = await context.req.json()

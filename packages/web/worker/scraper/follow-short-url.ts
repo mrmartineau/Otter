@@ -1,4 +1,5 @@
 const MAX_REDIRECTS = 5
+const HEAD_TIMEOUT_MS = 10000
 
 export interface FollowShortUrlResponse {
   urls: string[]
@@ -9,30 +10,41 @@ export const followShortUrl = async (
   urls: string[],
   redirectCount = 0,
 ): Promise<FollowShortUrlResponse> => {
-  const fetchResponse = await fetch(urls[urls.length - 1], {
-    headers: {
-      Accept:
-        'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-      'Accept-Language': 'en-US,en;q=0.5',
-      referrer: 'http://www.google.com/',
-    },
-    method: 'HEAD',
-    redirect: 'manual',
-  })
-
   if (redirectCount >= MAX_REDIRECTS) {
     throw new Error(`Maximum redirects exceeded.`)
   }
-  if (fetchResponse.headers.get('location')) {
-    const location = fetchResponse.headers.get('location')
-    if (location) {
-      urls.push(location)
-      return await followShortUrl(urls, redirectCount + 1)
-    }
+
+  const currentUrl = urls[urls.length - 1]
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), HEAD_TIMEOUT_MS)
+
+  let fetchResponse: Response
+  try {
+    fetchResponse = await fetch(currentUrl, {
+      headers: {
+        Accept:
+          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        referrer: 'http://www.google.com/',
+      },
+      method: 'HEAD',
+      redirect: 'manual',
+      signal: controller.signal,
+    })
+  } finally {
+    clearTimeout(timeoutId)
+  }
+
+  const location = fetchResponse.headers.get('location')
+  if (location) {
+    // Resolve relative redirect URLs against the current URL
+    const resolvedLocation = new URL(location, currentUrl).toString()
+    urls.push(resolvedLocation)
+    return followShortUrl(urls, redirectCount + 1)
   }
 
   return {
-    unshortened_url: urls[urls.length - 1],
+    unshortened_url: currentUrl,
     urls,
   }
 }

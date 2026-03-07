@@ -21,7 +21,7 @@ export const typeChecker = (path: string): LinkType | undefined => {
     const url = new URL(path)
     const hostname = url.hostname.replace('www.', '')
     return types[hostname]
-  } catch (err) {
+  } catch {
     // swallow the error, no need to do anything
   }
 
