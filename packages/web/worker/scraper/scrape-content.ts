@@ -109,7 +109,9 @@ export const handleScrapeContent = async (request: HonoRequest) => {
 
   if (!url) {
     return generateErrorJSONResponse(
-      'Please provide a `url` query parameter, e.g. ?url=https://example.com',
+      new Error(
+        'Please provide a `url` query parameter, e.g. ?url=https://example.com',
+      ),
     )
   }
 
