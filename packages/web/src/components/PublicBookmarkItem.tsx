@@ -5,7 +5,6 @@ import { fullPath } from '@/utils/fullPath'
 import { simpleUrl } from '@/utils/simpleUrl'
 import { Favicon } from './Favicon'
 import { Flex } from './Flex'
-import { Link } from './Link'
 import { Markdown } from './Markdown'
 import { TypeToIcon } from './TypeToIcon'
 

@@ -12,19 +12,23 @@ import { cn } from '@/utils/classnames'
 import { getRecentPublicBookmarksOptions } from '@/utils/fetching/recentPublicBookmarks'
 
 const RECENT_LIMIT = 50
+type RecentSearch = {
+  limit: number
+  offset: number
+}
 
 export const Route = createFileRoute('/recent')({
   component: RecentPage,
   head: () => ({
     meta: [{ title: `Recent — ${CONTENT.appName}` }],
   }),
-  loader: async (opts) => {
-    return opts.context.queryClient.ensureQueryData(
-      getRecentPublicBookmarksOptions(opts.deps?.search),
+  loader: async ({ context, deps }) => {
+    return context.queryClient.ensureQueryData(
+      getRecentPublicBookmarksOptions(deps),
     )
   },
-  loaderDeps: ({ search }) => ({ search }),
-  validateSearch: (search: Record<string, unknown>) => ({
+  loaderDeps: ({ search }): RecentSearch => search,
+  validateSearch: (search: Record<string, unknown>): RecentSearch => ({
     limit: Number(search.limit) || RECENT_LIMIT,
     offset: Number(search.offset) || 0,
   }),

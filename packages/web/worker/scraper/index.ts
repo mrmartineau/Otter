@@ -28,7 +28,6 @@ export const handleScrape = async (request: HonoRequest) => {
   let response: Record<string, ScrapeResponse>
   let url = searchParams.get('url')
   const cleanUrl = searchParams.get('cleanUrl')
-  const includeMarkdown = searchParams.get('markdown') === 'true'
 
   if (!url) {
     return generateErrorJSONResponse(
@@ -37,7 +36,7 @@ export const handleScrape = async (request: HonoRequest) => {
   }
 
   if (url && !url.match(/^[a-zA-Z]+:\/\//)) {
-    url = 'https://' + url
+    url = `https://${url}`
   }
 
   try {
@@ -79,14 +78,8 @@ export const handleScrape = async (request: HonoRequest) => {
       try {
         response.jsonld = JSON.parse(response.jsonld as string)
       } catch {
-        response.jsonld = null
+        response.jsonld = {} as JSONObject
       }
-    }
-
-    // Extract page content as markdown when requested
-    if (includeMarkdown) {
-      const markdown = await scraper.getMarkdown()
-      response.markdown = markdown ?? null
     }
   } catch (error) {
     return generateErrorJSONResponse(error, url)

@@ -16,7 +16,6 @@ import {
 import { getMedia } from './media/media'
 import { getMediaSearch } from './media/mediaSearch'
 import { feedToJson } from './rss/rss-to-json'
-import { handleScrape } from './scraper'
 import { handleScrapeContent } from './scraper/scrape-content'
 import { getSearch } from './search/search'
 import { sendToots } from './toots/sendToots'
