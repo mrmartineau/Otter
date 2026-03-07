@@ -4,7 +4,7 @@ import type { MetadataResponse } from '@/types/api'
 export const getScrapeData = async (url: string): Promise<MetadataResponse> => {
   const response = await fetch(
     urlJoin('/api/scrape', {
-      query: { cleanUrl: 'true', url: url.toString() },
+      query: { url: url.toString() },
     }),
     { cache: 'force-cache' },
   )

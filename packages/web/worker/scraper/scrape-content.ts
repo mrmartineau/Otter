@@ -3,7 +3,11 @@ import Defuddle from 'defuddle'
 import type { HonoRequest } from 'hono'
 import { parseHTML } from 'linkedom'
 import TurndownService from 'turndown'
-import { generateErrorJSONResponse, generateJSONResponse } from './json-response'
+import {
+  generateErrorJSONResponse,
+  generateJSONResponse,
+} from './json-response'
+import { linkType } from './link-type'
 
 const MAX_SIZE = 5 * 1024 * 1024 // 5MB
 
@@ -16,16 +20,20 @@ export interface ScrapeContentResponse {
   content: string
   wordCount: number
   source: string
+  url: string
+  urlType: string
   favicon?: string
   image?: string
   site?: string
 }
 
-async function fetchAndParse(targetUrl: string): Promise<ScrapeContentResponse> {
+async function fetchAndParse(
+  targetUrl: string,
+): Promise<ScrapeContentResponse> {
   const response = await fetch(targetUrl, {
     headers: {
-      'User-Agent': 'Mozilla/5.0 (compatible; OtterBot/1.0)',
       Accept: 'text/html,application/xhtml+xml',
+      'User-Agent': 'Mozilla/5.0 (compatible; OtterBot/1.0)',
     },
     redirect: 'follow',
   })
@@ -73,23 +81,25 @@ async function fetchAndParse(targetUrl: string): Promise<ScrapeContentResponse> 
   const result = defuddle.parse()
 
   const turndown = new TurndownService({
-    headingStyle: 'atx',
     codeBlockStyle: 'fenced',
+    headingStyle: 'atx',
   })
   const markdown = turndown.turndown(result.content || '')
 
   return {
-    title: result.title || '',
     author: result.author || '',
-    published: result.published || '',
+    content: markdown,
     description: result.description || '',
     domain: result.domain || '',
-    content: markdown,
-    wordCount: result.wordCount || 0,
-    source: targetUrl,
     favicon: result.favicon,
     image: result.image,
+    published: result.published || '',
     site: result.site,
+    source: targetUrl,
+    title: result.title || '',
+    url: response.url || targetUrl,
+    urlType: linkType(targetUrl, Boolean(result?.author)),
+    wordCount: result.wordCount || 0,
   }
 }
 

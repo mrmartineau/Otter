@@ -55,7 +55,7 @@ app.post('/bluesky', async (c) => {
   return await sendBlueskyPost(c.req)
 })
 app.get('/scrape', async (c) => {
-  return await handleScrape(c.req)
+  return await handleScrapeContent(c.req)
 })
 app.get('/scrape-content', async (c) => {
   return await handleScrapeContent(c.req)
