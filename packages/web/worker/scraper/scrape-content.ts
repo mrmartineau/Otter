@@ -98,7 +98,7 @@ async function fetchAndParse(
     source: targetUrl,
     title: result.title || '',
     url: response.url || targetUrl,
-    urlType: linkType(targetUrl, Boolean(result?.author)),
+    urlType: linkType(response.url || targetUrl, Boolean(result?.author)),
     wordCount: result.wordCount || 0,
   }
 }

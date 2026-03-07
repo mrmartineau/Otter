@@ -18,13 +18,46 @@ interface ScrapeContentResult {
   domain: string
 }
 
+const isScrapeContentResult = (value: unknown): value is ScrapeContentResult => {
+  if (!value || typeof value !== 'object') return false
+  const candidate = value as Record<string, unknown>
+  return (
+    typeof candidate.title === 'string' &&
+    typeof candidate.content === 'string' &&
+    typeof candidate.author === 'string' &&
+    typeof candidate.domain === 'string'
+  )
+}
+
 const getContentOptions = (url: string) =>
   queryOptions({
     queryFn: async (): Promise<ScrapeContentResult> => {
       const response = await fetch(
         urlJoin('/api/scrape-content', { query: { url } }),
       )
-      return response.json()
+      const data = (await response.json()) as
+        | ScrapeContentResult
+        | { error?: string; message?: string }
+
+      if (!response.ok) {
+        const message =
+          'error' in data && data.error
+            ? data.error
+            : 'message' in data && data.message
+              ? data.message
+              : `Request failed with status ${response.status}`
+        throw new Error(message)
+      }
+
+      if ('error' in data && data.error) {
+        throw new Error(data.error)
+      }
+
+      if (!isScrapeContentResult(data)) {
+        throw new Error('Unexpected scrape-content response shape')
+      }
+
+      return data
     },
     queryKey: ['bookmark-content', url],
     staleTime: 60 * 1000,

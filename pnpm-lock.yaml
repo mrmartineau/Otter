@@ -111,9 +111,6 @@ importers:
       '@tanstack/react-router-devtools':
         specifier: ^1.161.3
         version: 1.161.3(@tanstack/react-router@1.161.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@tanstack/router-core@1.161.3)(csstype@3.2.3)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@types/turndown':
-        specifier: ^5.0.6
-        version: 5.0.6
       change-case:
         specifier: ^5.4.4
         version: 5.4.4
@@ -283,6 +280,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
+      '@types/turndown':
+        specifier: ^5.0.6
+        version: 5.0.6
       '@types/xml2js':
         specifier: ^0.4.14
         version: 0.4.14
