@@ -199,20 +199,23 @@ class Scraper {
     const parts: string[] = []
 
     const state = {
-      skipDepth: 0,
+      blockquoteDepth: 0,
       blockText: '',
       headingLevel: 0,
+      inLink: false,
       inPre: false,
       linkHref: '',
       linkText: '',
-      inLink: false,
-      listStyle: null as 'ul' | 'ol' | null,
-      listCounter: 0,
+      listStack: [] as Array<{ style: 'ul' | 'ol'; counter: number }>,
+      skipDepth: 0,
     }
 
     const flushBlock = (prefix = '', suffix = '') => {
       const text = state.blockText.trim()
-      if (text) parts.push(prefix + text + suffix)
+      if (text) {
+        const bqPrefix = '> '.repeat(state.blockquoteDepth)
+        parts.push(bqPrefix + prefix + text + suffix)
+      }
       state.blockText = ''
     }
 
@@ -260,16 +263,14 @@ class Scraper {
     // Paragraphs
     rewriter.on('p', {
       element(el) {
-        if (state.skipDepth > 0 || state.headingLevel > 0 || state.inPre)
-          return
+        if (state.skipDepth > 0 || state.headingLevel > 0 || state.inPre) return
         state.blockText = ''
         el.onEndTag(() => {
           if (state.headingLevel === 0 && !state.inPre) flushBlock()
         })
       },
       text(t) {
-        if (state.skipDepth > 0 || state.headingLevel > 0 || state.inPre)
-          return
+        if (state.skipDepth > 0 || state.headingLevel > 0 || state.inPre) return
         if (state.inLink) {
           state.linkText += t.text
         } else {
@@ -283,11 +284,7 @@ class Scraper {
       element(el) {
         if (state.skipDepth > 0) return
         const href = el.getAttribute('href')
-        if (
-          href &&
-          !href.startsWith('#') &&
-          !href.startsWith('javascript:')
-        ) {
+        if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
           state.inLink = true
           state.linkHref = href
           state.linkText = ''
@@ -310,9 +307,9 @@ class Scraper {
     rewriter.on('ul', {
       element(el) {
         if (state.skipDepth > 0) return
-        state.listStyle = 'ul'
+        state.listStack.push({ counter: 0, style: 'ul' })
         el.onEndTag(() => {
-          state.listStyle = null
+          state.listStack.pop()
         })
       },
     })
@@ -321,11 +318,9 @@ class Scraper {
     rewriter.on('ol', {
       element(el) {
         if (state.skipDepth > 0) return
-        state.listStyle = 'ol'
-        state.listCounter = 0
+        state.listStack.push({ counter: 0, style: 'ol' })
         el.onEndTag(() => {
-          state.listStyle = null
-          state.listCounter = 0
+          state.listStack.pop()
         })
       },
     })
@@ -334,13 +329,16 @@ class Scraper {
     rewriter.on('li', {
       element(el) {
         if (state.skipDepth > 0) return
-        if (state.listStyle === 'ol') state.listCounter++
-        const counter = state.listCounter
-        const ls = state.listStyle
+        const list = state.listStack[state.listStack.length - 1]
+        if (list?.style === 'ol') list.counter++
+        const counter = list?.counter ?? 0
+        const ls = list?.style ?? null
+        const savedBlockText = state.blockText
         state.blockText = ''
         el.onEndTag(() => {
           const prefix = ls === 'ol' ? `${counter}. ` : '- '
           flushBlock(prefix)
+          state.blockText = savedBlockText
         })
       },
       text(t) {
@@ -374,8 +372,12 @@ class Scraper {
     rewriter.on('blockquote', {
       element(el) {
         if (state.skipDepth > 0) return
+        state.blockquoteDepth++
         state.blockText = ''
-        el.onEndTag(() => flushBlock('> '))
+        el.onEndTag(() => {
+          flushBlock()
+          state.blockquoteDepth--
+        })
       },
       text(t) {
         if (state.skipDepth > 0) return
