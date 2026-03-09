@@ -1,3 +1,6 @@
+import closeSound from '@mrmartineau/kit/sounds/close_001.mp3'
+import openSound from '@mrmartineau/kit/sounds/open_001.mp3'
+import useSound from '@mrmartineau/use-sound'
 import {
   ArrowElbowDownLeftIcon,
   ArrowFatLinesUpIcon,
@@ -65,7 +68,8 @@ export const CmdK = () => {
   const [open, toggleOpen, setOpen] = useToggle(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [isHoldingAltKeyDown, setIsHoldingAltKeyDown] = useState(false)
-
+  const [playOpen] = useSound(openSound, { volume: 0.15 })
+  const [playClose] = useSound(closeSound, { volume: 0.15 })
   const { data, isLoading } = useQuery({
     enabled: !!searchTerm,
     queryFn: () => fetchSearch(searchTerm),
@@ -110,6 +114,14 @@ export const CmdK = () => {
       document.removeEventListener('keyup', up)
     }
   }, [])
+
+  useEffect(() => {
+    if (open) {
+      playOpen()
+    } else {
+      playClose()
+    }
+  }, [open, playClose, playOpen])
 
   const enableIfSearchTermHasValue = searchTerm?.length
 

@@ -1,3 +1,6 @@
+import switchOffSfx from '@mrmartineau/kit/sounds/switch-off.mp3'
+import switchOnSfx from '@mrmartineau/kit/sounds/switch-on.mp3'
+import useSound from '@mrmartineau/use-sound'
 import {
   ArrowCounterClockwiseIcon,
   ArrowSquareOutIcon,
@@ -13,9 +16,6 @@ import urlJoin from 'proper-url-join'
 import { DropdownMenu } from 'radix-ui'
 import { Suspense, useRef } from 'react'
 import { toast } from 'sonner'
-import useSound from 'use-sound'
-import switchOffSfx from '@/assets/sounds/switch-off.mp3'
-import switchOnSfx from '@/assets/sounds/switch-on.mp3'
 import { Button } from '@/components/Button'
 import { getMetaOptions } from '@/utils/fetching/meta'
 import { filteredTags } from '@/utils/filteredTags'

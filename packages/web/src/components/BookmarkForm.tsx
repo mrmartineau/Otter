@@ -1,5 +1,19 @@
-import buy01Sfx from '@/assets/sounds/buy-01.mp3'
-import buy02Sfx from '@/assets/sounds/buy-02.mp3'
+import buy01Sfx from '@mrmartineau/kit/sounds/buy-01.mp3'
+import buy02Sfx from '@mrmartineau/kit/sounds/buy-02.mp3'
+import useSound from '@mrmartineau/use-sound'
+import { DownloadIcon, SparkleIcon } from '@phosphor-icons/react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import {
+  type ComponentProps,
+  type DispatchWithoutAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { Textarea } from '@/components/Textarea'
@@ -16,20 +30,6 @@ import {
   rewriteDescriptionOptions,
   rewriteTitleOptions,
 } from '@/utils/fetching/ai'
-import { DownloadIcon, SparkleIcon } from '@phosphor-icons/react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import {
-  type ComponentProps,
-  type DispatchWithoutAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import useSound from 'use-sound'
 import {
   CONTENT,
   DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER,
@@ -98,8 +98,8 @@ export const BookmarkForm = ({
   const [isScraping, , setIsScraping] = useToggle(false)
   const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>()
   const queryClient = useQueryClient()
-  const [playAdd] = useSound(buy01Sfx)
-  const [playEdit] = useSound(buy02Sfx)
+  const [playAdd] = useSound(buy01Sfx, { volume: 0.2 })
+  const [playEdit] = useSound(buy02Sfx, { volume: 0.2 })
   const { getValues, register, handleSubmit, setValue, watch } =
     useForm<BookmarkFormValues>({
       defaultValues: {

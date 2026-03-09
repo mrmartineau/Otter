@@ -1,3 +1,8 @@
+import popOffSfx from '@mrmartineau/kit/sounds/pop-off.mp3'
+import popOnSfx from '@mrmartineau/kit/sounds/pop-on.mp3'
+import popUpOffSfx from '@mrmartineau/kit/sounds/pop-up-off.mp3'
+import popUpOnSfx from '@mrmartineau/kit/sounds/pop-up-on.mp3'
+import useSound from '@mrmartineau/use-sound'
 import {
   ArticleIcon,
   CalendarIcon,
@@ -14,11 +19,6 @@ import urlJoin from 'proper-url-join'
 import { Suspense, useMemo } from 'react'
 import { toast } from 'sonner'
 import title from 'title'
-import useSound from 'use-sound'
-import popOffSfx from '@/assets/sounds/pop-off.mp3'
-import popOnSfx from '@/assets/sounds/pop-on.mp3'
-import popUpOffSfx from '@/assets/sounds/pop-up-off.mp3'
-import popUpOnSfx from '@/assets/sounds/pop-up-on.mp3'
 import {
   Tooltip,
   TooltipContent,

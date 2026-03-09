@@ -1,16 +1,16 @@
-import { ROUTE_FEED } from '@/constants'
 import { CheckCircleIcon } from '@phosphor-icons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { ROUTE_FEED } from '@/constants'
 
 export const Route = createFileRoute('/_app/new/bookmark/confirmation')({
+  component: RouteComponent,
   validateSearch: (search: {
     id?: string
     bookmarklet?: string
   }): { id?: string; bookmarklet?: string } => ({
-    id: search.id,
     bookmarklet: search.bookmarklet,
+    id: search.id,
   }),
-  component: RouteComponent,
 })
 
 function RouteComponent() {

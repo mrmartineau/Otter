@@ -7,6 +7,7 @@ catalog:
   vite: ^7.3.1
   vitest: ^4.0.18
   wrangler: ^4.67.0
+  '@mrmartineau/kit': ^0.1.0
 
 linkWorkspacePackages: true
 

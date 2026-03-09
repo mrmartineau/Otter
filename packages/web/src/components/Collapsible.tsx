@@ -1,9 +1,9 @@
+import switchOffSfx from '@mrmartineau/kit/sounds/switch-off.mp3'
+import switchOnSfx from '@mrmartineau/kit/sounds/switch-on.mp3'
+import useSound from '@mrmartineau/use-sound'
 import { CaretUpDownIcon } from '@phosphor-icons/react'
 import { Collapsible as CollapsiblePrimitive } from 'radix-ui'
 import { type ComponentProps, useCallback } from 'react'
-import useSound from 'use-sound'
-import switchOffSfx from '@/assets/sounds/switch-off.mp3'
-import switchOnSfx from '@/assets/sounds/switch-on.mp3'
 import { Button } from '@/components/Button'
 
 import { Flex } from './Flex'
