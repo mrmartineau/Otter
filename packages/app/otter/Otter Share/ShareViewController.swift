@@ -32,20 +32,24 @@ class ShareViewController: UIViewController {
         view.addSubview(webView)
 
         // Manual close control for dismissing the extension.
-        let closeButton = UIButton(type: .close)
+        let closeButton = UIButton(type: .system)
         closeButton.translatesAutoresizingMaskIntoConstraints = false
+
+        // Use a plain configuration so we can control content insets and background.
+        var config = UIButton.Configuration.plain()
+        config.contentInsets = NSDirectionalEdgeInsets(top: 3, leading: 3, bottom: 3, trailing: 3)
+        config.baseForegroundColor = .label
+        config.image = UIImage(systemName: "xmark")
+        config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(pointSize: 10, weight: .semibold)
+        closeButton.configuration = config
+
+        // Background styling to create a circular button with subtle border.
         closeButton.backgroundColor = .secondarySystemBackground
-        // Match the 26x26 frame below so the control stays perfectly circular.
         closeButton.layer.cornerRadius = 13
         closeButton.layer.borderWidth = 1
         closeButton.layer.borderColor = UIColor.label.withAlphaComponent(0.15).cgColor
-        // Shrink the xmark and add breathing room from the border.
-        closeButton.setPreferredSymbolConfiguration(
-            UIImage.SymbolConfiguration(pointSize: 10, weight: .semibold),
-            forImageIn: .normal
-        )
-        closeButton.contentEdgeInsets = UIEdgeInsets(top: 3, left: 3, bottom: 3, right: 3)
         closeButton.clipsToBounds = true
+
         closeButton.addTarget(self, action: #selector(cancel), for: .touchUpInside)
         view.addSubview(closeButton)
 
@@ -111,3 +115,4 @@ class ShareViewController: UIViewController {
         extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
     }
 }
+
