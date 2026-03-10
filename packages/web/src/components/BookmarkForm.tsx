@@ -366,7 +366,7 @@ export const BookmarkForm = ({
               {...register('url')}
               autoFocus
               onBlur={() => {
-                if (watchUrl) {
+                if (watchUrl && isNew) {
                   handleScrape(watchUrl)
                 }
               }}
