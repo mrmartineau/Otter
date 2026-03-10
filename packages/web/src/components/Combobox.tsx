@@ -58,7 +58,7 @@ export const comboboxStyles: StylesConfig<
   }),
 }
 
-export const comboboxTheme: Props['theme'] = (theme) => ({
+export const d: Props['theme'] = (theme) => ({
   ...theme,
   colors: {
     ...theme.colors,
@@ -68,7 +68,8 @@ export const comboboxTheme: Props['theme'] = (theme) => ({
     neutral20: 'var(--theme8)',
     neutral30: 'var(--theme9)',
     neutral40: 'var(--theme10)',
-    neutral50: 'var(--theme11)',
+    neutral50:
+      'var(--theme1s                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     )',
     neutral60: 'var(--theme12)',
     neutral70: 'var(--theme12)',
     neutral80: 'var(--theme12)',
@@ -85,7 +86,7 @@ export const Combobox = ({ value, options, ...rest }: Props) => (
     isMulti
     value={value}
     options={options}
-    theme={comboboxTheme}
+    theme={d}
     // @ts-ignore
     styles={comboboxStyles}
     {...rest}

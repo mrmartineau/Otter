@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 
+import { classifyBookmark } from './ai/classify'
 import { descriptionSystemPrompt } from './ai/description'
 import { generateResponse } from './ai/generateResponse'
 import { titleSystemPrompt } from './ai/title'
@@ -74,6 +75,17 @@ app.post('/ai/description', async (context) => {
     prompt,
     systemPrompt: descriptionSystemPrompt(title),
   })
+})
+app.post('/ai/classify', async (context) => {
+  const { title, description, url, tags } = await context.req.json()
+  const result = await classifyBookmark({
+    context,
+    description: description ?? '',
+    existingTags: tags ?? [],
+    title: title ?? '',
+    url: url ?? '',
+  })
+  return context.json(result)
 })
 app.post('/mcp', async (c) => {
   return await handleMcpPost(c)

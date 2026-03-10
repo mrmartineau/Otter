@@ -1,4 +1,5 @@
 import { mutationOptions } from '@tanstack/react-query'
+import type { AiClassifyResponse } from '../../../worker/ai/classify'
 import type { AiGenerateResponse } from '../../../worker/ai/generateResponse'
 
 export const rewriteTitle = async (
@@ -43,5 +44,30 @@ export const rewriteDescriptionOptions = (
   return mutationOptions({
     mutationFn: () => rewriteDescription(description, title),
     mutationKey: ['ai', 'description'],
+  })
+}
+
+export const classifyBookmark = async (data: {
+  title: string
+  description: string
+  url: string
+  tags: string[]
+}): Promise<AiClassifyResponse> => {
+  const response = await fetch('/api/ai/classify', {
+    body: JSON.stringify(data),
+    method: 'POST',
+  })
+  return response.json()
+}
+
+export const classifyBookmarkOptions = (data: {
+  title: string
+  description: string
+  url: string
+  tags: string[]
+}) => {
+  return mutationOptions({
+    mutationFn: () => classifyBookmark(data),
+    mutationKey: ['ai', 'classify'],
   })
 }

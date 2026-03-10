@@ -1,7 +1,7 @@
 import buy01Sfx from '@mrmartineau/kit/sounds/buy-01.mp3'
 import buy02Sfx from '@mrmartineau/kit/sounds/buy-02.mp3'
 import useSound from '@mrmartineau/use-sound'
-import { DownloadIcon, SparkleIcon } from '@phosphor-icons/react'
+import { CircleIcon, DownloadIcon, SparkleIcon } from '@phosphor-icons/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import {
@@ -13,6 +13,7 @@ import {
   useState,
 } from 'react'
 import { useForm } from 'react-hook-form'
+import { components as selectComponents } from 'react-select'
 import { toast } from 'sonner'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
@@ -27,6 +28,7 @@ import { useIsBookmarklet } from '@/hooks/useIsBookmarklet'
 import { useIsMobile } from '@/hooks/useMobile'
 import { cn } from '@/utils/classnames'
 import {
+  classifyBookmark as classifyBookmarkFn,
   rewriteDescriptionOptions,
   rewriteTitleOptions,
 } from '@/utils/fetching/ai'
@@ -42,7 +44,6 @@ import type { MetaTag } from '../utils/fetching/meta'
 import { getScrapeData } from '../utils/fetching/scrape'
 import { fullPath } from '../utils/fullPath'
 import { getErrorMessage } from '../utils/get-error-message'
-import { type MatchTagsProps, matchTags } from '../utils/matchTags'
 import { supabase } from '../utils/supabase/client'
 import { Combobox } from './Combobox'
 import { FieldValueSuggestion } from './FieldValueSuggestion'
@@ -94,13 +95,13 @@ export const BookmarkForm = ({
   const [possibleMatchingItems, setPossibleMatchingItems] = useState<
     Bookmark[] | null
   >(null)
-  const [possibleMatchingTags, setPossibleMatchingTags] = useState<string[]>([])
+  const [newTagNames, setNewTagNames] = useState<Set<string>>(new Set())
   const [isScraping, , setIsScraping] = useToggle(false)
   const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>()
   const queryClient = useQueryClient()
   const [playAdd] = useSound(buy01Sfx, { volume: 0.2 })
   const [playEdit] = useSound(buy02Sfx, { volume: 0.2 })
-  const { getValues, register, handleSubmit, setValue, watch } =
+  const { getValues, register, handleSubmit, setValue, watch, reset } =
     useForm<BookmarkFormValues>({
       defaultValues: {
         type: 'link',
@@ -110,7 +111,6 @@ export const BookmarkForm = ({
   const watchUrl = watch('url')
   const watchTitle = watch('title')
   const watchDescription = watch('description')
-  const watchNote = watch('note')
   const watchTags = watch('tags')
   const watchImage = watch('image')
 
@@ -131,6 +131,54 @@ export const BookmarkForm = ({
       setValue('description', data.response)
     },
   })
+
+  const existingTagNames = useMemo(
+    () =>
+      tags
+        ?.filter(
+          (item) =>
+            item.tag !== 'Untagged' && !item.tag?.startsWith('like:'),
+        )
+        .map((item) => item.tag as string) ?? [],
+    [tags],
+  )
+
+  const { mutate: handleClassifyMutate, isPending: isClassifying } =
+    useMutation({
+      mutationFn: (data: {
+        title: string
+        description: string
+        url: string
+        tags: string[]
+      }) => classifyBookmarkFn(data),
+      mutationKey: ['ai', 'classify'],
+      onSuccess: (data) => {
+        const existingTags = getValues('tags') ?? []
+        const newNames = new Set(
+          data.tags.filter((t) => t.isNew).map((t) => t.name),
+        )
+        const suggestedNames = data.tags.map((t) => t.name)
+        const merged = [
+          ...existingTags,
+          ...suggestedNames.filter((name) => !existingTags.includes(name)),
+        ]
+        setValue('tags', merged)
+        setNewTagNames(newNames)
+        if (data.type && data.type !== 'link') {
+          setValue('type', data.type as BookmarkFormValues['type'])
+        }
+      },
+    })
+
+  const triggerClassify = useCallback(() => {
+    const values = getValues()
+    handleClassifyMutate({
+      description: (values.description as string) ?? '',
+      tags: existingTagNames,
+      title: values.title ?? '',
+      url: values.url ?? '',
+    })
+  }, [existingTagNames, getValues, handleClassifyMutate])
 
   const handleSubmitForm = async (formData: BookmarkFormValues) => {
     setFormSubmitting(true)
@@ -193,13 +241,6 @@ export const BookmarkForm = ({
       })
   }, [tags])
 
-  const handleMatchTags = useCallback(
-    (data: MatchTagsProps) => {
-      setPossibleMatchingTags(matchTags(data, tags))
-    },
-    [tags],
-  )
-
   const handleScrape = useCallback(
     async (value: string) => {
       setIsScraping(true)
@@ -207,13 +248,8 @@ export const BookmarkForm = ({
         const url = new URL(value)
         const data = await getScrapeData(url.toString())
 
-        const values = getValues()
-        if (!values.title) {
-          setValue('title', data.title)
-        }
-        if (!values.description) {
-          setValue('description', data?.description)
-        }
+        setValue('title', data.title)
+        setValue('description', data?.description)
         if (data.url !== data.image) {
           setValue('image', data.image as string)
         }
@@ -223,9 +259,14 @@ export const BookmarkForm = ({
         setValue('feed', data.feeds?.length ? data.feeds[0] : null)
         setValue('type', data.urlType)
         setScrapeResponse(data)
-        handleMatchTags({
-          description: data.description as string,
+        setValue('tags', [])
+        setNewTagNames(new Set())
+
+        handleClassifyMutate({
+          description: (data.description as string) ?? '',
+          tags: existingTagNames,
           title: data?.title ?? '',
+          url: data.url,
         })
       } catch (error: unknown) {
         const errorMessage = getErrorMessage(error)
@@ -234,7 +275,7 @@ export const BookmarkForm = ({
         setIsScraping(false)
       }
     },
-    [getValues, handleMatchTags, setIsScraping, setValue],
+    [existingTagNames, handleClassifyMutate, setIsScraping, setValue],
   )
 
   useEffect(() => {
@@ -271,23 +312,6 @@ export const BookmarkForm = ({
     },
     [checkMatchingItems, isNew],
   )
-
-  // check for matching tags when content changes
-  useEffect(() => {
-    if (watchTitle || watchDescription || watchNote) {
-      const matchTagsData: MatchTagsProps = {}
-      if (watchTitle) {
-        matchTagsData.title = watchTitle
-      }
-      if (watchDescription) {
-        matchTagsData.description = watchDescription
-      }
-      if (watchNote) {
-        matchTagsData.note = watchNote
-      }
-      handleMatchTags(matchTagsData)
-    }
-  }, [watchTitle, watchDescription, watchNote, handleMatchTags])
 
   useEffect(() => {
     if (watchUrl && watchUrl.length > 4) {
@@ -429,7 +453,27 @@ export const BookmarkForm = ({
         </div>
 
         {/* TAGS */}
-        <FormGroup label="Tags" name="tags">
+        <FormGroup
+          label="Tags"
+          name="tags"
+          labelSuffix={
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <IconButton
+                    type="button"
+                    size="s"
+                    disabled={(!watchUrl && !watchTitle) || isClassifying}
+                    onClick={() => triggerClassify()}
+                  >
+                    <SparkleIcon weight="duotone" size="18" />
+                  </IconButton>
+                </TooltipTrigger>
+                <TooltipContent>{CONTENT.findMatchingTags}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          }
+        >
           <Combobox
             inputId="tags"
             options={transformedTagsForCombobox}
@@ -441,35 +485,34 @@ export const BookmarkForm = ({
             }}
             value={setComboboxValue(watchTags)}
             maxMenuHeight={100}
+            components={{
+              MultiValue: (props) => {
+                const tagName = (props.data as ComboOption).value
+                const isNewTag = newTagNames.has(tagName ?? '')
+                return (
+                  <div style={{ position: 'relative' }}>
+                    <selectComponents.MultiValue {...props} />
+                    {isNewTag ? (
+                      <CircleIcon
+                        weight="fill"
+                        size="9"
+                        className="absolute top-1 left-1 text-purple-500"
+                      />
+                    ) : null}
+                  </div>
+                )
+              },
+            }}
           />
-          {possibleMatchingTags.length ? (
-            <Flex
-              className="mt-2 text-sm"
-              gapX="2xs"
-              gapY="3xs"
-              align="center"
-              wrap="wrap"
-            >
-              Suggested tags:
-              {possibleMatchingTags.map((tag, index) => (
-                <Button
-                  key={`possibleTagMatch-${tag}`}
-                  variant="ghost"
-                  size="2xs"
-                  onClick={() => {
-                    const existingTags = watchTags?.length ? watchTags : []
-                    setValue('tags', [...existingTags, tag])
-                    possibleMatchingTags[index]
-                    setPossibleMatchingTags(
-                      possibleMatchingTags.filter((item) => item !== tag),
-                    )
-                  }}
-                  type="button"
-                >
-                  #{tag}
-                </Button>
-              ))}
-            </Flex>
+          {isClassifying ? (
+            <div className="mt-2 text-sm text-muted-foreground">
+              <SparkleIcon
+                weight="duotone"
+                size="14"
+                className="inline animate-pulse mr-1"
+              />
+              Finding tags…
+            </div>
           ) : null}
         </FormGroup>
 
@@ -509,11 +552,24 @@ export const BookmarkForm = ({
 
         {formError && <div className="my-m">Error: {formError}</div>}
 
-        <div>
+        <Flex gap="xs">
           <Button size="m" type="submit" disabled={formSubmitting}>
             Save
           </Button>
-        </div>
+          <Button
+            size="m"
+            variant="ghost"
+            type="button"
+            onClick={() => {
+              reset()
+              setNewTagNames(new Set())
+              setPossibleMatchingItems(null)
+              setScrapeResponse(undefined)
+            }}
+          >
+            Reset
+          </Button>
+        </Flex>
       </form>
     </div>
   )
