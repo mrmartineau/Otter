@@ -96,6 +96,9 @@ importers:
       '@mrmartineau/use-sound':
         specifier: ^5.1.0
         version: 5.1.0(react@19.2.4)
+      '@mrmartineau/xtractr':
+        specifier: ^0.1.1
+        version: 0.1.1(jsdom@28.1.0)
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -138,9 +141,6 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
-      defuddle:
-        specifier: ^0.10.0
-        version: 0.10.0(jsdom@28.1.0)
       email-validator:
         specifier: ^2.0.4
         version: 2.0.4
@@ -162,9 +162,6 @@ importers:
       isomorphic-dompurify:
         specifier: ^2.36.0
         version: 2.36.0
-      linkedom:
-        specifier: ^0.18.12
-        version: 0.18.12
       lodash.throttle:
         specifier: ^4.1.1
         version: 4.1.1
@@ -237,9 +234,6 @@ importers:
       top-user-agents:
         specifier: ^2.1.95
         version: 2.1.95
-      turndown:
-        specifier: ^7.2.2
-        version: 7.2.2
       unique-random-array:
         specifier: ^4.0.0
         version: 4.0.0
@@ -392,6 +386,25 @@ importers:
       webpack-merge:
         specifier: ^5.8.0
         version: 5.10.0
+
+  packages/xtractr--:
+    dependencies:
+      defuddle:
+        specifier: ^0.12.0
+        version: 0.12.0(jsdom@28.1.0)
+      file-extension:
+        specifier: ^4.0.5
+        version: 4.0.5
+      linkedom:
+        specifier: ^0.18.12
+        version: 0.18.12
+      turndown:
+        specifier: ^7.2.2
+        version: 7.2.2
+    devDependencies:
+      '@types/turndown':
+        specifier: ^5.0.6
+        version: 5.0.6
 
 packages:
 
@@ -1714,6 +1727,9 @@ packages:
     resolution: {integrity: sha512-XtMz5d48GiKNRaHG2NaAYdq2DebZpOYfTQ8itpvu7jMXY1/DHTjWzVKkALbVxZHwlN4+mp5XScEy3d0HFS/OPA==}
     peerDependencies:
       react: '>=16.8'
+
+  '@mrmartineau/xtractr@0.1.1':
+    resolution: {integrity: sha512-wnpevmZDqQPKc8j4KSFPQqhQ+CcOn58PD6ZpGZxXBmB+yh18wPg/DiWC+ayUnITYQFmzKRA4WghR2wFGWQ1B5g==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -3872,8 +3888,8 @@ packages:
   defu@6.1.4:
     resolution: {integrity: sha512-mEQCMmwJu317oSz8CwdIOdwf3xMif1ttiM8LTufzc3g6kR+9Pe236twL8j3IYT1F7GfRgGcW6MWxzZjLIkuHIg==}
 
-  defuddle@0.10.0:
-    resolution: {integrity: sha512-a43juTtHv6Vs4+sxvahVLM5NxoyDsarO1Ag3UxLORI4Fo/nsNFwzDxuQBvosKVGTIRxCwN/mfnWAzNXmQfieqw==}
+  defuddle@0.12.0:
+    resolution: {integrity: sha512-Y/WgyGKBxwxFir+hWNth4nmWDDDb8BzQi3qASS2NWYPXsKU42Ku49/3M5yFYefnRef9prynnmasfnXjk99EWgA==}
     hasBin: true
     peerDependencies:
       jsdom: ^24.0.0
@@ -8245,6 +8261,16 @@ snapshots:
       howler: 2.2.4
       react: 19.2.4
 
+  '@mrmartineau/xtractr@0.1.1(jsdom@28.1.0)':
+    dependencies:
+      defuddle: 0.12.0(jsdom@28.1.0)
+      file-extension: 4.0.5
+      linkedom: 0.18.12
+      turndown: 7.2.2
+    transitivePeerDependencies:
+      - canvas
+      - jsdom
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -10513,7 +10539,7 @@ snapshots:
 
   defu@6.1.4: {}
 
-  defuddle@0.10.0(jsdom@28.1.0):
+  defuddle@0.12.0(jsdom@28.1.0):
     dependencies:
       commander: 12.1.0
       jsdom: 28.1.0

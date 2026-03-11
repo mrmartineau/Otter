@@ -52,6 +52,7 @@ export const classifyBookmark = async (data: {
   description: string
   url: string
   tags: string[]
+  currentType: string
 }): Promise<AiClassifyResponse> => {
   const response = await fetch('/api/ai/classify', {
     body: JSON.stringify(data),
@@ -65,6 +66,7 @@ export const classifyBookmarkOptions = (data: {
   description: string
   url: string
   tags: string[]
+  currentType: string
 }) => {
   return mutationOptions({
     mutationFn: () => classifyBookmark(data),

@@ -10,7 +10,7 @@ import WebKit
 
 // Share extension entry point:
 // receives a URL from another app and opens Otter's bookmark UI in a web view.
-class ShareViewController: UIViewController {
+class ShareViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
 
     private var webView: WKWebView!
 
@@ -21,13 +21,19 @@ class ShareViewController: UIViewController {
 
         // Present as a resizable bottom sheet when supported.
         if let sheet = self.sheetPresentationController {
-            sheet.detents = [.medium(), .large()]
+            sheet.detents = [.large()]
             sheet.prefersGrabberVisible = true
-            sheet.prefersEdgeAttachedInCompactHeight = true
+            sheet.prefersEdgeAttachedInCompactHeight = false
+            if #available(iOS 16.0, *) {
+                sheet.selectedDetentIdentifier = .large
+            }
         }
 
         // Full-screen web view hosting the bookmark creation flow.
         webView = WKWebView(frame: .zero)
+        webView.navigationDelegate = self
+        webView.uiDelegate = self
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
 
@@ -113,6 +119,43 @@ class ShareViewController: UIViewController {
     private func close() {
         // Signals to the host app that the extension finished successfully.
         extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+    }
+}
+
+// MARK: - WKNavigationDelegate & WKUIDelegate
+extension ShareViewController {
+    // Allow navigation within the web view, but open external links in the system browser.
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        // Only intercept user-initiated link activations.
+        if navigationAction.navigationType == .linkActivated, let url = navigationAction.request.url {
+            // Attempt to open externally. In an extension, use the shared application via selector to avoid direct API restrictions.
+            #if os(iOS)
+            // Use UIApplication if available (Share extension has limited APIs, so performSelector to avoid direct reference).
+            if let app = NSClassFromString("UIApplication")?.value(forKeyPath: "sharedApplication") as? NSObject,
+               app.responds(to: NSSelectorFromString("openURL:")) {
+                _ = app.perform(NSSelectorFromString("openURL:"), with: url)
+            }
+            #elseif os(macOS)
+            NSWorkspace.shared.open(url)
+            #endif
+            decisionHandler(.cancel)
+            return
+        }
+        decisionHandler(.allow)
+    }
+    // Handle target=_blank or window.open by opening externally instead of creating a new web view.
+    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        if let url = navigationAction.request.url {
+            #if os(iOS)
+            if let app = NSClassFromString("UIApplication")?.value(forKeyPath: "sharedApplication") as? NSObject,
+               app.responds(to: NSSelectorFromString("openURL:")) {
+                _ = app.perform(NSSelectorFromString("openURL:"), with: url)
+            }
+            #elseif os(macOS)
+            NSWorkspace.shared.open(url)
+            #endif
+        }
+        return nil
     }
 }
 

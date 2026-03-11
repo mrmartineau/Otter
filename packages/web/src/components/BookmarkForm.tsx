@@ -136,8 +136,7 @@ export const BookmarkForm = ({
     () =>
       tags
         ?.filter(
-          (item) =>
-            item.tag !== 'Untagged' && !item.tag?.startsWith('like:'),
+          (item) => item.tag !== 'Untagged' && !item.tag?.startsWith('like:'),
         )
         .map((item) => item.tag as string) ?? [],
     [tags],
@@ -150,6 +149,7 @@ export const BookmarkForm = ({
         description: string
         url: string
         tags: string[]
+        currentType: string
       }) => classifyBookmarkFn(data),
       mutationKey: ['ai', 'classify'],
       onSuccess: (data) => {
@@ -164,7 +164,7 @@ export const BookmarkForm = ({
         ]
         setValue('tags', merged)
         setNewTagNames(newNames)
-        if (data.type && data.type !== 'link') {
+        if (data.type) {
           setValue('type', data.type as BookmarkFormValues['type'])
         }
       },
@@ -173,6 +173,7 @@ export const BookmarkForm = ({
   const triggerClassify = useCallback(() => {
     const values = getValues()
     handleClassifyMutate({
+      currentType: values.type ?? 'link',
       description: (values.description as string) ?? '',
       tags: existingTagNames,
       title: values.title ?? '',
@@ -263,6 +264,7 @@ export const BookmarkForm = ({
         setNewTagNames(new Set())
 
         handleClassifyMutate({
+          currentType: data.urlType ?? 'link',
           description: (data.description as string) ?? '',
           tags: existingTagNames,
           title: data?.title ?? '',
