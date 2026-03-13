@@ -41,7 +41,7 @@ import { useToggle } from '../hooks/useToggle'
 import type { MetadataResponse } from '../types/api'
 import type { Bookmark, BookmarkFormValues } from '../types/db'
 import type { MetaTag } from '../utils/fetching/meta'
-import { getScrapeData } from '../utils/fetching/scrape'
+import { useScrapeData } from '../utils/fetching/scrape'
 import { fullPath } from '../utils/fullPath'
 import { getErrorMessage } from '../utils/get-error-message'
 import { supabase } from '../utils/supabase/client'
@@ -99,6 +99,7 @@ export const BookmarkForm = ({
   const [isScraping, , setIsScraping] = useToggle(false)
   const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>()
   const queryClient = useQueryClient()
+  const scrapeData = useScrapeData()
   const [playAdd] = useSound(buy01Sfx, { volume: 0.2 })
   const [playEdit] = useSound(buy02Sfx, { volume: 0.2 })
   const { getValues, register, handleSubmit, setValue, watch, reset } =
@@ -171,6 +172,7 @@ export const BookmarkForm = ({
     })
 
   const triggerClassify = useCallback(() => {
+    console.log(`🚀 ~ BookmarkForm ~ triggerClassify:`)
     const values = getValues()
     handleClassifyMutate({
       currentType: values.type ?? 'link',
@@ -247,7 +249,8 @@ export const BookmarkForm = ({
       setIsScraping(true)
       try {
         const url = new URL(value)
-        const data = await getScrapeData(url.toString())
+        const data = await scrapeData(url.toString())
+        console.log(`🚀 ~ BookmarkForm ~ handleScrape:`, data)
 
         setValue('title', data.title)
         setValue('description', data?.description)
@@ -277,17 +280,23 @@ export const BookmarkForm = ({
         setIsScraping(false)
       }
     },
-    [existingTagNames, handleClassifyMutate, setIsScraping, setValue],
+    [
+      existingTagNames,
+      handleClassifyMutate,
+      scrapeData,
+      setIsScraping,
+      setValue,
+    ],
   )
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: I only want this run once on load
   useEffect(() => {
     const urlQueryParam = initialValues?.url
     if (urlQueryParam && isNew) {
       setValue('url', urlQueryParam)
       handleScrape(urlQueryParam)
-      // checkMatchingItems(urlQueryParam);
     }
-  }, [handleScrape, isNew, setValue, initialValues])
+  }, [])
 
   const checkMatchingItems = useCallback(
     async (link: string): Promise<void> => {
@@ -350,6 +359,7 @@ export const BookmarkForm = ({
                       disabled={!watchUrl || isScraping}
                       onClick={() => {
                         if (watchUrl) {
+                          console.log(`🚀 ~ BookmarkForm ~ onClick:`, watchUrl)
                           // handleScrape(watchUrl)
                         }
                       }}

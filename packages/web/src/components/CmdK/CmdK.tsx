@@ -21,6 +21,7 @@ import { Command } from 'cmdk'
 import {
   createContext,
   type DispatchWithoutAction,
+  useCallback,
   useEffect,
   useState,
 } from 'react'
@@ -86,15 +87,26 @@ export const CmdK = () => {
   }
   const groupByDate = profile?.settings_group_by_date
 
+  const handleOpenCmdK = useCallback(() => {
+    setOpen(true)
+    playOpen()
+  }, [setOpen, playOpen])
+
+  const handleCloseCmdK = useCallback(() => {
+    setOpen(false)
+    playClose()
+    setSearchTerm('')
+  }, [setOpen, playClose])
+
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
       if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
-        toggleOpen()
+        handleOpenCmdK()
       }
     }
     document.addEventListener('keydown', down)
     return () => document.removeEventListener('keydown', down)
-  }, [toggleOpen])
+  }, [handleOpenCmdK])
 
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
@@ -115,14 +127,6 @@ export const CmdK = () => {
     }
   }, [])
 
-  useEffect(() => {
-    if (open) {
-      playOpen()
-    } else {
-      playClose()
-    }
-  }, [open, playClose, playOpen])
-
   const enableIfSearchTermHasValue = searchTerm?.length
 
   return (
@@ -132,7 +136,7 @@ export const CmdK = () => {
           <Button
             variant="cmdk"
             aria-label="Search Otter"
-            onClick={toggleOpen}
+            onClick={handleOpenCmdK}
             className="h-10"
           >
             <MagnifyingGlassIcon weight="duotone" size="25" />
@@ -147,10 +151,11 @@ export const CmdK = () => {
       <Command.Dialog
         open={open}
         onOpenChange={(open) => {
-          if (!open) {
-            setSearchTerm('')
+          if (open) {
+            handleOpenCmdK()
+          } else {
+            handleCloseCmdK()
           }
-          setOpen(open)
         }}
         label="Search"
         onKeyDown={(event) => {
