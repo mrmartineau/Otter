@@ -2,12 +2,12 @@ packages:
   - packages/*
 
 catalog:
-  '@cloudflare/vite-plugin': ^1.25.2
-  '@cloudflare/workers-types': ^4.20260228.0
+  '@cloudflare/vite-plugin': ^1.28.0
+  '@cloudflare/workers-types': ^4.20260313.1
+  '@mrmartineau/kit': ^0.1.0
   vite: ^7.3.1
   vitest: ^4.0.18
-  wrangler: ^4.67.0
-  '@mrmartineau/kit': ^0.1.0
+  wrangler: ^4.73.0
 
 linkWorkspacePackages: true
 
