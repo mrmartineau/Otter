@@ -19,9 +19,14 @@ export const generateResponse = async ({
   prompt: string
   context: Context
 }) => {
-  const response = await context.env.AI.run(AI_MODEL, {
-    prompt: `${systemPrompt}\n${prompt}`,
-  })
+  const messages = [
+    { content: systemPrompt, role: 'system' },
+    {
+      content: prompt,
+      role: 'user',
+    },
+  ]
+  const response = await context.env.AI.run(AI_MODEL, { messages })
 
   return context.json(response)
 }

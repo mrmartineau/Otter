@@ -1,1 +1,1 @@
-export const AI_MODEL = '@cf/ibm-granite/granite-4.0-h-micro'
+export const AI_MODEL = '@cf/meta/llama-3.1-8b-instruct-fp8-fast'

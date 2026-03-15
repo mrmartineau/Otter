@@ -79,8 +79,16 @@ export const classifyBookmark = async ({
     ? currentType
     : 'link'
 
+  const messages = [
+    { content: classifySystemPrompt(existingTags, normalizedCurrentType), role: 'system' },
+    {
+      content: prompt,
+      role: 'user',
+    },
+  ]
+
   const response = (await context.env.AI.run(AI_MODEL, {
-    prompt: `${classifySystemPrompt(existingTags, normalizedCurrentType)}\n\n${prompt}`,
+    messages,
   })) as { response: string }
 
   try {
