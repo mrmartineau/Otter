@@ -1,5 +1,5 @@
-import { xtract } from '@mrmartineau/xtractr'
 import type { HonoRequest } from 'hono'
+import { xtract } from '../xtractr/index'
 import {
   generateErrorJSONResponse,
   generateJSONResponse,

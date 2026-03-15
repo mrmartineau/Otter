@@ -1,5 +1,5 @@
 import type { Context } from 'hono'
-import { AI_MODEL } from './consts';
+import { AI_MODEL } from './consts'
 
 export type AiClassifyResponse = {
   tags: { name: string; isNew: boolean }[]

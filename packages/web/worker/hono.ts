@@ -77,12 +77,13 @@ app.post('/ai/description', async (context) => {
   })
 })
 app.post('/ai/classify', async (context) => {
-  const { title, description, url, tags, currentType } = await context.req.json()
+  const { title, description, url, tags, currentType } =
+    await context.req.json()
   const result = await classifyBookmark({
     context,
+    currentType: currentType ?? 'link',
     description: description ?? '',
     existingTags: tags ?? [],
-    currentType: currentType ?? 'link',
     title: title ?? '',
     url: url ?? '',
   })

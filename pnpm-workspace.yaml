@@ -5,7 +5,7 @@ catalog:
   '@cloudflare/vite-plugin': ^1.28.0
   '@cloudflare/workers-types': ^4.20260313.1
   '@mrmartineau/kit': ^0.1.0
-  vite: ^7.3.1
+  vite: ^8.0.0
   vitest: ^4.0.18
   wrangler: ^4.73.0
 
