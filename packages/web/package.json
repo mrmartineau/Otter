@@ -13,6 +13,7 @@
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@supabase/supabase-js": "^2.99.1",
     "@tanstack/query-async-storage-persister": "^5.90.24",
+    "@tanstack/react-form": "^1.28.5",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-query-devtools": "^5.91.3",
     "@tanstack/react-query-persist-client": "^5.90.24",
@@ -61,7 +62,8 @@
     "use-click-away": "^0.0.1",
     "use-sound": "^5.0.0",
     "usehooks-ts": "^3.1.1",
-    "workers-ai-provider": "^3.1.2"
+    "workers-ai-provider": "^3.1.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:",

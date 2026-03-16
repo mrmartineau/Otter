@@ -95,7 +95,6 @@ const Flex = ({
       className={cn(
         flexVariants({
           align,
-          className,
           direction,
           display,
           gap,
@@ -104,6 +103,7 @@ const Flex = ({
           justify,
           wrap,
         }),
+        className,
       )}
       {...props}
     />

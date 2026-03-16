@@ -2,6 +2,7 @@ import buy01Sfx from '@mrmartineau/kit/sounds/buy-01.mp3'
 import buy02Sfx from '@mrmartineau/kit/sounds/buy-02.mp3'
 import useSound from '@mrmartineau/use-sound'
 import { CircleIcon, DownloadIcon, SparkleIcon } from '@phosphor-icons/react'
+import { useForm, useStore } from '@tanstack/react-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import {
@@ -10,9 +11,9 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react'
-import { useForm } from 'react-hook-form'
 import { components as selectComponents } from 'react-select'
 import { toast } from 'sonner'
 import { Button } from '@/components/Button'
@@ -24,11 +25,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/Tooltip'
+import { useClassifyMutation } from '@/hooks/useClassifyMutation'
 import { useIsBookmarklet } from '@/hooks/useIsBookmarklet'
 import { useIsMobile } from '@/hooks/useMobile'
+import { useScrapeMutation } from '@/hooks/useScrapeMutation'
 import { cn } from '@/utils/classnames'
 import {
-  classifyBookmark as classifyBookmarkFn,
   rewriteDescriptionOptions,
   rewriteTitleOptions,
 } from '@/utils/fetching/ai'
@@ -37,13 +39,9 @@ import {
   DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER,
   ROUTE_NEW_BOOKMARK_CONFIRMATION,
 } from '../constants'
-import { useToggle } from '../hooks/useToggle'
-import type { MetadataResponse } from '../types/api'
 import type { Bookmark, BookmarkFormValues } from '../types/db'
 import type { MetaTag } from '../utils/fetching/meta'
-import { useScrapeData } from '../utils/fetching/scrape'
 import { fullPath } from '../utils/fullPath'
-import { getErrorMessage } from '../utils/get-error-message'
 import { supabase } from '../utils/supabase/client'
 import { Combobox } from './Combobox'
 import { FieldValueSuggestion } from './FieldValueSuggestion'
@@ -90,38 +88,49 @@ export const BookmarkForm = ({
   const isNew = type === 'new'
   const navigate = useNavigate()
   const bookmarkformClass = cn(className, 'bookmark-form flex flex-col gap-s')
-  const [formSubmitting, , setFormSubmitting] = useToggle(false)
-  const [formError, setFormError] = useState<string>('')
   const [possibleMatchingItems, setPossibleMatchingItems] = useState<
     Bookmark[] | null
   >(null)
   const [newTagNames, setNewTagNames] = useState<Set<string>>(new Set())
-  const [isScraping, , setIsScraping] = useToggle(false)
-  const [scrapeResponse, setScrapeResponse] = useState<MetadataResponse>()
+  const hasAutoClassified = useRef(false)
   const queryClient = useQueryClient()
-  const scrapeData = useScrapeData()
   const [playAdd] = useSound(buy01Sfx, { volume: 0.2 })
   const [playEdit] = useSound(buy02Sfx, { volume: 0.2 })
-  const { getValues, register, handleSubmit, setValue, watch, reset } =
-    useForm<BookmarkFormValues>({
-      defaultValues: {
-        type: 'link',
-        ...initialValues,
-      },
-    })
-  const watchUrl = watch('url')
-  const watchTitle = watch('title')
-  const watchDescription = watch('description')
-  const watchTags = watch('tags')
-  const watchImage = watch('image')
 
+  const form = useForm({
+    defaultValues: {
+      type: 'link',
+      ...initialValues,
+    } as BookmarkFormValues,
+    onSubmit: async ({ value }) => {
+      await handleSubmitForm(value)
+    },
+  })
+
+  const watchUrl = useStore(form.store, (s) => s.values.url)
+  const watchTitle = useStore(form.store, (s) => s.values.title)
+  const watchDescription = useStore(form.store, (s) => s.values.description)
+  const watchTags = useStore(form.store, (s) => s.values.tags)
+  const watchImage = useStore(form.store, (s) => s.values.image)
+  const isSubmitting = useStore(form.store, (s) => s.isSubmitting)
+
+  const setFieldValue = useCallback(
+    (field: keyof BookmarkFormValues, value: unknown) => {
+      form.setFieldValue(field, value as never)
+    },
+    [form],
+  )
+
+  // AI title rewrite
   const { mutate: handleAiTitleMutate, isPending: isTitleAiLoading } =
     useMutation({
       ...rewriteTitleOptions(watchTitle),
       onSuccess: (data) => {
-        setValue('title', data.response)
+        setFieldValue('title', data.response)
       },
     })
+
+  // AI description rewrite
   const {
     mutate: handleAiDescriptionMutate,
     isPending: isDescriptionAiLoading,
@@ -129,7 +138,7 @@ export const BookmarkForm = ({
     // @ts-expect-error - TODO: fix this
     ...rewriteDescriptionOptions(watchDescription, watchTitle),
     onSuccess: (data) => {
-      setValue('description', data.response)
+      setFieldValue('description', data.response)
     },
   })
 
@@ -143,50 +152,72 @@ export const BookmarkForm = ({
     [tags],
   )
 
-  const { mutate: handleClassifyMutate, isPending: isClassifying } =
-    useMutation({
-      mutationFn: (data: {
-        title: string
-        description: string
-        url: string
-        tags: string[]
-        currentType: string
-      }) => classifyBookmarkFn(data),
-      mutationKey: ['ai', 'classify'],
-      onSuccess: (data) => {
-        const existingTags = getValues('tags') ?? []
-        const newNames = new Set(
-          data.tags.filter((t) => t.isNew).map((t) => t.name),
-        )
-        const suggestedNames = data.tags.map((t) => t.name)
-        const merged = [
-          ...existingTags,
-          ...suggestedNames.filter((name) => !existingTags.includes(name)),
-        ]
-        setValue('tags', merged)
-        setNewTagNames(newNames)
-        if (data.type) {
-          setValue('type', data.type as BookmarkFormValues['type'])
-        }
-      },
-    })
+  // Classifying
+  const classifyMutation = useClassifyMutation()
 
   const triggerClassify = useCallback(() => {
-    console.log(`🚀 ~ BookmarkForm ~ triggerClassify:`)
-    const values = getValues()
-    handleClassifyMutate({
-      currentType: values.type ?? 'link',
-      description: (values.description as string) ?? '',
-      tags: existingTagNames,
-      title: values.title ?? '',
-      url: values.url ?? '',
-    })
-  }, [existingTagNames, getValues, handleClassifyMutate])
+    const values = form.state.values
+    classifyMutation.mutate(
+      {
+        currentType: values.type ?? 'link',
+        description: (values.description as string) ?? '',
+        tags: existingTagNames,
+        title: values.title ?? '',
+        url: values.url ?? '',
+      },
+      {
+        onSuccess: (data) => {
+          const existingTags = form.state.values.tags ?? []
+          const newNames = new Set(
+            data.tags.filter((t) => t.isNew).map((t) => t.name),
+          )
+          const suggestedNames = data.tags.map((t) => t.name)
+          const merged = [
+            ...existingTags,
+            ...suggestedNames.filter((name) => !existingTags.includes(name)),
+          ]
+          setFieldValue('tags', merged)
+          setNewTagNames(newNames)
+          if (data.type) {
+            setFieldValue('type', data.type)
+          }
+        },
+      },
+    )
+  }, [classifyMutation, existingTagNames, form, setFieldValue])
+
+  // Scraping
+  const scrapeMutation = useScrapeMutation()
+
+  const handleScrape = useCallback(
+    (url: string) => {
+      scrapeMutation.mutate(url, {
+        onError: (error) => {
+          console.error(error)
+        },
+        onSuccess: (data) => {
+          setFieldValue('title', data.title)
+          setFieldValue('description', data.description)
+          if (data.url !== data.image) {
+            setFieldValue('image', data.image)
+          }
+          if (data.url !== url) {
+            setFieldValue('url', data.url)
+          }
+          setFieldValue('feed', data.feeds?.length ? data.feeds[0] : null)
+          setFieldValue('type', data.urlType)
+
+          if (!hasAutoClassified.current) {
+            hasAutoClassified.current = true
+            triggerClassify()
+          }
+        },
+      })
+    },
+    [scrapeMutation, setFieldValue, triggerClassify],
+  )
 
   const handleSubmitForm = async (formData: BookmarkFormValues) => {
-    setFormSubmitting(true)
-    setFormError('')
-
     try {
       if (isNew) {
         const { data: insertedBookmark, error } = await supabase
@@ -215,7 +246,7 @@ export const BookmarkForm = ({
       } else {
         await supabase
           .from('bookmarks')
-          // @ts-ignore
+          // @ts-expect-error - TODO: fix this
           .update({ ...formData, modified_at: new Date() })
           .match({ id })
         playEdit()
@@ -228,8 +259,6 @@ export const BookmarkForm = ({
       toast.message('Uh oh! Something went wrong.', {
         description: 'There was a problem with your request. Please try again.',
       })
-    } finally {
-      setFormSubmitting(false)
     }
   }
 
@@ -244,56 +273,11 @@ export const BookmarkForm = ({
       })
   }, [tags])
 
-  const handleScrape = useCallback(
-    async (value: string) => {
-      setIsScraping(true)
-      try {
-        const url = new URL(value)
-        const data = await scrapeData(url.toString())
-        console.log(`🚀 ~ BookmarkForm ~ handleScrape:`, data)
-
-        setValue('title', data.title)
-        setValue('description', data?.description)
-        if (data.url !== data.image) {
-          setValue('image', data.image as string)
-        }
-        if (data.url !== value) {
-          setValue('url', data.url)
-        }
-        setValue('feed', data.feeds?.length ? data.feeds[0] : null)
-        setValue('type', data.urlType)
-        setScrapeResponse(data)
-        setValue('tags', [])
-        setNewTagNames(new Set())
-
-        handleClassifyMutate({
-          currentType: data.urlType ?? 'link',
-          description: (data.description as string) ?? '',
-          tags: existingTagNames,
-          title: data?.title ?? '',
-          url: data.url,
-        })
-      } catch (error: unknown) {
-        const errorMessage = getErrorMessage(error)
-        console.error(errorMessage)
-      } finally {
-        setIsScraping(false)
-      }
-    },
-    [
-      existingTagNames,
-      handleClassifyMutate,
-      scrapeData,
-      setIsScraping,
-      setValue,
-    ],
-  )
-
   // biome-ignore lint/correctness/useExhaustiveDependencies: I only want this run once on load
   useEffect(() => {
     const urlQueryParam = initialValues?.url
     if (urlQueryParam && isNew) {
-      setValue('url', urlQueryParam)
+      setFieldValue('url', urlQueryParam)
       handleScrape(urlQueryParam)
     }
   }, [])
@@ -339,10 +323,22 @@ export const BookmarkForm = ({
         <h2 className="mb-s">{isNew ? CONTENT.newTitle : CONTENT.editTitle}</h2>
       ) : null}
       <form
-        onSubmit={handleSubmit(handleSubmitForm)}
+        onSubmit={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          form.handleSubmit()
+        }}
         className={bookmarkformClass}
       >
-        <input type="hidden" {...register('feed')} />
+        <form.Field name="feed">
+          {(field) => (
+            <input
+              type="hidden"
+              name={field.name}
+              value={field.state.value ?? ''}
+            />
+          )}
+        </form.Field>
 
         <div className="bookmark-form-grid">
           {/* URL */}
@@ -356,11 +352,10 @@ export const BookmarkForm = ({
                     <IconButton
                       type="button"
                       size="s"
-                      disabled={!watchUrl || isScraping}
+                      disabled={!watchUrl || scrapeMutation.isPending}
                       onClick={() => {
                         if (watchUrl) {
-                          console.log(`🚀 ~ BookmarkForm ~ onClick:`, watchUrl)
-                          // handleScrape(watchUrl)
+                          handleScrape(watchUrl)
                         }
                       }}
                     >
@@ -372,17 +367,25 @@ export const BookmarkForm = ({
               </TooltipProvider>
             }
           >
-            <Input
-              id="url"
-              placeholder={DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER}
-              {...register('url')}
-              autoFocus
-              onBlur={() => {
-                if (watchUrl && isNew) {
-                  handleScrape(watchUrl)
-                }
-              }}
-            />
+            <form.Field name="url">
+              {(field) => (
+                <Input
+                  id="url"
+                  name={field.name}
+                  placeholder={DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER}
+                  value={field.state.value ?? ''}
+                  onBlur={(e) => {
+                    field.handleBlur()
+                    const url = e.target.value
+                    if (url && isNew && !hasAutoClassified.current) {
+                      handleScrape(url)
+                    }
+                  }}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  autoFocus
+                />
+              )}
+            </form.Field>
             <PossibleMatchingItems items={possibleMatchingItems} />
           </FormGroup>
 
@@ -390,6 +393,14 @@ export const BookmarkForm = ({
           <FormGroup
             label="Title"
             name="title"
+            suggestion={
+              watchTitle !== scrapeMutation.data?.title
+                ? (scrapeMutation.data?.title ?? undefined)
+                : undefined
+            }
+            onUseSuggestion={() =>
+              setFieldValue('title', scrapeMutation.data?.title)
+            }
             labelSuffix={
               <TooltipProvider>
                 <Tooltip>
@@ -410,15 +421,17 @@ export const BookmarkForm = ({
               </TooltipProvider>
             }
           >
-            <Input id="title" {...register('title')} />
-            {watchTitle !== scrapeResponse?.title ? (
-              <FieldValueSuggestion
-                fieldId="title"
-                setFieldValue={setValue}
-                suggestion={scrapeResponse?.title as string}
-                type="original"
-              />
-            ) : null}
+            <form.Field name="title">
+              {(field) => (
+                <Input
+                  id="title"
+                  name={field.name}
+                  value={field.state.value ?? ''}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              )}
+            </form.Field>
           </FormGroup>
         </div>
 
@@ -447,12 +460,22 @@ export const BookmarkForm = ({
               </TooltipProvider>
             }
           >
-            <Textarea id="description" {...register('description')}></Textarea>
-            {watchDescription !== scrapeResponse?.description ? (
+            <form.Field name="description">
+              {(field) => (
+                <Textarea
+                  id="description"
+                  name={field.name}
+                  value={field.state.value ?? ''}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              )}
+            </form.Field>
+            {watchDescription !== scrapeMutation.data?.description ? (
               <FieldValueSuggestion
                 fieldId="description"
-                setFieldValue={setValue}
-                suggestion={scrapeResponse?.description as string}
+                setFieldValue={setFieldValue}
+                suggestion={scrapeMutation.data?.description as string}
                 type="original"
               />
             ) : null}
@@ -460,7 +483,17 @@ export const BookmarkForm = ({
 
           {/* NOTE */}
           <FormGroup label="Note" name="note">
-            <Textarea id="note" {...register('note')}></Textarea>
+            <form.Field name="note">
+              {(field) => (
+                <Textarea
+                  id="note"
+                  name={field.name}
+                  value={field.state.value ?? ''}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              )}
+            </form.Field>
           </FormGroup>
         </div>
 
@@ -475,7 +508,9 @@ export const BookmarkForm = ({
                   <IconButton
                     type="button"
                     size="s"
-                    disabled={(!watchUrl && !watchTitle) || isClassifying}
+                    disabled={
+                      (!watchUrl && !watchTitle) || classifyMutation.isPending
+                    }
                     onClick={() => triggerClassify()}
                   >
                     <SparkleIcon weight="duotone" size="18" />
@@ -490,7 +525,7 @@ export const BookmarkForm = ({
             inputId="tags"
             options={transformedTagsForCombobox}
             onChange={(option) => {
-              setValue(
+              setFieldValue(
                 'tags',
                 (option as ComboOption[]).map((item) => item.value),
               )
@@ -516,7 +551,7 @@ export const BookmarkForm = ({
               },
             }}
           />
-          {isClassifying ? (
+          {classifyMutation.isPending ? (
             <div className="mt-2 text-sm text-muted-foreground">
               <SparkleIcon
                 weight="duotone"
@@ -530,20 +565,36 @@ export const BookmarkForm = ({
 
         {/* TYPE */}
         <FormGroup label="Type" name="type">
-          <Flex gap="xs" wrap="wrap" justify="start">
-            <TypeRadio value="link" {...register('type')} />
-            <TypeRadio value="article" {...register('type')} />
-            <TypeRadio value="video" {...register('type')} />
-            <TypeRadio value="audio" {...register('type')} />
-            <TypeRadio value="recipe" {...register('type')} />
-            <TypeRadio value="image" {...register('type')} />
-            <TypeRadio value="document" {...register('type')} />
-            <TypeRadio value="product" {...register('type')} />
-            <TypeRadio value="game" {...register('type')} />
-            <TypeRadio value="note" {...register('type')} />
-            <TypeRadio value="event" {...register('type')} />
-            <TypeRadio value="place" {...register('type')} />
-          </Flex>
+          <form.Field name="type">
+            {(field) => (
+              <Flex gap="xs" wrap="wrap" justify="start">
+                {(
+                  [
+                    'link',
+                    'article',
+                    'video',
+                    'audio',
+                    'recipe',
+                    'image',
+                    'document',
+                    'product',
+                    'game',
+                    'note',
+                    'event',
+                    'place',
+                  ] as const
+                ).map((typeValue) => (
+                  <TypeRadio
+                    key={typeValue}
+                    value={typeValue}
+                    name={field.name}
+                    checked={field.state.value === typeValue}
+                    onChange={() => field.handleChange(typeValue)}
+                  />
+                ))}
+              </Flex>
+            )}
+          </form.Field>
         </FormGroup>
 
         {/* IMAGE */}
@@ -555,28 +606,34 @@ export const BookmarkForm = ({
               className="bookmark-form-image"
             />
           ) : null}
-          <Textarea
-            id="image"
-            {...register('image')}
-            className="min-h-[41px]"
-          ></Textarea>
+          <form.Field name="image">
+            {(field) => (
+              <Textarea
+                id="image"
+                name={field.name}
+                value={field.state.value ?? ''}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                className="min-h-[41px]"
+              />
+            )}
+          </form.Field>
         </FormGroup>
 
-        {formError && <div className="my-m">Error: {formError}</div>}
-
         <Flex gap="xs">
-          <Button size="m" type="submit" disabled={formSubmitting}>
+          <Button type="submit" disabled={isSubmitting}>
             Save
           </Button>
           <Button
-            size="m"
             variant="ghost"
             type="button"
             onClick={() => {
-              reset()
+              form.reset()
               setNewTagNames(new Set())
               setPossibleMatchingItems(null)
-              setScrapeResponse(undefined)
+              hasAutoClassified.current = false
+              scrapeMutation.reset()
+              classifyMutation.reset()
             }}
           >
             Reset
