@@ -58,9 +58,9 @@ export const DialogContent = ({
       className={cn(dialogContentVariants({ className, placement, width }))}
       {...props}
     >
-      <div className="sticky top-0">
+      <div className="fixed top-2 right-2">
         <DialogPrimitive.Close asChild>
-          <IconButton className="z-3 absolute right-0 top-0" shape="circle">
+          <IconButton size="m" shape="circle" variant="default">
             <XIcon size="18" weight="bold" />
           </IconButton>
         </DialogPrimitive.Close>

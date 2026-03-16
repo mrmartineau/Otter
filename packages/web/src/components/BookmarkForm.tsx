@@ -339,264 +339,106 @@ export const BookmarkForm = ({
         }}
         className="bookmark-form"
       >
-        <div className="bookmark-form-grid">
-          <form.Field name="feed">
-            {(field) => (
-              <input
-                type="hidden"
-                name={field.name}
-                value={field.state.value ?? ''}
-              />
-            )}
-          </form.Field>
-
-          <div className="bookmark-form-col">
-            {/* URL */}
-            <FormGroup
-              label="URL"
-              name="url"
-              labelSuffix={
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <IconButton
-                        type="button"
-                        size="s"
-                        disabled={!watchUrl || scrapeMutation.isPending}
-                        onClick={() => {
-                          if (watchUrl) {
-                            handleScrape(watchUrl)
-                          }
-                        }}
-                      >
-                        <DownloadIcon weight="duotone" size="18" />
-                      </IconButton>
-                    </TooltipTrigger>
-                    <TooltipContent>{CONTENT.scrapeThisUrl}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              }
-            >
-              <form.Field name="url">
-                {(field) => (
-                  <Input
-                    id="url"
-                    name={field.name}
-                    placeholder={DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER}
-                    value={field.state.value ?? ''}
-                    onBlur={(e) => {
-                      field.handleBlur()
-                      const url = e.target.value.trim()
-                      if (
-                        url &&
-                        isNew &&
-                        !scrapeMutation.isPending &&
-                        normalizeUrl(url) !== lastScrapedUrl.current
-                      ) {
-                        handleScrape(url)
-                      }
-                    }}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    autoFocus
-                  />
-                )}
-              </form.Field>
-              <PossibleMatchingItems items={possibleMatchingItems} />
-            </FormGroup>
-
-            {/* TITLE */}
-            <FormGroup
-              label="Title"
-              name="title"
-              suggestion={
-                watchTitle !== scrapeMutation.data?.title
-                  ? (scrapeMutation.data?.title ?? undefined)
-                  : undefined
-              }
-              onUseSuggestion={() =>
-                setFieldValue('title', scrapeMutation.data?.title)
-              }
-              labelSuffix={
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <IconButton
-                        type="button"
-                        size="s"
-                        disabled={!watchTitle || isTitleAiLoading}
-                        onClick={() => {
-                          handleAiTitleMutate()
-                        }}
-                      >
-                        <SparkleIcon weight="duotone" size="18" />
-                      </IconButton>
-                    </TooltipTrigger>
-                    <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              }
-            >
-              <form.Field name="title">
-                {(field) => (
-                  <Input
-                    id="title"
-                    name={field.name}
-                    value={field.state.value ?? ''}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                )}
-              </form.Field>
-            </FormGroup>
-            {/* DESCRIPTION */}
-            <FormGroup
-              label="Description"
-              name="description"
-              labelSuffix={
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <IconButton
-                        type="button"
-                        size="s"
-                        disabled={!watchDescription || isDescriptionAiLoading}
-                        onClick={() => {
-                          handleAiDescriptionMutate()
-                        }}
-                      >
-                        <SparkleIcon weight="duotone" size="18" />
-                      </IconButton>
-                    </TooltipTrigger>
-                    <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              }
-            >
-              <form.Field name="description">
-                {(field) => (
-                  <Textarea
-                    id="description"
-                    name={field.name}
-                    value={field.state.value ?? ''}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                )}
-              </form.Field>
-              {watchDescription !== scrapeMutation.data?.description ? (
-                <FieldValueSuggestion
-                  fieldId="description"
-                  setFieldValue={setFieldValue}
-                  suggestion={scrapeMutation.data?.description as string}
-                  type="original"
+        <div className="bookmark-form-wrapper">
+          <PossibleMatchingItems items={possibleMatchingItems} />
+          <div className="bookmark-form-grid">
+            <form.Field name="feed">
+              {(field) => (
+                <input
+                  type="hidden"
+                  name={field.name}
+                  value={field.state.value ?? ''}
                 />
-              ) : null}
-            </FormGroup>
-
-            {/* TAGS */}
-            <FormGroup
-              label="Tags"
-              name="tags"
-              labelSuffix={
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <IconButton
-                        type="button"
-                        size="s"
-                        disabled={
-                          (!watchUrl && !watchTitle) ||
-                          classifyMutation.isPending
-                        }
-                        onClick={() => triggerClassify()}
-                      >
-                        <SparkleIcon weight="duotone" size="18" />
-                      </IconButton>
-                    </TooltipTrigger>
-                    {classifyMutation.isPending ? (
-                      <div className="text-xs text-muted-foreground">
-                        Finding tags…
-                      </div>
-                    ) : null}
-                    <TooltipContent>{CONTENT.findMatchingTags}</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              }
-            >
-              <Combobox
-                inputId="tags"
-                options={transformedTagsForCombobox}
-                onChange={(option) => {
-                  setFieldValue(
-                    'tags',
-                    (option as ComboOption[]).map((item) => item.value),
-                  )
-                }}
-                value={setComboboxValue(watchTags)}
-                maxMenuHeight={100}
-                components={{
-                  MultiValue: (props) => {
-                    const tagName = (props.data as ComboOption).value
-                    const isNewTag = newTagNames.has(tagName ?? '')
-                    return (
-                      <div style={{ position: 'relative' }}>
-                        <selectComponents.MultiValue {...props} />
-                        {isNewTag ? (
-                          <CircleIcon
-                            weight="fill"
-                            size="9"
-                            className="absolute top-1 left-1 text-purple-500"
-                          />
-                        ) : null}
-                      </div>
-                    )
-                  },
-                }}
-              />
-            </FormGroup>
-
-            {/* NOTE */}
-            {showNote ? (
-              <FormGroup label="Note" name="note">
-                <form.Field name="note">
-                  {(field) => (
-                    <Textarea
-                      id="note"
-                      name={field.name}
-                      value={field.state.value ?? ''}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                  )}
-                </form.Field>
-              </FormGroup>
-            ) : (
-              <div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="2xs"
-                  onClick={() => setShowNote(true)}
-                >
-                  Add note
-                </Button>
-              </div>
-            )}
-          </div>
-
-          <div className="bookmark-form-col">
-            {/* IMAGE */}
-            {watchUrl && watchImage ? (
-              <FormGroup label="Image" name="image">
-                <img
-                  src={fullPath(watchUrl, watchImage)}
-                  alt=""
-                  className="bookmark-form-image"
-                />
-                <form.Field name="image">
+              )}
+            </form.Field>
+            <div className="bookmark-form-col">
+              {/* URL */}
+              <FormGroup
+                label="URL"
+                name="url"
+                labelSuffix={
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <IconButton
+                          type="button"
+                          size="s"
+                          disabled={!watchUrl || scrapeMutation.isPending}
+                          onClick={() => {
+                            if (watchUrl) {
+                              handleScrape(watchUrl)
+                            }
+                          }}
+                        >
+                          <DownloadIcon weight="duotone" size="18" />
+                        </IconButton>
+                      </TooltipTrigger>
+                      <TooltipContent>{CONTENT.scrapeThisUrl}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                }
+              >
+                <form.Field name="url">
                   {(field) => (
                     <Input
-                      id="image"
+                      id="url"
+                      name={field.name}
+                      placeholder={DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER}
+                      value={field.state.value ?? ''}
+                      onBlur={(e) => {
+                        field.handleBlur()
+                        const url = e.target.value.trim()
+                        if (
+                          url &&
+                          isNew &&
+                          !scrapeMutation.isPending &&
+                          normalizeUrl(url) !== lastScrapedUrl.current
+                        ) {
+                          handleScrape(url)
+                        }
+                      }}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      autoFocus
+                    />
+                  )}
+                </form.Field>
+              </FormGroup>
+              {/* TITLE */}
+              <FormGroup
+                label="Title"
+                name="title"
+                suggestion={
+                  watchTitle !== scrapeMutation.data?.title
+                    ? (scrapeMutation.data?.title ?? undefined)
+                    : undefined
+                }
+                onUseSuggestion={() =>
+                  setFieldValue('title', scrapeMutation.data?.title)
+                }
+                labelSuffix={
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <IconButton
+                          type="button"
+                          size="s"
+                          disabled={!watchTitle || isTitleAiLoading}
+                          onClick={() => {
+                            handleAiTitleMutate()
+                          }}
+                        >
+                          <SparkleIcon weight="duotone" size="18" />
+                        </IconButton>
+                      </TooltipTrigger>
+                      <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                }
+              >
+                <form.Field name="title">
+                  {(field) => (
+                    <Input
+                      id="title"
                       name={field.name}
                       value={field.state.value ?? ''}
                       onBlur={field.handleBlur}
@@ -605,63 +447,222 @@ export const BookmarkForm = ({
                   )}
                 </form.Field>
               </FormGroup>
-            ) : null}
-            {/* TYPE */}
-            <FormGroup label="Type" name="type">
-              <form.Field name="type">
-                {(field) => (
-                  <div className="type-radio-wrapper">
-                    {(
-                      [
-                        'link',
-                        'article',
-                        'video',
-                        'audio',
-                        'recipe',
-                        'image',
-                        'document',
-                        'product',
-                        'game',
-                        'note',
-                        'event',
-                        'place',
-                      ] as const
-                    ).map((typeValue) => (
-                      <TypeRadio
-                        key={typeValue}
-                        value={typeValue}
+              {/* DESCRIPTION */}
+              <FormGroup
+                label="Description"
+                name="description"
+                labelSuffix={
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <IconButton
+                          type="button"
+                          size="s"
+                          disabled={!watchDescription || isDescriptionAiLoading}
+                          onClick={() => {
+                            handleAiDescriptionMutate()
+                          }}
+                        >
+                          <SparkleIcon weight="duotone" size="18" />
+                        </IconButton>
+                      </TooltipTrigger>
+                      <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                }
+              >
+                <form.Field name="description">
+                  {(field) => (
+                    <Textarea
+                      id="description"
+                      name={field.name}
+                      value={field.state.value ?? ''}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                  )}
+                </form.Field>
+                {watchDescription !== scrapeMutation.data?.description ? (
+                  <FieldValueSuggestion
+                    fieldId="description"
+                    setFieldValue={setFieldValue}
+                    suggestion={scrapeMutation.data?.description as string}
+                    type="original"
+                  />
+                ) : null}
+              </FormGroup>
+              {/* TAGS */}
+              <FormGroup
+                label="Tags"
+                name="tags"
+                labelSuffix={
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <IconButton
+                          type="button"
+                          size="s"
+                          disabled={
+                            (!watchUrl && !watchTitle) ||
+                            classifyMutation.isPending
+                          }
+                          onClick={() => triggerClassify()}
+                        >
+                          <SparkleIcon weight="duotone" size="18" />
+                        </IconButton>
+                      </TooltipTrigger>
+                      {classifyMutation.isPending ? (
+                        <div className="text-xs text-muted-foreground">
+                          Finding tags…
+                        </div>
+                      ) : null}
+                      <TooltipContent>
+                        {CONTENT.findMatchingTags}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                }
+              >
+                <Combobox
+                  inputId="tags"
+                  options={transformedTagsForCombobox}
+                  onChange={(option) => {
+                    setFieldValue(
+                      'tags',
+                      (option as ComboOption[]).map((item) => item.value),
+                    )
+                  }}
+                  value={setComboboxValue(watchTags)}
+                  maxMenuHeight={100}
+                  components={{
+                    MultiValue: (props) => {
+                      const tagName = (props.data as ComboOption).value
+                      const isNewTag = newTagNames.has(tagName ?? '')
+                      return (
+                        <div style={{ position: 'relative' }}>
+                          <selectComponents.MultiValue {...props} />
+                          {isNewTag ? (
+                            <CircleIcon
+                              weight="fill"
+                              size="9"
+                              className="absolute top-1 left-1 text-purple-500"
+                            />
+                          ) : null}
+                        </div>
+                      )
+                    },
+                  }}
+                />
+              </FormGroup>
+              {/* NOTE */}
+              {showNote ? (
+                <FormGroup label="Note" name="note">
+                  <form.Field name="note">
+                    {(field) => (
+                      <Textarea
+                        id="note"
                         name={field.name}
-                        checked={field.state.value === typeValue}
-                        onChange={() => field.handleChange(typeValue)}
+                        value={field.state.value ?? ''}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
                       />
-                    ))}
-                  </div>
-                )}
-              </form.Field>
-            </FormGroup>
+                    )}
+                  </form.Field>
+                </FormGroup>
+              ) : (
+                <div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="2xs"
+                    onClick={() => setShowNote(true)}
+                  >
+                    Add note
+                  </Button>
+                </div>
+              )}
+            </div>
+            <div className="bookmark-form-col">
+              {/* IMAGE */}
+              {watchUrl && watchImage ? (
+                <FormGroup label="Image" name="image">
+                  <img
+                    src={fullPath(watchUrl, watchImage)}
+                    alt=""
+                    className="bookmark-form-image"
+                  />
+                  <form.Field name="image">
+                    {(field) => (
+                      <Input
+                        id="image"
+                        name={field.name}
+                        value={field.state.value ?? ''}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        className="rounded-t-none text-step--2"
+                      />
+                    )}
+                  </form.Field>
+                </FormGroup>
+              ) : null}
+              {/* TYPE */}
+              <FormGroup label="Type" name="type">
+                <form.Field name="type">
+                  {(field) => (
+                    <div className="type-radio-wrapper">
+                      {(
+                        [
+                          'link',
+                          'article',
+                          'video',
+                          'audio',
+                          'recipe',
+                          'image',
+                          'document',
+                          'product',
+                          'game',
+                          'note',
+                          'event',
+                          'place',
+                        ] as const
+                      ).map((typeValue) => (
+                        <TypeRadio
+                          key={typeValue}
+                          value={typeValue}
+                          name={field.name}
+                          checked={field.state.value === typeValue}
+                          onChange={() => field.handleChange(typeValue)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </form.Field>
+              </FormGroup>
+            </div>
+          </div>
+          <div className="bookmark-form-footer">
+            <Flex gap="xs" direction="column">
+              <Button type="submit" disabled={isSubmitting}>
+                Save
+              </Button>
+              <Button
+                variant="ghost"
+                type="button"
+                onClick={() => {
+                  form.reset()
+                  setNewTagNames(new Set())
+                  setPossibleMatchingItems(null)
+                  hasAutoClassified.current = false
+                  lastScrapedUrl.current = null
+                  scrapeMutation.reset()
+                  classifyMutation.reset()
+                }}
+              >
+                Reset
+              </Button>
+            </Flex>
           </div>
         </div>
-
-        <Flex gap="xs">
-          <Button type="submit" disabled={isSubmitting}>
-            Save
-          </Button>
-          <Button
-            variant="ghost"
-            type="button"
-            onClick={() => {
-              form.reset()
-              setNewTagNames(new Set())
-              setPossibleMatchingItems(null)
-              hasAutoClassified.current = false
-              lastScrapedUrl.current = null
-              scrapeMutation.reset()
-              classifyMutation.reset()
-            }}
-          >
-            Reset
-          </Button>
-        </Flex>
       </form>
     </div>
   )

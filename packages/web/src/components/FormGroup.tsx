@@ -37,7 +37,7 @@ export const FormGroup = ({
     <div className={cn('form-group', className)} {...rest}>
       <Label
         htmlFor={name}
-        className={cn({ hidden: !labelIsVisible, 'mb-2': true })}
+        className={cn({ hidden: !labelIsVisible, 'mb-1': true })}
       >
         {label} {labelSuffix}
         {hasSuggestion ? (

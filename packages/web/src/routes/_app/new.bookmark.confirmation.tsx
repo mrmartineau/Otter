@@ -17,7 +17,7 @@ function RouteComponent() {
   const { id } = Route.useSearch()
 
   return (
-    <div className="flex h-full min-h-[60vh] flex-col items-center justify-center gap-m text-center">
+    <div className="flex h-dvh min-h-[60vh] flex-col items-center justify-center gap-m text-center">
       <CheckCircleIcon weight="duotone" size={64} />
       <h1 className="text-2xl font-semibold">Item added</h1>
       {id ? (
