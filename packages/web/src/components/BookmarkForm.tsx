@@ -76,6 +76,14 @@ interface BookmarkFormProps extends ComponentProps<'div'> {
   tags?: MetaTag[]
 }
 
+const normalizeUrl = (value: string) => {
+  try {
+    return new URL(value).toString()
+  } catch {
+    return value.trim()
+  }
+}
+
 export const BookmarkForm = ({
   className,
   type,
@@ -93,6 +101,7 @@ export const BookmarkForm = ({
   >(null)
   const [newTagNames, setNewTagNames] = useState<Set<string>>(new Set())
   const hasAutoClassified = useRef(false)
+  const lastScrapedUrl = useRef<string | null>(null)
   const queryClient = useQueryClient()
   const [playAdd] = useSound(buy01Sfx, { volume: 0.2 })
   const [playEdit] = useSound(buy02Sfx, { volume: 0.2 })
@@ -196,6 +205,7 @@ export const BookmarkForm = ({
           console.error(error)
         },
         onSuccess: (data) => {
+          lastScrapedUrl.current = normalizeUrl(data.url ?? url)
           setFieldValue('title', data.title)
           setFieldValue('description', data.description)
           if (data.url !== data.image) {
@@ -376,8 +386,13 @@ export const BookmarkForm = ({
                   value={field.state.value ?? ''}
                   onBlur={(e) => {
                     field.handleBlur()
-                    const url = e.target.value
-                    if (url && isNew && !hasAutoClassified.current) {
+                    const url = e.target.value.trim()
+                    if (
+                      url &&
+                      isNew &&
+                      !scrapeMutation.isPending &&
+                      normalizeUrl(url) !== lastScrapedUrl.current
+                    ) {
                       handleScrape(url)
                     }
                   }}
@@ -632,6 +647,7 @@ export const BookmarkForm = ({
               setNewTagNames(new Set())
               setPossibleMatchingItems(null)
               hasAutoClassified.current = false
+              lastScrapedUrl.current = null
               scrapeMutation.reset()
               classifyMutation.reset()
             }}
