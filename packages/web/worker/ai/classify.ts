@@ -1,4 +1,5 @@
 import type { Context } from 'hono'
+import type { BookmarkType } from '@/types/db'
 import { AI_MODEL } from './consts'
 
 export type AiClassifyResponse = {
@@ -21,7 +22,7 @@ const BOOKMARK_TYPES = [
   'note',
   'file',
   'place',
-] as const
+] as const satisfies readonly BookmarkType[]
 
 const classifySystemPrompt = (
   existingTags: string[],
@@ -36,6 +37,8 @@ IMPORTANT — Tag selection process:
 - Treat close lexical variants as matches: plural/singular, derivations, morphology, and nearby forms (e.g. "orchestration", "orchestrate", and "orchestrators" should map to existing "ai:orchestrator" when relevant).
 - Many tags use prefixes with colons (e.g. "ai:orchestrator", "dev:tools", "css:animation"). Check ALL existing tags including prefixed tags and compare by meaning, not exact surface form.
 - If an existing tag is even reasonably relevant, choose it instead of inventing a new one.
+- Bookmark types are not tags. Never output a tag whose name is any bookmark type from this list: ${BOOKMARK_TYPES.join(', ')}.
+- In particular, do not suggest generic type tags like "link", "product", "article", "video", "book", or similar.
 - Only invent a new tag as a last resort when no existing tag is semantically appropriate. New tags should be lowercase, concise (1-2 words), and use kebab-case for multi-word tags.
 
 Existing tags:
@@ -49,6 +52,7 @@ Rules:
 - "isNew" must be false for tags from the existing list, true for invented tags
 - Prefer existing tags over new tags in all borderline cases
 - Normalize mentally before matching (singular/plural, tense, and word family) and pick the closest existing tag
+- Never use any bookmark type as a tag name
 - The "type" must be one of: ${BOOKMARK_TYPES.join(', ')}
 - Start from the current type "${currentType}" as the default assumption
 - Only change the type if there is strong evidence from the URL/title/description that "${currentType}" is wrong
@@ -102,6 +106,7 @@ export const classifyBookmark = async ({
 
     // Validate and sanitize
     const existingTagSet = new Set(existingTags.map((t) => t.toLowerCase()))
+    const bookmarkTypeSet = new Set(BOOKMARK_TYPES.map((type) => type.toLowerCase()))
     const tags = Array.isArray(parsed.tags)
       ? parsed.tags
           .slice(0, 5)
@@ -111,7 +116,8 @@ export const classifyBookmark = async ({
               typeof t === 'object' &&
               'name' in (t as Record<string, unknown>) &&
               typeof (t as Record<string, string>).name === 'string' &&
-              !(t as Record<string, string>).name.startsWith('like:'),
+              !(t as Record<string, string>).name.startsWith('like:') &&
+              !bookmarkTypeSet.has((t as Record<string, string>).name.toLowerCase()),
           )
           .map((t: { name: string }) => ({
             isNew: !existingTagSet.has(t.name.toLowerCase()),
