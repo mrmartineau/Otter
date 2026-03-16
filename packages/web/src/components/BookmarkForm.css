@@ -1,18 +1,32 @@
-.bookmark-form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-
-  label {
-    min-height: 20px;
+@layer components {
+  .bookmark-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
   }
-}
 
-.bookmark-form-image {
-  border-radius: var(--radii-l);
-  border: 1px solid var(--border);
-  width: 100%;
-  max-width: 450px;
-  background-color: var(--theme3);
-  margin-bottom: var(--space-s);
+  .bookmark-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-s);
+  }
+
+  .bookmark-form-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+
+    label {
+      min-height: 20px;
+    }
+  }
+
+  .bookmark-form-image {
+    border-radius: var(--radii-l);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 450px;
+    background-color: var(--theme3);
+    margin-bottom: var(--space-s);
+  }
 }

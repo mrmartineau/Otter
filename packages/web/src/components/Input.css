@@ -15,7 +15,7 @@
     }
 
     &:focus {
-      border-color: var(--theme5);
+      border-color: var(--theme7);
     }
 
     &::placeholder {
