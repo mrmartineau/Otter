@@ -27,7 +27,6 @@ export const Route = createFileRoute('/_app/feed')({
 
 function FeedPage() {
   const search = useSearch({ from: '/_app/feed' })
-  // @ts-expect-error Fix `search` typings
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useSuspenseInfiniteQuery(getBookmarksInfiniteOptions(search))
 

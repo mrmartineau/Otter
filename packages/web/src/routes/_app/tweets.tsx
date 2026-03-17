@@ -1,5 +1,8 @@
 import { TwitterLogoIcon } from '@phosphor-icons/react'
-import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useSuspenseInfiniteQuery,
+  useSuspenseQuery,
+} from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import { CONTENT, createTitle } from '@/constants'

@@ -84,7 +84,9 @@ export function createMarkdownContent(content: string) {
           return (
             '\n\n' +
             turndownService.turndown(
-              directCells.map((cell: any) => serializeHTML(cell as GenericElement)).join(''),
+              directCells
+                .map((cell: any) => serializeHTML(cell as GenericElement))
+                .join(''),
             ) +
             '\n\n'
           )

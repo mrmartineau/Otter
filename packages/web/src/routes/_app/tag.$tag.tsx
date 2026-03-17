@@ -26,7 +26,6 @@ function Page() {
   const tag = Route.useParams().tag
   const search = useSearch({ from: '/_app/tag/$tag' })
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    // @ts-expect-error Fix `search` typings
     useSuspenseInfiniteQuery(getBookmarksInfiniteOptions({ ...search, tag }))
 
   const items = data.pages.flatMap((page) => page.data ?? []) as Bookmark[]

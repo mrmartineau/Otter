@@ -84,7 +84,10 @@ export const classifyBookmark = async ({
     : 'link'
 
   const messages = [
-    { content: classifySystemPrompt(existingTags, normalizedCurrentType), role: 'system' },
+    {
+      content: classifySystemPrompt(existingTags, normalizedCurrentType),
+      role: 'system',
+    },
     {
       content: prompt,
       role: 'user',
@@ -106,7 +109,9 @@ export const classifyBookmark = async ({
 
     // Validate and sanitize
     const existingTagSet = new Set(existingTags.map((t) => t.toLowerCase()))
-    const bookmarkTypeSet = new Set(BOOKMARK_TYPES.map((type) => type.toLowerCase()))
+    const bookmarkTypeSet = new Set(
+      BOOKMARK_TYPES.map((type) => type.toLowerCase()),
+    )
     const tags = Array.isArray(parsed.tags)
       ? parsed.tags
           .slice(0, 5)
@@ -117,7 +122,9 @@ export const classifyBookmark = async ({
               'name' in (t as Record<string, unknown>) &&
               typeof (t as Record<string, string>).name === 'string' &&
               !(t as Record<string, string>).name.startsWith('like:') &&
-              !bookmarkTypeSet.has((t as Record<string, string>).name.toLowerCase()),
+              !bookmarkTypeSet.has(
+                (t as Record<string, string>).name.toLowerCase(),
+              ),
           )
           .map((t: { name: string }) => ({
             isNew: !existingTagSet.has(t.name.toLowerCase()),

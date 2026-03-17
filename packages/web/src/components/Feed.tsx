@@ -57,12 +57,12 @@ export const Feed = memo(
     icon,
     items,
     allowDeletion = false,
-    count,
-    limit = DEFAULT_API_RESPONSE_LIMIT,
+    count: _count,
+    limit: _limit = DEFAULT_API_RESPONSE_LIMIT,
     allowGroupByDate = false,
     subNav,
     showFeedOptions = true,
-    from,
+    from: _from,
     hasNextPage = false,
     isFetchingNextPage = false,
     fetchNextPage,
@@ -71,9 +71,9 @@ export const Feed = memo(
       useFeedOptions()
     const { groupByDate, groupedItems } = useGroupByDate(items)
     const { sentinelRef } = useInfiniteScroll({
+      fetchNextPage: fetchNextPage ?? (() => {}),
       hasNextPage,
       isFetchingNextPage,
-      fetchNextPage: fetchNextPage ?? (() => {}),
     })
     const { data: collectionsTags } = useSuspenseQuery(
       getCollectionsTagsOptions(),

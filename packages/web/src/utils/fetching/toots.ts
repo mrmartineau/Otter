@@ -44,15 +44,19 @@ export const getTootsInfiniteOptions = ({
     ...rest
   } = apiParameters(params)
   return infiniteQueryOptions({
-    queryFn: ({ pageParam = 0 }) =>
-      getToots({ likes, params: { ...rest, limit, offset: pageParam } }),
-    queryKey: ['toots', 'infinite', likes, rest, limit],
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+    getNextPageParam: (
+      lastPage: Awaited<ReturnType<typeof getToots>>,
+      _allPages,
+      lastPageParam,
+    ) => {
       const total = lastPage.count ?? 0
       const nextOffset = lastPageParam + limit!
       return nextOffset < total ? nextOffset : undefined
     },
+    initialPageParam: 0,
+    queryFn: ({ pageParam = 0 }) =>
+      getToots({ likes, params: { ...rest, limit, offset: pageParam } }),
+    queryKey: ['toots', 'infinite', likes, rest, limit],
   })
 }
 

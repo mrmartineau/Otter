@@ -19,7 +19,7 @@ export function usePasteUrl() {
   const navigate = useNavigate()
   const matchRoute = useMatchRoute()
   const isNewBookmarkRoute = Boolean(
-    matchRoute({ to: '/new/bookmark', fuzzy: true }),
+    matchRoute({ fuzzy: true, to: '/new/bookmark' }),
   )
 
   useEffect(() => {
@@ -39,8 +39,8 @@ export function usePasteUrl() {
       if (text && isUrl(text)) {
         event.preventDefault()
         navigate({
-          to: '/new/bookmark',
           search: { url: text },
+          to: '/new/bookmark',
         })
       }
     }

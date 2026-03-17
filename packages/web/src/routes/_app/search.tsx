@@ -31,7 +31,6 @@ function RouteComponent() {
   const { q, ...search } = useSearch({ from: '/_app/search' })
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useSuspenseInfiniteQuery(
-      // @ts-expect-error Fix `search` typings
       getSearchBookmarksInfiniteOptions({ params: search, searchTerm: q }),
     )
 

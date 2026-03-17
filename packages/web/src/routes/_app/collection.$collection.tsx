@@ -30,7 +30,6 @@ function Page() {
     useSuspenseInfiniteQuery(
       getCollectionsInfiniteOptions({
         name: collection,
-        // @ts-expect-error Fix `search` typings
         params: search,
       }),
     )

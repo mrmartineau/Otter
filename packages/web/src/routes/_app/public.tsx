@@ -27,7 +27,6 @@ function Page() {
   const search = useSearch({ from: '/_app/public' })
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useSuspenseInfiniteQuery(
-      // @ts-expect-error Fix `search` typings
       getBookmarksInfiniteOptions({ ...search, public: true }),
     )
 

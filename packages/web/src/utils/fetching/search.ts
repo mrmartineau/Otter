@@ -64,18 +64,22 @@ export const getSearchBookmarksInfiniteOptions = ({
     ...rest
   } = apiParameters(params)
   return infiniteQueryOptions({
+    getNextPageParam: (
+      lastPage: Awaited<ReturnType<typeof getSearchBookmarks>>,
+      _allPages,
+      lastPageParam,
+    ) => {
+      const total = lastPage.count ?? 0
+      const nextOffset = lastPageParam + limit!
+      return nextOffset < total ? nextOffset : undefined
+    },
+    initialPageParam: 0,
     queryFn: ({ pageParam = 0 }) =>
       getSearchBookmarks({
         params: { ...rest, limit, offset: pageParam },
         searchTerm,
       }),
     queryKey: ['bookmarks', 'search', 'infinite', rest, limit, searchTerm],
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-      const total = lastPage.count ?? 0
-      const nextOffset = lastPageParam + limit!
-      return nextOffset < total ? nextOffset : undefined
-    },
     staleTime: 5 * 1000,
   })
 }

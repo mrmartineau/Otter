@@ -39,7 +39,7 @@
   .bookmark-form-footer {
     margin-top: var(--space-m);
     padding: var(--space-s);
-    padding-bottom: max(var(--space-s),env(safe-area-inset-bottom));
+    padding-bottom: max(var(--space-s), env(safe-area-inset-bottom));
     background-color: var(--theme1);
     border-top: 1px solid var(--theme3);
   }

@@ -18,20 +18,15 @@ export interface ApiParametersQuery extends BaseApiParameters {
   star: boolean | undefined
   public: boolean | undefined
 }
-export interface ApiParametersReturn extends BaseApiParameters {
-  star: boolean | null
-  public: boolean | null
-}
-
 export const apiParameters = (
   apiParams: Partial<ApiParametersQuery>,
-): Partial<ApiParametersReturn> => {
+): Partial<ApiParametersQuery> => {
   const limit = Number(apiParams?.limit) || DEFAULT_API_RESPONSE_LIMIT
   const offset = Number(apiParams?.offset) || 0
   const order = apiParams?.order || DEFAULT_API_RESPONSE_ORDER
   const status = apiParams?.status || 'active'
-  const star = apiParams?.star || false
-  const publicItems = apiParams?.public || false
+  const star = apiParams?.star || undefined
+  const publicItems = apiParams?.public || undefined
   const type = apiParams?.type || undefined
   const tag = apiParams?.tag || undefined
   const top = apiParams?.top || undefined
@@ -40,7 +35,7 @@ export const apiParameters = (
     limit,
     offset,
     order: order as RequestOrder,
-    public: publicItems as boolean,
+    public: publicItems,
     star,
     status: status as Status,
     tag,
