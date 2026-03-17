@@ -50,18 +50,18 @@ export const FormGroup = ({
             disabled={!onUseSuggestion}
             aria-pressed={showOriginal}
           >
-            {showOriginal ? 'Current' : 'Original'}
+            {showOriginal ? 'View Suggestion' : 'View Original'}
           </Button>
         ) : null}
       </Label>
       {showOriginal && hasSuggestion ? (
-        <div className="input-base flex flex-col gap-2xs text-step--2">
+        <div className="input-base flex flex-col gap-2xs text-step--1">
           <div className="text-muted-foreground">{suggestion}</div>
           {onUseSuggestion ? (
-            <div>
+            <div className="ml-auto">
               <Button
                 type="button"
-                variant="outline"
+                // variant="outline"
                 size="2xs"
                 onClick={onUseSuggestion}
               >

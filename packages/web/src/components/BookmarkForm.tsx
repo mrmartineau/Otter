@@ -470,6 +470,14 @@ export const BookmarkForm = ({
                     </Tooltip>
                   </TooltipProvider>
                 }
+                suggestion={
+                  watchDescription !== scrapeMutation.data?.description
+                    ? (scrapeMutation.data?.description ?? undefined)
+                    : undefined
+                }
+                onUseSuggestion={() =>
+                  setFieldValue('description', scrapeMutation.data?.description)
+                }
               >
                 <form.Field name="description">
                   {(field) => (
@@ -482,14 +490,6 @@ export const BookmarkForm = ({
                     />
                   )}
                 </form.Field>
-                {watchDescription !== scrapeMutation.data?.description ? (
-                  <FieldValueSuggestion
-                    fieldId="description"
-                    setFieldValue={setFieldValue}
-                    suggestion={scrapeMutation.data?.description as string}
-                    type="original"
-                  />
-                ) : null}
               </FormGroup>
               {/* TAGS */}
               <FormGroup

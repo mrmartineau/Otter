@@ -55,7 +55,7 @@ export const AllTags = ({ tags }: AllTagsProps) => {
 
   return (
     <Collapsible stateKey="tags">
-      <CollapsibleTrigger asChild>
+      <CollapsibleTrigger>
         {CONTENT.tagsNav} <Text variant="count">{tags?.length}</Text>
       </CollapsibleTrigger>
       <CollapsibleContent>

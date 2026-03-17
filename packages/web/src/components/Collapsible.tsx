@@ -58,11 +58,7 @@ export const CollapsibleTrigger = ({
 }: ComponentProps<typeof CollapsiblePrimitive.Trigger>) => {
   return (
     <CollapsiblePrimitive.Trigger asChild {...rest}>
-      <Button
-        variant="collapsible"
-        size="s"
-        className="h-7 w-full justify-start !gap-2xs"
-      >
+      <Button variant="collapsible">
         <div className="rounded bg-theme3 p-1">
           <CaretUpDownIcon weight="duotone" size={14} />
         </div>

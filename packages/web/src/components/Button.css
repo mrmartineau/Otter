@@ -11,6 +11,7 @@
     font-size: var(--step--1);
     letter-spacing: 0.03em;
     font-weight: 300;
+    line-height: 1;
 
     &:disabled {
       pointer-events: none;
@@ -72,13 +73,21 @@
   }
 
   .button-collapsible {
-    padding: var(--space-3xs);
+    padding: var(--space-3xs) var(--space-2xs) var(--space-3xs) var(--space-3xs) !important;
     color: var(--theme10);
     border-radius: var(--radii-m);
+    width: 100%;
+    gap: var(--space-2xs);
+    justify-content: flex-start;
+    /* height: 32px; */
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 1;
 
     &:hover {
-      background-color: var(--theme6);
-      color: var(--theme10);
+      background-color: var(--theme4) !important;
+      color: var(--theme11);
     }
   }
 }

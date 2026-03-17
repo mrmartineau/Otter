@@ -258,9 +258,7 @@ export const MediaForm = ({
         </div>
 
         <div>
-          <Button size="m" type="submit">
-            {isNew ? 'Create' : 'Update'}
-          </Button>
+          <Button type="submit">{isNew ? 'Create' : 'Update'}</Button>
         </div>
       </form>
     </div>
