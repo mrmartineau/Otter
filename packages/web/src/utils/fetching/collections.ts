@@ -1,4 +1,5 @@
-import { queryOptions } from '@tanstack/react-query'
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
+import { DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { supabase } from '../supabase/client'
 import { type ApiParametersQuery, apiParameters } from './apiParameters'
 
@@ -62,6 +63,28 @@ export const getCollectionsOptions = ({
   return queryOptions({
     queryFn: () => getCollections({ name, params }),
     queryKey: ['collections', name, params],
+  })
+}
+
+export const getCollectionsInfiniteOptions = ({
+  name,
+  params,
+}: CollectionsFetchingOptions) => {
+  const {
+    limit = DEFAULT_API_RESPONSE_LIMIT,
+    offset: _offset,
+    ...rest
+  } = apiParameters(params)
+  return infiniteQueryOptions({
+    queryFn: ({ pageParam = 0 }) =>
+      getCollections({ name, params: { ...rest, limit, offset: pageParam } }),
+    queryKey: ['collections', 'infinite', name, rest, limit],
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      const total = lastPage.count ?? 0
+      const nextOffset = lastPageParam + limit!
+      return nextOffset < total ? nextOffset : undefined
+    },
   })
 }
 

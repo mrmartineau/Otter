@@ -1,3 +1,5 @@
+import { infiniteQueryOptions } from '@tanstack/react-query'
+import { DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { supabase } from '../supabase/client'
 import { type ApiParametersQuery, apiParameters } from './apiParameters'
 
@@ -20,6 +22,28 @@ export const getTweets = async ({ params, likes }: TweetsFetchingOptions) => {
   }
 
   return supabaseResponse
+}
+
+export const getTweetsInfiniteOptions = ({
+  params,
+  likes,
+}: TweetsFetchingOptions) => {
+  const {
+    limit = DEFAULT_API_RESPONSE_LIMIT,
+    offset: _offset,
+    ...rest
+  } = apiParameters(params)
+  return infiniteQueryOptions({
+    queryFn: ({ pageParam = 0 }) =>
+      getTweets({ likes, params: { ...rest, limit, offset: pageParam } }),
+    queryKey: ['tweets', 'infinite', likes, rest, limit],
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      const total = lastPage.count ?? 0
+      const nextOffset = lastPageParam + limit!
+      return nextOffset < total ? nextOffset : undefined
+    },
+  })
 }
 
 interface TweetFetchingOptions {

@@ -1,11 +1,11 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import title from 'title'
 import { Feed } from '@/components/Feed'
 import { TypeToIcon } from '@/components/TypeToIcon'
 import type { Bookmark, BookmarkType } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
-import { getBookmarksOptions } from '@/utils/fetching/bookmarks'
+import { getBookmarksInfiniteOptions } from '@/utils/fetching/bookmarks'
 
 export const Route = createFileRoute('/_app/type/$type')({
   component: Page,
@@ -16,36 +16,36 @@ export const Route = createFileRoute('/_app/type/$type')({
       },
     ],
   }),
-  loader: async (opts) => {
-    const bookmarks = await opts.context.queryClient.ensureQueryData(
-      // @ts-expect-error Why is `search` not typed properly?
-      getBookmarksOptions({ ...opts.deps.search, type: opts.params.type }),
-    )
-    return bookmarks
-  },
   loaderDeps: ({ search }) => ({ search }),
   validateSearch: (search: Record<string, unknown>) => {
-    return apiParameters(search)
+    const { offset: _, ...params } = apiParameters(search)
+    return params
   },
 })
 
 function Page() {
   const type = Route.useParams().type
   const search = useSearch({ from: '/_app/type/$type' })
-  // @ts-expect-error Fix `search` typings
-  const { data } = useSuspenseQuery(getBookmarksOptions({ ...search, type }))
+  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
+    // @ts-expect-error Fix `search` typings
+    useSuspenseInfiniteQuery(getBookmarksInfiniteOptions({ ...search, type }))
+
+  const items = data.pages.flatMap((page) => page.data ?? []) as Bookmark[]
+  const count = data.pages[0]?.count ?? 0
 
   return (
     <Feed
-      items={data.data as Bookmark[]}
-      count={data.count || 0}
+      items={items}
+      count={count}
       limit={search.limit}
-      offset={search.offset}
       allowGroupByDate={true}
       title={title(type)}
       icon={<TypeToIcon size={24} type={type as BookmarkType} />}
       feedType="bookmarks"
       from={`/type/${type}`}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      fetchNextPage={fetchNextPage}
     />
   )
 }

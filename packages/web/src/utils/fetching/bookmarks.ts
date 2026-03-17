@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { queryOptions } from '@tanstack/react-query'
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
+import { DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import type { Database } from '@/types/supabase'
 import { supabase } from '../supabase/client'
 import { type ApiParametersQuery, apiParameters } from './apiParameters'
@@ -66,6 +67,28 @@ export const getBookmarksOptions = (params: Partial<ApiParametersQuery>) => {
   return queryOptions({
     queryFn: () => getBookmarks(params),
     queryKey: ['bookmarks', params],
+    staleTime: 5 * 1000,
+  })
+}
+
+export const getBookmarksInfiniteOptions = (
+  params: Partial<ApiParametersQuery>,
+) => {
+  const {
+    limit = DEFAULT_API_RESPONSE_LIMIT,
+    offset: _offset,
+    ...rest
+  } = apiParameters(params)
+  return infiniteQueryOptions({
+    queryFn: ({ pageParam = 0 }) =>
+      getBookmarks({ ...rest, limit, offset: pageParam }),
+    queryKey: ['bookmarks', 'infinite', rest, limit],
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      const total = lastPage.count ?? 0
+      const nextOffset = lastPageParam + limit!
+      return nextOffset < total ? nextOffset : undefined
+    },
     staleTime: 5 * 1000,
   })
 }

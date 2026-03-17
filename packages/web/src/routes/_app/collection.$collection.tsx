@@ -1,11 +1,11 @@
 import { FolderIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import { useCollectionsSubNav } from '@/hooks/useCollectionsSubNav'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
-import { getCollectionsOptions } from '@/utils/fetching/collections'
+import { getCollectionsInfiniteOptions } from '@/utils/fetching/collections'
 
 export const Route = createFileRoute('/_app/collection/$collection')({
   component: Page,
@@ -16,46 +16,43 @@ export const Route = createFileRoute('/_app/collection/$collection')({
       },
     ],
   }),
-  loader: async (opts) => {
-    const bookmarks = await opts.context.queryClient.ensureQueryData(
-      getCollectionsOptions({
-        name: opts.params.collection,
-        // @ts-expect-error Fix `search` typings
-        params: opts.deps.search,
-      }),
-    )
-    return bookmarks
-  },
   loaderDeps: ({ search }) => ({ search }),
   validateSearch: (search: Record<string, unknown>) => {
-    return apiParameters(search)
+    const { offset: _, ...params } = apiParameters(search)
+    return params
   },
 })
 
 function Page() {
   const collection = Route.useParams().collection
   const search = useSearch({ from: '/_app/collection/$collection' })
-  const { data } = useSuspenseQuery(
-    getCollectionsOptions({
-      name: collection,
-      // @ts-expect-error Fix `search` typings
-      params: search,
-    }),
-  )
+  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
+    useSuspenseInfiniteQuery(
+      getCollectionsInfiniteOptions({
+        name: collection,
+        // @ts-expect-error Fix `search` typings
+        params: search,
+      }),
+    )
   const subNav = useCollectionsSubNav(collection)
+
+  const items = data.pages.flatMap((page) => page.data ?? []) as Bookmark[]
+  const count = data.pages[0]?.count ?? 0
 
   return (
     <Feed
-      items={data.data as Bookmark[]}
-      count={data.count || 0}
+      items={items}
+      count={count}
       limit={search.limit}
-      offset={search.offset}
       allowGroupByDate={true}
       title={collection}
       icon={<FolderIcon weight="duotone" size={24} />}
       feedType="bookmarks"
       subNav={subNav}
       from={`/collection/${encodeURIComponent(collection)}`}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      fetchNextPage={fetchNextPage}
     />
   )
 }

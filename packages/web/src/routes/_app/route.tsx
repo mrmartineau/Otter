@@ -34,7 +34,7 @@ function RouteComponent() {
           <div className="otter-sidebar-pane-overlay" />
           <main id="main" className="otter-content-pane">
             <div className="otter-content-pane-inner">
-              <Container className="h-dvh">
+              <Container className="min-h-dvh">
                 <Outlet />
               </Container>
             </div>

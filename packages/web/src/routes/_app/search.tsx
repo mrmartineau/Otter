@@ -1,11 +1,11 @@
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import { CONTENT } from '@/constants'
 import type { Bookmark } from '@/types/db'
 import { apiParameters } from '@/utils/fetching/apiParameters'
-import { getSearchBookmarksOptions } from '@/utils/fetching/search'
+import { getSearchBookmarksInfiniteOptions } from '@/utils/fetching/search'
 
 export const Route = createFileRoute('/_app/search')({
   component: RouteComponent,
@@ -17,18 +17,11 @@ export const Route = createFileRoute('/_app/search')({
       },
     ],
   }),
-  loader: async (opts) => {
-    // @ts-expect-error Fix `search` typings
-    const { q, ...search } = opts.deps.search
-    const { data } = await opts.context.queryClient.ensureQueryData(
-      getSearchBookmarksOptions({ params: search, searchTerm: q }),
-    )
-    return data
-  },
   loaderDeps: ({ search }) => ({ search }),
   validateSearch: (search: Record<string, unknown>) => {
+    const { offset: _, ...params } = apiParameters(search)
     return {
-      ...apiParameters(search),
+      ...params,
       q: search.q as string,
     }
   },
@@ -36,22 +29,28 @@ export const Route = createFileRoute('/_app/search')({
 
 function RouteComponent() {
   const { q, ...search } = useSearch({ from: '/_app/search' })
-  const { data } = useSuspenseQuery(
-    // @ts-expect-error Fix `search` typings
-    getSearchBookmarksOptions({ params: search, searchTerm: q }),
-  )
+  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
+    useSuspenseInfiniteQuery(
+      // @ts-expect-error Fix `search` typings
+      getSearchBookmarksInfiniteOptions({ params: search, searchTerm: q }),
+    )
+
+  const items = data.pages.flatMap((page) => page.data ?? []) as Bookmark[]
+  const count = data.pages[0]?.count ?? 0
 
   return (
     <Feed
-      items={data.data as Bookmark[]}
-      count={data.count || 0}
+      items={items}
+      count={count}
       limit={search.limit}
-      offset={search.offset}
       allowGroupByDate={true}
       title={`${CONTENT.searchTitle}: ${q}`}
       icon={<MagnifyingGlassIcon weight="duotone" size={24} />}
       feedType="bookmarks"
       from={`/search?q=${encodeURIComponent(q)}`}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      fetchNextPage={fetchNextPage}
     />
   )
 }

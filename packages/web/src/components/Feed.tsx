@@ -7,13 +7,14 @@ import { Button } from '@/components/Button'
 import { CONTENT, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { useFeedOptions } from '@/hooks/useFeedOptions'
 import { type FeedItemModel, useGroupByDate } from '@/hooks/useGroupByDate'
-import { usePagination } from '@/hooks/usePagination'
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { getCollectionsTagsOptions } from '@/utils/fetching/collections'
 import type { Bookmark, Toot, Tweet } from '../types/db'
 import { cn } from '../utils/classnames'
 import { BookmarkFeedItem } from './BookmarkFeedItem'
 import { Flex } from './Flex'
 import { headingVariants } from './Heading'
+import { Loader } from './Loader'
 import { SidebarLink } from './SidebarLink'
 import { TootFeedItem } from './TootFeedItem'
 import { TweetFeedItem } from './TweetFeedItem'
@@ -29,13 +30,15 @@ interface FeedProps {
   icon?: ReactNode
   items: FeedItemModel[]
   allowDeletion?: boolean
-  offset?: number
   count: number
   limit?: number
   allowGroupByDate?: boolean
   feedType?: 'tweets' | 'bookmarks' | 'toots'
   showFeedOptions?: boolean
   from?: FileRouteTypes['fullPaths']
+  hasNextPage?: boolean
+  isFetchingNextPage?: boolean
+  fetchNextPage?: () => void
 }
 
 export function isBookmark(item: FeedItemModel): item is Bookmark {
@@ -56,20 +59,21 @@ export const Feed = memo(
     allowDeletion = false,
     count,
     limit = DEFAULT_API_RESPONSE_LIMIT,
-    offset = 0,
     allowGroupByDate = false,
     subNav,
     showFeedOptions = true,
     from,
+    hasNextPage = false,
+    isFetchingNextPage = false,
+    fetchNextPage,
   }: FeedProps) => {
     const { starQuery, publicQuery, setStarQuery, setPublicQuery } =
       useFeedOptions()
     const { groupByDate, groupedItems } = useGroupByDate(items)
-    const { handleUpdateOffset, hasOldItems, hasNewItems } = usePagination({
-      count,
-      from,
-      limit,
-      offset,
+    const { sentinelRef } = useInfiniteScroll({
+      hasNextPage,
+      isFetchingNextPage,
+      fetchNextPage: fetchNextPage ?? (() => {}),
     })
     const { data: collectionsTags } = useSuspenseQuery(
       getCollectionsTagsOptions(),
@@ -85,17 +89,6 @@ export const Feed = memo(
         setStarQuery((prev) => !prev)
       }
     }
-
-    // // TODO: move this to usequery
-    // useEffect(() => {
-    //   const getCollections = async () => {
-    //     const collectionTagsResponse = await supabase
-    //       .from('collection_tags_view')
-    //       .select('*')
-    //     setCollections(collectionTagsResponse.data)
-    //   }
-    //   getCollections()
-    // }, [])
 
     return (
       <div className="feed">
@@ -213,33 +206,10 @@ export const Feed = memo(
           </div>
         )}
 
-        {/* Next/previous navigation */}
-        {hasOldItems || hasNewItems ? (
-          <Flex align="center" justify="center" gap="s" className="mt-m">
-            {hasNewItems ? (
-              <Button
-                onClick={() =>
-                  handleUpdateOffset(Number(offset) - Number(limit))
-                }
-                disabled={!hasNewItems}
-                // disabledText={CONTENT.noNewerItems}
-              >
-                {CONTENT.newerBtn}
-              </Button>
-            ) : null}
-            {hasOldItems ? (
-              <Button
-                onClick={() =>
-                  handleUpdateOffset(Number(offset) + Number(limit))
-                }
-                disabled={!hasOldItems}
-                // disabledText={CONTENT.noOlderItems}
-              >
-                {CONTENT.olderBtn}
-              </Button>
-            ) : null}
-          </Flex>
-        ) : null}
+        {/* Infinite scroll sentinel */}
+        <div ref={sentinelRef} className="mt-m flex justify-center">
+          {isFetchingNextPage ? <Loader /> : null}
+        </div>
       </div>
     )
   },

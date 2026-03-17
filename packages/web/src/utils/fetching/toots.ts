@@ -1,4 +1,5 @@
-import { queryOptions } from '@tanstack/react-query'
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
+import { DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { supabase } from '../supabase/client'
 import { type ApiParametersQuery, apiParameters } from './apiParameters'
 
@@ -30,6 +31,28 @@ export const getTootsOptions = ({ params, likes }: TootsFetchingOptions) => {
   return queryOptions({
     queryFn: () => getToots({ likes, params }),
     queryKey: ['toots', likes, params],
+  })
+}
+
+export const getTootsInfiniteOptions = ({
+  params,
+  likes,
+}: TootsFetchingOptions) => {
+  const {
+    limit = DEFAULT_API_RESPONSE_LIMIT,
+    offset: _offset,
+    ...rest
+  } = apiParameters(params)
+  return infiniteQueryOptions({
+    queryFn: ({ pageParam = 0 }) =>
+      getToots({ likes, params: { ...rest, limit, offset: pageParam } }),
+    queryKey: ['toots', 'infinite', likes, rest, limit],
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      const total = lastPage.count ?? 0
+      const nextOffset = lastPageParam + limit!
+      return nextOffset < total ? nextOffset : undefined
+    },
   })
 }
 

@@ -1,11 +1,11 @@
 import { MastodonLogoIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import { CONTENT, createTitle } from '@/constants'
 import { apiParameters } from '@/utils/fetching/apiParameters'
 import { getMetaOptions } from '@/utils/fetching/meta'
-import { getTootsOptions } from '@/utils/fetching/toots'
+import { getTootsInfiniteOptions } from '@/utils/fetching/toots'
 
 export const Route = createFileRoute('/_app/toots')({
   component: Page,
@@ -16,18 +16,11 @@ export const Route = createFileRoute('/_app/toots')({
       },
     ],
   }),
-  loader: async (opts) => {
-    // @ts-expect-error Fix `search` typings
-    const { liked, ...search } = opts.deps.search
-    const toots = await opts.context.queryClient.ensureQueryData(
-      getTootsOptions({ likes: liked, params: search }),
-    )
-    return toots
-  },
   loaderDeps: ({ search }) => ({ search }),
   validateSearch: (search: Record<string, unknown>) => {
+    const { offset: _, ...params } = apiParameters(search)
     return {
-      ...apiParameters(search),
+      ...params,
       liked: search.liked as boolean,
     }
   },
@@ -36,9 +29,13 @@ export const Route = createFileRoute('/_app/toots')({
 function Page() {
   const { liked, ...search } = useSearch({ from: '/_app/toots' })
   const { data: dbMeta } = useSuspenseQuery(getMetaOptions())
-  const { data } = useSuspenseQuery(
-    getTootsOptions({ likes: liked, params: search }),
-  )
+  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
+    useSuspenseInfiniteQuery(
+      getTootsInfiniteOptions({ likes: liked, params: search }),
+    )
+
+  const items = data.pages.flatMap((page) => page.data ?? [])
+  const count = data.pages[0]?.count ?? 0
 
   const subNav = [
     {
@@ -60,17 +57,19 @@ function Page() {
 
   return (
     <Feed
-      items={data.data}
-      count={data.count || 0}
+      items={items}
+      count={count}
       limit={search.limit}
-      offset={search.offset}
       allowGroupByDate={true}
       title={CONTENT.tootsTitle}
       icon={<MastodonLogoIcon size={24} />}
       feedType="toots"
       subNav={subNav}
       showFeedOptions={false}
-      from={`/toots`}
+      from="/toots"
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      fetchNextPage={fetchNextPage}
     />
   )
 }

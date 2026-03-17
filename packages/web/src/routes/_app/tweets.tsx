@@ -1,10 +1,11 @@
 import { TwitterLogoIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import { CONTENT, createTitle } from '@/constants'
+import { apiParameters } from '@/utils/fetching/apiParameters'
 import { getMetaOptions } from '@/utils/fetching/meta'
-import { getTweets } from '@/utils/fetching/tweets'
+import { getTweetsInfiniteOptions } from '@/utils/fetching/tweets'
 
 export const Route = createFileRoute('/_app/tweets')({
   component: Page,
@@ -15,21 +16,26 @@ export const Route = createFileRoute('/_app/tweets')({
       },
     ],
   }),
-  // @ts-expect-error How do I type useLoaderData?
-  loader: async ({ deps: { search } }) => {
-    const { data } = await getTweets({
-      ...search,
-      likes: search?.liked ?? false,
-    })
-    const response = { tweets: data, ...search }
-    return response
-  },
   loaderDeps: ({ search }) => ({ search }),
+  validateSearch: (search: Record<string, unknown>) => {
+    const { offset: _, ...params } = apiParameters(search)
+    return {
+      ...params,
+      liked: (search.liked as boolean) ?? false,
+    }
+  },
 })
 
 function Page() {
-  const { tweets, count, limit, offset, liked } = Route.useLoaderData()
+  const { liked, ...search } = useSearch({ from: '/_app/tweets' })
   const { data: dbMeta } = useSuspenseQuery(getMetaOptions())
+  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
+    useSuspenseInfiniteQuery(
+      getTweetsInfiniteOptions({ likes: liked ?? false, params: search }),
+    )
+
+  const items = data.pages.flatMap((page) => page.data ?? [])
+  const count = data.pages[0]?.count ?? 0
 
   const subNav = [
     {
@@ -51,10 +57,9 @@ function Page() {
 
   return (
     <Feed
-      items={tweets}
-      count={count || 0}
-      limit={limit}
-      offset={offset}
+      items={items}
+      count={count}
+      limit={search.limit}
       allowGroupByDate={true}
       title={CONTENT.tweetsTitle}
       icon={
@@ -63,7 +68,10 @@ function Page() {
       feedType="tweets"
       subNav={subNav}
       showFeedOptions={false}
-      from={`/tweets`}
+      from="/tweets"
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      fetchNextPage={fetchNextPage}
     />
   )
 }
