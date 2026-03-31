@@ -3,6 +3,10 @@ import { Hono } from 'hono'
 import { classifyBookmark } from './ai/classify'
 import { descriptionSystemPrompt } from './ai/description'
 import { generateResponse } from './ai/generateResponse'
+import {
+  MAX_CONTENT_LENGTH,
+  summariseSystemPrompt,
+} from './ai/summarise'
 import { titleSystemPrompt } from './ai/title'
 import { sendBlueskyPost } from './bluesky/sendBlueskyPost'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
@@ -74,6 +78,15 @@ app.post('/ai/description', async (context) => {
     context,
     prompt,
     systemPrompt: descriptionSystemPrompt(title),
+  })
+})
+app.post('/ai/summarise', async (context) => {
+  const { prompt } = await context.req.json()
+  const truncated = prompt.slice(0, MAX_CONTENT_LENGTH)
+  return await generateResponse({
+    context,
+    prompt: truncated,
+    systemPrompt: summariseSystemPrompt,
   })
 })
 app.post('/ai/classify', async (context) => {

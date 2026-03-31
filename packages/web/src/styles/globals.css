@@ -14,6 +14,7 @@
 @import "../routes/_app/layout.css";
 @import "../routes/_app/media.css";
 @import "./components.css";
+@import "../routes/_app/bookmark.$id.read.css";
 
 :root {
   --radius: 0.625rem;

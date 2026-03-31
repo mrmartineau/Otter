@@ -14,11 +14,13 @@ import { Paragraph } from './Paragraph'
 interface MarkdownProps {
   children: string
   preventClamping?: boolean
+  textSize?: number;
 }
 
 export const Markdown = ({
   children,
   preventClamping = false,
+  textSize = -1,
 }: MarkdownProps) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const [isClamped, setClamped] = useState(false)
@@ -43,9 +45,9 @@ export const Markdown = ({
     <div>
       <article
         ref={contentRef}
-        className={`markdown flow last:mb- text-step--1 ${
+        className={`markdown flow last:mb- ${
           isExpanded ? 'line-clamp-none' : 'line-clamp-5'
-        }`}
+        } text-step-${textSize}`}
       >
         <ReactMarkdown
           remarkPlugins={[
