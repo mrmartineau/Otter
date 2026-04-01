@@ -23,7 +23,7 @@ interface DialogContentProps
   children: ReactNode
 }
 
-const dialogContentVariants = cva('DialogContent', {
+const dialogContentVariants = cva('zui-dialog DialogContent', {
   defaultVariants: {
     placement: 'center',
     width: 'm',
@@ -66,16 +66,20 @@ export const DialogContent = ({
         </DialogPrimitive.Close>
       </div>
       {title ? (
-        <DialogPrimitive.Title className="DialogTitle">
-          {title}
-        </DialogPrimitive.Title>
+        <div className="zui-dialog-header">
+          <DialogPrimitive.Title className="zui-dialog-title">
+            {title}
+          </DialogPrimitive.Title>
+          {description ? (
+            <DialogPrimitive.Description className="zui-dialog-description">
+              {description}
+            </DialogPrimitive.Description>
+          ) : null}
+        </div>
       ) : null}
-      {description ? (
-        <DialogPrimitive.Description className="DialogDescription">
-          {description}
-        </DialogPrimitive.Description>
-      ) : null}
-      {children}
+      <div className="zui-dialog-body">
+        {children}
+      </div>
     </DialogPrimitive.Content>
   </DialogPrimitive.Portal>
 )

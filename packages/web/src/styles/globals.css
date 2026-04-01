@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@mrmartineau/zui/css";
 
 @custom-variant dark (&:is(.dark *));
 

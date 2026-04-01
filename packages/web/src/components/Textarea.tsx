@@ -8,7 +8,7 @@ export interface TextareaProps extends TextareaAutosizeProps {}
 const Textarea = ({ className, ...props }: TextareaProps) => {
   return (
     <TextareaAutosize
-      className={cn('input-base focus min-h-[80px]', className)}
+      className={cn('zui-textarea min-h-[80px]', className)}
       {...props}
     />
   )

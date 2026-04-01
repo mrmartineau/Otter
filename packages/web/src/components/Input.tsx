@@ -9,8 +9,7 @@ const Input = ({ className, type, ...props }: InputProps) => {
     <input
       type={type}
       className={cn(
-        'input-base',
-        'focus',
+        'zui-input',
         'file:border-0 file:bg-transparent file:text-sm file:font-medium',
         className,
       )}

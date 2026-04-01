@@ -3,21 +3,21 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import type * as React from 'react'
 import { cn } from '@/utils/classnames'
 
-const linkVariants = cva(['link-base', 'focus'], {
+const linkVariants = cva([], {
   defaultVariants: {
     variant: 'default',
   },
   variants: {
     variant: {
-      accent: 'link-accent',
-      add: 'link-add',
-      default: 'link-default',
-      fab: 'link-fab',
-      feedTitle: 'link-feed-title',
-      logo: 'link-logo',
-      sidebar: 'link-sidebar',
-      subtle: 'link-subtle',
-      tag: 'link-tag',
+      accent: 'zui-link link-accent',
+      add: 'link-base link-add',
+      default: 'zui-link',
+      fab: 'link-base link-fab',
+      feedTitle: 'link-base link-feed-title',
+      logo: 'link-base link-logo',
+      sidebar: 'link-base link-sidebar',
+      subtle: 'link-base link-subtle',
+      tag: 'link-base link-tag',
     },
   },
 })
@@ -31,7 +31,7 @@ export interface LinkProps
 const Link = ({ className, variant, isActive, href, ...props }: LinkProps) => {
   return (
     <TanstackLink
-      className={cn(linkVariants({ className, variant }), {
+      className={cn(linkVariants({ variant }), className, {
         'is-active': isActive,
       })}
       to={href}
