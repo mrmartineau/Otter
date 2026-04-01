@@ -30,7 +30,15 @@
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
    */
-  "placement": { "mode": "smart" }
+  "placement": { "mode": "smart" },
+
+  /**
+   * Cron Triggers
+   * https://developers.cloudflare.com/workers/configuration/cron-triggers/
+   */
+  "triggers": {
+    "crons": ["*/15 * * * *"]
+  }
   /**
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
