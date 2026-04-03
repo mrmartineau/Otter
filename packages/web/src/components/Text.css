@@ -1,6 +1,6 @@
 .text-count {
   font-size: var(--step--3);
   font-family: var(--font-mono);
-  color: var(--theme9);
+  color: var(--color-faint);
   line-height: 1;
 }

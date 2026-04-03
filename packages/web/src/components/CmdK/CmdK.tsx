@@ -1,6 +1,7 @@
 import closeSound from '@mrmartineau/kit/sounds/close_001.mp3'
 import openSound from '@mrmartineau/kit/sounds/open_001.mp3'
 import useSound from '@mrmartineau/use-sound'
+import { Button } from '@mrmartineau/zui/react'
 import {
   ArrowElbowDownLeftIcon,
   ArrowFatLinesUpIcon,
@@ -26,11 +27,9 @@ import {
   useState,
 } from 'react'
 import formatTitle from 'title'
-import { Button } from '@/components/Button'
 import { useToggle } from '@/hooks/useToggle'
 import type { Tweet } from '@/types/db'
 import { getMetaOptions } from '@/utils/fetching/meta'
-
 import {
   ROUTE_DASHBOARD,
   ROUTE_FEED,
@@ -134,10 +133,10 @@ export const CmdK = () => {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant="cmdk"
+            variant="subtle"
             aria-label="Search Otter"
             onClick={handleOpenCmdK}
-            className="h-10"
+            className="h-10 button-cmdk"
           >
             <MagnifyingGlassIcon weight="duotone" size="25" />
             Search

@@ -19,7 +19,6 @@ const buttonVariants = cva(['zui-button'], {
       xs: 'zui-button-size-xs',
     },
     variant: {
-      cmdk: 'button-cmdk',
       collapsible: 'button-collapsible',
       default: '',
       destructive: 'zui-button-color-destructive',

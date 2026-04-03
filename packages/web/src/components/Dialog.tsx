@@ -23,7 +23,7 @@ interface DialogContentProps
   children: ReactNode
 }
 
-const dialogContentVariants = cva('zui-dialog DialogContent', {
+const dialogContentVariants = cva('DialogContent', {
   defaultVariants: {
     placement: 'center',
     width: 'm',

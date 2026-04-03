@@ -144,7 +144,7 @@ export const Feed = memo(
         </Flex>
 
         {allowGroupByDate && groupByDate ? (
-          <div className="bp2:gap-m grid gap-s">
+          <div className="bp2:gap-m grid gap-sm">
             {groupedItems?.length ? (
               groupedItems.map((groupedItem) => (
                 <div key={groupedItem.date}>
@@ -180,7 +180,7 @@ export const Feed = memo(
             )}
           </div>
         ) : (
-          <div className="mt-m grid gap-m">
+          <div className="mt-sm grid gap-md">
             {items?.length ? (
               items.map((item) => {
                 if (!item) {

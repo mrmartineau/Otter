@@ -1,0 +1,11 @@
+:root {
+  --color-theme: light-dark(var(--color-mauve-600), var(--color-mauve-400));
+  --color-accent: light-dark(var(--color-violet-600), var(--color-violet-400));
+  --color-background: light-dark(var(--color-mauve-200), var(--color-mauve-800));
+  --color-surface: light-dark(var(--color-mauve-100), var(--color-mauve-900));
+  --color-border: light-dark(var(--color-mauve-300), var(--color-mauve-700));
+  --color-text: light-dark(var(--color-mauve-700), var(--color-mauve-400));
+  --font-body: Geist, var(--font-stack-sans);
+  --font-display: Geist, var(--font-stack-sans);
+  --radius-scale: 1;
+}

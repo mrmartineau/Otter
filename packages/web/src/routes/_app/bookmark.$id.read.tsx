@@ -1,9 +1,9 @@
+import { Button } from '@mrmartineau/zui/react'
 import { ArrowLeftIcon, ArrowSquareOutIcon } from '@phosphor-icons/react'
 import { queryOptions, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import urlJoin from 'proper-url-join'
 import { useState } from 'react'
-import { Button } from '@/components/Button'
 import { Flex } from '@/components/Flex'
 import { Link } from '@/components/Link'
 import { Loader } from '@/components/Loader'
@@ -157,9 +157,10 @@ function RouteComponent() {
               role="tab"
               aria-selected={viewMode === 'read'}
               onClick={() => setViewMode('read')}
-              variant={viewMode === 'read' ? 'default' : 'ghost'}
+              variant={viewMode === 'read' ? 'subtle' : 'ghost'}
+              shape="soft"
               className={`rounded-full grow`}
-              >
+            >
               Read
             </Button>
             <Button
@@ -167,8 +168,9 @@ function RouteComponent() {
               role="tab"
               aria-selected={viewMode === 'summary'}
               onClick={() => setViewMode('summary')}
-              variant={viewMode === 'summary' ? 'default' : 'ghost'}
-              className={`rounded-full grow`}
+              variant={viewMode === 'summary' ? 'subtle' : 'ghost'}
+              shape="soft"
+              className={`grow`}
             >
               Summary
             </Button>

@@ -1,8 +1,8 @@
-@layer components {
+@layer zui.components {
   .bookmark-form {
     display: flex;
     flex-direction: column;
-    gap: var(--space-m);
+    gap: var(--space-md);
     flex-shrink: 0;
   }
 
@@ -14,13 +14,13 @@
   .bookmark-form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: var(--space-s);
+    gap: var(--space-sm);
   }
 
   .bookmark-form-col {
     display: flex;
     flex-direction: column;
-    gap: var(--space-s);
+    gap: var(--space-sm);
 
     label {
       min-height: 20px;
@@ -37,10 +37,10 @@
   }
 
   .bookmark-form-footer {
-    margin-top: var(--space-m);
-    padding: var(--space-s);
-    padding-bottom: max(var(--space-s), env(safe-area-inset-bottom));
-    background-color: var(--theme1);
+    margin-top: var(--space-md);
+    padding: var(--space-sm);
+    padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom));
+    background-color: var(--theme2);
     border-top: 1px solid var(--theme3);
   }
 }

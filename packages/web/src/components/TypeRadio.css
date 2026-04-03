@@ -27,7 +27,7 @@
   }
 
   &:checked + .type-radio-label {
-    padding-x: var(--space-m);
+    padding-x: var(--space-xs);
   }
 }
 
@@ -41,7 +41,7 @@
   background-color: var(--theme2);
   border: 1px solid var(--theme3);
   border-radius: var(--radii-full);
-  padding: var(--space-3xs) var(--space-xs);
+  padding: var(--space-4xs) var(--space-2xs);
   cursor: pointer;
   transition: all 200ms var(--ease-in-out-1);
   font-size: var(--step--2);

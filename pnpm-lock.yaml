@@ -99,6 +99,9 @@ importers:
       '@mrmartineau/xtractr':
         specifier: ^0.2.7
         version: 0.2.7
+      '@mrmartineau/zui':
+        specifier: ^0.7.0
+        version: 0.7.0(react@19.2.4)(typescript@5.9.3)
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1882,6 +1885,24 @@ packages:
 
   '@mrmartineau/xtractr@0.2.7':
     resolution: {integrity: sha512-S+SJjPTb2chokQlYDxydKlwt1wPJTIsltTqllWbWFYhLfZ7YUj8Yb85RxCDhxh19z8W7E7rU/kD78R9hg9GXSg==}
+
+  '@mrmartineau/zui@0.7.0':
+    resolution: {integrity: sha512-+UzLegKztFx8tBqpT6KapWN9NEEhRIJU873GM7XAiNK32OOi283Dtd7ITMMpbgoop+JnGgSRdOqKk+nUQra8sQ==}
+    hasBin: true
+    peerDependencies:
+      astro: '*'
+      react: ^18.0.0 || ^19.0.0
+      solid-js: ^1.7.0
+      vue: ^3.3.0
+    peerDependenciesMeta:
+      astro:
+        optional: true
+      react:
+        optional: true
+      solid-js:
+        optional: true
+      vue:
+        optional: true
 
   '@napi-rs/wasm-runtime@1.1.1':
     resolution: {integrity: sha512-p64ah1M1ld8xjWv3qbvFwHiFVWrq1yFvV4f7w+mzaqiR4IlSgkqhcRdHwsGgomwzBH51sRY4NEowLxnaBjcW/A==}
@@ -4137,6 +4158,14 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+
+  cva@1.0.0-beta.4:
+    resolution: {integrity: sha512-F/JS9hScapq4DBVQXcK85l9U91M6ePeXoBMSp7vypzShoefUBxjQTo3g3935PUHgQd+IW77DjbPRIxugy4/GCQ==}
+    peerDependencies:
+      typescript: '>= 4.5.5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   data-uri-to-buffer@6.0.2:
     resolution: {integrity: sha512-7hvf7/GW8e86rW0ptuwS3OcBGDjIi6SZva7hCyWC0yYry2cOPmLIjXAUHI6DK2HsnwJd9ifmt57i8eV2n4YNpw==}
@@ -8798,6 +8827,14 @@ snapshots:
     transitivePeerDependencies:
       - canvas
 
+  '@mrmartineau/zui@0.7.0(react@19.2.4)(typescript@5.9.3)':
+    dependencies:
+      cva: 1.0.0-beta.4(typescript@5.9.3)
+    optionalDependencies:
+      react: 19.2.4
+    transitivePeerDependencies:
+      - typescript
+
   '@napi-rs/wasm-runtime@1.1.1':
     dependencies:
       '@emnapi/core': 1.9.0
@@ -11118,6 +11155,12 @@ snapshots:
       lru-cache: 11.2.6
 
   csstype@3.2.3: {}
+
+  cva@1.0.0-beta.4(typescript@5.9.3):
+    dependencies:
+      clsx: 2.1.1
+    optionalDependencies:
+      typescript: 5.9.3
 
   data-uri-to-buffer@6.0.2: {}
 

@@ -41,32 +41,32 @@
     --radii-pill: var(--radius-full);
 
     /* Theme scale — mapped to ZUI mist palette via light-dark() */
-    --theme1:  light-dark(var(--color-mist-50),  var(--color-mist-950));
-    --theme2:  light-dark(var(--color-mist-100), var(--color-mist-900));
-    --theme3:  light-dark(var(--color-mist-200), var(--color-mist-800));
-    --theme4:  light-dark(var(--color-mist-300), var(--color-mist-700));
-    --theme5:  light-dark(var(--color-mist-300), var(--color-mist-700));
-    --theme6:  light-dark(var(--color-mist-400), var(--color-mist-600));
-    --theme7:  light-dark(var(--color-mist-400), var(--color-mist-500));
-    --theme8:  light-dark(var(--color-mist-500), var(--color-mist-500));
-    --theme9:  light-dark(var(--color-mist-500), var(--color-mist-400));
-    --theme10: light-dark(var(--color-mist-600), var(--color-mist-300));
-    --theme11: light-dark(var(--color-mist-700), var(--color-mist-200));
-    --theme12: light-dark(var(--color-mist-800), var(--color-mist-100));
+    --theme1:  light-dark(var(--color-mauve-50),  var(--color-mauve-950));
+    --theme2:  light-dark(var(--color-mauve-100), var(--color-mauve-900));
+    --theme3:  light-dark(var(--color-mauve-200), var(--color-mauve-800));
+    --theme4:  light-dark(var(--color-mauve-300), var(--color-mauve-700));
+    --theme5:  light-dark(var(--color-mauve-300), var(--color-mauve-700));
+    --theme6:  light-dark(var(--color-mauve-400), var(--color-mauve-600));
+    --theme7:  light-dark(var(--color-mauve-400), var(--color-mauve-500));
+    --theme8:  light-dark(var(--color-mauve-500), var(--color-mauve-500));
+    --theme9:  light-dark(var(--color-mauve-500), var(--color-mauve-400));
+    --theme10: light-dark(var(--color-mauve-600), var(--color-mauve-300));
+    --theme11: light-dark(var(--color-mauve-700), var(--color-mauve-200));
+    --theme12: light-dark(var(--color-mauve-800), var(--color-mauve-100));
 
-    /* Accent scale — mapped to ZUI sky palette via light-dark() */
-    --accent1:  light-dark(var(--color-sky-50),  var(--color-sky-950));
-    --accent2:  light-dark(var(--color-sky-100), var(--color-sky-900));
-    --accent3:  light-dark(var(--color-sky-200), var(--color-sky-800));
-    --accent4:  light-dark(var(--color-sky-300), var(--color-sky-700));
-    --accent5:  light-dark(var(--color-sky-400), var(--color-sky-600));
-    --accent6:  light-dark(var(--color-sky-400), var(--color-sky-500));
-    --accent7:  light-dark(var(--color-sky-500), var(--color-sky-400));
-    --accent8:  light-dark(var(--color-sky-600), var(--color-sky-400));
-    --accent9:  light-dark(var(--color-sky-600), var(--color-sky-400));
-    --accent10: light-dark(var(--color-sky-700), var(--color-sky-300));
-    --accent11: light-dark(var(--color-sky-800), var(--color-sky-200));
-    --accent12: light-dark(var(--color-sky-900), var(--color-sky-100));
+    /* Accent scale — mapped to ZUI violet palette via light-dark() */
+    --accent1:  light-dark(var(--color-violet-50),  var(--color-violet-950));
+    --accent2:  light-dark(var(--color-violet-100), var(--color-violet-900));
+    --accent3:  light-dark(var(--color-violet-200), var(--color-violet-800));
+    --accent4:  light-dark(var(--color-violet-300), var(--color-violet-700));
+    --accent5:  light-dark(var(--color-violet-400), var(--color-violet-600));
+    --accent6:  light-dark(var(--color-violet-400), var(--color-violet-500));
+    --accent7:  light-dark(var(--color-violet-500), var(--color-violet-400));
+    --accent8:  light-dark(var(--color-violet-600), var(--color-violet-400));
+    --accent9:  light-dark(var(--color-violet-600), var(--color-violet-400));
+    --accent10: light-dark(var(--color-violet-700), var(--color-violet-300));
+    --accent11: light-dark(var(--color-violet-800), var(--color-violet-200));
+    --accent12: light-dark(var(--color-violet-900), var(--color-violet-100));
 
     /* Semantic aliases — point to ZUI tokens */
     --text:       var(--color-text);

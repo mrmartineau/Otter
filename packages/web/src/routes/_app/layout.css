@@ -59,7 +59,7 @@
   margin-top: var(--header-height);
   height: calc(100dvh - var(--header-height));
   transform: translateX(calc(-1 * var(--sidebar-width)));
-  background-color: var(--theme2);
+  background-color: var(--color-surface);
   overflow-y: auto;
   border-right: 1px solid var(--border);
 
@@ -114,7 +114,7 @@
 }
 
 .otter-content-pane-inner {
-  padding-top: var(--space-m);
+  padding-top: var(--space-md);
   padding-bottom: var(--space-xl);
   min-height: 100%;
 }
