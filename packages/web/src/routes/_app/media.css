@@ -1,11 +1,17 @@
 .media-columns {
   display: grid;
   grid-template-columns: 268px 268px 268px;
-  gap: var(--space-m);
+  gap: var(--space-md);
   overflow-x: auto;
   width: 100dvw;
 
   @media (min-width: 768px) {
     width: calc(100dvw - var(--sidebar-width) - 40px);
   }
+}
+
+.media-card-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 50px;
+  gap: var(--space-sm);
 }

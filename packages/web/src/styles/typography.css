@@ -114,11 +114,11 @@
   }
 
   .lede + * {
-    --flow-space: var(---space-m);
+    --flow-space: var(---space-md);
   }
 
   hr {
     border-top-color: var(--text);
-    margin: var(--space-m);
+    margin: var(--space-md);
   }
 }

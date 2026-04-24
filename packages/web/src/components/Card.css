@@ -4,15 +4,14 @@
   justify-content: space-between;
   gap: var(--space-2xs);
   position: relative;
-  padding: var(--space-s);
-  border-radius: var(--radii-l);
-  transition: border 200ms var(--ease-in-out-1);
-  background-color: var(--theme2);
-  border: 1px solid var(--border);
-  color: var(--theme10);
+  padding: var(--space-sm);
+  border-radius: var(--radius-xl);
+  transition: border 200ms var(--ease-in-out);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
 
   &:hover,
   &:focus-within {
-    border: 1px solid var(--theme4);
+    border-color: oklch(from var(--color-border) calc(l + .1) c h);
   }
 }

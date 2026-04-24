@@ -6,10 +6,8 @@
     --container: 1200px;
 
     /* Fonts */
-    --font-sans: Mona Sans, system-ui, sans-serif;
-    --font-mono: JetBrains Mono, SF Mono, Menlo, Monaco, Courier New, monospace;
-    --font-headings: var(--font-sans);
-    --font-body: var(--font-sans);
+    --font-sans: var(--font-body, Geist, system-ui, sans-serif);
+    --font-mono: var(--font-code, JetBrains Mono, SF Mono, Menlo, Monaco, Courier New, monospace);
 
     /* Line heights */
     --line-height-none: 1;
@@ -30,54 +28,45 @@
 
     /* Transitions */
     --transition: 0.2s var(--ease-in-out-4);
+    --radius-pill: var(--radius-full);
 
-    /* Radii */
-    --radii-none: 0;
-    --radii-s: 0.125rem;
-    --radii-default: 0.25rem;
-    --radii-m: 0.3rem;
-    --radii-l: 0.5rem;
-    --radii-xl: 1rem;
-    --radii-full: 9999px;
-    --radii-round: 50%;
-    --radii-pill: 9999px;
+    /* Theme scale — mapped to ZUI mist palette via light-dark() */
+    --theme1:  light-dark(var(--color-mauve-50),  var(--color-mauve-950));
+    --theme2:  light-dark(var(--color-mauve-100), var(--color-mauve-900));
+    --theme3:  light-dark(var(--color-mauve-200), var(--color-mauve-800));
+    --theme4:  light-dark(var(--color-mauve-300), var(--color-mauve-700));
+    --theme5:  light-dark(var(--color-mauve-300), var(--color-mauve-700));
+    --theme6:  light-dark(var(--color-mauve-400), var(--color-mauve-600));
+    --theme7:  light-dark(var(--color-mauve-400), var(--color-mauve-500));
+    --theme8:  light-dark(var(--color-mauve-500), var(--color-mauve-500));
+    --theme9:  light-dark(var(--color-mauve-500), var(--color-mauve-400));
+    --theme10: light-dark(var(--color-mauve-600), var(--color-mauve-300));
+    --theme11: light-dark(var(--color-mauve-700), var(--color-mauve-200));
+    --theme12: light-dark(var(--color-mauve-800), var(--color-mauve-100));
 
-    --radius: 0.5rem; /* from shadcn */
+    /* Accent scale — mapped to ZUI violet palette via light-dark() */
+    --accent1:  light-dark(var(--color-violet-50),  var(--color-violet-950));
+    --accent2:  light-dark(var(--color-violet-100), var(--color-violet-900));
+    --accent3:  light-dark(var(--color-violet-200), var(--color-violet-800));
+    --accent4:  light-dark(var(--color-violet-300), var(--color-violet-700));
+    --accent5:  light-dark(var(--color-violet-400), var(--color-violet-600));
+    --accent6:  light-dark(var(--color-violet-400), var(--color-violet-500));
+    --accent7:  light-dark(var(--color-violet-500), var(--color-violet-400));
+    --accent8:  light-dark(var(--color-violet-600), var(--color-violet-400));
+    --accent9:  light-dark(var(--color-violet-600), var(--color-violet-400));
+    --accent10: light-dark(var(--color-violet-700), var(--color-violet-300));
+    --accent11: light-dark(var(--color-violet-800), var(--color-violet-200));
+    --accent12: light-dark(var(--color-violet-900), var(--color-violet-100));
 
-    /* Colors */
-    --theme1: var(--mauve-1);
-    --theme2: var(--mauve-2);
-    --theme3: var(--mauve-3);
-    --theme4: var(--mauve-4);
-    --theme5: var(--mauve-5);
-    --theme6: var(--mauve-6);
-    --theme7: var(--mauve-7);
-    --theme8: var(--mauve-8);
-    --theme9: var(--mauve-9);
-    --theme10: var(--mauve-10);
-    --theme11: var(--mauve-11);
-    --theme12: var(--mauve-12);
-    --accent1: var(--violet-1);
-    --accent2: var(--violet-2);
-    --accent3: var(--violet-3);
-    --accent4: var(--violet-4);
-    --accent5: var(--violet-5);
-    --accent6: var(--violet-6);
-    --accent7: var(--violet-7);
-    --accent8: var(--violet-8);
-    --accent9: var(--violet-9);
-    --accent10: var(--violet-10);
-    --accent11: var(--violet-11);
-    --accent12: var(--violet-12);
-
-    --text: var(--theme10);
-    --foreground: var(--theme12);
-    --background: var(--theme1);
-    --focus: var(--accent7);
-    --overlay: var(--overlayAlpha);
-    --border: var(--theme3);
+    /* Semantic aliases — point to ZUI tokens */
+    --text:       var(--color-text);
+    --foreground: var(--color-text);
+    --background: var(--color-background);
+    --focus:      var(--color-accent);
+    --border:     var(--color-border);
+    --overlay:    oklch(from var(--color-background) calc(l - .1) c h / 0.85);
 
     /* Other */
-    --flow-space: var(--space-m);
+    --flow-space: var(--space-md);
   }
 }

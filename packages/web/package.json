@@ -9,6 +9,7 @@
     "@mrmartineau/strifx": "^0.2.0",
     "@mrmartineau/use-sound": "^5.1.0",
     "@mrmartineau/xtractr": "^0.2.7",
+    "@mrmartineau/zui": "^0.7.0",
     "@phosphor-icons/react": "^2.1.10",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@supabase/supabase-js": "^2.99.1",

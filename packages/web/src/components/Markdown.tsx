@@ -45,7 +45,7 @@ export const Markdown = ({
     <div>
       <article
         ref={contentRef}
-        className={`markdown flow last:mb- ${
+        className={`prose flow ${
           isExpanded ? 'line-clamp-none' : 'line-clamp-5'
         } text-step-${textSize}`}
       >

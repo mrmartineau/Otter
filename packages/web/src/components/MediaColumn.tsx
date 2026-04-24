@@ -63,7 +63,7 @@ export const MediaColumn = ({
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        <div className={cn('space-y-3', { 'bg-gray-400': isOverContainer })}>
+        <div className={cn('flex flex-col gap-3', { 'bg-gray-400': isOverContainer })}>
           {media.map((item) => (
             <MediaCard
               key={item.id}

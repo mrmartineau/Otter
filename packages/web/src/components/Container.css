@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding-x: var(--space-s);
+  padding-inline: var(--space-sm);
 }
 
 .otter-container-auth {

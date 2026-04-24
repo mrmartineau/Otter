@@ -1,5 +1,4 @@
 import { NoteIcon, TwitterLogoIcon } from '@phosphor-icons/react'
-
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import type { Bookmark, Collection } from '../types/db'
 import { fullPath } from '../utils/fullPath'

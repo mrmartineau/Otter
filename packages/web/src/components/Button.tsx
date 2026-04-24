@@ -3,7 +3,7 @@ import { Slot as SlotPrimitive } from 'radix-ui'
 import type * as React from 'react'
 import { cn } from '@/utils/classnames'
 
-const buttonVariants = cva(['button-base', 'focus'], {
+const buttonVariants = cva(['zui-button'], {
   defaultVariants: {
     size: 'm',
     variant: 'default',
@@ -11,24 +11,22 @@ const buttonVariants = cva(['button-base', 'focus'], {
   variants: {
     size: {
       // @biome-ignore assist/source/useSortedKeys
-      '2xs': 'px-2xs py-3xs text-step--2 rounded-md',
+      '2xs': 'zui-button-size-xs',
       collapsible: 'h-6 w-6',
-      l: 'px-m py-s',
-      m: 'px-s py-2xs text-step--1',
-      s: 'px-s py-2xs text-step--1',
-      xs: 'px-xs py-3xs text-step--2',
+      l: 'zui-button-size-lg',
+      m: '',
+      s: 'zui-button-size-sm',
+      xs: 'zui-button-size-xs',
     },
     variant: {
-      cmdk: 'button-cmdk',
       collapsible: 'button-collapsible',
-      default: 'bg-accent9 hover:bg-accent7',
-      destructive:
-        'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-      ghost: 'button-ghost',
-      icon: 'h-10 w-10 hover:bg-theme6 hover:text-theme10 button-icon',
-      nav: 'text-text hover:bg-theme3 rounded-lg shrink-0',
-      outline: 'button-outline',
-      secondary: 'bg-theme8 hover:bg-theme6',
+      default: '',
+      destructive: 'zui-button-color-destructive',
+      ghost: 'zui-button-variant-ghost',
+      icon: 'zui-button-icon',
+      nav: 'zui-button-variant-ghost rounded-lg shrink-0',
+      outline: 'zui-button-variant-outline',
+      secondary: 'zui-button-variant-subtle',
     },
   },
 })

@@ -21,13 +21,13 @@
 
   &:hover + .type-radio-label,
   &:checked + .type-radio-label {
-    border-color: var(--accent9);
-    background-color: var(--accent3);
-    color: var(--accent9);
+    border-color: currentColor;
+    background-color: var(--theme4);
+    color: var(--theme9);
   }
 
   &:checked + .type-radio-label {
-    padding-x: var(--space-m);
+    padding-x: var(--space-xs);
   }
 }
 
@@ -40,8 +40,8 @@
   gap: var(--space-2xs);
   background-color: var(--theme2);
   border: 1px solid var(--theme3);
-  border-radius: var(--radii-full);
-  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-full);
+  padding: var(--space-4xs) var(--space-2xs);
   cursor: pointer;
   transition: all 200ms var(--ease-in-out-1);
   font-size: var(--step--2);

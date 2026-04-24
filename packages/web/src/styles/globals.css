@@ -1,15 +1,15 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@mrmartineau/zui/css";
 
-@custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:is(.dark *)); */
 
+@import "./zui-theme.css";
 @import "./colors.css";
 @import "./vars.css";
 @import "./media.css";
 @import "./easings.css";
-@import "./utopia.css";
 @import "./fonts.css";
-@import "./typography.css";
 @import "./focus.css";
 @import "../routes/_app/layout.css";
 @import "../routes/_app/media.css";
@@ -54,10 +54,10 @@
 }
 
 @theme inline {
-  --radius-sm: var(--radii-s);
-  --radius-md: var(--radii-m);
-  --radius-lg: var(--radii-l);
-  --radius-xl: var(--radii-xl);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
