@@ -2,7 +2,7 @@
   .input-base {
     width: 100%;
     display: flex;
-    border-radius: var(--radii-l);
+    border-radius: var(--radius-lg);
     background-color: var(--theme2);
     border: 1px solid var(--theme3);
     padding: var(--space-3xs) var(--space-2xs);

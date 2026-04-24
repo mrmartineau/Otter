@@ -3,7 +3,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radii-full);
+    border-radius: var(--radius-full);
     font-size: var(--step--2);
     min-width: 80px;
     width: 10%;
@@ -47,7 +47,7 @@
     grid-column-gap: var(--space-2xs);
     padding: var(--space-2xs);
     text-align: center;
-    border-radius: var(--radii-l);
+    border-radius: var(--radius-lg);
     --activeColor: var(--accent9);
     font-weight: 500;
     letter-spacing: 0.02em;

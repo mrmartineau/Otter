@@ -25,10 +25,10 @@ module.exports = {
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
       borderRadius: {
-        l: 'var(--radii-l)',
-        m: 'var(--radii-m)',
-        s: 'var(--radii-s) !important',
-        xl: 'var(--radii-xl)',
+        lg: 'var(--radius-lg)',
+        md: 'var(--radius-md)',
+        sm: 'var(--radius-sm) !important',
+        xl: 'var(--radius-xl)',
       },
       colors: {
         accent: {
@@ -118,9 +118,9 @@ module.exports = {
         '3xl': 'var(--space-3xl)',
         '3xs': 'var(--space-3xs)',
         '4xs': 'var(--space-4xs)',
-        l: 'var(--space-l)',
-        m: 'var(--space-m)',
-        s: 'var(--space-s)',
+        l: 'var(--space-lg)',
+        m: 'var(--space-md)',
+        s: 'var(--space-sm)',
         xl: 'var(--space-xl)',
         xs: 'var(--space-xs)',
       },

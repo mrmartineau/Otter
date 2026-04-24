@@ -12,7 +12,7 @@
   position: fixed;
   z-index: var(--z-2);
   overflow: auto;
-  border-radius: var(--radii-l);
+  border-radius: var(--radius-lg);
   top: 5dvh;
   left: 50%;
   transform: translateX(-50%);
@@ -83,7 +83,7 @@
     display: flex;
     border: 1px solid currentColor;
     color: var(--theme8);
-    border-radius: var(--radii-default);
+    border-radius: var(--radius-md);
     margin-inline-start: var(--space-md);
     position: absolute;
     top: 50%;

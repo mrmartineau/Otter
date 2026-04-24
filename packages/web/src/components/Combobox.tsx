@@ -13,7 +13,7 @@ export const comboboxStyles: StylesConfig<
     ...provided,
     backgroundColor: 'var(--theme2)',
     borderColor: state.isFocused ? 'var(--theme6)' : 'var(--theme3)',
-    borderRadius: 'var(--radii-l)',
+    borderRadius: 'var(--radius-lg)',
     borderWidth: '1px',
     boxShadow: state.isFocused
       ? '0 0 0 2px var(--focus)'
@@ -24,7 +24,7 @@ export const comboboxStyles: StylesConfig<
     ...provided,
     alignItems: 'center',
     backgroundColor: 'var(--theme4)',
-    borderRadius: 'var(--radii-default)',
+    borderRadius: 'var(--radius-md)',
     color: 'var(--theme8)',
     fontSize: 'var(--step--1)',
     padding: 'var(--space-3xs)',
@@ -36,7 +36,7 @@ export const comboboxStyles: StylesConfig<
       backgroundColor: 'var(--theme6)',
       color: 'var(--theme10)',
     },
-    borderRadius: 'var(--radii-full)',
+    borderRadius: 'var(--radius-full)',
     cursor: 'pointer',
     flexShrink: 0,
     height: '1.5em',

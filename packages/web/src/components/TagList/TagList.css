@@ -1,6 +1,6 @@
 .tagListItem {
   position: relative;
-  border-radius: var(--radii-m);
+  border-radius: var(--radius-md);
 
   &:hover {
     background-color: var(--theme3);

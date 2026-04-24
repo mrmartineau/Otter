@@ -28,17 +28,7 @@
 
     /* Transitions */
     --transition: 0.2s var(--ease-in-out-4);
-
-    /* Radii — alias ZUI tokens */
-    --radii-none: 0;
-    --radii-s: var(--radius-sm);
-    --radii-default: var(--radius-md);
-    --radii-m: var(--radius-md);
-    --radii-l: var(--radius-lg);
-    --radii-xl: var(--radius-xl);
-    --radii-full: var(--radius-full);
-    --radii-round: var(--radius-round);
-    --radii-pill: var(--radius-full);
+    --radius-pill: var(--radius-full);
 
     /* Theme scale — mapped to ZUI mist palette via light-dark() */
     --theme1:  light-dark(var(--color-mauve-50),  var(--color-mauve-950));

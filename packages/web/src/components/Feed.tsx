@@ -1,9 +1,9 @@
+import { Button } from '@mrmartineau/zui/react'
 import { EyeIcon, StarIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import type { FileRouteTypes } from '@tanstack/react-router'
 import { memo, type ReactNode } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { Button } from '@/components/Button'
 import { CONTENT, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { useFeedOptions } from '@/hooks/useFeedOptions'
 import { type FeedItemModel, useGroupByDate } from '@/hooks/useGroupByDate'
@@ -107,7 +107,7 @@ export const Feed = memo(
               <Flex gap="3xs">
                 <Button
                   onClick={() => handleToggleState('star')}
-                  size="xs"
+                  size="sm"
                   variant="ghost"
                   aria-pressed={starQuery}
                 >
@@ -116,7 +116,7 @@ export const Feed = memo(
                 </Button>
                 <Button
                   onClick={() => handleToggleState('public')}
-                  size="xs"
+                  size="sm"
                   variant="ghost"
                   aria-pressed={publicQuery}
                 >
@@ -180,7 +180,7 @@ export const Feed = memo(
             )}
           </div>
         ) : (
-          <div className="mt-sm grid gap-md">
+          <div className="mt-sm grid gap-sm">
             {items?.length ? (
               items.map((item) => {
                 if (!item) {

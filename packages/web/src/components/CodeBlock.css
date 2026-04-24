@@ -7,10 +7,10 @@
 .pre {
   @extend .code-base;
   background-color: var(--theme5);
-  border-radius: var(--radii-l);
+  border-radius: var(--radius-lg);
   word-break: break-all;
   white-space: break-spaces;
-  padding: var(--space-s);
+  padding: var(--space-sm);
   margin-y: var(--space-xs);
   color: var(--theme11);
 

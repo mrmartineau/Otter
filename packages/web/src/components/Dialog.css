@@ -56,7 +56,7 @@
   width: 100vw;
   min-height: 100dvh;
   overflow: auto;
-  padding: var(--space-m);
+  padding: var(--space-md);
   z-index: 3000;
 
   &:focus {
@@ -68,7 +68,7 @@
 .DialogContent--center {
   left: 0;
   @media (min-width: 768px) {
-    border-radius: var(--radii-default);
+    border-radius: var(--radius-md);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

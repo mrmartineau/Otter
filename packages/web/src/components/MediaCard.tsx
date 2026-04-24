@@ -35,8 +35,6 @@ export const MediaCard = ({
     index: media.sort_order ?? 0,
     type: 'item',
   })
-  // console.log(`🚀 ~ MediaCard ~ data:`, data.sortable.index, index, newIndex)
-  // const index = data.sortable.index
 
   const deleteMedia = useDeleteMedia()
 
@@ -59,13 +57,15 @@ export const MediaCard = ({
       data-index={media.sort_order ?? 0}
       data-media-id={media.media_id}
     >
-      {media.image ? (
-        <img src={media.image} alt={media.name} className="rounded-md" />
-      ) : (
-        <div className="media-card-title">{media.name}</div>
-      )}
-
-      {media.rating ? <Rating rating={media.rating} /> : null}
+      <div className="media-card-wrapper">
+        <div>
+          <div className="media-card-title">{media.name}</div>
+          {media.rating ? <Rating rating={media.rating} /> : null}
+        </div>
+        {media.image ? (
+          <img src={media.image} alt={media.name} className="rounded-md" />
+        ) : null}
+      </div>
 
       <TooltipProvider delayDuration={800} skipDelayDuration={500}>
         <div className="feed-item-footer">

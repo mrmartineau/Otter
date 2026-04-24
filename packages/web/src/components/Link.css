@@ -13,7 +13,7 @@
     cursor: pointer;
     transition: color var(--transition);
     color: var(--color);
-    border-radius: var(--radii-s);
+    border-radius: var(--radius-sm);
 
     &:hover {
       text-decoration-line: underline;
@@ -39,7 +39,7 @@
     justify-content: space-between;
     padding: var(--space-4xs) var(--space-2xs);
     column-gap: var(--space-m);
-    border-radius: var(--radii-m);
+    border-radius: var(--radius-md);
     line-height: 18px;
 
     &:hover {
@@ -94,7 +94,7 @@
   .link-add {
     background-color: var(--theme4);
     color: var(--theme11);
-    border-radius: var(--radii-pill);
+    border-radius: var(--radius-pill);
     padding-x: var(--space-2xs);
     padding-y: var(--space-3xs);
     font-size: var(--step--2);
@@ -122,7 +122,7 @@
 
   .link-fab {
     --color: var(--theme12);
-    border-radius: var(--radii-l);
+    border-radius: var(--radius-lg);
     height: 40px;
     width: 40px;
     background-color: var(--accent8);
@@ -141,7 +141,7 @@
 
   .link-tag {
     border: 1px solid var(--theme5);
-    border-radius: var(--radii-pill);
+    border-radius: var(--radius-pill);
     padding-x: var(--space-2xs);
     background-color: var(--theme3);
 

@@ -28,7 +28,7 @@
   }
 
   .bookmark-form-image {
-    border-radius: var(--radii-l) var(--radii-l) 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     border: 1px solid var(--border);
     border-bottom: none;
     width: 100%;
@@ -42,5 +42,6 @@
     padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom));
     background-color: var(--theme2);
     border-top: 1px solid var(--theme3);
+    border-radius: var(--radius-xl);;
   }
 }

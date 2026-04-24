@@ -4,7 +4,7 @@
     align-items: center;
     gap: var(--space-2xs);
     justify-content: center;
-    border-radius: var(--radii-l);
+    border-radius: var(--radius-lg);
     color: #f5f5f0;
     transition: 200ms var(--ease-in-out-1);
     transition-property: background-color, border-color, color, opacity;

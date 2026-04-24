@@ -60,7 +60,7 @@ function Index() {
   )
 
   return (
-    <div className="flex flex-col gap-l">
+    <div className="flex flex-col gap-md">
       {dashboard?.recent?.length ? (
         <FeedSimple items={dashboard.recent} title="Recent" />
       ) : null}

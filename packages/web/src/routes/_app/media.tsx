@@ -143,14 +143,14 @@ function RouteComponent() {
   }, [media])
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Media</h1>
       </div>
 
       {/* Filters */}
       <div className="flex gap-4 justify-between flex-wrap">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-3">
           <div className="flex gap-4">
             <div className="flex-1">
               <Input

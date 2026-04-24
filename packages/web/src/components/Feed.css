@@ -3,8 +3,8 @@
 
 .feed-simple-grid {
   display: grid;
-  margin-top: var(--space-md);
-  gap: var(--space-md);
+  margin-top: var(--space-xs);
+  gap: var(--space-sm);
 
   @media (min-width: 500px) {
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -46,13 +46,13 @@
 }
 
 .feed-avatar {
-  border-radius: var(--radii-full);
+  border-radius: var(--radius-full);
   width: 50px;
   height: 50px;
 }
 
 .feed-image {
-  border-radius: var(--radii-md);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   width: 150px;
   max-width: 150px;
@@ -60,7 +60,7 @@
 }
 
 .feed-item-note {
-  border-radius: var(--radii-md);
+  border-radius: var(--radius-md);
   background-color: var(--theme2);
   border: 1px solid var(--color-border);
   padding: var(--space-xs);
