@@ -148,7 +148,7 @@ psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;'
 Common causes:
 
 - missing or incorrect `packages/web/.dev.vars`
-- `BETTER_AUTH_URL` does not exactly match `http://localhost:5678`
+- `BETTER_AUTH_URL` does not exactly match `http://localhost:5678` or your real app origin in production
 - database schema is missing Better Auth tables
 - browser has stale cookies from an older local setup
 
@@ -189,13 +189,21 @@ psql "$DATABASE_URL" -c 'select id, token, user_id, expires_at, created_at from 
 The Raycast extension authenticates with Otter through Better Auth OAuth.
 
 ```bash
-RAYCAST_OAUTH_CLIENT_ID="$(uuidgen)"
-DATABASE_URL=postgresql://... \
+## assuming DATABASE_URL is already set (see above)
+DATABASE_URL="$DATABASE_URL" \
+RAYCAST_OAUTH_CLIENT_ID="$(uuidgen)" \
 RAYCAST_OAUTH_CLIENT_ID="$RAYCAST_OAUTH_CLIENT_ID" \
 pnpm oauth:raycast
 ```
 
 Use the same `RAYCAST_OAUTH_CLIENT_ID` in Raycast.
+
+By default, `pnpm oauth:raycast` now registers both Raycast callback formats:
+
+- `https://raycast.com/redirect?packageName=Extension`
+- `https://raycast.com/redirect/extension`
+
+If Raycast sends a different callback URL, pass it explicitly with `--redirect-uri` or `RAYCAST_OAUTH_REDIRECT_URI`.
 
 ## Migrating from Supabase
 

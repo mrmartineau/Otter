@@ -14,10 +14,21 @@ const get = (flag: string) => {
 }
 
 const clientId = get('--client-id') ?? process.env.RAYCAST_OAUTH_CLIENT_ID
-const redirectUri =
-  get('--redirect-uri') ??
-  process.env.RAYCAST_OAUTH_REDIRECT_URI ??
-  'https://raycast.com/redirect/extension'
+const redirectUris = Array.from(
+  new Set(
+    (
+      get('--redirect-uri') ??
+      process.env.RAYCAST_OAUTH_REDIRECT_URI ??
+      [
+        'https://raycast.com/redirect?packageName=Extension',
+        'https://raycast.com/redirect/extension',
+      ].join(',')
+    )
+      .split(',')
+      .map((uri) => uri.trim())
+      .filter(Boolean),
+  ),
+)
 const databaseUrl = process.env.DATABASE_URL
 
 if (!clientId) {
@@ -58,7 +69,7 @@ await pool.query(
       ARRAY['authorization_code', 'refresh_token']::text[],
       'Otter Raycast Extension',
       true,
-      ARRAY[$2]::text[],
+      $2::text[],
       true,
       ARRAY['code']::text[],
       ARRAY[
@@ -90,10 +101,10 @@ await pool.query(
       type = EXCLUDED.type,
       updated_at = now()
   `,
-  [clientId, redirectUri],
+  [clientId, redirectUris],
 )
 
 console.log(`Raycast OAuth client is ready: ${clientId}`)
-console.log(`Redirect URI: ${redirectUri}`)
+console.log(`Redirect URIs: ${redirectUris.join(', ')}`)
 
 await pool.end()

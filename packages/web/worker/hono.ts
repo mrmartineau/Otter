@@ -261,7 +261,15 @@ app.all('/.well-known/openid-configuration/api/auth', async (c) => {
 })
 app.route('/api', api)
 
-app.notFound((c) => {
+app.notFound(async (c) => {
+  if (c.req.method === 'GET' || c.req.method === 'HEAD') {
+    const assetResponse = await c.env.ASSETS?.fetch(c.req.raw)
+
+    if (assetResponse) {
+      return assetResponse
+    }
+  }
+
   return c.text('Not found', 404)
 })
 
