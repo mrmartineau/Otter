@@ -11,8 +11,8 @@ After: ollama/ollama: Get up and running with Llama 2 and other large language m
 
 or
 
-Before: Implement user API keys with Supabase. GitHub Gist: instantly share code, notes, and snippets.
-After: Implement user API keys with Supabase.
+Before: Implement user API keys. GitHub Gist: instantly share code, notes, and snippets.
+After: Implement user API keys.
 
 Rewrite the following description:
 `

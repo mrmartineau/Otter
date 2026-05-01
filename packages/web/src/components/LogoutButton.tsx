@@ -1,12 +1,12 @@
 import { SignOutIcon } from '@phosphor-icons/react'
 import { useNavigate } from '@tanstack/react-router'
 import { CONTENT } from '../constants'
-import { supabase } from '../utils/supabase/client'
+import { authClient } from '../utils/auth/client'
 export default function LogoutButton() {
   const navigate = useNavigate()
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    await authClient.signOut()
     navigate({ search: { message: 'Signed out' }, to: '/signin' })
   }
 

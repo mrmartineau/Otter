@@ -26,7 +26,7 @@ import {
   TooltipTrigger,
 } from '@/components/Tooltip'
 import { MINIMUM_CLICK_COUNT } from '@/constants'
-import { supabase } from '@/utils/supabase/client'
+import { updateBookmark } from '@/utils/fetching/bookmarks'
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import { getRelativeDate } from '../utils/dates'
 import { findMatchingCollections } from '../utils/findMatchingCollections'
@@ -83,13 +83,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
   ): Promise<void> => {
     const updateData =
       column === 'public' ? { public: !isPublic } : { star: !star }
-    await supabase
-      .from('bookmarks')
-      .update({
-        ...updateData,
-        modified_at: new Date().toISOString(),
-      })
-      .match({ id })
+    await updateBookmark(id, updateData)
     await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
     const label =
       column === 'public'

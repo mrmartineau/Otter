@@ -1,0 +1,21 @@
+# Local development example for Otter Web
+# Copy to .dev.vars before running pnpm dev
+
+# Neon Postgres direct connection string
+DATABASE_URL=postgresql://user:password@host/dbname?sslmode=verify-full
+
+# Better Auth
+BETTER_AUTH_SECRET=replace-with-a-random-secret
+BETTER_AUTH_URL=http://localhost:5678
+BETTER_AUTH_DISABLE_SIGNUP=true
+
+# Frontend flags
+VITE_ALLOW_SIGNUP=false
+
+# Raycast OAuth
+RAYCAST_OAUTH_CLIENT_ID=
+
+# Optional integrations
+BOT_MASTODON_ACCESS_TOKEN=
+PERSONAL_MASTODON_ACCESS_TOKEN=
+WEBHOOK_SECRET=replace-with-a-random-secret

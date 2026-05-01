@@ -1,66 +1,62 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 import { DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
-import type { Database } from '@/types/supabase'
-import { supabase } from '../supabase/client'
+import type { Bookmark, BookmarkFormValues } from '@/types/db'
 import { type ApiParametersQuery, apiParameters } from './apiParameters'
+
+type ApiListResponse<T> = {
+  data: T
+  count: number | null
+  error: null
+}
+
+type SingleResponse<T> = {
+  data: T
+  error: null
+}
+
+const queryString = (params: Record<string, unknown>) => {
+  const searchParams = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '') {
+      searchParams.set(key, String(value))
+    }
+  }
+
+  const value = searchParams.toString()
+  return value ? `?${value}` : ''
+}
+
+const parseJsonResponse = async <T>(response: Response): Promise<T> => {
+  const body = (await response.json()) as {
+    error?: string
+    reason?: string
+  }
+
+  if (!response.ok) {
+    throw new Error(body.error || body.reason || 'Request failed')
+  }
+
+  return body as T
+}
 
 export const getBookmarks = async (
   params: Partial<ApiParametersQuery> = {},
-  supabaseClient: SupabaseClient<Database> = supabase,
-  userId?: string,
 ) => {
-  const {
-    limit,
-    offset,
-    order,
-    status,
-    type,
-    star,
-    tag,
-    top,
-    public: publicItems,
-  } = apiParameters(params)
+  const parsed = apiParameters(params)
+  const response = await fetch(`/api/bookmarks${queryString(parsed)}`, {
+    credentials: 'include',
+  })
+  const body = await parseJsonResponse<{
+    data: Bookmark[]
+    count: number
+  }>(response)
 
-  let query = supabaseClient.from('bookmarks').select('*', { count: 'exact' })
-
-  if (userId) {
-    query = query.eq('user', userId)
-  }
-  if (status) {
-    query = query.match({ status })
-  }
-  if (star) {
-    query = query.match({ star })
-  }
-  if (publicItems) {
-    query = query.match({ public: publicItems })
-  }
-  if (type) {
-    query = query.match({ type })
-  }
-  if (tag) {
-    if (tag === 'Untagged') {
-      query = query.eq('tags', ['{}'])
-    } else {
-      query = query.filter('tags', 'cs', `{${tag}}`)
-    }
-  }
-  if (top) {
-    query = query
-      .order('click_count', { ascending: false })
-      .gte('click_count', 1)
-  }
-
-  const supabaseResponse = await query
-    .order('created_at', { ascending: order === 'asc' })
-    .range(offset!, offset! + limit! - 1)
-
-  if (supabaseResponse.error) {
-    throw supabaseResponse.error
-  }
-
-  return supabaseResponse
+  return {
+    count: body.count,
+    data: body.data,
+    error: null,
+  } satisfies ApiListResponse<Bookmark[]>
 }
 
 export const getBookmarksOptions = (params: Partial<ApiParametersQuery>) => {
@@ -86,7 +82,7 @@ export const getBookmarksInfiniteOptions = (
       lastPageParam,
     ) => {
       const total = lastPage.count ?? 0
-      const nextOffset = lastPageParam + limit!
+      const nextOffset = lastPageParam + limit
       return nextOffset < total ? nextOffset : undefined
     },
     initialPageParam: 0,
@@ -100,18 +96,13 @@ export const getBookmarksInfiniteOptions = (
 interface BookmarkFetchingOptions {
   id: string
 }
+
 export const getBookmark = async ({ id }: BookmarkFetchingOptions) => {
-  const supabaseResponse = await supabase
-    .from('bookmarks')
-    .select('*')
-    .match({ id })
-    .single()
+  const response = await fetch(`/api/bookmarks/${id}`, {
+    credentials: 'include',
+  })
 
-  if (supabaseResponse.error) {
-    throw supabaseResponse.error
-  }
-
-  return supabaseResponse
+  return await parseJsonResponse<SingleResponse<Bookmark>>(response)
 }
 
 export const getBookmarkOptions = ({ id }: BookmarkFetchingOptions) => {
@@ -120,4 +111,56 @@ export const getBookmarkOptions = ({ id }: BookmarkFetchingOptions) => {
     queryKey: ['bookmarks', id],
     staleTime: 5 * 1000,
   })
+}
+
+export const createBookmark = async (bookmark: BookmarkFormValues) => {
+  const response = await fetch('/api/bookmarks', {
+    body: JSON.stringify(bookmark),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
+  })
+
+  return await parseJsonResponse<SingleResponse<Bookmark>>(response)
+}
+
+export const updateBookmark = async (
+  id: string,
+  bookmark: Partial<BookmarkFormValues | Bookmark>,
+) => {
+  const response = await fetch(`/api/bookmarks/${id}`, {
+    body: JSON.stringify(bookmark),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    method: 'PATCH',
+  })
+
+  return await parseJsonResponse<SingleResponse<Bookmark>>(response)
+}
+
+export const deleteBookmark = async (id: string) => {
+  const response = await fetch(`/api/bookmarks/${id}`, {
+    credentials: 'include',
+    method: 'DELETE',
+  })
+
+  return await parseJsonResponse<SingleResponse<Bookmark>>(response)
+}
+
+export const incrementBookmarkClickCount = async (id: string) => {
+  const response = await fetch(`/api/bookmarks/${id}/click`, {
+    credentials: 'include',
+    method: 'POST',
+  })
+
+  return await parseJsonResponse<SingleResponse<Bookmark>>(response)
+}
+
+export const checkBookmarkUrl = async (urlInput: string) => {
+  const response = await fetch(
+    `/api/check-url${queryString({ url_input: urlInput })}`,
+    { credentials: 'include' },
+  )
+
+  return await parseJsonResponse<SingleResponse<Bookmark[]>>(response)
 }

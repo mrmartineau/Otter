@@ -1,3 +1,7 @@
+packages/web/backups
+packages/web/legacy-export
+
+
 # Logs
 logs
 *.log
@@ -26,6 +30,7 @@ packages/*/build
 
 # Environment variables
 .env
+.dev.vars
 
 # cursor
 .cursor/

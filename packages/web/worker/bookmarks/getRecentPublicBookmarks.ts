@@ -1,12 +1,13 @@
-import { env } from 'cloudflare:workers'
-import { createClient } from '@supabase/supabase-js'
+import { and, count, desc, eq } from 'drizzle-orm'
 import type { HonoRequest } from 'hono'
 import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
-import type { Database } from '@/types/supabase'
 import { apiResponseGenerator } from '@/utils/fetching/apiResponse'
 import { getErrorMessage } from '@/utils/get-error-message'
 import { searchParamsToObject } from '@/utils/searchParamsToObject'
-import { supabaseUrl } from '@/utils/supabase/client'
+import { createDb } from '../../db/client'
+import { bookmarks } from '../../db/schema'
+import type { WorkerEnv } from '../env'
+import { bookmarkToRow } from './mapper'
 
 /**
  * GET /api/recent
@@ -15,41 +16,44 @@ import { supabaseUrl } from '@/utils/supabase/client'
  */
 export const getRecentPublicBookmarks = async (
   request: HonoRequest<'/api/recent'>,
+  env: WorkerEnv,
 ) => {
   try {
     const searchParams = searchParamsToObject(request.url)
     const limit = Number(searchParams.limit) || DEFAULT_API_RESPONSE_LIMIT
     const offset = Number(searchParams.offset) || 0
 
-    // @ts-expect-error - TODO: fix this
-    const client = createClient<Database>(supabaseUrl, env.SUPABASE_SERVICE_KEY)
-
-    const { data, count, error } = await client
-      .from('bookmarks')
-      .select('*', { count: 'exact' })
-      .match({ public: true, status: 'active' })
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
-
-    if (error) {
-      throw error
-    }
-
-    return new Response(
-      JSON.stringify(
-        apiResponseGenerator({
-          count: count ?? 0,
-          data: data || [],
-          limit,
-          offset,
-          path: request.url as string,
-        }),
-      ),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
+    const db = createDb(env)
+    const where = and(
+      eq(bookmarks.public, true),
+      eq(bookmarks.status, 'active'),
     )
+
+    const [{ value: total }] = await db
+      .select({ value: count() })
+      .from(bookmarks)
+      .where(where)
+
+    const data = await db
+      .select()
+      .from(bookmarks)
+      .where(where)
+      .orderBy(desc(bookmarks.createdAt))
+      .limit(limit)
+      .offset(offset)
+
+    const responseBody = apiResponseGenerator({
+      count: total ?? 0,
+      data: data.map(bookmarkToRow),
+      limit,
+      offset,
+      path: request.url as string,
+    })
+
+    return new Response(JSON.stringify(responseBody), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     const errorMessage = getErrorMessage(error)
     return new Response(

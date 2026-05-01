@@ -134,8 +134,10 @@ export const Feed = memo(
               {subNav.map(({ href, text, isActive, icon }) => {
                 return (
                   <SidebarLink href={href} isActive={isActive} key={href}>
-                    {icon}
-                    {text}
+                    <>
+                      {icon}
+                      {text}
+                    </>
                   </SidebarLink>
                 )
               })}

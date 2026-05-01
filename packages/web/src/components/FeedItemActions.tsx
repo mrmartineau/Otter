@@ -17,9 +17,9 @@ import { DropdownMenu } from 'radix-ui'
 import { Suspense, useRef } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/Button'
+import { deleteBookmark, updateBookmark } from '@/utils/fetching/bookmarks'
 import { getMetaOptions } from '@/utils/fetching/meta'
 import { filteredTags } from '@/utils/filteredTags'
-import { supabase } from '@/utils/supabase/client'
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import { useToggle } from '../hooks/useToggle'
 import type { BookmarkFeedItemProps } from './BookmarkFeedItem'
@@ -55,31 +55,19 @@ export const FeedItemActions = ({
 
   const handleArchiveBookmark = async () => {
     if (window.confirm('Do you really want to trash this bookmark?')) {
-      await supabase
-        .from('bookmarks')
-        .update({
-          modified_at: new Date().toISOString(),
-          status: 'inactive',
-        })
-        .match({ id })
+      await updateBookmark(id, { status: 'inactive' })
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
       toast.success('Moved to trash')
     }
   }
   const handleUnArchiveBookmark = async () => {
-    await supabase
-      .from('bookmarks')
-      .update({
-        modified_at: new Date().toISOString(),
-        status: 'active',
-      })
-      .match({ id })
+    await updateBookmark(id, { status: 'active' })
     await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
     toast.success('Restored from trash')
   }
   const handleDeleteBookmark = async () => {
     if (window.confirm('Do you really want to delete this bookmark forever?')) {
-      await supabase.from('bookmarks').delete().match({ id })
+      await deleteBookmark(id)
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
       toast.success('Permanently deleted')
     }

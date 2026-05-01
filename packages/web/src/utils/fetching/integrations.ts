@@ -4,27 +4,29 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { supabase } from '../supabase/client'
+import type { UserIntegration } from '@/types/db'
+
+const parseJsonResponse = async <T>(response: Response): Promise<T> => {
+  const body = (await response.json()) as {
+    error?: string
+    reason?: string
+  }
+
+  if (!response.ok) {
+    throw new Error(body.error || body.reason || 'Request failed')
+  }
+
+  return body as T
+}
 
 export const getIntegrationOptions = (userId: string) => {
   return queryOptions({
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_integrations')
-        .select(
-          'user_id, bluesky_enabled, bluesky_handle, bluesky_last_error, bluesky_post_prefix, bluesky_post_suffix, created_at, updated_at',
-        )
-        .match({ user_id: userId })
-        .single()
+      const response = await fetch('/api/integrations/bluesky', {
+        credentials: 'include',
+      })
 
-      // If no row exists yet, return null (user hasn't configured integrations)
-      if (error?.code === 'PGRST116') {
-        return null
-      }
-      if (error) {
-        throw error
-      }
-      return data
+      return await parseJsonResponse<UserIntegration | null>(response)
     },
     queryKey: ['userIntegrations', userId],
   })
@@ -44,30 +46,26 @@ export const useUpsertBlueskyMutation = () => {
 
   return useMutation({
     mutationFn: async ({
-      userId,
       handle,
       appPassword,
       enabled,
       postPrefix,
       postSuffix,
     }: UpsertBlueskyParams) => {
-      const { error } = await supabase.from('user_integrations').upsert(
-        {
-          bluesky_app_password: appPassword,
-          bluesky_enabled: enabled,
-          bluesky_handle: handle,
-          bluesky_last_error: null,
-          bluesky_post_prefix: postPrefix || null,
-          bluesky_post_suffix: postSuffix || null,
-          updated_at: new Date().toISOString(),
-          user_id: userId,
-        },
-        { onConflict: 'user_id' },
-      )
+      const response = await fetch('/api/integrations/bluesky', {
+        body: JSON.stringify({
+          appPassword,
+          enabled,
+          handle,
+          postPrefix,
+          postSuffix,
+        }),
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PUT',
+      })
 
-      if (error) {
-        throw error
-      }
+      await parseJsonResponse<UserIntegration>(response)
     },
     onError: (error) => {
       toast.error(`Failed to save Bluesky settings: ${error.message}`)
@@ -87,25 +85,15 @@ export const useToggleBlueskyMutation = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({
-      userId,
-      enabled,
-    }: {
-      userId: string
-      enabled: boolean
-    }) => {
-      const { error } = await supabase
-        .from('user_integrations')
-        .update({
-          bluesky_enabled: enabled,
-          bluesky_last_error: null,
-          updated_at: new Date().toISOString(),
-        })
-        .match({ user_id: userId })
+    mutationFn: async ({ enabled }: { userId: string; enabled: boolean }) => {
+      const response = await fetch('/api/integrations/bluesky', {
+        body: JSON.stringify({ enabled }),
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
+      })
 
-      if (error) {
-        throw error
-      }
+      await parseJsonResponse<UserIntegration>(response)
     },
     onError: (error) => {
       toast.error(`Failed to update Bluesky: ${error.message}`)

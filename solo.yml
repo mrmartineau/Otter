@@ -1,0 +1,17 @@
+name: otter
+icon: null
+processes:
+  web:dev:
+    command: nr web:dev
+    working_dir: null
+    auto_start: true
+    auto_restart: false
+    restart_when_changed: []
+    env: {}
+  lazygit:
+    command: lg
+    working_dir: null
+    auto_start: true
+    auto_restart: false
+    restart_when_changed: []
+    env: {}

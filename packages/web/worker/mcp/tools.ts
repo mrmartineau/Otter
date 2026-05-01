@@ -1,11 +1,10 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+import { and, arrayContains, count, desc, eq, ilike, or } from 'drizzle-orm'
 import { TidyURL } from 'tidy-url'
-import type { BookmarkType } from '@/types/db'
-import type { Database } from '@/types/supabase'
-import { getBookmarks } from '@/utils/fetching/bookmarks'
-import { getDbMetadata } from '@/utils/fetching/meta'
-import { getSearchBookmarks } from '@/utils/fetching/search'
+import type { BookmarkStatus, BookmarkType } from '@/types/db'
 import { matchTagsSource } from '@/utils/matchTags'
+import { bookmarks } from '../../db/schema'
+import { bookmarkToRow } from '../bookmarks/mapper'
+import type { RequestContext } from '../context'
 import { linkType } from '../scraper/link-type'
 import Scraper from '../scraper/scraper'
 import { scraperRules } from '../scraper/scraper-rules'
@@ -16,7 +15,7 @@ import {
   toolResult,
 } from './types'
 
-type Bookmark = Database['public']['Tables']['bookmarks']['Row']
+type Bookmark = ReturnType<typeof bookmarkToRow>
 
 const BOOKMARK_TYPES = [
   'link',
@@ -44,7 +43,7 @@ const typeEnumSchema = {
 } as const
 
 interface ToolContext {
-  client: SupabaseClient<Database>
+  requestContext: RequestContext
   userId: string
 }
 
@@ -57,8 +56,6 @@ interface McpTool {
   definition: McpToolDefinition
   handler: ToolHandler
 }
-
-// --- Formatting helpers ---
 
 function formatBookmark(b: Bookmark, index?: number): string {
   const prefix = index !== undefined ? `${index}. ` : ''
@@ -80,10 +77,11 @@ function formatBookmark(b: Bookmark, index?: number): string {
 
 function formatBookmarkList(
   bookmarks: Bookmark[],
-  count: number | null,
+  total: number | null,
 ): string {
   if (!bookmarks.length) return 'No bookmarks found.'
-  const header = `Found ${count ?? bookmarks.length} bookmark${(count ?? bookmarks.length) !== 1 ? 's' : ''}:\n`
+  const countLabel = total ?? bookmarks.length
+  const header = `Found ${countLabel} bookmark${countLabel !== 1 ? 's' : ''}:\n`
   return header + bookmarks.map((b, i) => formatBookmark(b, i + 1)).join('\n\n')
 }
 
@@ -92,7 +90,92 @@ function clampLimit(val: unknown): number {
   return Math.min(Math.max(1, n), MAX_LIMIT)
 }
 
-// --- Tool definitions and handlers ---
+const bookmarkFilters = (
+  userId: string,
+  args: Record<string, unknown>,
+  searchTerm?: string,
+) =>
+  and(
+    eq(bookmarks.user, userId),
+    eq(bookmarks.status, (args.status as BookmarkStatus) || 'active'),
+    args.type ? eq(bookmarks.type, args.type as BookmarkType) : undefined,
+    typeof args.star === 'boolean' ? eq(bookmarks.star, args.star) : undefined,
+    typeof args.public === 'boolean'
+      ? eq(bookmarks.public, args.public)
+      : undefined,
+    args.tag ? arrayContains(bookmarks.tags, [args.tag as string]) : undefined,
+    searchTerm
+      ? or(
+          ilike(bookmarks.title, `%${searchTerm}%`),
+          ilike(bookmarks.url, `%${searchTerm}%`),
+          ilike(bookmarks.description, `%${searchTerm}%`),
+          ilike(bookmarks.note, `%${searchTerm}%`),
+          arrayContains(bookmarks.tags, [searchTerm]),
+        )
+      : undefined,
+  )
+
+const listBookmarkRows = async (
+  ctx: ToolContext,
+  args: Record<string, unknown>,
+  searchTerm?: string,
+) => {
+  const limit = clampLimit(args.limit)
+  const offset = Number(args.offset) || 0
+  const top = Boolean(args.top)
+  const where = bookmarkFilters(ctx.userId, args, searchTerm)
+  const [{ value: total }] = await ctx.requestContext.db
+    .select({ value: count() })
+    .from(bookmarks)
+    .where(where)
+  const data = await ctx.requestContext.db
+    .select()
+    .from(bookmarks)
+    .where(where)
+    .orderBy(
+      ...(top
+        ? [desc(bookmarks.clickCount), desc(bookmarks.createdAt)]
+        : [desc(bookmarks.createdAt)]),
+    )
+    .limit(limit)
+    .offset(offset)
+
+  return { data: data.map(bookmarkToRow), total }
+}
+
+const getTagCounts = async (ctx: ToolContext) => {
+  const rows = await ctx.requestContext.db
+    .select({ tags: bookmarks.tags })
+    .from(bookmarks)
+    .where(and(eq(bookmarks.user, ctx.userId), eq(bookmarks.status, 'active')))
+  const counts = new Map<string, number>()
+
+  for (const row of rows) {
+    for (const tag of row.tags ?? []) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1)
+    }
+  }
+
+  return Array.from(counts, ([tag, count]) => ({ count, tag })).sort(
+    (a, b) => b.count - a.count || a.tag.localeCompare(b.tag),
+  )
+}
+
+const getTypeCounts = async (ctx: ToolContext) => {
+  const rows = await ctx.requestContext.db
+    .select({ type: bookmarks.type })
+    .from(bookmarks)
+    .where(and(eq(bookmarks.user, ctx.userId), eq(bookmarks.status, 'active')))
+  const counts = new Map<string, number>()
+
+  for (const row of rows) {
+    if (row.type) {
+      counts.set(row.type, (counts.get(row.type) ?? 0) + 1)
+    }
+  }
+
+  return Array.from(counts, ([type, count]) => ({ count, type }))
+}
 
 const searchBookmarks: McpTool = {
   definition: {
@@ -120,20 +203,18 @@ const searchBookmarks: McpTool = {
     name: 'search_bookmarks',
   },
   handler: async (args, ctx) => {
-    const { data, count, error } = await getSearchBookmarks({
-      params: {
-        limit: clampLimit(args.limit),
-        star: args.star as boolean | undefined,
-        status: (args.status as 'active' | 'inactive') || undefined,
-        tag: args.tag as string | undefined,
-        type: args.type as string | undefined,
-      },
-      searchTerm: args.query as string,
-      supabaseClient: ctx.client,
-      userId: ctx.userId,
-    })
-    if (error) return toolError(`Search failed: ${error.message}`)
-    return toolResult(formatBookmarkList(data || [], count))
+    try {
+      const { data, total } = await listBookmarkRows(
+        ctx,
+        args,
+        args.query as string,
+      )
+      return toolResult(formatBookmarkList(data, total))
+    } catch (err) {
+      return toolError(
+        `Search failed: ${err instanceof Error ? err.message : String(err)}`,
+      )
+    }
   },
 }
 
@@ -171,21 +252,8 @@ const listBookmarks: McpTool = {
   },
   handler: async (args, ctx) => {
     try {
-      const { data, count } = await getBookmarks(
-        {
-          limit: clampLimit(args.limit),
-          offset: Number(args.offset) || 0,
-          public: args.public as boolean | undefined,
-          star: args.star as boolean | undefined,
-          status: (args.status as 'active' | 'inactive') || undefined,
-          tag: args.tag as string | undefined,
-          top: args.top as boolean | undefined,
-          type: args.type as string | undefined,
-        },
-        ctx.client,
-        ctx.userId,
-      )
-      return toolResult(formatBookmarkList(data || [], count))
+      const { data, total } = await listBookmarkRows(ctx, args)
+      return toolResult(formatBookmarkList(data, total))
     } catch (err) {
       return toolError(
         `List failed: ${err instanceof Error ? err.message : String(err)}`,
@@ -201,14 +269,10 @@ const listTags: McpTool = {
     name: 'list_tags',
   },
   handler: async (_args, ctx) => {
-    const { data, error } = await ctx.client
-      .from('tags_count')
-      .select('*')
-      .order('count', { ascending: false })
-    if (error) return toolError(`Failed to list tags: ${error.message}`)
-    if (!data?.length) return toolResult('No tags found.')
-    const lines = data.map((t) => `${t.tag} (${t.count ?? 0})`)
-    return toolResult(`${data.length} tags:\n${lines.join('\n')}`)
+    const tags = await getTagCounts(ctx)
+    if (!tags.length) return toolResult('No tags found.')
+    const lines = tags.map((t) => `${t.tag} (${t.count ?? 0})`)
+    return toolResult(`${tags.length} tags:\n${lines.join('\n')}`)
   },
 }
 
@@ -221,19 +285,33 @@ const getStats: McpTool = {
   },
   handler: async (_args, ctx) => {
     try {
-      const meta = await getDbMetadata(ctx.client)
+      const [all, top, publicItems, stars, trash, types, tags] =
+        await Promise.all([
+          listBookmarkRows(ctx, { limit: 1, status: 'active' }),
+          listBookmarkRows(ctx, { limit: 1, status: 'active', top: true }),
+          listBookmarkRows(ctx, {
+            limit: 1,
+            public: true,
+            status: 'active',
+          }),
+          listBookmarkRows(ctx, { limit: 1, star: true, status: 'active' }),
+          listBookmarkRows(ctx, { limit: 1, status: 'inactive' }),
+          getTypeCounts(ctx),
+          getTagCounts(ctx),
+        ])
+      const collections = tags
+        .filter((tag) => tag.tag.startsWith('collection:'))
+        .map((tag) => `  ${tag.tag.replace('collection:', '')}: ${tag.count}`)
       const lines = [
-        `Bookmarks: ${meta.all} total, ${meta.stars} starred, ${meta.public} public, ${meta.trash} in trash, ${meta.top} with clicks`,
+        `Bookmarks: ${all.total} total, ${stars.total} starred, ${publicItems.total} public, ${trash.total} in trash, ${top.total} with clicks`,
         '',
         'Types:',
-        ...(meta.types || []).map((t) => `  ${t.type}: ${t.count}`),
+        ...types.map((t) => `  ${t.type}: ${t.count}`),
         '',
-        `Tags: ${meta.tags?.length ?? 0} unique tags`,
+        `Tags: ${tags.length} unique tags`,
         '',
         'Collections:',
-        ...(meta.collections || []).map(
-          (c) => `  ${c.collection}: ${c.bookmark_count} bookmarks`,
-        ),
+        ...(collections.length ? collections : ['  none']),
       ]
       return toolResult(lines.join('\n'))
     } catch (err) {
@@ -265,44 +343,34 @@ const randomBookmark: McpTool = {
       Math.max(1, Number(args.count) || 1),
       MAX_RANDOM,
     )
+    const where = bookmarkFilters(ctx.userId, args)
+    const [{ value: total }] = await ctx.requestContext.db
+      .select({ value: count() })
+      .from(bookmarks)
+      .where(where)
 
-    // Build a base query to get count
-    let countQuery = ctx.client
-      .from('bookmarks')
-      .select('*', { count: 'exact', head: true })
-      .eq('user', ctx.userId)
-      .eq('status', 'active')
-    if (args.type) countQuery = countQuery.eq('type', args.type as BookmarkType)
-    if (args.tag) countQuery = countQuery.filter('tags', 'cs', `{${args.tag}}`)
+    if (!total) return toolResult('No matching bookmarks found.')
 
-    const { count, error: countError } = await countQuery
-    if (countError) return toolError(`Failed to count: ${countError.message}`)
-    if (!count || count === 0) return toolResult('No matching bookmarks found.')
-
-    // Pick random offsets and fetch individual bookmarks
     const results: Bookmark[] = []
     const usedOffsets = new Set<number>()
-    const maxAttempts = Math.min(requestedCount, count)
+    const maxAttempts = Math.min(requestedCount, total)
 
     for (let i = 0; i < maxAttempts; i++) {
       let offset: number
       do {
-        offset = Math.floor(Math.random() * count)
-      } while (usedOffsets.has(offset) && usedOffsets.size < count)
+        offset = Math.floor(Math.random() * total)
+      } while (usedOffsets.has(offset) && usedOffsets.size < total)
       usedOffsets.add(offset)
 
-      let query = ctx.client
-        .from('bookmarks')
-        .select('*')
-        .eq('user', ctx.userId)
-        .eq('status', 'active')
-      if (args.type) query = query.eq('type', args.type as BookmarkType)
-      if (args.tag) query = query.filter('tags', 'cs', `{${args.tag}}`)
-      const { data } = await query
-        .order('created_at', { ascending: false })
-        .range(offset, offset)
+      const [bookmark] = await ctx.requestContext.db
+        .select()
+        .from(bookmarks)
+        .where(where)
+        .orderBy(desc(bookmarks.createdAt))
         .limit(1)
-      if (data?.[0]) results.push(data[0])
+        .offset(offset)
+
+      if (bookmark) results.push(bookmarkToRow(bookmark))
     }
 
     if (!results.length) return toolResult('No bookmarks found.')
@@ -351,7 +419,6 @@ const createBookmark: McpTool = {
   handler: async (args, ctx) => {
     const url = args.url as string
     const shouldScrape = args.scrape !== false
-
     let scrapedData: Record<string, unknown> = {}
     let autoTags: string[] = []
 
@@ -372,49 +439,46 @@ const createBookmark: McpTool = {
           url: cleanedUrl.url || unshortenedUrl || url,
         }
 
-        // Auto-detect tags based on scraped metadata
-        const dbMeta = await getDbMetadata(ctx.client)
+        const tags = await getTagCounts(ctx)
         autoTags = matchTagsSource(
           {
             description: (metadata.description as string) || undefined,
             title: (metadata.title as string) || undefined,
           },
-          dbMeta.tags,
+          tags,
         )
       } catch {
-        // Scraping failed — continue with manual data only
         scrapedData = { url }
       }
     }
 
     const userTags = (args.tags as string[]) || []
     const mergedTags = [...new Set([...autoTags, ...userTags])]
+    const [bookmark] = await ctx.requestContext.db
+      .insert(bookmarks)
+      .values({
+        description:
+          (args.description as string) ??
+          (scrapedData.description as string | null),
+        feed: scrapedData.feed as string | null,
+        image: scrapedData.image as string | null,
+        note: (args.note as string) || null,
+        public: (args.public as boolean) || false,
+        star: (args.star as boolean) || false,
+        tags: mergedTags.length ? mergedTags : null,
+        title: (args.title as string) ?? (scrapedData.title as string | null),
+        type:
+          (args.type as BookmarkType) ??
+          (scrapedData.type as BookmarkType | null),
+        url: (scrapedData.url as string) || url,
+        user: ctx.userId,
+      })
+      .returning()
 
-    const insertData = {
-      description:
-        (args.description as string) ??
-        (scrapedData.description as string | null),
-      feed: scrapedData.feed as string | null,
-      image: scrapedData.image as string | null,
-      note: (args.note as string) || null,
-      public: (args.public as boolean) || false,
-      star: (args.star as boolean) || false,
-      tags: mergedTags.length ? mergedTags : null,
-      title: (args.title as string) ?? (scrapedData.title as string | null),
-      type:
-        (args.type as string) ?? (scrapedData.type as string | null) ?? null,
-      url: (scrapedData.url as string) || url,
-      user: ctx.userId,
-    }
-
-    const { data, error } = await ctx.client
-      .from('bookmarks')
-      .insert(insertData as Database['public']['Tables']['bookmarks']['Insert'])
-      .select()
-
-    if (error) return toolError(`Create failed: ${error.message}`)
-    if (!data?.[0]) return toolError('Create succeeded but no data returned.')
-    return toolResult(`Bookmark created:\n\n${formatBookmark(data[0])}`)
+    if (!bookmark) return toolError('Create succeeded but no data returned.')
+    return toolResult(
+      `Bookmark created:\n\n${formatBookmark(bookmarkToRow(bookmark))}`,
+    )
   },
 }
 
@@ -447,13 +511,21 @@ const updateBookmark: McpTool = {
     name: 'update_bookmark',
   },
   handler: async (args, ctx) => {
-    const { id, ...updates } = args
-    // Filter out undefined values
-    const updateData: Record<string, unknown> = {}
-    for (const [key, value] of Object.entries(updates)) {
-      if (value !== undefined) updateData[key] = value
+    const updateData: Partial<typeof bookmarks.$inferInsert> = {
+      modifiedAt: new Date(),
     }
-    updateData.modified_at = new Date().toISOString()
+
+    if (typeof args.description === 'string')
+      updateData.description = args.description
+    if (typeof args.note === 'string') updateData.note = args.note
+    if (typeof args.public === 'boolean') updateData.public = args.public
+    if (typeof args.star === 'boolean') updateData.star = args.star
+    if (typeof args.status === 'string')
+      updateData.status = args.status as BookmarkStatus
+    if (Array.isArray(args.tags)) updateData.tags = args.tags as string[]
+    if (typeof args.title === 'string') updateData.title = args.title
+    if (typeof args.type === 'string')
+      updateData.type = args.type as BookmarkType
 
     if (Object.keys(updateData).length <= 1) {
       return toolError(
@@ -461,16 +533,21 @@ const updateBookmark: McpTool = {
       )
     }
 
-    const { data, error } = await ctx.client
-      .from('bookmarks')
-      .update(updateData)
-      .eq('id', id as string)
-      .eq('user', ctx.userId)
-      .select()
+    const [bookmark] = await ctx.requestContext.db
+      .update(bookmarks)
+      .set(updateData)
+      .where(
+        and(
+          eq(bookmarks.id, args.id as string),
+          eq(bookmarks.user, ctx.userId),
+        ),
+      )
+      .returning()
 
-    if (error) return toolError(`Update failed: ${error.message}`)
-    if (!data?.length) return toolError('Bookmark not found or access denied.')
-    return toolResult(`Bookmark updated:\n\n${formatBookmark(data[0])}`)
+    if (!bookmark) return toolError('Bookmark not found or access denied.')
+    return toolResult(
+      `Bookmark updated:\n\n${formatBookmark(bookmarkToRow(bookmark))}`,
+    )
   },
 }
 
@@ -488,23 +565,26 @@ const deleteBookmark: McpTool = {
     name: 'delete_bookmark',
   },
   handler: async (args, ctx) => {
-    const { data, error } = await ctx.client
-      .from('bookmarks')
-      .update({
-        modified_at: new Date().toISOString(),
-        status: 'inactive' as const,
+    const [bookmark] = await ctx.requestContext.db
+      .update(bookmarks)
+      .set({
+        modifiedAt: new Date(),
+        status: 'inactive',
       })
-      .eq('id', args.id as string)
-      .eq('user', ctx.userId)
-      .select()
+      .where(
+        and(
+          eq(bookmarks.id, args.id as string),
+          eq(bookmarks.user, ctx.userId),
+        ),
+      )
+      .returning()
 
-    if (error) return toolError(`Delete failed: ${error.message}`)
-    if (!data?.length) return toolError('Bookmark not found or access denied.')
-    return toolResult(`Bookmark moved to trash:\n\n${formatBookmark(data[0])}`)
+    if (!bookmark) return toolError('Bookmark not found or access denied.')
+    return toolResult(
+      `Bookmark moved to trash:\n\n${formatBookmark(bookmarkToRow(bookmark))}`,
+    )
   },
 }
-
-// --- Exports ---
 
 export const tools: McpTool[] = [
   searchBookmarks,

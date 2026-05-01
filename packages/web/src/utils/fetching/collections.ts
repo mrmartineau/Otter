@@ -1,59 +1,56 @@
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 import { DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
-import { supabase } from '../supabase/client'
+import type { Bookmark } from '@/types/db'
 import { type ApiParametersQuery, apiParameters } from './apiParameters'
+import type { CollectionType } from './meta'
 
 interface CollectionsFetchingOptions {
-  params: Partial<ApiParametersQuery>
   name: string
+  params: Partial<ApiParametersQuery>
 }
+
+const queryString = (params: Record<string, unknown>) => {
+  const searchParams = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '') {
+      searchParams.set(key, String(value))
+    }
+  }
+
+  const value = searchParams.toString()
+  return value ? `?${value}` : ''
+}
+
+const parseJsonResponse = async <T>(response: Response): Promise<T> => {
+  const body = (await response.json()) as {
+    error?: string
+    reason?: string
+  }
+
+  if (!response.ok) {
+    throw new Error(body.error || body.reason || 'Request failed')
+  }
+
+  return body as T
+}
+
 export const getCollections = async ({
   params,
   name,
 }: CollectionsFetchingOptions) => {
-  const {
-    limit,
-    offset,
-    star,
-    type,
-    status,
-    public: publicItems,
-  } = apiParameters(params)
-  let query = supabase
-    .rpc(
-      'get_bookmarks_by_collection',
-      {
-        collection_name: name,
-      },
-      { count: 'exact' },
-    )
-    .range(offset!, offset! + limit! - 1)
+  const parsed = apiParameters(params)
+  const response = await fetch(
+    `/api/collections/${encodeURIComponent(name)}${queryString(parsed)}`,
+    { credentials: 'include' },
+  )
+  const body = await parseJsonResponse<{
+    count: number
+    data: Bookmark[]
+    error: null
+  }>(response)
 
-  if (status) {
-    query = query.match({ status })
-  }
-  if (star) {
-    query = query.match({ star })
-  }
-  if (type) {
-    query = query.match({ type })
-  }
-  if (publicItems) {
-    query = query.match({ public: publicItems })
-  }
-
-  const supabaseResponse = await query
-
-  if (supabaseResponse.error) {
-    throw supabaseResponse.error
-  }
-
-  return supabaseResponse
-}
-
-interface CollectionsFetchingOptions {
-  name: string
-  params: Partial<ApiParametersQuery>
+  return body
 }
 
 export const getCollectionsOptions = ({
@@ -82,7 +79,7 @@ export const getCollectionsInfiniteOptions = ({
       lastPageParam,
     ) => {
       const total = lastPage.count ?? 0
-      const nextOffset = lastPageParam + limit!
+      const nextOffset = lastPageParam + limit
       return nextOffset < total ? nextOffset : undefined
     },
     initialPageParam: 0,
@@ -93,14 +90,11 @@ export const getCollectionsInfiniteOptions = ({
 }
 
 export const getCollectionsTags = async () => {
-  const { data, error } = await supabase
-    .from('collection_tags_view')
-    .select('*')
-  if (error) {
-    throw error
-  }
+  const response = await fetch('/api/collections-tags', {
+    credentials: 'include',
+  })
 
-  return data
+  return await parseJsonResponse<CollectionType[]>(response)
 }
 
 export const getCollectionsTagsOptions = () => {

@@ -27,6 +27,9 @@ import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
 import { Route as PublicSigninIndexRouteImport } from './routes/_public/signin/index'
+import { Route as PublicResetPasswordIndexRouteImport } from './routes/_public/reset-password/index'
+import { Route as PublicRegisterIndexRouteImport } from './routes/_public/register/index'
+import { Route as PublicForgotPasswordIndexRouteImport } from './routes/_public/forgot-password/index'
 import { Route as AppTypeTypeRouteImport } from './routes/_app/type.$type'
 import { Route as AppTagTagRouteImport } from './routes/_app/tag.$tag'
 import { Route as AppSettingsTagsRouteImport } from './routes/_app/settings/tags'
@@ -128,6 +131,23 @@ const PublicSigninIndexRoute = PublicSigninIndexRouteImport.update({
   path: '/signin/',
   getParentRoute: () => PublicRouteRoute,
 } as any)
+const PublicResetPasswordIndexRoute =
+  PublicResetPasswordIndexRouteImport.update({
+    id: '/reset-password/',
+    path: '/reset-password/',
+    getParentRoute: () => PublicRouteRoute,
+  } as any)
+const PublicRegisterIndexRoute = PublicRegisterIndexRouteImport.update({
+  id: '/register/',
+  path: '/register/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicForgotPasswordIndexRoute =
+  PublicForgotPasswordIndexRouteImport.update({
+    id: '/forgot-password/',
+    path: '/forgot-password/',
+    getParentRoute: () => PublicRouteRoute,
+  } as any)
 const AppTypeTypeRoute = AppTypeTypeRouteImport.update({
   id: '/type/$type',
   path: '/type/$type',
@@ -215,6 +235,9 @@ export interface FileRoutesByFullPath {
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
   '/type/$type': typeof AppTypeTypeRoute
+  '/forgot-password/': typeof PublicForgotPasswordIndexRoute
+  '/register/': typeof PublicRegisterIndexRoute
+  '/reset-password/': typeof PublicResetPasswordIndexRoute
   '/signin/': typeof PublicSigninIndexRoute
   '/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
   '/bookmark/$id/read': typeof AppBookmarkIdReadRoute
@@ -245,6 +268,9 @@ export interface FileRoutesByTo {
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
   '/type/$type': typeof AppTypeTypeRoute
+  '/forgot-password': typeof PublicForgotPasswordIndexRoute
+  '/register': typeof PublicRegisterIndexRoute
+  '/reset-password': typeof PublicResetPasswordIndexRoute
   '/signin': typeof PublicSigninIndexRoute
   '/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
   '/bookmark/$id/read': typeof AppBookmarkIdReadRoute
@@ -278,6 +304,9 @@ export interface FileRoutesById {
   '/_app/settings/tags': typeof AppSettingsTagsRoute
   '/_app/tag/$tag': typeof AppTagTagRoute
   '/_app/type/$type': typeof AppTypeTypeRoute
+  '/_public/forgot-password/': typeof PublicForgotPasswordIndexRoute
+  '/_public/register/': typeof PublicRegisterIndexRoute
+  '/_public/reset-password/': typeof PublicResetPasswordIndexRoute
   '/_public/signin/': typeof PublicSigninIndexRoute
   '/_app/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
   '/_app/bookmark/$id/read': typeof AppBookmarkIdReadRoute
@@ -310,6 +339,9 @@ export interface FileRouteTypes {
     | '/settings/tags'
     | '/tag/$tag'
     | '/type/$type'
+    | '/forgot-password/'
+    | '/register/'
+    | '/reset-password/'
     | '/signin/'
     | '/bookmark/$id/edit'
     | '/bookmark/$id/read'
@@ -340,6 +372,9 @@ export interface FileRouteTypes {
     | '/settings/tags'
     | '/tag/$tag'
     | '/type/$type'
+    | '/forgot-password'
+    | '/register'
+    | '/reset-password'
     | '/signin'
     | '/bookmark/$id/edit'
     | '/bookmark/$id/read'
@@ -372,6 +407,9 @@ export interface FileRouteTypes {
     | '/_app/settings/tags'
     | '/_app/tag/$tag'
     | '/_app/type/$type'
+    | '/_public/forgot-password/'
+    | '/_public/register/'
+    | '/_public/reset-password/'
     | '/_public/signin/'
     | '/_app/bookmark/$id/edit'
     | '/_app/bookmark/$id/read'
@@ -512,6 +550,27 @@ declare module '@tanstack/react-router' {
       path: '/signin'
       fullPath: '/signin/'
       preLoaderRoute: typeof PublicSigninIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/reset-password/': {
+      id: '/_public/reset-password/'
+      path: '/reset-password'
+      fullPath: '/reset-password/'
+      preLoaderRoute: typeof PublicResetPasswordIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/register/': {
+      id: '/_public/register/'
+      path: '/register'
+      fullPath: '/register/'
+      preLoaderRoute: typeof PublicRegisterIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/forgot-password/': {
+      id: '/_public/forgot-password/'
+      path: '/forgot-password'
+      fullPath: '/forgot-password/'
+      preLoaderRoute: typeof PublicForgotPasswordIndexRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/_app/type/$type': {
@@ -688,11 +747,17 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 
 interface PublicRouteRouteChildren {
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicForgotPasswordIndexRoute: typeof PublicForgotPasswordIndexRoute
+  PublicRegisterIndexRoute: typeof PublicRegisterIndexRoute
+  PublicResetPasswordIndexRoute: typeof PublicResetPasswordIndexRoute
   PublicSigninIndexRoute: typeof PublicSigninIndexRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicIndexRoute: PublicIndexRoute,
+  PublicForgotPasswordIndexRoute: PublicForgotPasswordIndexRoute,
+  PublicRegisterIndexRoute: PublicRegisterIndexRoute,
+  PublicResetPasswordIndexRoute: PublicResetPasswordIndexRoute,
   PublicSigninIndexRoute: PublicSigninIndexRoute,
 }
 

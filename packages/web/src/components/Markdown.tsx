@@ -14,7 +14,7 @@ import { Paragraph } from './Paragraph'
 interface MarkdownProps {
   children: string
   preventClamping?: boolean
-  textSize?: number;
+  textSize?: number
 }
 
 export const Markdown = ({

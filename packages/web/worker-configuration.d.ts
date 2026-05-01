@@ -3,12 +3,13 @@
 // Runtime types generated with workerd@1.20250823.0 2025-07-26 nodejs_compat
 declare namespace Cloudflare {
   interface Env {
-    VITE_SUPABASE_URL: string
-    VITE_SUPABASE_ANON_KEY: string
-    SUPABASE_SERVICE_KEY: string
+    DATABASE_URL: string
+    BETTER_AUTH_SECRET: string
+    BETTER_AUTH_URL: string
+    RAYCAST_OAUTH_CLIENT_ID: string
     BOT_MASTODON_ACCESS_TOKEN: string
     PERSONAL_MASTODON_ACCESS_TOKEN: string
-    SUPABASE_USER_API_KEY: string
+    WEBHOOK_SECRET: string
     AI: Ai
   }
 }
@@ -23,12 +24,13 @@ declare namespace NodeJS {
     extends StringifyValues<
       Pick<
         Cloudflare.Env,
-        | 'VITE_SUPABASE_URL'
-        | 'VITE_SUPABASE_ANON_KEY'
-        | 'SUPABASE_SERVICE_KEY'
+        | 'DATABASE_URL'
+        | 'BETTER_AUTH_SECRET'
+        | 'BETTER_AUTH_URL'
+        | 'RAYCAST_OAUTH_CLIENT_ID'
         | 'BOT_MASTODON_ACCESS_TOKEN'
         | 'PERSONAL_MASTODON_ACCESS_TOKEN'
-        | 'SUPABASE_USER_API_KEY'
+        | 'WEBHOOK_SECRET'
       >
     > {}
 }

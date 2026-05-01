@@ -1,70 +1,190 @@
 import { Hono } from 'hono'
 
+import { createAuth } from '../auth/server'
 import { classifyBookmark } from './ai/classify'
 import { descriptionSystemPrompt } from './ai/description'
 import { generateResponse } from './ai/generateResponse'
-import {
-  MAX_CONTENT_LENGTH,
-  summariseSystemPrompt,
-} from './ai/summarise'
+import { MAX_CONTENT_LENGTH, summariseSystemPrompt } from './ai/summarise'
 import { titleSystemPrompt } from './ai/title'
 import { sendBlueskyPost } from './bluesky/sendBlueskyPost'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
 import { getRecentPublicBookmarks } from './bookmarks/getRecentPublicBookmarks'
+import {
+  checkBookmarkUrl,
+  createBookmark,
+  deleteBookmarkById,
+  getBookmarkById,
+  incrementBookmarkClickCount,
+  updateBookmarkById,
+} from './bookmarks/item'
 import { getNewBookmark, postNewBookmark } from './bookmarks/new'
+import { getDashboard } from './dashboard'
+import type { WorkerEnv } from './env'
+import {
+  getBlueskyIntegration,
+  toggleBlueskyIntegration,
+  upsertBlueskyIntegration,
+} from './integrations'
 import {
   handleMcpDelete,
   handleMcpGet,
   handleMcpOptions,
   handleMcpPost,
 } from './mcp/handler'
-import { getMedia } from './media/media'
+import {
+  createMedia,
+  deleteMedia,
+  getMedia,
+  getMediaItem,
+  updateMedia,
+} from './media/media'
 import { getMediaSearch } from './media/mediaSearch'
+import {
+  getCollectionBookmarks,
+  getCollectionsTags,
+  getMeta,
+  getTags,
+  renameTag,
+} from './meta'
+import { getCurrentProfile, updateCurrentProfile } from './profile'
 import { feedToJson } from './rss/rss-to-json'
 import { handleScrapeContent } from './scraper/scrape-content'
 import { getSearch } from './search/search'
+import {
+  getToot,
+  getToots,
+  getTweet,
+  getTweets,
+  searchToots,
+  searchTweets,
+} from './social'
 import { sendToots } from './toots/sendToots'
 
-export const app = new Hono().basePath('/api')
+export const api = new Hono<{ Bindings: WorkerEnv }>()
 
-app.get('/', (c) => {
+api.get('/', (c) => {
   return c.text('Otter API', 200)
 })
 
-app.post('/new', async (c) => {
-  return await postNewBookmark(c.req)
+api.all('/auth/*', async (c) => {
+  return await createAuth(c.env).handler(c.req.raw)
 })
-app.get('/new', async (c) => {
-  return await getNewBookmark(c.req)
+api.get('/me', async (c) => {
+  return await getCurrentProfile(c)
 })
-app.get('/bookmarks', async (c) => {
-  return await getAllBookmarks(c.req)
+api.patch('/me', async (c) => {
+  return await updateCurrentProfile(c)
 })
-app.get('/recent', async (c) => {
-  return await getRecentPublicBookmarks(c.req)
+
+api.post('/new', async (c) => {
+  return await postNewBookmark(c)
 })
-app.get('/search', async (c) => {
-  return await getSearch(c.req)
+api.get('/new', async (c) => {
+  return await getNewBookmark(c)
 })
-app.get('/media', async (c) => {
-  return await getMedia(c.req)
+api.get('/bookmarks', async (c) => {
+  return await getAllBookmarks(c)
 })
-app.get('/media-search', async (c) => {
+api.post('/bookmarks', async (c) => {
+  return await createBookmark(c)
+})
+api.get('/bookmarks/:id', async (c) => {
+  return await getBookmarkById(c)
+})
+api.patch('/bookmarks/:id', async (c) => {
+  return await updateBookmarkById(c)
+})
+api.delete('/bookmarks/:id', async (c) => {
+  return await deleteBookmarkById(c)
+})
+api.post('/bookmarks/:id/click', async (c) => {
+  return await incrementBookmarkClickCount(c)
+})
+api.get('/check-url', async (c) => {
+  return await checkBookmarkUrl(c)
+})
+api.get('/recent', async (c) => {
+  return await getRecentPublicBookmarks(c.req, c.env)
+})
+api.get('/search', async (c) => {
+  return await getSearch(c)
+})
+api.get('/search/tweets', async (c) => {
+  return await searchTweets(c)
+})
+api.get('/search/toots', async (c) => {
+  return await searchToots(c)
+})
+api.get('/dashboard', async (c) => {
+  return await getDashboard(c)
+})
+api.get('/tweets', async (c) => {
+  return await getTweets(c)
+})
+api.get('/tweets/:id', async (c) => {
+  return await getTweet(c)
+})
+api.get('/toots', async (c) => {
+  return await getToots(c)
+})
+api.get('/toots/:id', async (c) => {
+  return await getToot(c)
+})
+api.get('/media', async (c) => {
+  return await getMedia(c)
+})
+api.post('/media', async (c) => {
+  return await createMedia(c)
+})
+api.get('/media/:id', async (c) => {
+  return await getMediaItem(c)
+})
+api.patch('/media/:id', async (c) => {
+  return await updateMedia(c)
+})
+api.delete('/media/:id', async (c) => {
+  return await deleteMedia(c)
+})
+api.get('/media-search', async (c) => {
   return await getMediaSearch(c.req)
 })
-app.post('/toot', async (c) => {
-  return await sendToots(c.req)
+api.get('/meta', async (c) => {
+  return await getMeta(c)
 })
-app.post('/bluesky', async (c) => {
-  return await sendBlueskyPost(c.req)
+api.get('/tags', async (c) => {
+  return await getTags(c)
 })
-app.get('/scrape', async (c) => {
+api.patch('/tags/rename', async (c) => {
+  return await renameTag(c)
+})
+api.get('/collections-tags', async (c) => {
+  return await getCollectionsTags(c)
+})
+api.get('/collections/:collection', async (c) => {
+  return await getCollectionBookmarks(c)
+})
+api.get('/integrations/bluesky', async (c) => {
+  return await getBlueskyIntegration(c)
+})
+api.put('/integrations/bluesky', async (c) => {
+  return await upsertBlueskyIntegration(c)
+})
+api.patch('/integrations/bluesky', async (c) => {
+  return await toggleBlueskyIntegration(c)
+})
+api.post('/toot', async (c) => {
+  return await sendToots(c)
+})
+api.post('/bluesky', async (c) => {
+  return await sendBlueskyPost(c)
+})
+api.get('/scrape', async (c) => {
   return await handleScrapeContent(c.req)
 })
-app.get('/scrape-content', async (c) => {
+api.get('/scrape-content', async (c) => {
   return await handleScrapeContent(c.req)
 })
-app.post('/ai/title', async (context) => {
+api.post('/ai/title', async (context) => {
   const { prompt } = await context.req.json()
   return await generateResponse({
     context,
@@ -72,7 +192,7 @@ app.post('/ai/title', async (context) => {
     systemPrompt: titleSystemPrompt,
   })
 })
-app.post('/ai/description', async (context) => {
+api.post('/ai/description', async (context) => {
   const { title, prompt } = await context.req.json()
   return await generateResponse({
     context,
@@ -80,7 +200,7 @@ app.post('/ai/description', async (context) => {
     systemPrompt: descriptionSystemPrompt(title),
   })
 })
-app.post('/ai/summarise', async (context) => {
+api.post('/ai/summarise', async (context) => {
   const { prompt } = await context.req.json()
   const truncated = prompt.slice(0, MAX_CONTENT_LENGTH)
   return await generateResponse({
@@ -89,7 +209,7 @@ app.post('/ai/summarise', async (context) => {
     systemPrompt: summariseSystemPrompt,
   })
 })
-app.post('/ai/classify', async (context) => {
+api.post('/ai/classify', async (context) => {
   const { title, description, url, tags, currentType } =
     await context.req.json()
   const result = await classifyBookmark({
@@ -102,19 +222,19 @@ app.post('/ai/classify', async (context) => {
   })
   return context.json(result)
 })
-app.post('/mcp', async (c) => {
+api.post('/mcp', async (c) => {
   return await handleMcpPost(c)
 })
-app.get('/mcp', (c) => {
+api.get('/mcp', (c) => {
   return handleMcpGet(c)
 })
-app.delete('/mcp', (c) => {
+api.delete('/mcp', (c) => {
   return handleMcpDelete(c)
 })
-app.options('/mcp', (c) => {
+api.options('/mcp', (c) => {
   return handleMcpOptions(c)
 })
-app.get('/rss', async (c) => {
+api.get('/rss', async (c) => {
   const feed = c.req.query('feed')
   const isValidUrl = new URL(feed ?? '')
 
@@ -131,11 +251,22 @@ app.get('/rss', async (c) => {
   )
 })
 
+export const app = new Hono<{ Bindings: WorkerEnv }>()
+
+app.all('/.well-known/oauth-authorization-server/api/auth', async (c) => {
+  return await createAuth(c.env).handler(c.req.raw)
+})
+app.all('/.well-known/openid-configuration/api/auth', async (c) => {
+  return await createAuth(c.env).handler(c.req.raw)
+})
+app.route('/api', api)
+
 app.notFound((c) => {
   return c.text('Not found', 404)
 })
 
 app.onError((err, c) => {
-  console.error(`${err}`)
+  console.error(err)
+  console.error(err.stack)
   return c.text(err.message, 500)
 })

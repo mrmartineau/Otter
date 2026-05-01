@@ -9,8 +9,7 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
   head: ({ loaderData }) => ({
     meta: [
       {
-        // @ts-expect-error How do I type loader data?
-        title: `Bookmark: ${loaderData?.title}`,
+        title: `Bookmark: ${(loaderData as { title?: string } | undefined)?.title ?? ''}`,
       },
     ],
   }),
@@ -46,7 +45,6 @@ function RouteComponent() {
         <Outlet />
       ) : (
         <ErrorBoundary fallback={<div>Something went wrong</div>}>
-          {/* @ts-expect-error How do I get the proper types for this? */}
           <BookmarkFeedItem {...bookmark.data} preventMarkdownClamping />
         </ErrorBoundary>
       )}

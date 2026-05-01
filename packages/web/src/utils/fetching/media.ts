@@ -1,4 +1,3 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
 import {
   queryOptions,
   useMutation,
@@ -14,11 +13,18 @@ import type {
   MediaType,
   MediaUpdate,
 } from '@/types/db'
-import type { Database } from '@/types/supabase'
 import { getErrorMessage } from '../get-error-message'
-import { supabase } from '../supabase/client'
 
 export type GroupedMedia = Record<NonNullable<Media['status']>, Media[]>
+
+type WorkerGroupedMedia = Partial<
+  Record<MediaType, Partial<Record<MediaStatus, Media[]>>>
+>
+
+type SingleResponse<T> = {
+  data: T
+  error: null
+}
 
 const groupMediaByStatus = (media: Media[]) => {
   return Object.groupBy(
@@ -27,41 +33,55 @@ const groupMediaByStatus = (media: Media[]) => {
   ) as GroupedMedia
 }
 
-export const getMedia = async (
-  filters: MediaFilters = {},
-  supabaseClient: SupabaseClient<Database> = supabase,
-) => {
-  let query = supabaseClient
-    .from('media')
-    .select('*', { count: 'exact' })
-    .order('sort_order', { ascending: true, nullsFirst: false })
-    .order('created_at', { ascending: false })
-
-  // Apply filters
-  if (filters.search) {
-    const searchTerm = filters.search.toLowerCase()
-    query = query.or(
-      `name.ilike.%${searchTerm}%,platform.ilike.%${searchTerm}%,type.ilike.%${searchTerm}%`,
-    )
+const parseJsonResponse = async <T>(response: Response): Promise<T> => {
+  const body = (await response.json()) as {
+    error?: string
+    reason?: string
   }
 
-  if (filters.type) {
-    query = query.eq('type', filters.type)
+  if (!response.ok) {
+    throw new Error(body.error || body.reason || 'Request failed')
   }
 
-  if (filters.status) {
-    query = query.eq('status', filters.status)
-  }
+  return body as T
+}
 
-  const supabaseResponse = await query
+const flattenWorkerMedia = (grouped: WorkerGroupedMedia) =>
+  Object.values(grouped).flatMap((typeBucket) =>
+    Object.values(typeBucket ?? {}).flatMap((items) => items ?? []),
+  )
 
-  if (supabaseResponse.error) {
-    throw supabaseResponse.error
-  }
+export const getMedia = async (filters: MediaFilters = {}) => {
+  const response = await fetch('/api/media', { credentials: 'include' })
+  const grouped = await parseJsonResponse<WorkerGroupedMedia>(response)
+  const data = flattenWorkerMedia(grouped).filter((item) => {
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase()
+      const matchesSearch =
+        item.name?.toLowerCase().includes(searchTerm) ||
+        item.platform?.toLowerCase().includes(searchTerm) ||
+        item.type?.toLowerCase().includes(searchTerm)
+
+      if (!matchesSearch) {
+        return false
+      }
+    }
+
+    if (filters.type && item.type !== filters.type) {
+      return false
+    }
+
+    if (filters.status && item.status !== filters.status) {
+      return false
+    }
+
+    return true
+  })
 
   return {
-    ...supabaseResponse,
-    data: groupMediaByStatus(supabaseResponse.data ?? []),
+    count: data.length,
+    data: groupMediaByStatus(data),
+    error: null,
   }
 }
 
@@ -78,17 +98,8 @@ interface MediaFetchingOptions {
 }
 
 export const getMediaItem = async ({ id }: MediaFetchingOptions) => {
-  const supabaseResponse = await supabase
-    .from('media')
-    .select('*')
-    .eq('id', id)
-    .single()
-
-  if (supabaseResponse.error) {
-    throw supabaseResponse.error
-  }
-
-  return supabaseResponse
+  const response = await fetch(`/api/media/${id}`, { credentials: 'include' })
+  return await parseJsonResponse<SingleResponse<Media>>(response)
 }
 
 export const getMediaItemOptions = ({ id }: MediaFetchingOptions) => {
@@ -99,23 +110,19 @@ export const getMediaItemOptions = ({ id }: MediaFetchingOptions) => {
   })
 }
 
-// Mutation hooks
 export const useCreateMedia = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (data: MediaInsert) => {
-      const response = await supabase
-        .from('media')
-        .insert([data])
-        .select()
-        .single()
+      const response = await fetch('/api/media', {
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
 
-      if (response.error) {
-        throw response.error
-      }
-
-      return response
+      return await parseJsonResponse<SingleResponse<Media>>(response)
     },
     onError: (error) => {
       const errorMessage = getErrorMessage(error)
@@ -135,18 +142,14 @@ export const useUpdateMedia = () => {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: number; data: MediaUpdate }) => {
-      const response = await supabase
-        .from('media')
-        .update({ ...data, modified_at: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single()
+      const response = await fetch(`/api/media/${id}`, {
+        body: JSON.stringify(data),
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
+      })
 
-      if (response.error) {
-        throw response.error
-      }
-
-      return response
+      return await parseJsonResponse<SingleResponse<Media>>(response)
     },
     onError: (error) => {
       const errorMessage = getErrorMessage(error)
@@ -172,24 +175,21 @@ export const useUpdateMediaStatus = () => {
         sortOrder?: number
       }>,
     ) => {
-      const now = new Date().toISOString()
-      const payload = items.map(({ id, status, sortOrder }) => ({
-        id,
-        modified_at: now,
-        sort_order: sortOrder,
-        status,
-      }))
-
-      const response = await supabase
-        .from('media')
-        .upsert(payload, { onConflict: 'id' })
-        .select()
-
-      if (response.error) {
-        throw response.error
-      }
-
-      return response
+      return await Promise.all(
+        items.map(({ id, status, sortOrder }) =>
+          fetch(`/api/media/${id}`, {
+            body: JSON.stringify({
+              sort_order: sortOrder,
+              status,
+            }),
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            method: 'PATCH',
+          }).then((response) =>
+            parseJsonResponse<SingleResponse<Media>>(response),
+          ),
+        ),
+      )
     },
     onError: (error) => {
       const errorMessage = getErrorMessage(error)
@@ -208,13 +208,12 @@ export const useDeleteMedia = () => {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const response = await supabase.from('media').delete().eq('id', id)
+      const response = await fetch(`/api/media/${id}`, {
+        credentials: 'include',
+        method: 'DELETE',
+      })
 
-      if (response.error) {
-        throw response.error
-      }
-
-      return response
+      return await parseJsonResponse<SingleResponse<Media>>(response)
     },
     onError: (error) => {
       const errorMessage = getErrorMessage(error)
@@ -256,6 +255,5 @@ export const getMediaSearchOptions = ({
     // @ts-expect-error - This will only run if query and type are defined
     queryFn: () => getMediaSearch({ query, type }),
     queryKey: ['media', query, type],
-    // staleTime: 5 * 1000, //
   })
 }

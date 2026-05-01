@@ -1,27 +1,30 @@
-import { env } from 'cloudflare:workers'
 import { AtpAgent, RichText } from '@atproto/api'
 import { strifx, when } from '@mrmartineau/strifx'
-import type { HonoRequest } from 'hono'
+import { eq } from 'drizzle-orm'
+import type { Context } from 'hono'
 import { errorResponse } from '@/utils/fetching/errorResponse'
 import { filteredTags } from '@/utils/filteredTags'
-import { createServiceClient } from '../supabase/serviceClient'
+import { createDb } from '../../db/client'
+import { bookmarks, userIntegrations } from '../../db/schema'
+import type { WorkerEnv } from '../env'
+
+type HonoContext = Context<{ Bindings: WorkerEnv }>
 
 /**
  * POST /api/bluesky
- * Called by a Supabase webhook when a bookmark is inserted or updated.
+ * Called by Otter's internal bookmark side-effect flow when a bookmark is inserted or updated.
  * Posts to Bluesky if the bookmark is newly public and the user has Bluesky enabled.
  */
-export const sendBlueskyPost = async (request: HonoRequest) => {
-  const webhookSecret = request.header('x-otter-webhook-secret')
-  // @ts-expect-error - env typing
-  if (!webhookSecret || webhookSecret !== env.WEBHOOK_SECRET) {
+export const sendBlueskyPost = async (context: HonoContext) => {
+  const webhookSecret = context.req.header('x-otter-webhook-secret')
+  if (!webhookSecret || webhookSecret !== context.env.WEBHOOK_SECRET) {
     return errorResponse({
       reason: 'Invalid webhook secret',
       status: 401,
     })
   }
 
-  const body = await request.json()
+  const body = await context.req.json()
 
   if (!body.type || !body?.record) {
     return errorResponse({
@@ -49,14 +52,12 @@ export const sendBlueskyPost = async (request: HonoRequest) => {
   }
 
   // Fetch the user's Bluesky integration settings
-  const client = createServiceClient()
-  const { data: integration, error: integrationError } = await client
-    .from('user_integrations')
-    .select('*')
-    .match({ user_id: body.record.user })
-    .single()
+  const db = createDb(context.env)
+  const integration = await db.query.userIntegrations.findFirst({
+    where: eq(userIntegrations.userId, body.record.user),
+  })
 
-  if (integrationError || !integration) {
+  if (!integration) {
     return errorResponse({
       reason: 'Bluesky post not sent: no integration settings found',
       status: 200,
@@ -64,9 +65,9 @@ export const sendBlueskyPost = async (request: HonoRequest) => {
   }
 
   if (
-    !integration.bluesky_enabled ||
-    !integration.bluesky_handle ||
-    !integration.bluesky_app_password
+    !integration.blueskyEnabled ||
+    !integration.blueskyHandle ||
+    !integration.blueskyAppPassword
   ) {
     return errorResponse({
       reason: 'Bluesky post not sent: integration not enabled or configured',
@@ -85,13 +86,13 @@ export const sendBlueskyPost = async (request: HonoRequest) => {
   try {
     const agent = new AtpAgent({ service: 'https://bsky.social' })
     await agent.login({
-      identifier: integration.bluesky_handle,
-      password: integration.bluesky_app_password,
+      identifier: integration.blueskyHandle,
+      password: integration.blueskyAppPassword,
     })
 
     // Compose the post text
     const filteredTagsString = filteredTags(body.record.tags ?? [])
-    const postText = strifx`${when(integration.bluesky_post_prefix, { suffix: ' ' })}${body.record.title ?? ''}${when(body.record.description, { prefix: ' — ' })}${when(filteredTagsString, { prefix: '\n', test: (v: string) => v.length > 0 })}${when(integration.bluesky_post_suffix, { prefix: '\n' })}`
+    const postText = strifx`${when(integration.blueskyPostPrefix, { suffix: ' ' })}${body.record.title ?? ''}${when(body.record.description, { prefix: ' — ' })}${when(filteredTagsString, { prefix: '\n', test: (v: string) => v.length > 0 })}${when(integration.blueskyPostSuffix, { prefix: '\n' })}`
 
     // Parse rich text for facets (links, mentions, hashtags)
     const richText = new RichText({ text: postText })
@@ -142,10 +143,10 @@ export const sendBlueskyPost = async (request: HonoRequest) => {
     })
 
     // Store the post URI on the bookmark for idempotency
-    await client
-      .from('bookmarks')
-      .update({ bluesky_post_uri: response.uri })
-      .match({ id: body.record.id })
+    await db
+      .update(bookmarks)
+      .set({ blueskyPostUri: response.uri })
+      .where(eq(bookmarks.id, body.record.id))
 
     return new Response(JSON.stringify({ success: true, uri: response.uri }), {
       headers: { 'Content-Type': 'application/json' },
@@ -161,14 +162,14 @@ export const sendBlueskyPost = async (request: HonoRequest) => {
 
     // Disable integration on auth errors so the user sees it in settings
     if (isAuthError) {
-      await client
-        .from('user_integrations')
-        .update({
-          bluesky_enabled: false,
-          bluesky_last_error:
+      await db
+        .update(userIntegrations)
+        .set({
+          blueskyEnabled: false,
+          blueskyLastError:
             'Authentication failed. Please check your handle and app password.',
         })
-        .match({ user_id: body.record.user })
+        .where(eq(userIntegrations.userId, body.record.user))
     }
 
     return errorResponse({

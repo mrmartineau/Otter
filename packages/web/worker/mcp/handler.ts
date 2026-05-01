@@ -1,5 +1,5 @@
 import type { Context } from 'hono'
-import { createAuthenticatedClient } from '../supabase/client'
+import { type RequestContext, requireRequestContext } from '../context'
 import { toolDefinitions, toolHandlers } from './tools'
 import {
   INTERNAL_ERROR,
@@ -69,11 +69,18 @@ export const handleMcpPost = async (c: Context) => {
   }
 
   // Authenticate
-  const authResult = await createAuthenticatedClient(c.req)
+  const authResult = await requireRequestContext(c)
   if (authResult instanceof Response) {
     return authResult
   }
-  const { client, user } = authResult
+  const userId = authResult.user?.id
+
+  if (!userId) {
+    return jsonResponse(
+      c,
+      jsonRpcError(null, INVALID_REQUEST, 'Authentication required'),
+    )
+  }
 
   // Parse JSON body
   let body: unknown
@@ -91,8 +98,8 @@ export const handleMcpPost = async (c: Context) => {
     const responses: JsonRpcResponse[] = []
     for (const msg of body) {
       const result = await processMessage(msg as JsonRpcRequest, {
-        client,
-        userId: user.id,
+        requestContext: authResult,
+        userId,
       })
       if (result !== null) {
         responses.push(result)
@@ -110,8 +117,8 @@ export const handleMcpPost = async (c: Context) => {
 
   // Handle single request
   const result = await processMessage(body as JsonRpcRequest, {
-    client,
-    userId: user.id,
+    requestContext: authResult,
+    userId,
   })
   // Notification — no id, no response body
   if (result === null) {
@@ -124,7 +131,7 @@ export const handleMcpPost = async (c: Context) => {
 
 async function processMessage(
   msg: JsonRpcRequest,
-  ctx: { client: unknown; userId: string },
+  ctx: { requestContext: RequestContext; userId: string },
 ): Promise<JsonRpcResponse | null> {
   // Validate basic structure
   if (!msg || typeof msg !== 'object' || msg.jsonrpc !== '2.0' || !msg.method) {
@@ -163,7 +170,7 @@ async function processMessage(
 async function dispatch(
   method: string,
   params: Record<string, unknown> | undefined,
-  ctx: { client: unknown; userId: string },
+  ctx: { requestContext: RequestContext; userId: string },
 ): Promise<unknown> {
   switch (method) {
     case 'initialize':
@@ -201,8 +208,10 @@ async function dispatch(
       try {
         return await handler(
           (params?.arguments as Record<string, unknown>) || {},
-          // biome-ignore lint/suspicious/noExplicitAny: auth types are complex
-          { client: ctx.client as any, userId: ctx.userId },
+          {
+            requestContext: ctx.requestContext,
+            userId: ctx.userId,
+          },
         )
       } catch (err) {
         // Tool execution errors are returned as isError results, not JSON-RPC errors

@@ -3,7 +3,7 @@
 
 # Variables
 @base_url = http://localhost:5678/api
-@token = {{$dotenv SUPABASE_USER_API_KEY}}
+@token = {{$dotenv OTTER_USER_API_KEY}}
 
 ###
 

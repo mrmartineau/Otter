@@ -1,47 +1,72 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 import { DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
-import type { Database } from '@/types/supabase'
-import { supabase } from '../supabase/client'
+import type { Bookmark, Toot, Tweet } from '@/types/db'
 import { type ApiParametersQuery, apiParameters } from './apiParameters'
+
+type ApiListResponse<T> = {
+  data: T
+  count: number | null
+  error: null
+}
+
+const queryString = (params: Record<string, unknown>) => {
+  const searchParams = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '') {
+      searchParams.set(key, String(value))
+    }
+  }
+
+  const value = searchParams.toString()
+  return value ? `?${value}` : ''
+}
+
+const parseJsonResponse = async <T>(response: Response): Promise<T> => {
+  const body = (await response.json()) as {
+    error?: string
+    reason?: string
+  }
+
+  if (!response.ok) {
+    throw new Error(body.error || body.reason || 'Request failed')
+  }
+
+  return body as T
+}
 
 interface SearchFetchingOptions {
   params: Partial<ApiParametersQuery>
   searchTerm: string
-  supabaseClient?: SupabaseClient<Database>
   userId?: string
 }
+
+const getSearchResults = async <T>(
+  path: string,
+  searchTerm: string,
+  params: Partial<ApiParametersQuery>,
+) => {
+  const parsed = apiParameters(params)
+  const response = await fetch(
+    `${path}${queryString({ ...parsed, q: searchTerm })}`,
+    {
+      credentials: 'include',
+    },
+  )
+  const body = await parseJsonResponse<{ data: T[]; count: number }>(response)
+
+  return {
+    count: body.count,
+    data: body.data,
+    error: null,
+  } satisfies ApiListResponse<T[]>
+}
+
 export const getSearchBookmarks = async ({
   searchTerm,
   params,
-  supabaseClient = supabase,
-  userId,
-}: SearchFetchingOptions) => {
-  const { limit, offset, order, status, type } = apiParameters(params)
-
-  // Search bookmarks
-  let bookmarksSearchQuery = supabaseClient
-    .from('bookmarks')
-    .select('*', { count: 'exact' })
-    .or(
-      `title.ilike.*${searchTerm}*,url.ilike.*${searchTerm}*,description.ilike.*${searchTerm}*,note.ilike.*${searchTerm}*,tags.cs.{${searchTerm}}`,
-    )
-
-  if (userId) {
-    bookmarksSearchQuery = bookmarksSearchQuery.eq('user', userId)
-  }
-  if (status) {
-    bookmarksSearchQuery = bookmarksSearchQuery.match({ status })
-  }
-  if (type) {
-    bookmarksSearchQuery = bookmarksSearchQuery.match({ type })
-  }
-  const bookmarksSearch = await bookmarksSearchQuery
-    .order('created_at', { ascending: order === 'asc' })
-    .range(offset!, offset! + limit! - 1)
-
-  return bookmarksSearch
-}
+}: SearchFetchingOptions) =>
+  await getSearchResults<Bookmark>('/api/search', searchTerm, params)
 
 export const getSearchBookmarksOptions = ({
   searchTerm,
@@ -70,7 +95,7 @@ export const getSearchBookmarksInfiniteOptions = ({
       lastPageParam,
     ) => {
       const total = lastPage.count ?? 0
-      const nextOffset = lastPageParam + limit!
+      const nextOffset = lastPageParam + limit
       return nextOffset < total ? nextOffset : undefined
     },
     initialPageParam: 0,
@@ -87,27 +112,8 @@ export const getSearchBookmarksInfiniteOptions = ({
 export const getSearchTweets = async ({
   searchTerm,
   params,
-}: SearchFetchingOptions) => {
-  const { limit, offset, order, status, type } = apiParameters(params)
-
-  // Search tweets
-  let tweetsSearchQuery = supabase
-    .from('tweets')
-    .select('*', { count: 'exact' })
-    .or(`text.ilike.*${searchTerm}*,user_name.ilike.*${searchTerm}*`)
-
-  if (status) {
-    tweetsSearchQuery = tweetsSearchQuery.match({ status })
-  }
-  if (type) {
-    tweetsSearchQuery = tweetsSearchQuery.match({ type })
-  }
-  const tweetsSearch = await tweetsSearchQuery
-    .order('created_at', { ascending: order === 'asc' })
-    .range(offset!, offset! + limit! - 1)
-
-  return tweetsSearch
-}
+}: SearchFetchingOptions) =>
+  await getSearchResults<Tweet>('/api/search/tweets', searchTerm, params)
 
 export const getSearchTweetsOptions = ({
   searchTerm,
@@ -123,27 +129,8 @@ export const getSearchTweetsOptions = ({
 export const getSearchToots = async ({
   searchTerm,
   params,
-}: SearchFetchingOptions) => {
-  const { limit, offset, order, status, type } = apiParameters(params)
-
-  // Search Mastodon toots
-  let tweetsSearchQuery = supabase
-    .from('toots')
-    .select('*', { count: 'exact' })
-    .or(`text.ilike.*${searchTerm}*,user_name.ilike.*${searchTerm}*`)
-
-  if (status) {
-    tweetsSearchQuery = tweetsSearchQuery.match({ status })
-  }
-  if (type) {
-    tweetsSearchQuery = tweetsSearchQuery.match({ type })
-  }
-  const tweetsSearch = await tweetsSearchQuery
-    .order('created_at', { ascending: order === 'asc' })
-    .range(offset!, offset! + limit! - 1)
-
-  return tweetsSearch
-}
+}: SearchFetchingOptions) =>
+  await getSearchResults<Toot>('/api/search/toots', searchTerm, params)
 
 export const getSearchTootsOptions = ({
   searchTerm,

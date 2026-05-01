@@ -39,9 +39,13 @@ import {
   ROUTE_NEW_BOOKMARK_CONFIRMATION,
 } from '../constants'
 import type { Bookmark, BookmarkFormValues } from '../types/db'
+import {
+  checkBookmarkUrl,
+  createBookmark,
+  updateBookmark,
+} from '../utils/fetching/bookmarks'
 import type { MetaTag } from '../utils/fetching/meta'
 import { fullPath } from '../utils/fullPath'
-import { supabase } from '../utils/supabase/client'
 import { Combobox } from './Combobox'
 import { Flex } from './Flex'
 import { FormGroup } from './FormGroup'
@@ -228,16 +232,7 @@ export const BookmarkForm = ({
   const handleSubmitForm = async (formData: BookmarkFormValues) => {
     try {
       if (isNew) {
-        const { data: insertedBookmark, error } = await supabase
-          .from('bookmarks')
-          .insert([{ ...formData }], {
-            defaultToNull: true,
-          })
-          .select('id')
-          .single()
-        if (error) {
-          throw error
-        }
+        const { data: insertedBookmark } = await createBookmark(formData)
         playAdd()
         if (isBookmarklet && insertedBookmark?.id) {
           navigate({
@@ -252,11 +247,9 @@ export const BookmarkForm = ({
           navigate({ to: '/feed' })
         }
       } else {
-        await supabase
-          .from('bookmarks')
-          // @ts-expect-error - TODO: fix this
-          .update({ ...formData, modified_at: new Date() })
-          .match({ id })
+        if (id) {
+          await updateBookmark(id, formData)
+        }
         playEdit()
         toast.success('Item edited')
       }
@@ -294,9 +287,7 @@ export const BookmarkForm = ({
     async (link: string): Promise<void> => {
       try {
         const url = new URL(link)
-        const { data } = await supabase.rpc('check_url', {
-          url_input: url.hostname,
-        })
+        const { data } = await checkBookmarkUrl(url.hostname)
         setPossibleMatchingItems(data as Bookmark[])
       } catch {
         setPossibleMatchingItems(null)

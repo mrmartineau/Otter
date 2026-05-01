@@ -2,8 +2,7 @@ import { CollisionPriority } from '@dnd-kit/abstract'
 import { useDroppable } from '@dnd-kit/react'
 import type { ComponentProps } from 'react'
 import titleFmt from 'title'
-import type { Media } from '@/types/db'
-import type { Database } from '@/types/supabase'
+import type { Media, MediaStatus } from '@/types/db'
 import { cn } from '@/utils/classnames'
 import { MediaCard } from './MediaCard'
 
@@ -23,7 +22,7 @@ const getStatusColor = (status: string) => {
 }
 
 interface MediaColumnProps extends ComponentProps<'div'> {
-  status: Database['public']['Enums']['media_status']
+  status: MediaStatus
   media: Media[]
   title: string
   onEdit?: (media: Media) => void

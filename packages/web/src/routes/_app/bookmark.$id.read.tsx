@@ -159,7 +159,7 @@ function RouteComponent() {
               onClick={() => setViewMode('read')}
               variant={viewMode === 'read' ? 'default' : 'ghost'}
               className={`rounded-full grow`}
-              >
+            >
               Read
             </Button>
             <Button

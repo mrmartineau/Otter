@@ -104,7 +104,7 @@ const features = [
   },
   {
     description:
-      'Your data stays yours. Self-host on Cloudflare Workers and Supabase.',
+      'Your data stays yours. Run Otter on Cloudflare Workers with Neon Postgres.',
     icon: LockIcon,
     title: 'Private & Self-Hosted',
   },

@@ -1,12 +1,17 @@
-import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+  useSearch,
+} from '@tanstack/react-router'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { Flex } from '@/components/Flex'
 import { FormGroup } from '@/components/FormGroup'
 import { Input } from '@/components/Input'
-import { ROUTE_HOME } from '@/constants'
+import { ALLOW_SIGNUP, ROUTE_HOME } from '@/constants'
 import { useToggle } from '@/hooks/useToggle'
-import { supabase } from '@/utils/supabase/client'
+import { authClient } from '@/utils/auth/client'
 
 type SigninSearch = {
   error?: string
@@ -41,7 +46,7 @@ function RouteComponent() {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await authClient.signIn.email({
       email,
       password,
     })
@@ -95,14 +100,19 @@ function RouteComponent() {
           </FormGroup>
 
           <Flex gap="m" justify="between">
-            {/* {ALLOW_SIGNUP ? (
-              <Button formAction={signUp} variant="secondary">
-                Sign Up
-              </Button>
-            ) : null} */}
             <Button type="submit" disabled={isLoading}>
               Sign In
             </Button>
+            <Flex gap="m">
+              {ALLOW_SIGNUP ? (
+                <Link to="/register" className="self-center">
+                  Register
+                </Link>
+              ) : null}
+              <Link to="/forgot-password" className="self-center">
+                Forgot password?
+              </Link>
+            </Flex>
           </Flex>
 
           {error ? (

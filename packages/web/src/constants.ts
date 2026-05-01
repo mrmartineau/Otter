@@ -4,7 +4,7 @@ import type { RequestOrder } from './types/api'
 
 export const REPO_URL = 'https://github.com/mrmartineau/Otter'
 
-export const ALLOW_SIGNUP = false
+export const ALLOW_SIGNUP = import.meta.env.VITE_ALLOW_SIGNUP === 'true'
 
 export const TITLE_SEPARATOR = ' — '
 export const CONTENT = {
