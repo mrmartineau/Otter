@@ -20,6 +20,7 @@
   },
   "compatibility_date": "2025-07-26",
   "compatibility_flags": ["nodejs_compat"],
+  "keep_vars": true,
   "main": "worker/index.ts",
   "name": "otter-web",
   "observability": {
