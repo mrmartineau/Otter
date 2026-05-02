@@ -265,8 +265,18 @@ app.notFound(async (c) => {
   if (c.req.method === 'GET' || c.req.method === 'HEAD') {
     const assetResponse = await c.env.ASSETS?.fetch(c.req.raw)
 
-    if (assetResponse) {
+    if (assetResponse && assetResponse.status !== 404) {
       return assetResponse
+    }
+
+    if (c.env.ASSETS) {
+      const indexUrl = new URL('/index.html', c.req.url)
+      const indexRequest = new Request(indexUrl.toString(), c.req.raw)
+      const indexResponse = await c.env.ASSETS.fetch(indexRequest)
+
+      if (indexResponse.status !== 404) {
+        return indexResponse
+      }
     }
   }
 
