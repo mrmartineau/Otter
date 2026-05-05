@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import type { Context, HonoRequest } from 'hono'
-import { createLocalJWKSet, jwtVerify, type JWK } from 'jose'
+import { createLocalJWKSet, jwtVerify, type JWK, type JWTPayload } from 'jose'
 import { createAuth, getOAuthAudience } from '../auth/server'
 import { createDb, type Db } from '../db/client'
 import { profiles } from '../db/schema'
@@ -70,18 +70,27 @@ export const getProfileByApiKey = async (db: Db, apiKey: string) => {
   return profile ? profileToRow(profile) : null
 }
 
-const getProfileByOAuthToken = async (
+let cachedJwks: Promise<{ keys: JWK[] }> | null = null
+const getJwks = (auth: ReturnType<typeof createAuth>) => {
+  if (!cachedJwks) {
+    cachedJwks = auth.api.getJwks().catch((err) => {
+      cachedJwks = null
+      throw err
+    }) as Promise<{ keys: JWK[] }>
+  }
+  return cachedJwks
+}
+
+const verifyOAuthAccessToken = async (
   env: WorkerEnv,
-  db: Db,
   auth: ReturnType<typeof createAuth>,
   accessToken: string,
-  scopes: string[] = [],
-) => {
+  scopes: string[],
+): Promise<JWTPayload | null> => {
   try {
     const audience = getOAuthAudience(env)
-    const issuer = `${audience}/api/auth`
-    const jwks = (await auth.api.getJwks()) as { keys: JWK[] }
-    const keySet = createLocalJWKSet(jwks)
+    const issuer = `${audience}${auth.options.basePath ?? '/api/auth'}`
+    const keySet = createLocalJWKSet(await getJwks(auth))
     const { payload } = await jwtVerify(accessToken, keySet, {
       audience,
       issuer,
@@ -91,17 +100,26 @@ const getProfileByOAuthToken = async (
       const tokenScopes = new Set(
         typeof payload.scope === 'string' ? payload.scope.split(' ') : [],
       )
-      for (const sc of scopes) {
-        if (!tokenScopes.has(sc)) return null
-      }
+      if (scopes.some((sc) => !tokenScopes.has(sc))) return null
     }
 
-    const userId = typeof payload.sub === 'string' ? payload.sub : null
-    return userId ? await getProfileById(db, userId) : null
+    return payload
   } catch (err) {
-    console.error('getProfileByOAuthToken failed:', err)
+    console.error('verifyOAuthAccessToken failed:', err)
     return null
   }
+}
+
+const getProfileByOAuthToken = async (
+  env: WorkerEnv,
+  db: Db,
+  auth: ReturnType<typeof createAuth>,
+  accessToken: string,
+  scopes: string[] = [],
+) => {
+  const payload = await verifyOAuthAccessToken(env, auth, accessToken, scopes)
+  const userId = typeof payload?.sub === 'string' ? payload.sub : null
+  return userId ? await getProfileById(db, userId) : null
 }
 
 export const createRequestContext = async (
