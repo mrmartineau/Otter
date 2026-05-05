@@ -66,7 +66,7 @@ api.get('/', (c) => {
   return c.text('Otter API', 200)
 })
 
-api.all('/auth/*', async (c) => {
+api.on(["GET", "POST"], '/auth/*', async (c) => {
   return await createAuth(c.env).handler(c.req.raw)
 })
 api.get('/me', async (c) => {

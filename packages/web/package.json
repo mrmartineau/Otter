@@ -35,6 +35,7 @@
     "hono": "^4.12.8",
     "html-entities": "^2.6.0",
     "isomorphic-dompurify": "^2.36.0",
+    "jose": "^6.2.3",
     "linkedom": "^0.18.12",
     "lodash.throttle": "^4.1.1",
     "match-words": "^1.0.0",

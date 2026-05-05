@@ -15,8 +15,10 @@
     "binding": "AI"
   },
   "assets": {
-    "directory": "./public",
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    "directory": "./dist/client",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
   },
   "compatibility_date": "2025-07-26",
   "compatibility_flags": ["nodejs_compat"],
@@ -43,12 +45,23 @@
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
    */
-  "placement": { "mode": "smart" }
+  "placement": { "mode": "smart" },
+
+  /* Custom domain */
+  "routes": [
+    {
+      "custom_domain": true,
+      "pattern": "otter.zander.wtf",
+      "zone_name": "zander.wtf"
+    }
+  ],
   /**
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
    */
-  // "vars": { "MY_VARIABLE": "production_value" },
+  "vars": {
+    "BETTER_AUTH_URL": "https://otter.zander.wtf"
+  }
   /**
    * Note: Use secrets to store sensitive data.
    * https://developers.cloudflare.com/workers/configuration/secrets/

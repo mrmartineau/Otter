@@ -60,6 +60,16 @@ function RouteComponent() {
     }
 
     setIsLoading(false)
+
+    // OAuth flow: window.location.search has sig param injected by oauthProviderClient
+    if (new URLSearchParams(window.location.search).has('sig')) {
+      const result = await authClient.oauth2.continue({ postLogin: true })
+      if (result.data?.url) {
+        window.location.href = result.data.url
+        return
+      }
+    }
+
     if (redirectTo) {
       return navigate({ to: redirectTo })
     }

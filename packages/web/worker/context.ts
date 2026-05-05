@@ -1,6 +1,6 @@
-import { oauthProviderResourceClient } from '@better-auth/oauth-provider/resource-client'
 import { eq } from 'drizzle-orm'
 import type { Context, HonoRequest } from 'hono'
+import { createLocalJWKSet, jwtVerify, type JWK } from 'jose'
 import { createAuth, getOAuthAudience } from '../auth/server'
 import { createDb, type Db } from '../db/client'
 import { profiles } from '../db/schema'
@@ -78,19 +78,28 @@ const getProfileByOAuthToken = async (
   scopes: string[] = [],
 ) => {
   try {
-    const client = oauthProviderResourceClient(
-      auth as unknown as Parameters<typeof oauthProviderResourceClient>[0],
-    ).getActions()
-    const payload = await client.verifyAccessToken(accessToken, {
-      scopes,
-      verifyOptions: {
-        audience: getOAuthAudience(env),
-      },
+    const audience = getOAuthAudience(env)
+    const issuer = `${audience}/api/auth`
+    const jwks = (await auth.api.getJwks()) as { keys: JWK[] }
+    const keySet = createLocalJWKSet(jwks)
+    const { payload } = await jwtVerify(accessToken, keySet, {
+      audience,
+      issuer,
     })
-    const userId = typeof payload.sub === 'string' ? payload.sub : null
 
+    if (scopes.length) {
+      const tokenScopes = new Set(
+        typeof payload.scope === 'string' ? payload.scope.split(' ') : [],
+      )
+      for (const sc of scopes) {
+        if (!tokenScopes.has(sc)) return null
+      }
+    }
+
+    const userId = typeof payload.sub === 'string' ? payload.sub : null
     return userId ? await getProfileById(db, userId) : null
-  } catch {
+  } catch (err) {
+    console.error('getProfileByOAuthToken failed:', err)
     return null
   }
 }
