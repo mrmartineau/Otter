@@ -1,12 +1,12 @@
 import { and, count, desc, eq } from 'drizzle-orm'
-import type { HonoRequest } from 'hono'
+import type { Context } from 'hono'
 import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { apiResponseGenerator } from '@/utils/fetching/apiResponse'
 import { getErrorMessage } from '@/utils/get-error-message'
 import { searchParamsToObject } from '@/utils/searchParamsToObject'
-import { createDb } from '../../db/client'
 import { bookmarks } from '../../db/schema'
 import type { WorkerEnv } from '../env'
+import '../middleware/db'
 import { bookmarkToRow } from './mapper'
 
 /**
@@ -15,15 +15,15 @@ import { bookmarkToRow } from './mapper'
  * No authentication required.
  */
 export const getRecentPublicBookmarks = async (
-  request: HonoRequest<'/api/recent'>,
-  env: WorkerEnv,
+  context: Context<{ Bindings: WorkerEnv }>,
 ) => {
+  const request = context.req
   try {
     const searchParams = searchParamsToObject(request.url)
     const limit = Number(searchParams.limit) || DEFAULT_API_RESPONSE_LIMIT
     const offset = Number(searchParams.offset) || 0
 
-    const db = createDb(env)
+    const db = context.var.db
     const where = and(
       eq(bookmarks.public, true),
       eq(bookmarks.status, 'active'),

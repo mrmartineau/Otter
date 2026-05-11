@@ -2,11 +2,12 @@ import { eq } from 'drizzle-orm'
 import type { Context, HonoRequest } from 'hono'
 import { createLocalJWKSet, jwtVerify, type JWK, type JWTPayload } from 'jose'
 import { createAuth, getOAuthAudience } from '../auth/server'
-import { createDb, type Db } from '../db/client'
+import type { Db } from '../db/client'
 import { profiles } from '../db/schema'
 import type { UserProfile } from '../src/types/db'
 import { errorResponse } from '../src/utils/fetching/errorResponse'
 import type { WorkerEnv } from './env'
+import '../worker/middleware/db'
 
 export type RequestContext = {
   db: Db
@@ -126,8 +127,8 @@ export const createRequestContext = async (
   context: Context<{ Bindings: WorkerEnv }>,
   scopes: string[] = [],
 ): Promise<RequestContext> => {
-  const db = createDb(context.env)
-  const auth = createAuth(context.env)
+  const db = context.var.db
+  const auth = createAuth(context.env, db)
   const session = await auth.api.getSession({
     headers: context.req.raw.headers,
   })

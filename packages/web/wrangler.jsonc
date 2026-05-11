@@ -4,7 +4,6 @@
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-
   /**
    * Bindings
    * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
@@ -22,6 +21,12 @@
   },
   "compatibility_date": "2025-07-26",
   "compatibility_flags": ["nodejs_compat"],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "fb72d6282a264b2e9f59a42e010bff2f"
+    }
+  ],
   "keep_vars": true,
   "main": "worker/index.ts",
   "name": "otter-web",
@@ -40,13 +45,13 @@
       "persist": true
     }
   },
-
   /**
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
    */
-  "placement": { "mode": "smart" },
-
+  "placement": {
+    "mode": "smart"
+  },
   /* Custom domain */
   "routes": [
     {
@@ -66,13 +71,11 @@
    * Note: Use secrets to store sensitive data.
    * https://developers.cloudflare.com/workers/configuration/secrets/
    */
-
   /**
    * Static Assets
    * https://developers.cloudflare.com/workers/static-assets/binding/
    */
   // "assets": { "directory": "./public/", "binding": "ASSETS" },
-
   /**
    * Service Bindings (communicate between multiple Workers)
    * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings

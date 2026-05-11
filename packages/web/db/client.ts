@@ -1,8 +1,8 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { Pool } from 'pg'
+import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres'
+import { Client } from 'pg'
 import * as schema from './schema'
 
-export type Db = ReturnType<typeof createDb>
+export type Db = NodePgDatabase<typeof schema>
 
 export type HyperdriveBinding = {
   connectionString: string
@@ -23,10 +23,8 @@ export const getDatabaseUrl = (env: DbEnv) => {
   return databaseUrl
 }
 
-export const createDb = (env: DbEnv) => {
-  const pool = new Pool({
-    connectionString: getDatabaseUrl(env),
-  })
-
-  return drizzle(pool, { schema })
+export const createDbClient = (env: DbEnv) => {
+  const client = new Client({ connectionString: getDatabaseUrl(env) })
+  const db = drizzle(client, { schema })
+  return { client, db }
 }

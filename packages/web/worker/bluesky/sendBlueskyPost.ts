@@ -4,9 +4,9 @@ import { eq } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { errorResponse } from '@/utils/fetching/errorResponse'
 import { filteredTags } from '@/utils/filteredTags'
-import { createDb } from '../../db/client'
 import { bookmarks, userIntegrations } from '../../db/schema'
 import type { WorkerEnv } from '../env'
+import '../middleware/db'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
 
@@ -52,7 +52,7 @@ export const sendBlueskyPost = async (context: HonoContext) => {
   }
 
   // Fetch the user's Bluesky integration settings
-  const db = createDb(context.env)
+  const db = context.var.db
   const integration = await db.query.userIntegrations.findFirst({
     where: eq(userIntegrations.userId, body.record.user),
   })

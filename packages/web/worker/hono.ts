@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 
 import { createAuth } from '../auth/server'
+import { dbMiddleware } from './middleware/db'
 import { classifyBookmark } from './ai/classify'
 import { descriptionSystemPrompt } from './ai/description'
 import { generateResponse } from './ai/generateResponse'
@@ -62,12 +63,14 @@ import { sendToots } from './toots/sendToots'
 
 export const api = new Hono<{ Bindings: WorkerEnv }>()
 
+api.use('*', dbMiddleware)
+
 api.get('/', (c) => {
   return c.text('Otter API', 200)
 })
 
 api.on(["GET", "POST"], '/auth/*', async (c) => {
-  return await createAuth(c.env).handler(c.req.raw)
+  return await createAuth(c.env, c.var.db).handler(c.req.raw)
 })
 api.get('/me', async (c) => {
   return await getCurrentProfile(c)
@@ -104,7 +107,7 @@ api.get('/check-url', async (c) => {
   return await checkBookmarkUrl(c)
 })
 api.get('/recent', async (c) => {
-  return await getRecentPublicBookmarks(c.req, c.env)
+  return await getRecentPublicBookmarks(c)
 })
 api.get('/search', async (c) => {
   return await getSearch(c)
@@ -253,11 +256,12 @@ api.get('/rss', async (c) => {
 
 export const app = new Hono<{ Bindings: WorkerEnv }>()
 
+app.use('/.well-known/*', dbMiddleware)
 app.all('/.well-known/oauth-authorization-server/api/auth', async (c) => {
-  return await createAuth(c.env).handler(c.req.raw)
+  return await createAuth(c.env, c.var.db).handler(c.req.raw)
 })
 app.all('/.well-known/openid-configuration/api/auth', async (c) => {
-  return await createAuth(c.env).handler(c.req.raw)
+  return await createAuth(c.env, c.var.db).handler(c.req.raw)
 })
 app.route('/api', api)
 

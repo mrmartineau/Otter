@@ -3,7 +3,8 @@ import { compare, hash } from 'bcryptjs'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { betterAuth } from 'better-auth/minimal'
 import { jwt } from 'better-auth/plugins'
-import { createDb, type DbEnv } from '../db/client'
+import type { Db } from '../db/client'
+import type { DbEnv } from '../db/client'
 import {
   authAccounts,
   authJwks,
@@ -49,9 +50,7 @@ const getTrustedOAuthClients = (env: AuthEnv) =>
     ? new Set([env.RAYCAST_OAUTH_CLIENT_ID])
     : undefined
 
-export const createAuth = (env: AuthEnv) => {
-  const db = createDb(env)
-
+export const createAuth = (env: AuthEnv, db: Db) => {
   return betterAuth({
     advanced: {
       database: {
