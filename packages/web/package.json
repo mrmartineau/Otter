@@ -110,6 +110,7 @@
     "wrangler": "catalog:"
   },
   "name": "@mrmartineau/otter-web",
+  "packageManager": "pnpm@11.1.1",
   "private": true,
   "scripts": {
     "build": "tsc -b && vite build",
@@ -119,7 +120,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "deploy": "pnpm run build && wrangler deploy",
-    "dev": "vite --port 5678",
+    "dev": "portless otter vite",
     "oauth:raycast": "tsx scripts/upsert-raycast-oauth-client.ts",
     "preview": "pnpm run build && vite preview",
     "type-check": "tsc --noEmit"
