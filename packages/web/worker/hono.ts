@@ -114,7 +114,15 @@ api.post('/ai/classify', async (context) => {
 })
 api.get('/rss', async (c) => {
   const feed = c.req.query('feed')
-  const isValidUrl = new URL(feed ?? '')
+  let isValidUrl = false
+  if (feed) {
+    try {
+      new URL(feed)
+      isValidUrl = true
+    } catch {
+      isValidUrl = false
+    }
+  }
 
   if (isValidUrl && feed) {
     const jsonFeed = await feedToJson(feed)
