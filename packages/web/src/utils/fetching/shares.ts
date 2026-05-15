@@ -1,4 +1,5 @@
 import {
+  type InfiniteData,
   infiniteQueryOptions,
   queryOptions,
   useMutation,
@@ -120,7 +121,13 @@ const fetchPublicShare = async ({
 
 export const getPublicShareInfiniteOptions = (token: string) => {
   const limit = DEFAULT_API_RESPONSE_LIMIT
-  return infiniteQueryOptions({
+  return infiniteQueryOptions<
+    PublicShareResponse,
+    Error,
+    InfiniteData<PublicShareResponse, number>,
+    ['public-share', string],
+    number
+  >({
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       const total = lastPage.count ?? 0
       const nextOffset = lastPageParam + limit
