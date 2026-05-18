@@ -23,6 +23,8 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: 'pnpm'
+      - name: Install safe-chain
+        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
       - run: pnpm install --frozen-lockfile
       - name: Release packages
         run: |

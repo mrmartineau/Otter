@@ -1,8 +1,6 @@
 name: Deploy to Cloudflare
 
 env:
-  VITE_SUPABASE_URL: ${{secrets.VITE_SUPABASE_URL}}
-  VITE_SUPABASE_ANON_KEY: ${{secrets.VITE_SUPABASE_ANON_KEY}}
   SUPABASE_SERVICE_KEY: ${{secrets.SUPABASE_SERVICE_KEY}}
   BOT_MASTODON_ACCESS_TOKEN: ${{secrets.BOT_MASTODON_ACCESS_TOKEN}}
   PERSONAL_MASTODON_ACCESS_TOKEN: ${{secrets.PERSONAL_MASTODON_ACCESS_TOKEN}}
@@ -30,6 +28,8 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install
+      - name: Install safe-chain
+        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
       - name: Build site
         run: pnpm web:build
       - name: Deploy to Cloudflare
