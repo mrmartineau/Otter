@@ -1,3 +1,16 @@
+# [@mrmartineau/otter-web-v1.1.0](https://github.com/mrmartineau/Otter/compare/@mrmartineau/otter-web-v1.0.1...@mrmartineau/otter-web-v1.1.0) (2026-05-19)
+
+
+### Bug Fixes
+
+* **web:** stale feed data and broken trash button ([#24](https://github.com/mrmartineau/Otter/issues/24)) ([5bbd4bb](https://github.com/mrmartineau/Otter/commit/5bbd4bbef730462e86fce4243693bff7b8448533))
+
+
+### Features
+
+* **web:** add shareable tag and collection views ([d0d199d](https://github.com/mrmartineau/Otter/commit/d0d199d1d99680fde52fff63a387ba52e73fa00d))
+* **web:** type public share infinite query options ([#22](https://github.com/mrmartineau/Otter/issues/22)) ([4b1ea2f](https://github.com/mrmartineau/Otter/commit/4b1ea2f451c50d0ddf7496f78dd068515a07aa56))
+
 # [@mrmartineau/otter-web-v1.0.1](https://github.com/mrmartineau/Otter/compare/@mrmartineau/otter-web-v1.0.0...@mrmartineau/otter-web-v1.0.1) (2026-05-07)
 
 

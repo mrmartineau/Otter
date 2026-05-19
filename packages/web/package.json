@@ -127,5 +127,5 @@
     "type-check": "tsc --noEmit"
   },
   "type": "module",
-  "version": "1.0.1"
+  "version": "1.1.0"
 }
