@@ -111,6 +111,7 @@ export const API_TWEETS_SEARCH = '/api/search/tweets'
 export const API_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Origin': '*',
+  'Cache-Control': 'no-store',
   'Content-Type': 'application/json',
 }
 
