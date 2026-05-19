@@ -3,6 +3,9 @@ packages:
 
 allowBuilds:
   electron: false
+  esbuild: true
+  sharp: false
+  workerd: true
 
 catalog:
   '@cloudflare/vite-plugin': ^1.28.0
