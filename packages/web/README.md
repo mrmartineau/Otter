@@ -250,6 +250,63 @@ The dump should include data for:
 - `tweets`
 - `user_integrations`
 
+## MCP server
+
+Otter exposes a [Model Context Protocol](https://modelcontextprotocol.io) server at `POST /api/mcp`, letting MCP clients (Claude, Cursor, etc.) read and manage your bookmarks.
+
+- **Transport**: stateless HTTP JSON-RPC 2.0. Only `POST` is supported; `GET` (SSE) and `DELETE` (sessions) return `405`.
+- **Protocol version**: `2025-03-26`.
+- **Server**: name `otter`, version `1.0.0`.
+- **Auth**: send your `profiles.api_key` as a bearer token (`Authorization: Bearer <key>`). Requests without a valid key are rejected.
+
+### Tools
+
+- `search_bookmarks` - text search across title, URL, description, note, and tags
+- `list_bookmarks` - list bookmarks with filters (status, type, tag, star, public, paging)
+- `list_tags` - all tags with usage counts
+- `get_stats` - database overview: totals, type breakdown, collections
+- `random_bookmark` - random bookmark(s) matching optional filters
+- `create_bookmark` - create a bookmark, auto-scraping metadata from the URL by default
+- `update_bookmark` - update a bookmark by ID
+- `delete_bookmark` - soft-delete a bookmark (moves it to trash)
+
+### Client config
+
+Add Otter to your MCP client config. Most clients support HTTP MCP servers directly:
+
+```json
+{
+  "mcpServers": {
+    "otter": {
+      "url": "http://localhost:5678/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${OTTER_USER_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+In production, replace `http://localhost:5678` with your real Otter base URL.
+
+For Claude Code, add the server with:
+
+```bash
+claude mcp add --transport http otter http://localhost:5678/api/mcp \
+  --header "Authorization: Bearer $OTTER_USER_API_KEY"
+```
+
+### Smoke check
+
+List the available tools without an MCP client:
+
+```bash
+curl -s -X POST "http://localhost:5678/api/mcp" \
+  -H "Authorization: Bearer $OTTER_USER_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | jq
+```
+
 ## Tech Stack
 
 - **Frontend**: React 19, TanStack Router, React Query, Tailwind CSS v4
@@ -273,6 +330,7 @@ The dump should include data for:
 - `POST /api/ai/title` - rewrite a title with AI
 - `POST /api/ai/description` - rewrite a description with AI
 - `GET /api/rss?feed=https://example.com/rss` - convert an RSS feed to JSON
+- `POST /api/mcp` - MCP JSON-RPC endpoint (see [MCP server](#mcp-server))
 
 ## Mastodon integration
 
