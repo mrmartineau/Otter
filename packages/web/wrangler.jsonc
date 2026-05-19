@@ -24,13 +24,7 @@
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
-      "id": "fb72d6282a264b2e9f59a42e010bff2f",
-      // Disable query result caching: this app expects edits to be
-      // visible immediately. Hyperdrive caching is time-based only and
-      // does not invalidate on writes, so it served stale reads for ~60s.
-      "caching": {
-        "disabled": true
-      }
+      "id": "fb72d6282a264b2e9f59a42e010bff2f"
     }
   ],
   "keep_vars": true,
