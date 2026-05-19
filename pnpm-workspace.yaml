@@ -1,6 +1,12 @@
 packages:
   - packages/*
 
+allowBuilds:
+  electron: false
+  esbuild: true
+  sharp: false
+  workerd: true
+
 catalog:
   '@cloudflare/vite-plugin': ^1.28.0
   '@cloudflare/workers-types': ^4.20260313.1
