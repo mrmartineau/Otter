@@ -359,11 +359,13 @@ export const getCollectionBookmarks = async (context: HonoContext) => {
     )
     const limit = params.limit ?? DEFAULT_API_RESPONSE_LIMIT
     const offset = params.offset ?? 0
-    const rows = (await getActiveBookmarks(auth)).filter((bookmark) =>
-      (bookmark.tags ?? []).some(
-        (tag) => tag === name || tag.startsWith(`${name}:`),
-      ),
-    )
+    const rows = (await getActiveBookmarks(auth))
+      .filter((bookmark) =>
+        (bookmark.tags ?? []).some(
+          (tag) => tag === name || tag.startsWith(`${name}:`),
+        ),
+      )
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     const data = rows.slice(offset, offset + limit).map(bookmarkToRow)
 
     return new Response(
