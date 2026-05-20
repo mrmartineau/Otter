@@ -161,6 +161,30 @@ const getTagCounts = async (ctx: ToolContext) => {
   )
 }
 
+const getCollectionCounts = async (ctx: ToolContext) => {
+  const rows = await ctx.requestContext.db
+    .select({ tags: bookmarks.tags })
+    .from(bookmarks)
+    .where(and(eq(bookmarks.user, ctx.userId), eq(bookmarks.status, 'active')))
+  const counts = new Map<string, number>()
+
+  for (const row of rows) {
+    const seen = new Set<string>()
+    for (const tag of row.tags ?? []) {
+      const colonIndex = tag.indexOf(':')
+      if (colonIndex <= 0) continue
+      const name = tag.slice(0, colonIndex)
+      if (!name || seen.has(name)) continue
+      seen.add(name)
+      counts.set(name, (counts.get(name) ?? 0) + 1)
+    }
+  }
+
+  return Array.from(counts, ([name, count]) => ({ count, name })).sort(
+    (a, b) => b.count - a.count || a.name.localeCompare(b.name),
+  )
+}
+
 const getTypeCounts = async (ctx: ToolContext) => {
   const rows = await ctx.requestContext.db
     .select({ type: bookmarks.type })
@@ -285,7 +309,7 @@ const getStats: McpTool = {
   },
   handler: async (_args, ctx) => {
     try {
-      const [all, top, publicItems, stars, trash, types, tags] =
+      const [all, top, publicItems, stars, trash, types, tags, collectionRows] =
         await Promise.all([
           listBookmarkRows(ctx, { limit: 1, status: 'active' }),
           listBookmarkRows(ctx, { limit: 1, status: 'active', top: true }),
@@ -298,24 +322,11 @@ const getStats: McpTool = {
           listBookmarkRows(ctx, { limit: 1, status: 'inactive' }),
           getTypeCounts(ctx),
           getTagCounts(ctx),
+          getCollectionCounts(ctx),
         ])
-      const collectionCounts = new Map<string, number>()
-      for (const tag of tags) {
-        const colonIndex = tag.tag.indexOf(':')
-        if (colonIndex <= 0) continue
-        const name = tag.tag.slice(0, colonIndex)
-        if (!name) continue
-        collectionCounts.set(
-          name,
-          (collectionCounts.get(name) ?? 0) + (tag.count ?? 0),
-        )
-      }
-      const collections = Array.from(collectionCounts, ([name, count]) => ({
-        count,
-        name,
-      }))
-        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
-        .map((entry) => `  ${entry.name}: ${entry.count}`)
+      const collections = collectionRows.map(
+        (entry) => `  ${entry.name}: ${entry.count}`,
+      )
       const lines = [
         `Bookmarks: ${all.total} total, ${stars.total} starred, ${publicItems.total} public, ${trash.total} in trash, ${top.total} with clicks`,
         '',
