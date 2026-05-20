@@ -102,7 +102,6 @@ const collectionCounts = (rows: BookmarkRow[]): CollectionType[] => {
   const collections = new Map<string, { count: number; tags: Set<string> }>()
 
   for (const row of rows) {
-    const seen = new Set<string>()
     for (const tag of row.tags ?? []) {
       const colonIndex = tag.indexOf(':')
       if (colonIndex <= 0) {
@@ -119,11 +118,24 @@ const collectionCounts = (rows: BookmarkRow[]): CollectionType[] => {
         tags: new Set<string>(),
       }
       item.tags.add(tag)
-      if (!seen.has(collection)) {
-        item.count += 1
-        seen.add(collection)
-      }
       collections.set(collection, item)
+    }
+  }
+
+  for (const row of rows) {
+    const seen = new Set<string>()
+    for (const tag of row.tags ?? []) {
+      const colonIndex = tag.indexOf(':')
+      const name = colonIndex > 0 ? tag.slice(0, colonIndex) : tag
+      if (!name || seen.has(name)) {
+        continue
+      }
+      const item = collections.get(name)
+      if (!item) {
+        continue
+      }
+      item.count += 1
+      seen.add(name)
     }
   }
 

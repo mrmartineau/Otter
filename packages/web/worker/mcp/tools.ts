@@ -166,15 +166,23 @@ const getCollectionCounts = async (ctx: ToolContext) => {
     .select({ tags: bookmarks.tags })
     .from(bookmarks)
     .where(and(eq(bookmarks.user, ctx.userId), eq(bookmarks.status, 'active')))
-  const counts = new Map<string, number>()
-
+  const collections = new Set<string>()
   for (const row of rows) {
-    const seen = new Set<string>()
     for (const tag of row.tags ?? []) {
       const colonIndex = tag.indexOf(':')
       if (colonIndex <= 0) continue
       const name = tag.slice(0, colonIndex)
-      if (!name || seen.has(name)) continue
+      if (name) collections.add(name)
+    }
+  }
+
+  const counts = new Map<string, number>()
+  for (const row of rows) {
+    const seen = new Set<string>()
+    for (const tag of row.tags ?? []) {
+      const colonIndex = tag.indexOf(':')
+      const name = colonIndex > 0 ? tag.slice(0, colonIndex) : tag
+      if (!name || seen.has(name) || !collections.has(name)) continue
       seen.add(name)
       counts.set(name, (counts.get(name) ?? 0) + 1)
     }
