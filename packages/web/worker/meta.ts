@@ -102,12 +102,14 @@ const collectionCounts = (rows: BookmarkRow[]): CollectionType[] => {
   const collections = new Map<string, { count: number; tags: Set<string> }>()
 
   for (const row of rows) {
+    const seen = new Set<string>()
     for (const tag of row.tags ?? []) {
-      if (!tag.startsWith('collection:')) {
+      const colonIndex = tag.indexOf(':')
+      if (colonIndex <= 0) {
         continue
       }
 
-      const [, collection] = tag.split(':')
+      const collection = tag.slice(0, colonIndex)
       if (!collection) {
         continue
       }
@@ -116,8 +118,11 @@ const collectionCounts = (rows: BookmarkRow[]): CollectionType[] => {
         count: 0,
         tags: new Set<string>(),
       }
-      item.count += 1
       item.tags.add(tag)
+      if (!seen.has(collection)) {
+        item.count += 1
+        seen.add(collection)
+      }
       collections.set(collection, item)
     }
   }
@@ -125,8 +130,12 @@ const collectionCounts = (rows: BookmarkRow[]): CollectionType[] => {
   return Array.from(collections, ([collection, value]) => ({
     bookmark_count: value.count,
     collection,
-    tags: Array.from(value.tags),
-  }))
+    tags: Array.from(value.tags).sort(),
+  })).sort(
+    (a, b) =>
+      (b.bookmark_count ?? 0) - (a.bookmark_count ?? 0) ||
+      a.collection.localeCompare(b.collection),
+  )
 }
 
 export const getMeta = async (context: HonoContext) => {
@@ -352,8 +361,7 @@ export const getCollectionBookmarks = async (context: HonoContext) => {
     const offset = params.offset ?? 0
     const rows = (await getActiveBookmarks(auth)).filter((bookmark) =>
       (bookmark.tags ?? []).some(
-        (tag) =>
-          tag === `collection:${name}` || tag.startsWith(`collection:${name}:`),
+        (tag) => tag === name || tag.startsWith(`${name}:`),
       ),
     )
     const data = rows.slice(offset, offset + limit).map(bookmarkToRow)

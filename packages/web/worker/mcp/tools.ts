@@ -299,9 +299,23 @@ const getStats: McpTool = {
           getTypeCounts(ctx),
           getTagCounts(ctx),
         ])
-      const collections = tags
-        .filter((tag) => tag.tag.startsWith('collection:'))
-        .map((tag) => `  ${tag.tag.replace('collection:', '')}: ${tag.count}`)
+      const collectionCounts = new Map<string, number>()
+      for (const tag of tags) {
+        const colonIndex = tag.tag.indexOf(':')
+        if (colonIndex <= 0) continue
+        const name = tag.tag.slice(0, colonIndex)
+        if (!name) continue
+        collectionCounts.set(
+          name,
+          (collectionCounts.get(name) ?? 0) + (tag.count ?? 0),
+        )
+      }
+      const collections = Array.from(collectionCounts, ([name, count]) => ({
+        count,
+        name,
+      }))
+        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+        .map((entry) => `  ${entry.name}: ${entry.count}`)
       const lines = [
         `Bookmarks: ${all.total} total, ${stars.total} starred, ${publicItems.total} public, ${trash.total} in trash, ${top.total} with clicks`,
         '',
