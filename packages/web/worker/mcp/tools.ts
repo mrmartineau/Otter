@@ -4,6 +4,7 @@ import type { BookmarkStatus, BookmarkType } from '@/types/db'
 import { matchTagsSource } from '@/utils/matchTags'
 import { bookmarks } from '../../db/schema'
 import { bookmarkToRow } from '../bookmarks/mapper'
+import { summariseCollections } from '../collections'
 import type { RequestContext } from '../context'
 import { linkType } from '../scraper/link-type'
 import Scraper from '../scraper/scraper'
@@ -161,6 +162,14 @@ const getTagCounts = async (ctx: ToolContext) => {
   )
 }
 
+const getCollectionCounts = async (ctx: ToolContext) => {
+  const rows = await ctx.requestContext.db
+    .select({ tags: bookmarks.tags })
+    .from(bookmarks)
+    .where(and(eq(bookmarks.user, ctx.userId), eq(bookmarks.status, 'active')))
+  return summariseCollections(rows)
+}
+
 const getTypeCounts = async (ctx: ToolContext) => {
   const rows = await ctx.requestContext.db
     .select({ type: bookmarks.type })
@@ -285,7 +294,7 @@ const getStats: McpTool = {
   },
   handler: async (_args, ctx) => {
     try {
-      const [all, top, publicItems, stars, trash, types, tags] =
+      const [all, top, publicItems, stars, trash, types, tags, collectionRows] =
         await Promise.all([
           listBookmarkRows(ctx, { limit: 1, status: 'active' }),
           listBookmarkRows(ctx, { limit: 1, status: 'active', top: true }),
@@ -298,10 +307,11 @@ const getStats: McpTool = {
           listBookmarkRows(ctx, { limit: 1, status: 'inactive' }),
           getTypeCounts(ctx),
           getTagCounts(ctx),
+          getCollectionCounts(ctx),
         ])
-      const collections = tags
-        .filter((tag) => tag.tag.startsWith('collection:'))
-        .map((tag) => `  ${tag.tag.replace('collection:', '')}: ${tag.count}`)
+      const collections = collectionRows.map(
+        (entry) => `  ${entry.collection}: ${entry.bookmark_count}`,
+      )
       const lines = [
         `Bookmarks: ${all.total} total, ${stars.total} starred, ${publicItems.total} public, ${trash.total} in trash, ${top.total} with clicks`,
         '',

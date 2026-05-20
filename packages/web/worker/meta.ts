@@ -3,10 +3,11 @@ import type { Context } from 'hono'
 import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { apiParameters } from '@/utils/fetching/apiParameters'
 import { errorResponse } from '@/utils/fetching/errorResponse'
-import type { CollectionType, MetaTag, MetaType } from '@/utils/fetching/meta'
+import type { MetaTag, MetaType } from '@/utils/fetching/meta'
 import { getErrorMessage } from '@/utils/get-error-message'
 import { bookmarks, toots, tweets } from '../db/schema'
 import { bookmarkToRow } from './bookmarks/mapper'
+import { summariseCollections, tagBelongsToCollection } from './collections'
 import { requireRequestContext } from './context'
 import type { WorkerEnv } from './env'
 
@@ -98,37 +99,6 @@ const typeCounts = (rows: BookmarkRow[]): MetaType[] => {
   }))
 }
 
-const collectionCounts = (rows: BookmarkRow[]): CollectionType[] => {
-  const collections = new Map<string, { count: number; tags: Set<string> }>()
-
-  for (const row of rows) {
-    for (const tag of row.tags ?? []) {
-      if (!tag.startsWith('collection:')) {
-        continue
-      }
-
-      const [, collection] = tag.split(':')
-      if (!collection) {
-        continue
-      }
-
-      const item = collections.get(collection) ?? {
-        count: 0,
-        tags: new Set<string>(),
-      }
-      item.count += 1
-      item.tags.add(tag)
-      collections.set(collection, item)
-    }
-  }
-
-  return Array.from(collections, ([collection, value]) => ({
-    bookmark_count: value.count,
-    collection,
-    tags: Array.from(value.tags),
-  }))
-}
-
 export const getMeta = async (context: HonoContext) => {
   try {
     const auth = await getAuthed(context)
@@ -198,7 +168,7 @@ export const getMeta = async (context: HonoContext) => {
     return new Response(
       JSON.stringify({
         all,
-        collections: collectionCounts(rows),
+        collections: summariseCollections(rows),
         likedToots,
         likedTweets,
         public: publicItems,
@@ -321,7 +291,7 @@ export const getCollectionsTags = async (context: HonoContext) => {
     }
 
     return new Response(
-      JSON.stringify(collectionCounts(await getActiveBookmarks(auth))),
+      JSON.stringify(summariseCollections(await getActiveBookmarks(auth))),
       {
         headers: API_HEADERS,
         status: 200,
@@ -345,17 +315,23 @@ export const getCollectionBookmarks = async (context: HonoContext) => {
     }
 
     const name = context.req.param('collection')
+    if (!name) {
+      return errorResponse({
+        reason: 'Missing collection name',
+        status: 400,
+      })
+    }
+
     const params = apiParameters(
       Object.fromEntries(new URL(context.req.url).searchParams),
     )
     const limit = params.limit ?? DEFAULT_API_RESPONSE_LIMIT
     const offset = params.offset ?? 0
-    const rows = (await getActiveBookmarks(auth)).filter((bookmark) =>
-      (bookmark.tags ?? []).some(
-        (tag) =>
-          tag === `collection:${name}` || tag.startsWith(`collection:${name}:`),
-      ),
-    )
+    const rows = (await getActiveBookmarks(auth))
+      .filter((bookmark) =>
+        (bookmark.tags ?? []).some((tag) => tagBelongsToCollection(tag, name)),
+      )
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
     const data = rows.slice(offset, offset + limit).map(bookmarkToRow)
 
     return new Response(
