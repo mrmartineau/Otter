@@ -1,0 +1,72 @@
+@layer components {
+  .slate-editor {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    padding: var(--space-3xs);
+    min-height: 80px;
+    cursor: text;
+  }
+
+  .slate-editor:focus-within {
+    border-color: var(--theme7);
+  }
+
+  .slate-toolbar {
+    display: flex;
+    gap: var(--space-3xs);
+    border-bottom: 1px solid var(--theme3);
+    padding-bottom: var(--space-3xs);
+    margin-bottom: var(--space-3xs);
+  }
+
+  .slate-toolbar-btn {
+    appearance: none;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radii-s);
+    padding: var(--space-3xs) var(--space-2xs);
+    color: var(--theme10);
+    font-size: var(--step--2);
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .slate-toolbar-btn:hover {
+    background: var(--theme3);
+  }
+
+  .slate-toolbar-btn.is-active {
+    background: var(--theme4);
+    border-color: var(--theme6);
+  }
+
+  .slate-editable {
+    outline: none;
+    min-height: 60px;
+    padding: var(--space-3xs) var(--space-2xs);
+    font-size: var(--step--1);
+    color: var(--theme12);
+  }
+
+  .slate-paragraph {
+    margin: 0 0 var(--space-2xs) 0;
+  }
+
+  .slate-paragraph:last-child {
+    margin-bottom: 0;
+  }
+
+  .slate-editable code {
+    background: var(--theme3);
+    padding: 0 var(--space-3xs);
+    border-radius: var(--radii-s);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.95em;
+  }
+
+  .slate-editable [data-slate-placeholder='true'] {
+    color: var(--theme7);
+  }
+}
