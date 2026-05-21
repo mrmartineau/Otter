@@ -14,6 +14,13 @@
       "tag": "0001_shares",
       "version": "7",
       "when": 1778500000000
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779401997663,
+      "tag": "0002_marvelous_war_machine",
+      "breakpoints": true
     }
   ],
   "version": "7"

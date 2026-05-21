@@ -57,6 +57,7 @@
     "remark-squeeze-paragraphs": "^6.0.0",
     "remark-truncate-links": "^1.0.3",
     "sonner": "^2.0.7",
+    "stripe": "^22.1.1",
     "tailwind-merge": "^3.5.0",
     "tidy-url": "^1.18.3",
     "tiny-relative-date": "^2.0.2",
@@ -124,6 +125,7 @@
     "dev": "portless run vite",
     "oauth:raycast": "tsx scripts/upsert-raycast-oauth-client.ts",
     "preview": "pnpm run build && vite preview",
+    "set-admin": "tsx scripts/set-admin.ts",
     "type-check": "tsc --noEmit"
   },
   "type": "module",

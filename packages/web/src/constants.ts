@@ -10,9 +10,14 @@ export const TITLE_SEPARATOR = ' — '
 export const CONTENT = {
   accountSettingsTitle: 'Account, settings & integrations',
   addToLabel: 'Add to Otter',
+  adminNav: 'Admin',
+  adminTitle: 'Admin',
+  adminUsersTitle: 'Users',
   allDescription: 'All your items',
   appName: 'Otter',
   appSettingsTitle: 'App settings',
+  billingNav: 'Billing',
+  billingTitle: 'Billing & plan',
   collectionsNav: 'Collections',
   dashboardNav: 'Dashboard',
   dashboardTitle: 'Dashboard',
@@ -39,6 +44,7 @@ export const CONTENT = {
   noNewerItems: 'No newer items',
   noOlderItems: 'No older items',
   olderBtn: 'Older',
+  pricingTitle: 'Pricing',
   publicNav: 'Public',
   publicTitle: 'Public',
   scrapeThisUrl: 'Scrape this URL',
@@ -86,6 +92,10 @@ export const ROUTE_RECENT = '/recent'
 export const ROUTE_STATS = '/top'
 export const ROUTE_TRASH = '/trash'
 export const ROUTE_SETTINGS_ACCOUNT = '/settings/account'
+export const ROUTE_SETTINGS_BILLING = '/settings/billing'
+export const ROUTE_PRICING = '/pricing'
+export const ROUTE_ADMIN = '/admin'
+export const ROUTE_ADMIN_USERS = '/admin/users'
 export const ROUTE_TOOTS_MINE = '/toots'
 export const ROUTE_TOOTS_LIKES = '/toots/likes'
 export const ROUTE_TWEETS_MINE = '/tweets'
@@ -125,3 +135,52 @@ export const DEFAULT_API_RESPONSE_ORDER: RequestOrder = 'desc'
 export const MINIMUM_CLICK_COUNT = 1
 
 export const DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER = 'https://zander.wtf'
+
+// Billing & plans
+//
+// The default number of bookmarks a free user may create each day. The live
+// value is configurable per-deployment via the `FREE_DAILY_BOOKMARK_LIMIT`
+// worker env var, and per-user via the `daily_bookmark_limit_override` column.
+// This constant is the fallback default and the value shown in marketing copy.
+export const DEFAULT_FREE_DAILY_BOOKMARK_LIMIT = 10
+
+export type PlanId = 'free' | 'pro'
+
+export interface BillingPlan {
+  id: PlanId
+  name: string
+  /** Price per month in whole units of currency (USD). */
+  price: number
+  priceLabel: string
+  tagline: string
+  features: string[]
+}
+
+export const BILLING_PLANS: Record<PlanId, BillingPlan> = {
+  free: {
+    features: [
+      `${DEFAULT_FREE_DAILY_BOOKMARK_LIMIT} new bookmarks per day`,
+      'Unlimited bookmark storage',
+      'Tags, collections, search & RSS',
+      'Browser extensions & bookmarklet',
+    ],
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    priceLabel: 'Free',
+    tagline: 'For getting started',
+  },
+  pro: {
+    features: [
+      'Unlimited new bookmarks',
+      'Everything in Free',
+      'AI titles, summaries & classification',
+      'Priority support',
+    ],
+    id: 'pro',
+    name: 'Pro',
+    price: 5,
+    priceLabel: '$5',
+    tagline: 'For people who save a lot',
+  },
+}

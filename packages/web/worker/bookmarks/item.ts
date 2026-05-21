@@ -8,6 +8,7 @@ import { bookmarks } from '../../db/schema'
 import { requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 import { bookmarkToRow } from './mapper'
+import { enforceBookmarkQuota } from './quota'
 import { scheduleBookmarkSideEffects } from './sideEffects'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
@@ -113,6 +114,16 @@ export const createBookmark = async (context: HonoContext) => {
 
     if (auth instanceof Response) {
       return auth
+    }
+
+    const quotaError = await enforceBookmarkQuota(
+      auth.requestContext.db,
+      context.env,
+      auth.userId,
+    )
+
+    if (quotaError) {
+      return quotaError
     }
 
     const body = await readJson(context)

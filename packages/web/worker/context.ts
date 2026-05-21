@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import type { Context, HonoRequest } from 'hono'
-import { createLocalJWKSet, jwtVerify, type JWK, type JWTPayload } from 'jose'
+import { createLocalJWKSet, type JWK, type JWTPayload, jwtVerify } from 'jose'
 import { createAuth, getOAuthAudience } from '../auth/server'
 import type { Db } from '../db/client'
 import { profiles } from '../db/schema'
@@ -24,6 +24,8 @@ export const profileToRow = (profile: Profile): UserProfile => ({
   api_key: profile.apiKey,
   avatar_url: profile.avatarUrl,
   id: profile.id,
+  plan: profile.plan,
+  role: profile.role,
   settings_collections_visible: profile.settingsCollectionsVisible,
   settings_group_by_date: profile.settingsGroupByDate,
   settings_pinned_tags: profile.settingsPinnedTags,
@@ -177,6 +179,31 @@ export const requireRequestContext = async (
       error: 'Authentication required',
       reason: 'Missing or invalid session/API key',
       status: 401,
+    })
+  }
+
+  return requestContext
+}
+
+/**
+ * Like {@link requireRequestContext} but additionally requires the
+ * authenticated user to have the `admin` role. Returns a 403 Response
+ * otherwise.
+ */
+export const requireAdminContext = async (
+  context: Context<{ Bindings: WorkerEnv }>,
+) => {
+  const requestContext = await requireRequestContext(context)
+
+  if (requestContext instanceof Response) {
+    return requestContext
+  }
+
+  if (requestContext.profile?.role !== 'admin') {
+    return errorResponse({
+      error: 'Forbidden',
+      reason: 'Admin access required',
+      status: 403,
     })
   }
 

@@ -1,4 +1,5 @@
 import {
+  CreditCardIcon,
   GearIcon,
   HashIcon,
   PlugsIcon,
@@ -34,6 +35,10 @@ function RouteComponent() {
         <SidebarLink href="/settings/account">
           <UserCircleIcon weight="duotone" size={18} />
           Account
+        </SidebarLink>
+        <SidebarLink href="/settings/billing">
+          <CreditCardIcon weight="duotone" size={18} />
+          {CONTENT.billingNav}
         </SidebarLink>
         <SidebarLink href="/settings/integrations">
           <PlugsIcon weight="duotone" size={18} />

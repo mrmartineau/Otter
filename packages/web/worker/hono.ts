@@ -1,11 +1,17 @@
 import { Hono } from 'hono'
 
 import { createAuth } from '../auth/server'
+import { getAdminStats } from './admin/stats'
+import { listUsers, updateUserAdmin } from './admin/users'
 import { classifyBookmark } from './ai/classify'
 import { descriptionSystemPrompt } from './ai/description'
 import { generateResponse } from './ai/generateResponse'
 import { MAX_CONTENT_LENGTH, summariseSystemPrompt } from './ai/summarise'
 import { titleSystemPrompt } from './ai/title'
+import { createCheckoutSession } from './billing/checkout'
+import { createPortalSession } from './billing/portal'
+import { getBillingStatus } from './billing/subscription'
+import { handleStripeWebhook } from './billing/webhook'
 import { sendBlueskyPost } from './bluesky/sendBlueskyPost'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
 import { getRecentPublicBookmarks } from './bookmarks/getRecentPublicBookmarks'
@@ -48,15 +54,15 @@ import {
 } from './meta'
 import { dbMiddleware } from './middleware/db'
 import { getCurrentProfile, updateCurrentProfile } from './profile'
+import { feedToJson } from './rss/rss-to-json'
+import { handleScrapeContent } from './scraper/scrape-content'
+import { getSearch } from './search/search'
 import {
   createOrRotateShare,
   deleteShare,
   getPublicShare,
   listShares,
 } from './shares'
-import { feedToJson } from './rss/rss-to-json'
-import { handleScrapeContent } from './scraper/scrape-content'
-import { getSearch } from './search/search'
 import {
   getToot,
   getToots,
@@ -153,6 +159,32 @@ api.get('/me', async (c) => {
 })
 api.patch('/me', async (c) => {
   return await updateCurrentProfile(c)
+})
+
+// Billing — Stripe checkout, portal, subscription status and webhook.
+// The webhook is intentionally unauthenticated; it is verified by signature.
+api.post('/billing/webhook', async (c) => {
+  return await handleStripeWebhook(c)
+})
+api.get('/billing', async (c) => {
+  return await getBillingStatus(c)
+})
+api.post('/billing/checkout', async (c) => {
+  return await createCheckoutSession(c)
+})
+api.post('/billing/portal', async (c) => {
+  return await createPortalSession(c)
+})
+
+// Admin — gated by requireAdminContext inside each handler.
+api.get('/admin/stats', async (c) => {
+  return await getAdminStats(c)
+})
+api.get('/admin/users', async (c) => {
+  return await listUsers(c)
+})
+api.patch('/admin/users/:id', async (c) => {
+  return await updateUserAdmin(c)
 })
 
 api.post('/new', async (c) => {

@@ -12,6 +12,7 @@ import { bookmarks } from '../../db/schema'
 import { type RequestContext, requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 import { bookmarkToRow } from './mapper'
+import { enforceBookmarkQuota } from './quota'
 import { scheduleBookmarkSideEffects } from './sideEffects'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
@@ -93,6 +94,17 @@ export const postNewBookmark = async (context: HonoContext) => {
       return auth
     }
 
+    const quotaError = await enforceBookmarkQuota(
+      auth.requestContext.db,
+      context.env,
+      auth.userId,
+      requestBody.length,
+    )
+
+    if (quotaError) {
+      return quotaError
+    }
+
     const dbTags = await getTagMetadata(auth.requestContext)
     const mapper = async ({ scrape, url, ...rest }: NewBookmark) => {
       if (url && scrape) {
@@ -170,6 +182,16 @@ export const getNewBookmark = async (context: HonoContext) => {
 
     if (auth instanceof Response) {
       return auth
+    }
+
+    const quotaError = await enforceBookmarkQuota(
+      auth.requestContext.db,
+      context.env,
+      auth.userId,
+    )
+
+    if (quotaError) {
+      return quotaError
     }
 
     const dbTags = await getTagMetadata(auth.requestContext)

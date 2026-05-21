@@ -19,3 +19,16 @@ RAYCAST_OAUTH_CLIENT_ID=
 BOT_MASTODON_ACCESS_TOKEN=
 PERSONAL_MASTODON_ACCESS_TOKEN=
 WEBHOOK_SECRET=replace-with-a-random-secret
+
+# Billing — Stripe
+# Public origin of the app, used to build Stripe redirect URLs.
+# Falls back to BETTER_AUTH_URL when unset.
+APP_URL=http://localhost:5678
+STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+# Recurring price ID for the Pro subscription (Stripe Dashboard → Products).
+STRIPE_PRICE_ID=price_xxx
+
+# Free plan: number of new bookmarks allowed per day.
+# Optional — defaults to 10 when unset.
+FREE_DAILY_BOOKMARK_LIMIT=10

@@ -4,6 +4,7 @@ import {
   boolean,
   check,
   index,
+  integer,
   json,
   numeric,
   pgEnum,
@@ -52,6 +53,19 @@ export const mediaTypeEnum = pgEnum('media_type', [
 export const bookmarkStatusEnum = pgEnum('status', ['active', 'inactive'])
 
 export const shareKindEnum = pgEnum('share_kind', ['tag', 'collection'])
+
+export const userRoleEnum = pgEnum('user_role', ['user', 'admin'])
+
+export const subscriptionPlanEnum = pgEnum('subscription_plan', ['free', 'pro'])
+
+export const subscriptionStatusEnum = pgEnum('subscription_status', [
+  'active',
+  'trialing',
+  'past_due',
+  'canceled',
+  'incomplete',
+  'inactive',
+])
 
 export const bookmarkTypeEnum = pgEnum('type', [
   'link',
@@ -279,9 +293,16 @@ export const profiles = pgTable(
   {
     apiKey: uuid('api_key').notNull().defaultRandom(),
     avatarUrl: text('avatar_url'),
+    cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
+    currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }),
+    // Per-user override of the free daily bookmark limit (admin-managed).
+    // null = use the app-wide default.
+    dailyBookmarkLimitOverride: integer('daily_bookmark_limit_override'),
     id: uuid('id')
       .primaryKey()
       .references(() => authUsers.id, { onDelete: 'cascade' }),
+    plan: subscriptionPlanEnum('plan').notNull().default('free'),
+    role: userRoleEnum('role').notNull().default('user'),
     settingsCollectionsVisible: boolean('settings_collections_visible')
       .notNull()
       .default(false),
@@ -299,6 +320,11 @@ export const profiles = pgTable(
     settingsTypesVisible: boolean('settings_types_visible')
       .notNull()
       .default(false),
+    stripeCustomerId: text('stripe_customer_id'),
+    stripeSubscriptionId: text('stripe_subscription_id'),
+    subscriptionStatus: subscriptionStatusEnum('subscription_status')
+      .notNull()
+      .default('inactive'),
     updatedAt: timestamp('updated_at', { withTimezone: true }),
     username: text('username'),
   },
@@ -306,6 +332,7 @@ export const profiles = pgTable(
     check('username_length', sql`char_length(${table.username}) >= 3`),
     uniqueIndex('profiles_api_key_key').on(table.apiKey),
     uniqueIndex('profiles_username_key').on(table.username),
+    index('profiles_stripe_customer_id_idx').on(table.stripeCustomerId),
   ],
 )
 
