@@ -66,7 +66,122 @@
     font-size: 0.95em;
   }
 
-  .slate-editable [data-slate-placeholder='true'] {
+  .slate-editable [data-slate-placeholder="true"] {
     color: var(--theme7);
+  }
+
+  .slate-code-block {
+    position: relative;
+    background: var(--theme2);
+    border: 1px solid var(--theme4);
+    border-radius: var(--radii-l);
+    padding: var(--space-xs) var(--space-s);
+    margin: var(--space-2xs) 0;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: var(--step--2);
+    color: var(--theme12);
+  }
+
+  .slate-code-block pre {
+    margin: 0;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .slate-code-block code {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  .slate-code-block-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--space-3xs);
+  }
+
+  .slate-code-block-lang {
+    appearance: none;
+    background: var(--theme3);
+    border: 1px solid var(--theme5);
+    border-radius: var(--radii-s);
+    color: var(--theme11);
+    font-family: inherit;
+    font-size: var(--step--3);
+    padding: 2px var(--space-3xs);
+    cursor: pointer;
+  }
+
+  .slate-editable .token.comment,
+  .slate-editable .token.prolog,
+  .slate-editable .token.doctype,
+  .slate-editable .token.cdata {
+    color: var(--theme9);
+    font-style: italic;
+  }
+
+  .slate-editable .token.punctuation {
+    color: var(--theme10);
+  }
+
+  .slate-editable .token.namespace {
+    opacity: 0.7;
+  }
+
+  .slate-editable .token.property,
+  .slate-editable .token.tag,
+  .slate-editable .token.boolean,
+  .slate-editable .token.number,
+  .slate-editable .token.constant,
+  .slate-editable .token.symbol,
+  .slate-editable .token.deleted {
+    color: var(--red11, #e5484d);
+  }
+
+  .slate-editable .token.selector,
+  .slate-editable .token.attr-name,
+  .slate-editable .token.string,
+  .slate-editable .token.char,
+  .slate-editable .token.builtin,
+  .slate-editable .token.inserted {
+    color: var(--green11, #30a46c);
+  }
+
+  .slate-editable .token.operator,
+  .slate-editable .token.entity,
+  .slate-editable .token.url,
+  .slate-editable .token.variable {
+    color: var(--amber11, #ad5700);
+  }
+
+  .slate-editable .token.atrule,
+  .slate-editable .token.attr-value,
+  .slate-editable .token.keyword {
+    color: var(--violet11, #6e56cf);
+  }
+
+  .slate-editable .token.function,
+  .slate-editable .token.class-name {
+    color: var(--blue11, #0091ff);
+  }
+
+  .slate-editable .token.regex,
+  .slate-editable .token.important {
+    color: var(--orange11, #d9480f);
+  }
+
+  .slate-editable .token.important,
+  .slate-editable .token.bold {
+    font-weight: bold;
+  }
+
+  .slate-editable .token.italic {
+    font-style: italic;
   }
 }
