@@ -46,7 +46,7 @@ function RouteComponent() {
         <Stat
           label="Comp users"
           value={fmt(stats.comp_users)}
-          hint="Complimentary, unlimited"
+          hint="Complimentary — full Pro access"
         />
         <Stat label="Free users" value={fmt(stats.free_users)} />
         <Stat label="Admins" value={fmt(stats.admin_users)} />

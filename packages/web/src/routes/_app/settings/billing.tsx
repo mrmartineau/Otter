@@ -63,7 +63,7 @@ function RouteComponent() {
   const planLabel = isPro
     ? 'Pro plan'
     : isComp
-      ? 'Complimentary plan'
+      ? 'Pro plan (complimentary)'
       : 'Free plan'
 
   return (
@@ -77,7 +77,7 @@ function RouteComponent() {
             <span
               className={`billing-badge ${isPro || isComp ? 'is-pro' : ''}`}
             >
-              {isPro ? 'Pro' : isComp ? 'Comp' : 'Free'}
+              {isPro || isComp ? 'Pro' : 'Free'}
             </span>
           </Flex>
           {isPro ? (
@@ -115,7 +115,7 @@ function RouteComponent() {
         ) : unlimited ? (
           <p>
             {isComp
-              ? 'You have a complimentary plan — unlimited bookmarks, no charge.'
+              ? 'You have full Pro access, complimentary — all Pro features (unlimited bookmarks, AI titles, summaries & classification) at no charge.'
               : 'You have unlimited bookmarks.'}
           </p>
         ) : (
