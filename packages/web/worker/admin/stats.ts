@@ -39,6 +39,7 @@ export const getAdminStats = async (context: HonoContext) => {
     const [
       totalUsers,
       proUsers,
+      compUsers,
       adminUsers,
       totalBookmarks,
       publicBookmarks,
@@ -53,6 +54,12 @@ export const getAdminStats = async (context: HonoContext) => {
           .select({ value: count() })
           .from(profiles)
           .where(eq(profiles.plan, 'pro')),
+      ),
+      firstValue(
+        db
+          .select({ value: count() })
+          .from(profiles)
+          .where(eq(profiles.plan, 'comp')),
       ),
       firstValue(
         db
@@ -97,8 +104,9 @@ export const getAdminStats = async (context: HonoContext) => {
       admin_users: adminUsers,
       bookmarks_last_7_days: bookmarks7,
       bookmarks_last_30_days: bookmarks30,
+      comp_users: compUsers,
       estimated_mrr: proUsers * BILLING_PLANS.pro.price,
-      free_users: Math.max(0, totalUsers - proUsers),
+      free_users: Math.max(0, totalUsers - proUsers - compUsers),
       pro_users: proUsers,
       public_bookmarks: publicBookmarks,
       signups_last_7_days: signups7,

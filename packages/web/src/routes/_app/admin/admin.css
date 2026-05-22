@@ -96,6 +96,11 @@
   color: var(--theme1);
 }
 
+.admin-badge.is-comp {
+  background-color: var(--jade9, #29a383);
+  color: #f5f5f0;
+}
+
 .admin-override-input {
   width: 5rem;
   padding: var(--space-4xs) var(--space-2xs);

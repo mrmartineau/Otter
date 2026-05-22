@@ -111,7 +111,7 @@ export interface BookmarkFormValues
 }
 
 export type UserRole = 'user' | 'admin'
-export type SubscriptionPlan = 'free' | 'pro'
+export type SubscriptionPlan = 'free' | 'pro' | 'comp'
 export type SubscriptionStatus =
   | 'active'
   | 'trialing'
@@ -167,6 +167,7 @@ export interface AdminUser {
 export interface AdminStats {
   total_users: number
   pro_users: number
+  comp_users: number
   free_users: number
   admin_users: number
   total_bookmarks: number

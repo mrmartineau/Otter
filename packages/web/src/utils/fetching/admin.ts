@@ -49,6 +49,7 @@ export const getAdminUsersOptions = () =>
 interface UpdateUserParams {
   id: string
   role?: UserRole
+  plan?: 'free' | 'comp'
   daily_bookmark_limit_override?: number | null
 }
 

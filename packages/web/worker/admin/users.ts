@@ -81,13 +81,17 @@ export const listUsers = async (context: HonoContext) => {
 const updateUserSchema = z
   .object({
     daily_bookmark_limit_override: z.number().int().min(0).nullable(),
+    // Only `free` and `comp` are settable by an admin — `pro` is managed by
+    // Stripe and must not be assigned manually.
+    plan: z.enum(['free', 'comp']),
     role: z.enum(['user', 'admin']),
   })
   .partial()
 
 /**
  * PATCH /api/admin/users/:id
- * Updates a user's role or per-user daily bookmark limit. Admin-only.
+ * Updates a user's role, plan (free/comp) or per-user daily bookmark limit.
+ * Admin-only.
  */
 export const updateUserAdmin = async (context: HonoContext) => {
   try {
@@ -125,6 +129,9 @@ export const updateUserAdmin = async (context: HonoContext) => {
     const update: Partial<typeof profiles.$inferInsert> = {}
     if (parsed.data.role !== undefined) {
       update.role = parsed.data.role
+    }
+    if (parsed.data.plan !== undefined) {
+      update.plan = parsed.data.plan
     }
     if (parsed.data.daily_bookmark_limit_override !== undefined) {
       update.dailyBookmarkLimitOverride =

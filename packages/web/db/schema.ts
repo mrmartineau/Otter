@@ -56,7 +56,13 @@ export const shareKindEnum = pgEnum('share_kind', ['tag', 'collection'])
 
 export const userRoleEnum = pgEnum('user_role', ['user', 'admin'])
 
-export const subscriptionPlanEnum = pgEnum('subscription_plan', ['free', 'pro'])
+export const subscriptionPlanEnum = pgEnum('subscription_plan', [
+  'free',
+  'pro',
+  // Complimentary — unlimited access granted manually by an admin, no Stripe
+  // subscription. Set via the admin users page.
+  'comp',
+])
 
 export const subscriptionStatusEnum = pgEnum('subscription_status', [
   'active',

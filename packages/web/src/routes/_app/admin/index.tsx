@@ -43,6 +43,11 @@ function RouteComponent() {
           hint="From active Pro subscriptions"
         />
         <Stat label="Pro users" value={fmt(stats.pro_users)} />
+        <Stat
+          label="Comp users"
+          value={fmt(stats.comp_users)}
+          hint="Complimentary, unlimited"
+        />
         <Stat label="Free users" value={fmt(stats.free_users)} />
         <Stat label="Admins" value={fmt(stats.admin_users)} />
         <Stat label="Total bookmarks" value={fmt(stats.total_bookmarks)} />

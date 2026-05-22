@@ -52,11 +52,19 @@ function RouteComponent() {
   }, [search.checkout, queryClient])
 
   const isPro = billing.plan === 'pro'
+  const isComp = billing.plan === 'comp'
   const { quota } = billing
+  // Unlimited covers Pro, complimentary plans and admins.
+  const unlimited = quota.limit === null
   const limit = quota.limit ?? 0
   const usedPct =
     limit > 0 ? Math.min(100, Math.round((quota.used / limit) * 100)) : 0
   const atLimit = quota.limit !== null && quota.used >= quota.limit
+  const planLabel = isPro
+    ? 'Pro plan'
+    : isComp
+      ? 'Complimentary plan'
+      : 'Free plan'
 
   return (
     <article className="flow">
@@ -65,9 +73,11 @@ function RouteComponent() {
       <div className="billing-card flow">
         <Flex align="center" justify="between" wrap="wrap" gap="xs">
           <Flex align="center" gap="2xs">
-            <strong>{isPro ? 'Pro plan' : 'Free plan'}</strong>
-            <span className={`billing-badge ${isPro ? 'is-pro' : ''}`}>
-              {isPro ? 'Pro' : 'Free'}
+            <strong>{planLabel}</strong>
+            <span
+              className={`billing-badge ${isPro || isComp ? 'is-pro' : ''}`}
+            >
+              {isPro ? 'Pro' : isComp ? 'Comp' : 'Free'}
             </span>
           </Flex>
           {isPro ? (
@@ -78,7 +88,7 @@ function RouteComponent() {
             >
               Manage subscription
             </Button>
-          ) : (
+          ) : unlimited ? null : (
             <Button
               onClick={() => checkout.mutate()}
               disabled={checkout.isPending}
@@ -101,6 +111,12 @@ function RouteComponent() {
                     billing.current_period_end,
                   )}.`
                 : 'Your Pro subscription is active.'}
+          </p>
+        ) : unlimited ? (
+          <p>
+            {isComp
+              ? 'You have a complimentary plan — unlimited bookmarks, no charge.'
+              : 'You have unlimited bookmarks.'}
           </p>
         ) : (
           <div className="flow">
@@ -155,7 +171,7 @@ function RouteComponent() {
                   </li>
                 ))}
               </ul>
-              {planId === 'pro' && !isPro ? (
+              {planId === 'pro' && !isPro && !unlimited ? (
                 <Button
                   onClick={() => checkout.mutate()}
                   disabled={checkout.isPending}

@@ -16,8 +16,9 @@ const startOfUtcDay = (date = new Date()): Date => {
 /**
  * Resolves the current daily bookmark quota for a user.
  *
- * Pro users are unlimited (`limit: null`). Free users get the per-user
- * override if set, otherwise the deployment-wide free limit.
+ * Unlimited (`limit: null`) for Pro and complimentary (`comp`) plans, and
+ * for admins. Free users get the per-user override if set, otherwise the
+ * deployment-wide free limit.
  */
 export const getBookmarkQuota = async (
   db: Db,
@@ -28,13 +29,18 @@ export const getBookmarkQuota = async (
     .select({
       override: profiles.dailyBookmarkLimitOverride,
       plan: profiles.plan,
+      role: profiles.role,
     })
     .from(profiles)
     .where(eq(profiles.id, userId))
     .limit(1)
 
-  // Pro users have no daily cap.
-  if (profile?.plan === 'pro') {
+  // Pro, complimentary and admin users have no daily cap.
+  if (
+    profile?.plan === 'pro' ||
+    profile?.plan === 'comp' ||
+    profile?.role === 'admin'
+  ) {
     return { limit: null, remaining: null, used: 0 }
   }
 

@@ -54,6 +54,16 @@ function UserRow({ user }: { user: AdminUser }) {
     })
   }
 
+  const toggleComp = () => {
+    update.mutate({
+      id: user.id,
+      plan: user.plan === 'comp' ? 'free' : 'comp',
+    })
+  }
+
+  const planBadgeClass =
+    user.plan === 'pro' ? 'is-pro' : user.plan === 'comp' ? 'is-comp' : ''
+
   return (
     <tr>
       <td>
@@ -61,9 +71,20 @@ function UserRow({ user }: { user: AdminUser }) {
         <div className="admin-user-email">{user.email}</div>
       </td>
       <td>
-        <span className={`admin-badge ${user.plan === 'pro' ? 'is-pro' : ''}`}>
-          {user.plan}
-        </span>
+        <Flex align="center" gap="2xs">
+          <span className={`admin-badge ${planBadgeClass}`}>{user.plan}</span>
+          {/* `pro` is Stripe-managed and not toggled here. */}
+          {user.plan !== 'pro' ? (
+            <Button
+              variant="ghost"
+              size="2xs"
+              onClick={toggleComp}
+              disabled={update.isPending}
+            >
+              {user.plan === 'comp' ? 'Revoke comp' : 'Grant comp'}
+            </Button>
+          ) : null}
+        </Flex>
         {user.plan === 'pro' ? (
           <div className="admin-user-email">{user.subscription_status}</div>
         ) : null}
