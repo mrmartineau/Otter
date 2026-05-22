@@ -137,6 +137,10 @@ function RouteComponent() {
           ) : null}
         </Flex>
       </form>
+
+      <p className="mt-m text-center">
+        <Link to="/pricing">Plans &amp; pricing</Link>
+      </p>
     </Container>
   )
 }

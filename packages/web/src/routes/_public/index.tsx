@@ -3,6 +3,7 @@ import {
   BookmarkSimpleIcon,
   BrainIcon,
   BrowserIcon,
+  CheckIcon,
   DeviceMobileIcon,
   FilmStripIcon,
   GlobeIcon,
@@ -24,11 +25,15 @@ import type { Bookmark } from '@/types/db'
 import { getRecentPublicBookmarksOptions } from '@/utils/fetching/recentPublicBookmarks'
 import { useSession } from '../../components/AuthProvider'
 import {
+  BILLING_PLANS,
   CONTENT,
+  type PlanId,
   ROUTE_HOME,
+  ROUTE_PRICING,
   ROUTE_RECENT,
   ROUTE_SIGNIN,
 } from '../../constants'
+import '../_app/settings/billing.css'
 
 const RECENT_PREVIEW_LIMIT = 5
 
@@ -206,6 +211,48 @@ function Index() {
         </div>
       </section>
 
+      {/* Pricing */}
+      <section className="max-w-[1000px] mx-auto px-s pb-3xl">
+        <h2 className="text-step-1 mb-3xs">Pricing</h2>
+        <p className="text-step--1 text-[var(--text)] mb-m">
+          Start free with {BILLING_PLANS.free.features[0]}. Upgrade to Pro for
+          unlimited bookmarks and AI features.
+        </p>
+        <div className="billing-plan-grid">
+          {(Object.keys(BILLING_PLANS) as PlanId[]).map((planId) => {
+            const plan = BILLING_PLANS[planId]
+            const isPro = planId === 'pro'
+
+            return (
+              <div
+                key={planId}
+                className={`billing-plan ${isPro ? 'is-current' : ''}`}
+              >
+                <strong>{plan.name}</strong>
+                <span>{plan.tagline}</span>
+                <div>
+                  <span className="billing-plan-price">{plan.priceLabel}</span>
+                  {plan.price > 0 ? <span> / month</span> : null}
+                </div>
+                <ul className="billing-plan-features">
+                  {plan.features.map((feature) => (
+                    <li key={feature}>
+                      <CheckIcon size={16} weight="bold" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button asChild variant={isPro ? 'default' : 'outline'}>
+                  <a href={ROUTE_SIGNIN}>
+                    {isPro ? 'Get started with Pro' : 'Get started free'}
+                  </a>
+                </Button>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="text-center pb-l px-s text-step--1">
         <Flex align="center" justify="center" gap="s" wrap="wrap">
@@ -215,6 +262,10 @@ function Index() {
               Zander Martineau
             </a>
           </span>
+          <span>·</span>
+          <Link href={ROUTE_PRICING} className="underline">
+            Pricing
+          </Link>
           <span>·</span>
           <Link href="/privacy" className="underline">
             Privacy Policy
