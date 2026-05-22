@@ -27,6 +27,17 @@ const queryString = (params: Record<string, unknown>) => {
   return value ? `?${value}` : ''
 }
 
+/** Error that preserves the HTTP status, so callers can branch on it. */
+export class ApiError extends Error {
+  status: number
+
+  constructor(message: string, status: number) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+  }
+}
+
 const parseJsonResponse = async <T>(response: Response): Promise<T> => {
   const body = (await response.json()) as {
     error?: string
@@ -34,7 +45,10 @@ const parseJsonResponse = async <T>(response: Response): Promise<T> => {
   }
 
   if (!response.ok) {
-    throw new Error(body.error || body.reason || 'Request failed')
+    throw new ApiError(
+      body.error || body.reason || 'Request failed',
+      response.status,
+    )
   }
 
   return body as T

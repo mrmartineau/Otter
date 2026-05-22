@@ -3,8 +3,8 @@ import buy02Sfx from '@mrmartineau/kit/sounds/buy-02.mp3'
 import useSound from '@mrmartineau/use-sound'
 import { CircleIcon, DownloadIcon, SparkleIcon } from '@phosphor-icons/react'
 import { useForm, useStore } from '@tanstack/react-form'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
 import {
   type ComponentProps,
   type DispatchWithoutAction,
@@ -37,9 +37,12 @@ import {
   CONTENT,
   DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER,
   ROUTE_NEW_BOOKMARK_CONFIRMATION,
+  ROUTE_SETTINGS_BILLING,
 } from '../constants'
 import type { Bookmark, BookmarkFormValues } from '../types/db'
+import { getBillingStatusOptions } from '../utils/fetching/billing'
 import {
+  ApiError,
   checkBookmarkUrl,
   createBookmark,
   updateBookmark,
@@ -107,6 +110,16 @@ export const BookmarkForm = ({
   const queryClient = useQueryClient()
   const [playAdd] = useSound(buy01Sfx, { volume: 0.2 })
   const [playEdit] = useSound(buy02Sfx, { volume: 0.2 })
+
+  // Free-tier daily bookmark quota — only fetched when adding a new bookmark.
+  const { data: billing } = useQuery({
+    ...getBillingStatusOptions(),
+    enabled: type === 'new',
+  })
+  const quota =
+    billing?.plan === 'free' && billing.quota.limit !== null
+      ? billing.quota
+      : null
 
   const form = useForm({
     defaultValues: {
@@ -254,8 +267,15 @@ export const BookmarkForm = ({
         toast.success('Item edited')
       }
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+      queryClient.invalidateQueries({ queryKey: ['billing'] })
       onSubmit?.()
     } catch (err) {
+      // Daily free-bookmark limit reached — send them to the upgrade page.
+      if (err instanceof ApiError && err.status === 402) {
+        toast.error(err.message)
+        navigate({ to: ROUTE_SETTINGS_BILLING })
+        return
+      }
       console.error(err)
       toast.message('Uh oh! Something went wrong.', {
         description: 'There was a problem with your request. Please try again.',
@@ -320,6 +340,24 @@ export const BookmarkForm = ({
     <div {...rest}>
       {isBookmarklet && !isMobile ? (
         <h2 className="mb-s">{isNew ? CONTENT.newTitle : CONTENT.editTitle}</h2>
+      ) : null}
+      {quota ? (
+        <div
+          className={`bookmark-quota ${quota.remaining === 0 ? 'is-full' : ''}`}
+        >
+          <span>
+            {quota.remaining === 0
+              ? `You've used all ${quota.limit} free bookmarks today.`
+              : `${quota.remaining} of ${quota.limit} free bookmarks left today.`}
+          </span>
+          <Button
+            asChild
+            variant={quota.remaining === 0 ? 'default' : 'ghost'}
+            size="2xs"
+          >
+            <Link to={ROUTE_SETTINGS_BILLING}>Upgrade to Pro</Link>
+          </Button>
+        </div>
       ) : null}
       <form
         onSubmit={(e) => {
