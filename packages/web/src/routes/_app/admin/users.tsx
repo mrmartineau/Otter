@@ -61,8 +61,10 @@ function UserRow({ user }: { user: AdminUser }) {
     })
   }
 
+  // Admins have Pro-level access via their role, regardless of stored plan.
+  const displayPlan = user.role === 'admin' ? 'pro' : user.plan
   const planBadgeClass =
-    user.plan === 'pro' ? 'is-pro' : user.plan === 'comp' ? 'is-comp' : ''
+    displayPlan === 'pro' ? 'is-pro' : displayPlan === 'comp' ? 'is-comp' : ''
 
   return (
     <tr>
@@ -72,9 +74,9 @@ function UserRow({ user }: { user: AdminUser }) {
       </td>
       <td>
         <Flex align="center" gap="2xs">
-          <span className={`admin-badge ${planBadgeClass}`}>{user.plan}</span>
-          {/* `pro` is Stripe-managed and not toggled here. */}
-          {user.plan !== 'pro' ? (
+          <span className={`admin-badge ${planBadgeClass}`}>{displayPlan}</span>
+          {/* `pro` is Stripe-managed; admins already have full access. */}
+          {user.role !== 'admin' && user.plan !== 'pro' ? (
             <Button
               variant="ghost"
               size="2xs"

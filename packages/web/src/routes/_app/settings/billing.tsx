@@ -6,6 +6,7 @@ import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/Button'
 import { Flex } from '@/components/Flex'
+import { useUser } from '@/components/UserProvider'
 import { BILLING_PLANS, CONTENT, createTitle, type PlanId } from '@/constants'
 import {
   getBillingStatusOptions,
@@ -32,6 +33,7 @@ const formatDate = (iso: string) => format(new Date(iso), 'd MMM yyyy')
 function RouteComponent() {
   const search = useSearch({ from: '/_app/settings/billing' })
   const queryClient = useQueryClient()
+  const { profile } = useUser()
   const { data: billing } = useSuspenseQuery(getBillingStatusOptions())
   const checkout = useCheckoutMutation()
   const portal = usePortalMutation()
@@ -50,6 +52,25 @@ function RouteComponent() {
     }, 2500)
     return () => clearTimeout(timer)
   }, [search.checkout, queryClient])
+
+  // Admins have full access via their role — there is nothing to bill.
+  if (profile?.role === 'admin') {
+    return (
+      <article className="flow">
+        <h3>{CONTENT.billingTitle}</h3>
+        <div className="billing-card flow">
+          <Flex align="center" gap="2xs">
+            <strong>Admin — full access</strong>
+            <span className="billing-badge is-pro">Admin</span>
+          </Flex>
+          <p>
+            You have unlimited bookmarks and all AI features as an admin. No
+            subscription needed.
+          </p>
+        </div>
+      </article>
+    )
+  }
 
   const isPro = billing.plan === 'pro'
   const isComp = billing.plan === 'comp'
