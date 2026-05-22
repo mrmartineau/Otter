@@ -55,6 +55,7 @@ import { FormGroup } from './FormGroup'
 import { IconButton } from './IconButton'
 import { PossibleMatchingItems } from './PossibleMatchingItems'
 import { TypeRadio } from './TypeRadio'
+import { useUser } from './UserProvider'
 
 export interface ComboOption {
   label: string
@@ -120,6 +121,15 @@ export const BookmarkForm = ({
     billing?.plan === 'free' && billing.quota.limit !== null
       ? billing.quota
       : null
+
+  // AI features (title/description rewrite, classification) are Pro-only.
+  const { profile } = useUser()
+  const isEntitled =
+    profile?.plan === 'pro' ||
+    profile?.plan === 'comp' ||
+    profile?.role === 'admin'
+  const aiTooltip = (label: string) =>
+    isEntitled ? label : 'Upgrade to Pro for AI features'
 
   const form = useForm({
     defaultValues: {
@@ -232,14 +242,15 @@ export const BookmarkForm = ({
           setFieldValue('feed', data.feeds?.length ? data.feeds[0] : null)
           setFieldValue('type', data.urlType)
 
-          if (!hasAutoClassified.current) {
+          // Auto-classification is a Pro-only AI feature.
+          if (isEntitled && !hasAutoClassified.current) {
             hasAutoClassified.current = true
             triggerClassify()
           }
         },
       })
     },
-    [scrapeMutation, setFieldValue, triggerClassify],
+    [scrapeMutation, setFieldValue, triggerClassify, isEntitled],
   )
 
   const handleSubmitForm = async (formData: BookmarkFormValues) => {
@@ -450,7 +461,9 @@ export const BookmarkForm = ({
                         <IconButton
                           type="button"
                           size="s"
-                          disabled={!watchTitle || isTitleAiLoading}
+                          disabled={
+                            !isEntitled || !watchTitle || isTitleAiLoading
+                          }
                           onClick={() => {
                             handleAiTitleMutate()
                           }}
@@ -458,7 +471,9 @@ export const BookmarkForm = ({
                           <SparkleIcon weight="duotone" size="18" />
                         </IconButton>
                       </TooltipTrigger>
-                      <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
+                      <TooltipContent>
+                        {aiTooltip(CONTENT.fixWithAi)}
+                      </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 }
@@ -486,7 +501,11 @@ export const BookmarkForm = ({
                         <IconButton
                           type="button"
                           size="s"
-                          disabled={!watchDescription || isDescriptionAiLoading}
+                          disabled={
+                            !isEntitled ||
+                            !watchDescription ||
+                            isDescriptionAiLoading
+                          }
                           onClick={() => {
                             handleAiDescriptionMutate()
                           }}
@@ -494,7 +513,9 @@ export const BookmarkForm = ({
                           <SparkleIcon weight="duotone" size="18" />
                         </IconButton>
                       </TooltipTrigger>
-                      <TooltipContent>{CONTENT.fixWithAi}</TooltipContent>
+                      <TooltipContent>
+                        {aiTooltip(CONTENT.fixWithAi)}
+                      </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 }
@@ -531,6 +552,7 @@ export const BookmarkForm = ({
                           type="button"
                           size="s"
                           disabled={
+                            !isEntitled ||
                             (!watchUrl && !watchTitle) ||
                             classifyMutation.isPending
                           }
@@ -545,7 +567,7 @@ export const BookmarkForm = ({
                         </div>
                       ) : null}
                       <TooltipContent>
-                        {CONTENT.findMatchingTags}
+                        {aiTooltip(CONTENT.findMatchingTags)}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

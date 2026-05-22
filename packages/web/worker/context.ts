@@ -209,3 +209,36 @@ export const requireAdminContext = async (
 
   return requestContext
 }
+
+/**
+ * Like {@link requireRequestContext} but additionally requires the user to be
+ * entitled to Pro features — a Pro or complimentary plan, or the admin role.
+ * Returns a 402 Response otherwise.
+ */
+export const requireEntitledContext = async (
+  context: Context<{ Bindings: WorkerEnv }>,
+) => {
+  const requestContext = await requireRequestContext(context)
+
+  if (requestContext instanceof Response) {
+    return requestContext
+  }
+
+  const profile = requestContext.profile
+  const entitled =
+    !!profile &&
+    (profile.plan === 'pro' ||
+      profile.plan === 'comp' ||
+      profile.role === 'admin')
+
+  if (!entitled) {
+    return errorResponse({
+      error:
+        'AI features require Otter Pro. Upgrade for AI titles, summaries and classification.',
+      reason: 'Pro plan required',
+      status: 402,
+    })
+  }
+
+  return requestContext
+}

@@ -24,6 +24,7 @@ import {
   updateBookmarkById,
 } from './bookmarks/item'
 import { getNewBookmark, postNewBookmark } from './bookmarks/new'
+import { requireEntitledContext } from './context'
 import { getDashboard } from './dashboard'
 import type { WorkerEnv } from './env'
 import {
@@ -86,44 +87,6 @@ api.get('/scrape', async (c) => {
 api.get('/scrape-content', async (c) => {
   return await handleScrapeContent(c.req)
 })
-api.post('/ai/title', async (context) => {
-  const { prompt } = await context.req.json()
-  return await generateResponse({
-    context,
-    prompt,
-    systemPrompt: titleSystemPrompt,
-  })
-})
-api.post('/ai/description', async (context) => {
-  const { title, prompt } = await context.req.json()
-  return await generateResponse({
-    context,
-    prompt,
-    systemPrompt: descriptionSystemPrompt(title),
-  })
-})
-api.post('/ai/summarise', async (context) => {
-  const { prompt } = await context.req.json()
-  const truncated = prompt.slice(0, MAX_CONTENT_LENGTH)
-  return await generateResponse({
-    context,
-    prompt: truncated,
-    systemPrompt: summariseSystemPrompt,
-  })
-})
-api.post('/ai/classify', async (context) => {
-  const { title, description, url, tags, currentType } =
-    await context.req.json()
-  const result = await classifyBookmark({
-    context,
-    currentType: currentType ?? 'link',
-    description: description ?? '',
-    existingTags: tags ?? [],
-    title: title ?? '',
-    url: url ?? '',
-  })
-  return context.json(result)
-})
 api.get('/rss', async (c) => {
   const feed = c.req.query('feed')
   let isValidUrl = false
@@ -159,6 +122,54 @@ api.get('/me', async (c) => {
 })
 api.patch('/me', async (c) => {
   return await updateCurrentProfile(c)
+})
+
+// AI — Pro-only. Each route requires an entitled (Pro/comp/admin) user.
+api.post('/ai/title', async (context) => {
+  const gate = await requireEntitledContext(context)
+  if (gate instanceof Response) return gate
+  const { prompt } = await context.req.json()
+  return await generateResponse({
+    context,
+    prompt,
+    systemPrompt: titleSystemPrompt,
+  })
+})
+api.post('/ai/description', async (context) => {
+  const gate = await requireEntitledContext(context)
+  if (gate instanceof Response) return gate
+  const { title, prompt } = await context.req.json()
+  return await generateResponse({
+    context,
+    prompt,
+    systemPrompt: descriptionSystemPrompt(title),
+  })
+})
+api.post('/ai/summarise', async (context) => {
+  const gate = await requireEntitledContext(context)
+  if (gate instanceof Response) return gate
+  const { prompt } = await context.req.json()
+  const truncated = prompt.slice(0, MAX_CONTENT_LENGTH)
+  return await generateResponse({
+    context,
+    prompt: truncated,
+    systemPrompt: summariseSystemPrompt,
+  })
+})
+api.post('/ai/classify', async (context) => {
+  const gate = await requireEntitledContext(context)
+  if (gate instanceof Response) return gate
+  const { title, description, url, tags, currentType } =
+    await context.req.json()
+  const result = await classifyBookmark({
+    context,
+    currentType: currentType ?? 'link',
+    description: description ?? '',
+    existingTags: tags ?? [],
+    title: title ?? '',
+    url: url ?? '',
+  })
+  return context.json(result)
 })
 
 // Billing — Stripe checkout, portal, subscription status and webhook.
