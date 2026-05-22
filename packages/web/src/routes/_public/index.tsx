@@ -25,6 +25,7 @@ import type { Bookmark } from '@/types/db'
 import { getRecentPublicBookmarksOptions } from '@/utils/fetching/recentPublicBookmarks'
 import { useSession } from '../../components/AuthProvider'
 import {
+  ALLOW_SIGNUP,
   BILLING_PLANS,
   CONTENT,
   type PlanId,
@@ -211,47 +212,51 @@ function Index() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="max-w-[1000px] mx-auto px-s pb-3xl">
-        <h2 className="text-step-1 mb-3xs">Pricing</h2>
-        <p className="text-step--1 text-[var(--text)] mb-m">
-          Start free with {BILLING_PLANS.free.features[0]}. Upgrade to Pro for
-          unlimited bookmarks and AI features.
-        </p>
-        <div className="billing-plan-grid">
-          {(Object.keys(BILLING_PLANS) as PlanId[]).map((planId) => {
-            const plan = BILLING_PLANS[planId]
-            const isPro = planId === 'pro'
+      {/* Pricing — only shown when new signups are allowed. */}
+      {ALLOW_SIGNUP ? (
+        <section className="max-w-[1000px] mx-auto px-s pb-3xl">
+          <h2 className="text-step-1 mb-3xs">Pricing</h2>
+          <p className="text-step--1 text-[var(--text)] mb-m">
+            Start free with {BILLING_PLANS.free.features[0]}. Upgrade to Pro for
+            unlimited bookmarks and AI features.
+          </p>
+          <div className="billing-plan-grid">
+            {(Object.keys(BILLING_PLANS) as PlanId[]).map((planId) => {
+              const plan = BILLING_PLANS[planId]
+              const isPro = planId === 'pro'
 
-            return (
-              <div
-                key={planId}
-                className={`billing-plan ${isPro ? 'is-current' : ''}`}
-              >
-                <strong>{plan.name}</strong>
-                <span>{plan.tagline}</span>
-                <div>
-                  <span className="billing-plan-price">{plan.priceLabel}</span>
-                  {plan.price > 0 ? <span> / month</span> : null}
+              return (
+                <div
+                  key={planId}
+                  className={`billing-plan ${isPro ? 'is-current' : ''}`}
+                >
+                  <strong>{plan.name}</strong>
+                  <span>{plan.tagline}</span>
+                  <div>
+                    <span className="billing-plan-price">
+                      {plan.priceLabel}
+                    </span>
+                    {plan.price > 0 ? <span> / month</span> : null}
+                  </div>
+                  <ul className="billing-plan-features">
+                    {plan.features.map((feature) => (
+                      <li key={feature}>
+                        <CheckIcon size={16} weight="bold" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button asChild variant={isPro ? 'default' : 'outline'}>
+                    <a href={ROUTE_SIGNIN}>
+                      {isPro ? 'Get started with Pro' : 'Get started free'}
+                    </a>
+                  </Button>
                 </div>
-                <ul className="billing-plan-features">
-                  {plan.features.map((feature) => (
-                    <li key={feature}>
-                      <CheckIcon size={16} weight="bold" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button asChild variant={isPro ? 'default' : 'outline'}>
-                  <a href={ROUTE_SIGNIN}>
-                    {isPro ? 'Get started with Pro' : 'Get started free'}
-                  </a>
-                </Button>
-              </div>
-            )
-          })}
-        </div>
-      </section>
+              )
+            })}
+          </div>
+        </section>
+      ) : null}
 
       {/* Footer */}
       <footer className="text-center pb-l px-s text-step--1">
@@ -262,10 +267,14 @@ function Index() {
               Zander Martineau
             </a>
           </span>
-          <span>·</span>
-          <Link href={ROUTE_PRICING} className="underline">
-            Pricing
-          </Link>
+          {ALLOW_SIGNUP ? (
+            <>
+              <span>·</span>
+              <Link href={ROUTE_PRICING} className="underline">
+                Pricing
+              </Link>
+            </>
+          ) : null}
           <span>·</span>
           <Link href="/privacy" className="underline">
             Privacy Policy

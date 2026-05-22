@@ -1,8 +1,9 @@
 import { CheckIcon } from '@phosphor-icons/react'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import {
+  ALLOW_SIGNUP,
   BILLING_PLANS,
   createTitle,
   type PlanId,
@@ -12,6 +13,12 @@ import {
 import './_app/settings/billing.css'
 
 export const Route = createFileRoute('/pricing')({
+  // Pricing targets new signups — hide it when signups are disabled.
+  beforeLoad: () => {
+    if (!ALLOW_SIGNUP) {
+      throw redirect({ to: ROUTE_SIGNIN })
+    }
+  },
   component: Pricing,
   head: () => ({
     meta: [{ title: createTitle('pricingTitle') }],

@@ -138,9 +138,11 @@ function RouteComponent() {
         </Flex>
       </form>
 
-      <p className="mt-m text-center">
-        <Link to="/pricing">Plans &amp; pricing</Link>
-      </p>
+      {ALLOW_SIGNUP ? (
+        <p className="mt-m text-center">
+          <Link to="/pricing">Plans &amp; pricing</Link>
+        </p>
+      ) : null}
     </Container>
   )
 }
