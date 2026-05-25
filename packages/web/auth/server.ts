@@ -22,7 +22,9 @@ export type AuthEnv = DbEnv & {
   BETTER_AUTH_SECRET?: string
   BETTER_AUTH_URL?: string
   BETTER_AUTH_TRUSTED_ORIGINS?: string
-  BETTER_AUTH_DISABLE_SIGNUP?: string
+  // Mirrors the frontend `VITE_ALLOW_SIGNUP`. Defaults to disabled — set
+  // to the literal string 'true' to allow new user registration.
+  BETTER_AUTH_ALLOW_SIGNUP?: string
   RAYCAST_OAUTH_CLIENT_ID?: string
 }
 
@@ -38,8 +40,8 @@ const getTrustedOrigins = (env: AuthEnv) => {
   return env.BETTER_AUTH_URL ? [env.BETTER_AUTH_URL] : undefined
 }
 
-const isSignUpDisabled = (env: AuthEnv) =>
-  env.BETTER_AUTH_DISABLE_SIGNUP !== 'false'
+const isSignUpAllowed = (env: AuthEnv) =>
+  env.BETTER_AUTH_ALLOW_SIGNUP === 'true'
 
 export const getOAuthAudience = (env: AuthEnv) => {
   return (env.BETTER_AUTH_URL ?? 'http://localhost:5678').replace(/\/+$/, '')
@@ -90,7 +92,7 @@ export const createAuth = (env: AuthEnv, db: Db) => {
       },
     },
     emailAndPassword: {
-      disableSignUp: isSignUpDisabled(env),
+      disableSignUp: !isSignUpAllowed(env),
       enabled: true,
       password: {
         hash: (password) => hash(password, 10),
