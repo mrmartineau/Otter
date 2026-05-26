@@ -105,10 +105,4 @@
 
 .admin-override-input {
   width: 5rem;
-  padding: var(--space-4xs) var(--space-2xs);
-  border-radius: var(--radii-m);
-  border: 1px solid var(--theme5);
-  background-color: var(--background);
-  color: var(--text);
-  font-size: var(--step--1);
 }
