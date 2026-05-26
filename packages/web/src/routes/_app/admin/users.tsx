@@ -12,6 +12,7 @@ import {
   useUpdateUserMutation,
 } from '@/utils/fetching/admin'
 import './admin.css'
+import { Input } from '@/components/Input'
 
 export const Route = createFileRoute('/_app/admin/users')({
   component: RouteComponent,
@@ -111,7 +112,7 @@ function UserRow({ user }: { user: AdminUser }) {
       <td>{user.bookmark_count.toLocaleString()}</td>
       <td>
         <Flex align="center" gap="2xs">
-          <input
+          <Input
             className="admin-override-input"
             inputMode="numeric"
             placeholder="default"

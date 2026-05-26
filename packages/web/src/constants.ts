@@ -50,7 +50,7 @@ export const CONTENT = {
   scrapeThisUrl: 'Scrape this URL',
   searchInputPlaceholder: 'Search',
   searchTitle: 'Search',
-  settingsNav: 'Account & integrations',
+  settingsNav: 'Account',
   signInTitle: 'Sign in',
   signOutNav: 'Sign out',
   signupTitle: 'Register',

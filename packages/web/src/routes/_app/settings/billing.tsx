@@ -61,7 +61,7 @@ function RouteComponent() {
         <div className="billing-card flow">
           <Flex align="center" gap="2xs">
             <strong>Admin — full access</strong>
-            <span className="billing-badge is-pro">Admin</span>
+            <span className="admin-badge is-pro">Admin</span>
           </Flex>
           <p>
             You have unlimited bookmarks and all AI features as an admin. No
@@ -96,7 +96,7 @@ function RouteComponent() {
           <Flex align="center" gap="2xs">
             <strong>{planLabel}</strong>
             <span
-              className={`billing-badge ${isPro || isComp ? 'is-pro' : ''}`}
+              className={`admin-badge ${isPro || isComp ? 'is-pro' : ''}`}
             >
               {isPro || isComp ? 'Pro' : 'Free'}
             </span>
@@ -177,7 +177,7 @@ function RouteComponent() {
               <Flex align="center" justify="between">
                 <strong>{plan.name}</strong>
                 {isCurrent ? (
-                  <span className="billing-badge">Current plan</span>
+                  <span className="admin-badge">Current plan</span>
                 ) : null}
               </Flex>
               <div>
