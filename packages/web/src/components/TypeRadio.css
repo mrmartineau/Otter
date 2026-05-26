@@ -27,7 +27,7 @@
   }
 
   &:checked + .type-radio-label {
-    padding-x: var(--space-m);
+    padding-inline: var(--space-m);
   }
 }
 

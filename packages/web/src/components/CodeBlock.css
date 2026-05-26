@@ -11,7 +11,7 @@
   word-break: break-all;
   white-space: break-spaces;
   padding: var(--space-s);
-  margin-y: var(--space-xs);
+  margin-block: var(--space-xs);
   color: var(--theme11);
 
   .code {

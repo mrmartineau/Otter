@@ -16,7 +16,7 @@
 .heading-date {
   font-size: var(--step--2);
   font-weight: 400;
-  margin-y: var(--space-2xs);
+  margin-block: var(--space-2xs);
   text-transform: uppercase;
   color: var(--theme10);
 }
@@ -29,7 +29,7 @@
     "wght" 500,
     "wdth" 105;
   color: var(--theme11);
-  margin-y: 0;
+  margin-block: 0;
   line-height: 26px;
 
   svg {

@@ -16,7 +16,6 @@ export default {
     },
     'postcss-custom-media': {},
     'postcss-extend-rule': {},
-    'postcss-axis': {},
     '@tailwindcss/postcss': {},
     cssnano: {
       preset: 'default',

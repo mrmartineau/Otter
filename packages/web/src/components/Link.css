@@ -94,8 +94,8 @@
   background-color: var(--theme4);
   color: var(--theme11);
   border-radius: var(--radii-pill);
-  padding-x: var(--space-2xs);
-  padding-y: var(--space-3xs);
+  padding-inline: var(--space-2xs);
+  padding-block: var(--space-3xs);
   font-size: var(--step--2);
   font-family: var(--font-mono);
   text-transform: uppercase;
@@ -141,7 +141,7 @@
 .link-tag {
   border: 1px solid var(--theme5);
   border-radius: var(--radii-pill);
-  padding-x: var(--space-2xs);
+  padding-inline: var(--space-2xs);
   background-color: var(--theme3);
 
   &:hover {
