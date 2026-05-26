@@ -13,7 +13,6 @@ import {
   useCheckoutMutation,
   usePortalMutation,
 } from '@/utils/fetching/billing'
-import './billing.css'
 
 export const Route = createFileRoute('/_app/settings/billing')({
   component: RouteComponent,

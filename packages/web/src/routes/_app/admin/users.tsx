@@ -11,7 +11,6 @@ import {
   getAdminUsersOptions,
   useUpdateUserMutation,
 } from '@/utils/fetching/admin'
-import './admin.css'
 import { Input } from '@/components/Input'
 
 export const Route = createFileRoute('/_app/admin/users')({

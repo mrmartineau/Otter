@@ -10,7 +10,6 @@ import {
   ROUTE_SETTINGS_BILLING,
   ROUTE_SIGNIN,
 } from '@/constants'
-import './_app/settings/billing.css'
 
 export const Route = createFileRoute('/pricing')({
   // Pricing targets new signups — hide it when signups are disabled.

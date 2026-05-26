@@ -3,7 +3,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { createTitle } from '@/constants'
 import { getAdminStatsOptions } from '@/utils/fetching/admin'
-import './admin.css'
 
 export const Route = createFileRoute('/_app/admin/')({
   component: RouteComponent,

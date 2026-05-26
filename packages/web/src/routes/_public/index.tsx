@@ -34,7 +34,6 @@ import {
   ROUTE_RECENT,
   ROUTE_SIGNIN,
 } from '../../constants'
-import '../_app/settings/billing.css'
 
 const RECENT_PREVIEW_LIMIT = 5
 
