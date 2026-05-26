@@ -26,6 +26,7 @@ import { getRecentPublicBookmarksOptions } from '@/utils/fetching/recentPublicBo
 import { useSession } from '../../components/AuthProvider'
 import {
   ALLOW_SIGNUP,
+  BILLING_ENABLED,
   BILLING_PLANS,
   CONTENT,
   type PlanId,
@@ -211,8 +212,8 @@ function Index() {
         </div>
       </section>
 
-      {/* Pricing — only shown when new signups are allowed. */}
-      {ALLOW_SIGNUP ? (
+      {/* Pricing — only shown when new signups are allowed and billing is on. */}
+      {ALLOW_SIGNUP && BILLING_ENABLED ? (
         <section className="max-w-[1000px] mx-auto px-s pb-3xl">
           <h2 className="text-step-1 mb-3xs">Pricing</h2>
           <p className="text-step--1 text-[var(--text)] mb-m">
@@ -266,7 +267,7 @@ function Index() {
               Zander Martineau
             </a>
           </span>
-          {ALLOW_SIGNUP ? (
+          {ALLOW_SIGNUP && BILLING_ENABLED ? (
             <>
               <span>·</span>
               <Link href={ROUTE_PRICING} className="underline">

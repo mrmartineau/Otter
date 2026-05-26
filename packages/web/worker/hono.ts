@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 
 import { createAuth } from '../auth/server'
+import { BILLING_ENABLED } from '../src/constants'
 import { getAdminStats } from './admin/stats'
 import { listUsers, updateUserAdmin } from './admin/users'
 import { classifyBookmark } from './ai/classify'
@@ -174,18 +175,22 @@ api.post('/ai/classify', async (context) => {
 
 // Billing — Stripe checkout, portal, subscription status and webhook.
 // The webhook is intentionally unauthenticated; it is verified by signature.
-api.post('/billing/webhook', async (c) => {
-  return await handleStripeWebhook(c)
-})
-api.get('/billing', async (c) => {
-  return await getBillingStatus(c)
-})
-api.post('/billing/checkout', async (c) => {
-  return await createCheckoutSession(c)
-})
-api.post('/billing/portal', async (c) => {
-  return await createPortalSession(c)
-})
+// Routes are only mounted when BILLING_ENABLED — otherwise the deployment
+// is a single-tier free instance with no payment endpoints.
+if (BILLING_ENABLED) {
+  api.post('/billing/webhook', async (c) => {
+    return await handleStripeWebhook(c)
+  })
+  api.get('/billing', async (c) => {
+    return await getBillingStatus(c)
+  })
+  api.post('/billing/checkout', async (c) => {
+    return await createCheckoutSession(c)
+  })
+  api.post('/billing/portal', async (c) => {
+    return await createPortalSession(c)
+  })
+}
 
 // Admin — gated by requireAdminContext inside each handler.
 api.get('/admin/stats', async (c) => {

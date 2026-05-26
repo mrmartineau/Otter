@@ -21,6 +21,13 @@ PERSONAL_MASTODON_ACCESS_TOKEN=
 WEBHOOK_SECRET=replace-with-a-random-secret
 
 # Billing — Stripe
+# Master switch for all paid-tier features (checkout, daily quota,
+# Pro-gated AI, billing/pricing UI). Build-time flag — read by both the SPA
+# and the worker. Defaults to enabled; set to 'false' to run Otter as a
+# single-tier free instance (every user gets unlimited bookmarks and full
+# AI access). When 'false', the rest of the Stripe vars below are unused.
+VITE_BILLING_ENABLED=true
+
 # Public origin of the app, used to build Stripe redirect URLs.
 # Falls back to BETTER_AUTH_URL when unset.
 APP_URL=http://localhost:5678

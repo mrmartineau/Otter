@@ -1,4 +1,5 @@
 import { and, count, eq, gte } from 'drizzle-orm'
+import { BILLING_ENABLED } from '@/constants'
 import type { BookmarkQuota } from '@/types/db'
 import { errorResponse } from '@/utils/fetching/errorResponse'
 import type { Db } from '../../db/client'
@@ -25,6 +26,11 @@ export const getBookmarkQuota = async (
   env: WorkerEnv,
   userId: string,
 ): Promise<BookmarkQuota> => {
+  // Billing disabled — every user is unlimited.
+  if (!BILLING_ENABLED) {
+    return { limit: null, remaining: null, used: 0 }
+  }
+
   const [profile] = await db
     .select({
       override: profiles.dailyBookmarkLimitOverride,

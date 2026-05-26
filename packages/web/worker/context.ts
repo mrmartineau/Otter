@@ -4,6 +4,7 @@ import { createLocalJWKSet, type JWK, type JWTPayload, jwtVerify } from 'jose'
 import { createAuth, getOAuthAudience } from '../auth/server'
 import type { Db } from '../db/client'
 import { profiles } from '../db/schema'
+import { BILLING_ENABLED } from '../src/constants'
 import type { UserProfile } from '../src/types/db'
 import { errorResponse } from '../src/utils/fetching/errorResponse'
 import type { WorkerEnv } from './env'
@@ -221,6 +222,11 @@ export const requireEntitledContext = async (
   const requestContext = await requireRequestContext(context)
 
   if (requestContext instanceof Response) {
+    return requestContext
+  }
+
+  // Billing disabled — every authenticated user has Pro access.
+  if (!BILLING_ENABLED) {
     return requestContext
   }
 

@@ -34,6 +34,7 @@ import {
   rewriteTitleOptions,
 } from '@/utils/fetching/ai'
 import {
+  BILLING_ENABLED,
   CONTENT,
   DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER,
   ROUTE_NEW_BOOKMARK_CONFIRMATION,
@@ -112,19 +113,22 @@ export const BookmarkForm = ({
   const [playAdd] = useSound(buy01Sfx, { volume: 0.2 })
   const [playEdit] = useSound(buy02Sfx, { volume: 0.2 })
 
-  // Free-tier daily bookmark quota — only fetched when adding a new bookmark.
+  // Free-tier daily bookmark quota — only fetched when adding a new bookmark
+  // and only when billing is enabled (otherwise everyone is unlimited).
   const { data: billing } = useQuery({
     ...getBillingStatusOptions(),
-    enabled: type === 'new',
+    enabled: BILLING_ENABLED && type === 'new',
   })
   const quota =
     isNew && billing?.plan === 'free' && billing.quota.limit !== null
       ? billing.quota
       : null
 
-  // AI features (title/description rewrite, classification) are Pro-only.
+  // AI features (title/description rewrite, classification) are Pro-only —
+  // unless billing is disabled, in which case everyone is entitled.
   const { profile } = useUser()
   const isEntitled =
+    !BILLING_ENABLED ||
     profile?.plan === 'pro' ||
     profile?.plan === 'comp' ||
     profile?.role === 'admin'

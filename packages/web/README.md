@@ -116,6 +116,25 @@ Runtime notes:
 - `pnpm dev` reads `.dev.vars`; a plain `.env` file is not enough for Worker runtime env vars.
 - If Hyperdrive is used, treat it as optional infrastructure in front of Neon.
 
+### Self-hosting without Stripe
+
+To run your own free-for-everyone instance, set:
+
+```bash
+VITE_BILLING_ENABLED=false
+```
+
+This is a **build-time** flag (it must be set when running `pnpm build` /
+`pnpm deploy`, not toggled at runtime). When `false`, Otter:
+
+- skips the daily bookmark quota — every user is unlimited
+- gives every user full AI access (titles, summaries, classification)
+- hides billing/pricing/upgrade UI and removes `/billing/*` API routes
+- redirects `/settings/billing` and `/pricing` to the dashboard
+
+When `false`, the `STRIPE_*` and `FREE_DAILY_BOOKMARK_LIMIT` vars are
+unused and can be omitted.
+
 ## Troubleshooting
 
 ### `pnpm db:migrate` fails with an unhelpful error

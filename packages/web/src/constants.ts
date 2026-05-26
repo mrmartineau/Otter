@@ -6,6 +6,15 @@ export const REPO_URL = 'https://github.com/mrmartineau/Otter'
 
 export const ALLOW_SIGNUP = import.meta.env.VITE_ALLOW_SIGNUP === 'true'
 
+/**
+ * Master switch for all paid-tier features (Stripe checkout, daily quota,
+ * Pro-gated AI, billing/pricing UI). Defaults to enabled; set
+ * `VITE_BILLING_ENABLED=false` at build time to run Otter as a single-tier
+ * free instance — every user gets unlimited bookmarks and full AI access.
+ * Build-time only — read by both the SPA and (via this constant) the worker.
+ */
+export const BILLING_ENABLED = import.meta.env.VITE_BILLING_ENABLED !== 'false'
+
 export const TITLE_SEPARATOR = ' — '
 export const CONTENT = {
   accountSettingsTitle: 'Account, settings & integrations',

@@ -4,16 +4,23 @@ import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import {
   ALLOW_SIGNUP,
+  BILLING_ENABLED,
   BILLING_PLANS,
   createTitle,
   type PlanId,
+  ROUTE_HOME,
   ROUTE_SETTINGS_BILLING,
   ROUTE_SIGNIN,
 } from '@/constants'
 
 export const Route = createFileRoute('/pricing')({
-  // Pricing targets new signups — hide it when signups are disabled.
+  // Pricing targets new signups — hide it when signups or billing are
+  // disabled. Billing-off instances are single-tier free, so there is
+  // nothing to price.
   beforeLoad: () => {
+    if (!BILLING_ENABLED) {
+      throw redirect({ to: ROUTE_HOME })
+    }
     if (!ALLOW_SIGNUP) {
       throw redirect({ to: ROUTE_SIGNIN })
     }

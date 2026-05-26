@@ -1,13 +1,20 @@
 import { CheckIcon } from '@phosphor-icons/react'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { createFileRoute, redirect, useSearch } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/Button'
 import { Flex } from '@/components/Flex'
 import { useUser } from '@/components/UserProvider'
-import { BILLING_PLANS, CONTENT, createTitle, type PlanId } from '@/constants'
+import {
+  BILLING_ENABLED,
+  BILLING_PLANS,
+  CONTENT,
+  createTitle,
+  type PlanId,
+  ROUTE_DASHBOARD,
+} from '@/constants'
 import {
   getBillingStatusOptions,
   useCheckoutMutation,
@@ -15,6 +22,11 @@ import {
 } from '@/utils/fetching/billing'
 
 export const Route = createFileRoute('/_app/settings/billing')({
+  beforeLoad: () => {
+    if (!BILLING_ENABLED) {
+      throw redirect({ to: ROUTE_DASHBOARD })
+    }
+  },
   component: RouteComponent,
   head: () => ({
     meta: [{ title: createTitle('billingTitle') }],
@@ -94,9 +106,7 @@ function RouteComponent() {
         <Flex align="center" justify="between" wrap="wrap" gap="xs">
           <Flex align="center" gap="2xs">
             <strong>{planLabel}</strong>
-            <span
-              className={`admin-badge ${isPro || isComp ? 'is-pro' : ''}`}
-            >
+            <span className={`admin-badge ${isPro || isComp ? 'is-pro' : ''}`}>
               {isPro || isComp ? 'Pro' : 'Free'}
             </span>
           </Flex>

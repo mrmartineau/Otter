@@ -9,7 +9,7 @@ import { Link } from '@/components/Link'
 import { Loader } from '@/components/Loader'
 import { Markdown } from '@/components/Markdown'
 import { useUser } from '@/components/UserProvider'
-import { ROUTE_SETTINGS_BILLING } from '@/constants'
+import { BILLING_ENABLED, ROUTE_SETTINGS_BILLING } from '@/constants'
 import { getBookmark } from '@/utils/fetching/bookmarks'
 import { simpleUrl } from '@/utils/simpleUrl'
 import type { AiGenerateResponse } from '../../../worker/ai/generateResponse'
@@ -114,9 +114,11 @@ function RouteComponent() {
   const { data: content } = useSuspenseQuery(getContentOptions(url!))
   const [viewMode, setViewMode] = useState<ViewMode>('read')
 
-  // AI summaries are a Pro feature.
+  // AI summaries are a Pro feature — except when billing is disabled, in
+  // which case everyone gets full access.
   const { profile } = useUser()
   const isEntitled =
+    !BILLING_ENABLED ||
     profile?.plan === 'pro' ||
     profile?.plan === 'comp' ||
     profile?.role === 'admin'

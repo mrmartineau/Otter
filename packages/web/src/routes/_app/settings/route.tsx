@@ -9,7 +9,7 @@ import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { Flex } from '@/components/Flex'
 import { headingVariants } from '@/components/Heading'
 import { SidebarLink } from '@/components/SidebarLink'
-import { CONTENT } from '@/constants'
+import { BILLING_ENABLED, CONTENT } from '@/constants'
 
 export const Route = createFileRoute('/_app/settings')({
   component: RouteComponent,
@@ -36,10 +36,12 @@ function RouteComponent() {
           <UserCircleIcon weight="duotone" size={18} />
           Account
         </SidebarLink>
-        <SidebarLink href="/settings/billing">
-          <CreditCardIcon weight="duotone" size={18} />
-          {CONTENT.billingNav}
-        </SidebarLink>
+        {BILLING_ENABLED ? (
+          <SidebarLink href="/settings/billing">
+            <CreditCardIcon weight="duotone" size={18} />
+            {CONTENT.billingNav}
+          </SidebarLink>
+        ) : null}
         <SidebarLink href="/settings/integrations">
           <PlugsIcon weight="duotone" size={18} />
           Integrations
