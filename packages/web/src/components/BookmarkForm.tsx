@@ -118,7 +118,7 @@ export const BookmarkForm = ({
     enabled: type === 'new',
   })
   const quota =
-    billing?.plan === 'free' && billing.quota.limit !== null
+    isNew && billing?.plan === 'free' && billing.quota.limit !== null
       ? billing.quota
       : null
 
