@@ -38,10 +38,25 @@ function RouteComponent() {
         <Stat label="Total users" value={fmt(stats.total_users)} />
         <Stat
           label="Est. MRR"
-          value={`$${fmt(stats.estimated_mrr)}`}
-          hint="From active Pro subscriptions"
+          value={`£${fmt(stats.estimated_mrr)}`}
+          hint="Monthly + annual amortised. Excludes lifetime."
         />
         <Stat label="Pro users" value={fmt(stats.pro_users)} />
+        <Stat
+          label="Monthly subs"
+          value={fmt(stats.monthly_subs)}
+          hint="Active monthly Pro subscriptions"
+        />
+        <Stat
+          label="Annual subs"
+          value={fmt(stats.annual_subs)}
+          hint="Active annual Pro subscriptions"
+        />
+        <Stat
+          label="Lifetime"
+          value={fmt(stats.lifetime_users)}
+          hint="One-off lifetime purchases"
+        />
         <Stat
           label="Comp users"
           value={fmt(stats.comp_users)}

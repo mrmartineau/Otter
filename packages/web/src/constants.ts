@@ -154,19 +154,48 @@ export const DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER = 'https://zander.wtf'
 // This constant is the fallback default and the value shown in marketing copy.
 export const DEFAULT_FREE_DAILY_BOOKMARK_LIMIT = 10
 
-export type PlanId = 'free' | 'pro'
+/**
+ * One billing tier the user can pick at checkout. `free` is the default
+ * untyped state; the three pro tiers correspond to one Stripe product with
+ * three prices.
+ */
+export type TierId = 'free' | 'monthly' | 'annual' | 'lifetime'
 
-export interface BillingPlan {
-  id: PlanId
+/** Billing cycle stored on a paying user's profile. */
+export type BillingCycleId = 'monthly' | 'annual' | 'lifetime'
+
+export interface BillingTier {
+  id: TierId
   name: string
-  /** Price per month in whole units of currency (USD). */
+  /** Price in whole units of currency (GBP). */
   price: number
   priceLabel: string
+  /** Short period suffix shown next to the price (e.g. "/ month"). */
+  periodLabel: string | null
   tagline: string
   features: string[]
+  /** Stripe checkout mode this tier maps to. */
+  mode: 'free' | 'subscription' | 'payment'
 }
 
-export const BILLING_PLANS: Record<PlanId, BillingPlan> = {
+export const PRO_FEATURES = [
+  'Unlimited new bookmarks',
+  'Everything in Free',
+  'AI titles, summaries & classification',
+  'Priority support',
+] as const
+
+export const BILLING_TIERS: Record<TierId, BillingTier> = {
+  annual: {
+    features: [...PRO_FEATURES, 'Two months free vs monthly'],
+    id: 'annual',
+    mode: 'subscription',
+    name: 'Pro · Annual',
+    periodLabel: '/ year',
+    price: 48,
+    priceLabel: '£48',
+    tagline: 'Best value if you stick around',
+  },
   free: {
     features: [
       `${DEFAULT_FREE_DAILY_BOOKMARK_LIMIT} new bookmarks per day`,
@@ -175,22 +204,42 @@ export const BILLING_PLANS: Record<PlanId, BillingPlan> = {
       'Browser extensions & bookmarklet',
     ],
     id: 'free',
+    mode: 'free',
     name: 'Free',
+    periodLabel: null,
     price: 0,
     priceLabel: 'Free',
     tagline: 'For getting started',
   },
-  pro: {
-    features: [
-      'Unlimited new bookmarks',
-      'Everything in Free',
-      'AI titles, summaries & classification',
-      'Priority support',
-    ],
-    id: 'pro',
-    name: 'Pro',
+  lifetime: {
+    features: [...PRO_FEATURES, 'One payment, forever'],
+    id: 'lifetime',
+    mode: 'payment',
+    name: 'Pro · Lifetime',
+    periodLabel: 'one-off',
+    price: 199,
+    priceLabel: '£199',
+    tagline: 'Pay once, done',
+  },
+  monthly: {
+    features: [...PRO_FEATURES],
+    id: 'monthly',
+    mode: 'subscription',
+    name: 'Pro · Monthly',
+    periodLabel: '/ month',
     price: 5,
-    priceLabel: '$5',
+    priceLabel: '£5',
     tagline: 'For people who save a lot',
   },
 }
+
+/** Order tiers are displayed in marketing/billing UI. */
+export const TIER_DISPLAY_ORDER: TierId[] = [
+  'free',
+  'monthly',
+  'annual',
+  'lifetime',
+]
+
+/** Paid tiers only (excludes free). */
+export const PAID_TIERS: BillingCycleId[] = ['monthly', 'annual', 'lifetime']

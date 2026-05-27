@@ -1,5 +1,6 @@
 import { queryOptions, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { BillingCycleId } from '@/constants'
 import type { BillingStatus } from '@/types/db'
 
 interface ApiResponse<T> {
@@ -27,24 +28,30 @@ export const getBillingStatusOptions = () =>
   })
 
 /** POSTs to a billing endpoint that returns a Stripe-hosted URL. */
-const requestBillingUrl = async (path: string): Promise<string> => {
+const requestBillingUrl = async (
+  path: string,
+  body?: unknown,
+): Promise<string> => {
   const response = await fetch(path, {
+    body: body ? JSON.stringify(body) : undefined,
     credentials: 'include',
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
     method: 'POST',
   })
-  const body = (await response.json()) as ApiResponse<{ url: string }>
+  const parsed = (await response.json()) as ApiResponse<{ url: string }>
 
-  if (!response.ok || !body.data?.url) {
-    throw new Error(body.error || body.reason || 'Request failed')
+  if (!response.ok || !parsed.data?.url) {
+    throw new Error(parsed.error || parsed.reason || 'Request failed')
   }
 
-  return body.data.url
+  return parsed.data.url
 }
 
-/** Starts Stripe Checkout and redirects the browser to it. */
+/** Starts Stripe Checkout for the chosen tier and redirects the browser. */
 export const useCheckoutMutation = () =>
   useMutation({
-    mutationFn: () => requestBillingUrl('/api/billing/checkout'),
+    mutationFn: (tier: BillingCycleId) =>
+      requestBillingUrl('/api/billing/checkout', { tier }),
     onError: (error: Error) => toast.error(error.message),
     onSuccess: (url) => {
       window.location.href = url

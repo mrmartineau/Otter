@@ -120,6 +120,16 @@ export type SubscriptionStatus =
   | 'incomplete'
   | 'inactive'
 
+/**
+ * Billing cycle for a paying Pro user.
+ *
+ * - `monthly` / `annual` — recurring Stripe subscription
+ * - `lifetime` — one-off payment, no renewal
+ *
+ * Null for free, comp and admin users.
+ */
+export type BillingCycle = 'monthly' | 'annual' | 'lifetime'
+
 export interface UserProfile {
   api_key: string | null
   avatar_url: string | null
@@ -145,6 +155,7 @@ export interface BookmarkQuota {
 export interface BillingStatus {
   plan: SubscriptionPlan
   status: SubscriptionStatus
+  billing_cycle: BillingCycle | null
   cancel_at_period_end: boolean
   current_period_end: string | null
   has_stripe_customer: boolean
@@ -159,6 +170,7 @@ export interface AdminUser {
   role: UserRole
   plan: SubscriptionPlan
   subscription_status: SubscriptionStatus
+  billing_cycle: BillingCycle | null
   daily_bookmark_limit_override: number | null
   bookmark_count: number
   created_at: string
@@ -170,6 +182,9 @@ export interface AdminStats {
   comp_users: number
   free_users: number
   admin_users: number
+  monthly_subs: number
+  annual_subs: number
+  lifetime_users: number
   total_bookmarks: number
   public_bookmarks: number
   bookmarks_last_7_days: number

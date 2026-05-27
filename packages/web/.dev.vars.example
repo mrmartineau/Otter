@@ -33,8 +33,13 @@ VITE_BILLING_ENABLED=true
 APP_URL=http://localhost:5678
 STRIPE_SECRET_KEY=sk_test_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
-# Recurring price ID for the Pro subscription (Stripe Dashboard → Products).
-STRIPE_PRICE_ID=price_xxx
+# Stripe price IDs (Stripe Dashboard → Products). One product, three prices:
+#   monthly  — recurring
+#   annual   — recurring
+#   lifetime — one-off
+STRIPE_PRICE_ID_MONTHLY=price_xxx
+STRIPE_PRICE_ID_ANNUAL=price_xxx
+STRIPE_PRICE_ID_LIFETIME=price_xxx
 
 # Free plan: number of new bookmarks allowed per day.
 # Optional — defaults to 10 when unset.

@@ -1,11 +1,12 @@
 import { eq } from 'drizzle-orm'
 import type { Context } from 'hono'
 import type Stripe from 'stripe'
+import type { BillingCycleId } from '@/constants'
 import type { Db } from '../../db/client'
 import { profiles } from '../../db/schema'
 import type { WorkerEnv } from '../env'
 import '../middleware/db'
-import { mapStripeStatus, planForStatus } from './plans'
+import { getCycleForPriceId, mapStripeStatus, planForStatus } from './plans'
 import { getStripe } from './stripe'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
@@ -25,6 +26,27 @@ const getCustomerId = (subscription: Stripe.Subscription): string | null => {
   const { customer } = subscription
   if (typeof customer === 'string') return customer
   return customer?.id ?? null
+}
+
+/**
+ * Figures out the billing cycle for a subscription. Prefers metadata set at
+ * checkout (`tier`), falling back to matching the price ID against the
+ * configured monthly/annual env vars.
+ */
+const getSubscriptionCycle = (
+  env: WorkerEnv,
+  subscription: Stripe.Subscription,
+): BillingCycleId | null => {
+  const fromMetadata = subscription.metadata?.tier
+  if (
+    fromMetadata === 'monthly' ||
+    fromMetadata === 'annual' ||
+    fromMetadata === 'lifetime'
+  ) {
+    return fromMetadata
+  }
+  const priceId = subscription.items?.data?.[0]?.price?.id
+  return getCycleForPriceId(env, priceId)
 }
 
 /**
@@ -53,20 +75,51 @@ const resolveUserId = async (
 /** Writes the live subscription state onto the user's profile. */
 const applySubscription = async (
   db: Db,
+  env: WorkerEnv,
   userId: string,
   subscription: Stripe.Subscription,
 ): Promise<void> => {
   const status = mapStripeStatus(subscription.status)
   const customerId = getCustomerId(subscription)
+  const plan = planForStatus(status)
+  const cycle = getSubscriptionCycle(env, subscription)
 
   await db
     .update(profiles)
     .set({
+      // Only set cycle when the subscription is currently entitled; clear it
+      // back to NULL when access lapses so the admin view stays meaningful.
+      billingCycle: plan === 'pro' ? cycle : null,
       cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
       currentPeriodEnd: getCurrentPeriodEnd(subscription),
-      plan: planForStatus(status),
+      plan,
       stripeSubscriptionId: subscription.id,
       subscriptionStatus: status,
+      updatedAt: new Date(),
+      ...(customerId ? { stripeCustomerId: customerId } : {}),
+    })
+    .where(eq(profiles.id, userId))
+}
+
+/**
+ * Marks a user as lifetime Pro after a successful one-off checkout. No
+ * Stripe subscription is created, so there's no period to renew and nothing
+ * to cancel.
+ */
+const applyLifetime = async (
+  db: Db,
+  userId: string,
+  customerId: string | null,
+): Promise<void> => {
+  await db
+    .update(profiles)
+    .set({
+      billingCycle: 'lifetime',
+      cancelAtPeriodEnd: false,
+      currentPeriodEnd: null,
+      plan: 'pro',
+      stripeSubscriptionId: null,
+      subscriptionStatus: 'active',
       updatedAt: new Date(),
       ...(customerId ? { stripeCustomerId: customerId } : {}),
     })
@@ -113,11 +166,20 @@ export const handleStripeWebhook = async (context: HonoContext) => {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.client_reference_id
 
-        if (userId && session.subscription) {
+        if (!userId) break
+
+        // Lifetime — one-off payment, no subscription created.
+        if (session.mode === 'payment') {
+          const customerId =
+            typeof session.customer === 'string'
+              ? session.customer
+              : (session.customer?.id ?? null)
+          await applyLifetime(db, userId, customerId)
+        } else if (session.subscription) {
           const subscription = await stripe.subscriptions.retrieve(
             session.subscription as string,
           )
-          await applySubscription(db, userId, subscription)
+          await applySubscription(db, env, userId, subscription)
         }
         break
       }
@@ -131,7 +193,7 @@ export const handleStripeWebhook = async (context: HonoContext) => {
         const subscription = await stripe.subscriptions.retrieve(eventSub.id)
         const userId = await resolveUserId(db, subscription)
         if (userId) {
-          await applySubscription(db, userId, subscription)
+          await applySubscription(db, env, userId, subscription)
         }
         break
       }
@@ -140,9 +202,20 @@ export const handleStripeWebhook = async (context: HonoContext) => {
         const subscription = event.data.object as Stripe.Subscription
         const userId = await resolveUserId(db, subscription)
         if (userId) {
+          // Lifetime users have no subscription, so a deleted-subscription
+          // event must not strip their access.
+          const [profile] = await db
+            .select({ billingCycle: profiles.billingCycle })
+            .from(profiles)
+            .where(eq(profiles.id, userId))
+            .limit(1)
+
+          if (profile?.billingCycle === 'lifetime') break
+
           await db
             .update(profiles)
             .set({
+              billingCycle: null,
               cancelAtPeriodEnd: false,
               currentPeriodEnd: null,
               plan: 'free',

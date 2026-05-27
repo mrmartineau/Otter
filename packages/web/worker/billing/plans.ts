@@ -1,4 +1,7 @@
-import { DEFAULT_FREE_DAILY_BOOKMARK_LIMIT } from '@/constants'
+import {
+  type BillingCycleId,
+  DEFAULT_FREE_DAILY_BOOKMARK_LIMIT,
+} from '@/constants'
 import type { SubscriptionPlan, SubscriptionStatus } from '@/types/db'
 import type { WorkerEnv } from '../env'
 
@@ -58,3 +61,34 @@ export const mapStripeStatus = (status: string): SubscriptionStatus => {
  */
 export const planForStatus = (status: SubscriptionStatus): SubscriptionPlan =>
   ENTITLED_STATUSES.includes(status) ? 'pro' : 'free'
+
+/** Stripe price ID configured for a given billing cycle, if any. */
+export const getPriceIdForCycle = (
+  env: WorkerEnv,
+  cycle: BillingCycleId,
+): string | undefined => {
+  switch (cycle) {
+    case 'monthly':
+      return env.STRIPE_PRICE_ID_MONTHLY
+    case 'annual':
+      return env.STRIPE_PRICE_ID_ANNUAL
+    case 'lifetime':
+      return env.STRIPE_PRICE_ID_LIFETIME
+  }
+}
+
+/**
+ * Reverse map — given a Stripe price ID, return the billing cycle it
+ * represents in this deployment. Used by the webhook to label new
+ * subscriptions and lifetime purchases.
+ */
+export const getCycleForPriceId = (
+  env: WorkerEnv,
+  priceId: string | null | undefined,
+): BillingCycleId | null => {
+  if (!priceId) return null
+  if (priceId === env.STRIPE_PRICE_ID_MONTHLY) return 'monthly'
+  if (priceId === env.STRIPE_PRICE_ID_ANNUAL) return 'annual'
+  if (priceId === env.STRIPE_PRICE_ID_LIFETIME) return 'lifetime'
+  return null
+}

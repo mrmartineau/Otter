@@ -9,11 +9,12 @@ import { Flex } from '@/components/Flex'
 import { useUser } from '@/components/UserProvider'
 import {
   BILLING_ENABLED,
-  BILLING_PLANS,
+  BILLING_TIERS,
   CONTENT,
   createTitle,
-  type PlanId,
   ROUTE_DASHBOARD,
+  TIER_DISPLAY_ORDER,
+  type TierId,
 } from '@/constants'
 import {
   getBillingStatusOptions,
@@ -85,6 +86,8 @@ function RouteComponent() {
 
   const isPro = billing.plan === 'pro'
   const isComp = billing.plan === 'comp'
+  const cycle = billing.billing_cycle
+  const isLifetime = cycle === 'lifetime'
   const { quota } = billing
   // Unlimited covers Pro, complimentary plans and admins.
   const unlimited = quota.limit === null
@@ -92,10 +95,15 @@ function RouteComponent() {
   const usedPct =
     limit > 0 ? Math.min(100, Math.round((quota.used / limit) * 100)) : 0
   const atLimit = quota.limit !== null && quota.used >= quota.limit
-  const planLabel = isPro
-    ? 'Pro plan'
-    : isComp
-      ? 'Pro plan (complimentary)'
+
+  const planLabel = isComp
+    ? 'Pro plan (complimentary)'
+    : isPro
+      ? cycle === 'lifetime'
+        ? 'Pro · Lifetime'
+        : cycle === 'annual'
+          ? 'Pro · Annual'
+          : 'Pro · Monthly'
       : 'Free plan'
 
   return (
@@ -110,7 +118,7 @@ function RouteComponent() {
               {isPro || isComp ? 'Pro' : 'Free'}
             </span>
           </Flex>
-          {isPro ? (
+          {isPro && !isLifetime ? (
             <Button
               variant="outline"
               onClick={() => portal.mutate()}
@@ -118,17 +126,15 @@ function RouteComponent() {
             >
               Manage subscription
             </Button>
-          ) : unlimited ? null : (
-            <Button
-              onClick={() => checkout.mutate()}
-              disabled={checkout.isPending}
-            >
-              Upgrade to Pro
-            </Button>
-          )}
+          ) : null}
         </Flex>
 
-        {isPro ? (
+        {isPro && isLifetime ? (
+          <p>
+            You have lifetime Pro access — paid in full, no renewal needed.
+            Thanks for the support!
+          </p>
+        ) : isPro ? (
           <p>
             {billing.cancel_at_period_end
               ? `Your subscription is set to cancel${
@@ -164,7 +170,7 @@ function RouteComponent() {
             </div>
             <p>
               {atLimit
-                ? "You've reached today's free limit. Upgrade to Pro for unlimited bookmarks."
+                ? "You've reached today's free limit. Upgrade to Pro below for unlimited bookmarks."
                 : `${quota.remaining} more bookmark${
                     quota.remaining === 1 ? '' : 's'
                   } available today.`}
@@ -174,39 +180,43 @@ function RouteComponent() {
       </div>
 
       <div className="billing-plan-grid">
-        {(Object.keys(BILLING_PLANS) as PlanId[]).map((planId) => {
-          const plan = BILLING_PLANS[planId]
-          const isCurrent = billing.plan === planId
+        {TIER_DISPLAY_ORDER.map((tierId: TierId) => {
+          const tier = BILLING_TIERS[tierId]
+          const isCurrent =
+            (tierId === 'free' && billing.plan === 'free') ||
+            (billing.plan === 'pro' && cycle === tierId)
+          const isPaidTier = tierId !== 'free'
 
           return (
             <div
-              key={planId}
+              key={tierId}
               className={`billing-plan ${isCurrent ? 'is-current' : ''}`}
             >
               <Flex align="center" justify="between">
-                <strong>{plan.name}</strong>
+                <strong>{tier.name}</strong>
                 {isCurrent ? (
                   <span className="admin-badge">Current plan</span>
                 ) : null}
               </Flex>
+              <span>{tier.tagline}</span>
               <div>
-                <span className="billing-plan-price">{plan.priceLabel}</span>
-                {plan.price > 0 ? <span> / month</span> : null}
+                <span className="billing-plan-price">{tier.priceLabel}</span>
+                {tier.periodLabel ? <span> {tier.periodLabel}</span> : null}
               </div>
               <ul className="billing-plan-features">
-                {plan.features.map((feature) => (
+                {tier.features.map((feature) => (
                   <li key={feature}>
                     <CheckIcon size={16} weight="bold" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
-              {planId === 'pro' && !isPro && !unlimited ? (
+              {isPaidTier && !isPro && !unlimited ? (
                 <Button
-                  onClick={() => checkout.mutate()}
+                  onClick={() => checkout.mutate(tierId)}
                   disabled={checkout.isPending}
                 >
-                  Upgrade to Pro
+                  {tierId === 'lifetime' ? 'Buy lifetime' : 'Subscribe'}
                 </Button>
               ) : null}
             </div>

@@ -5,13 +5,13 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/Button'
 import { Flex } from '@/components/Flex'
+import { Input } from '@/components/Input'
 import { createTitle } from '@/constants'
 import type { AdminUser } from '@/types/db'
 import {
   getAdminUsersOptions,
   useUpdateUserMutation,
 } from '@/utils/fetching/admin'
-import { Input } from '@/components/Input'
 
 export const Route = createFileRoute('/_app/admin/users')({
   component: RouteComponent,
@@ -65,6 +65,13 @@ function UserRow({ user }: { user: AdminUser }) {
   const displayPlan = user.role === 'admin' ? 'pro' : user.plan
   const planBadgeClass =
     displayPlan === 'pro' ? 'is-pro' : displayPlan === 'comp' ? 'is-comp' : ''
+  const cycleLabel = user.billing_cycle
+    ? user.billing_cycle === 'lifetime'
+      ? 'Lifetime'
+      : user.billing_cycle === 'annual'
+        ? 'Annual'
+        : 'Monthly'
+    : null
 
   return (
     <tr>
@@ -73,8 +80,11 @@ function UserRow({ user }: { user: AdminUser }) {
         <div className="admin-user-email">{user.email}</div>
       </td>
       <td>
-        <Flex align="center" gap="2xs">
+        <Flex align="center" gap="2xs" wrap="wrap">
           <span className={`admin-badge ${planBadgeClass}`}>{displayPlan}</span>
+          {cycleLabel ? (
+            <span className="admin-badge">{cycleLabel}</span>
+          ) : null}
           {/* `pro` is Stripe-managed; admins already have full access. */}
           {user.role !== 'admin' && user.plan !== 'pro' ? (
             <Button
@@ -87,7 +97,7 @@ function UserRow({ user }: { user: AdminUser }) {
             </Button>
           ) : null}
         </Flex>
-        {user.plan === 'pro' ? (
+        {user.plan === 'pro' && user.billing_cycle !== 'lifetime' ? (
           <div className="admin-user-email">{user.subscription_status}</div>
         ) : null}
       </td>

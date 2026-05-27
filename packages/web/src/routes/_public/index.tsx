@@ -27,14 +27,15 @@ import { useSession } from '../../components/AuthProvider'
 import {
   ALLOW_SIGNUP,
   BILLING_ENABLED,
-  BILLING_PLANS,
+  BILLING_TIERS,
   CONTENT,
-  type PlanId,
   ROUTE_HOME,
   ROUTE_PRICING,
   ROUTE_RECENT,
   ROUTE_SIGNIN,
-  ROUTE_SIGNUP
+  ROUTE_SIGNUP,
+  TIER_DISPLAY_ORDER,
+  type TierId,
 } from '../../constants'
 
 const RECENT_PREVIEW_LIMIT = 5
@@ -158,12 +159,14 @@ function Index() {
               {CONTENT.signInTitle}
             </a>
           </Button>
-          {ALLOW_SIGNUP ? (<Button asChild>
-            <a href={ROUTE_SIGNUP}>
-              <UserCircleIcon weight="duotone" width="20" height="20" />
-              {CONTENT.signupTitle}
-            </a>
-          </Button>) : null}
+          {ALLOW_SIGNUP ? (
+            <Button asChild>
+              <a href={ROUTE_SIGNUP}>
+                <UserCircleIcon weight="duotone" width="20" height="20" />
+                {CONTENT.signupTitle}
+              </a>
+            </Button>
+          ) : null}
           <Button asChild variant="outline">
             <a
               href="https://github.com/mrmartineau/Otter"
@@ -224,39 +227,45 @@ function Index() {
         <section className="max-w-[1000px] mx-auto px-s pb-3xl">
           <h2 className="text-step-1 mb-3xs">Pricing</h2>
           <p className="text-step--1 text-[var(--text)] mb-m">
-            Start free with {BILLING_PLANS.free.features[0]}. Upgrade to Pro for
-            unlimited bookmarks and AI features.
+            Start free with {BILLING_TIERS.free.features[0]}. Subscribe monthly
+            or annually, or pay once for lifetime access.
           </p>
           <div className="billing-plan-grid">
-            {(Object.keys(BILLING_PLANS) as PlanId[]).map((planId) => {
-              const plan = BILLING_PLANS[planId]
-              const isPro = planId === 'pro'
+            {TIER_DISPLAY_ORDER.map((tierId: TierId) => {
+              const tier = BILLING_TIERS[tierId]
+              const isPaid = tierId !== 'free'
+              const ctaLabel =
+                tierId === 'free'
+                  ? 'Get started free'
+                  : tierId === 'lifetime'
+                    ? 'Get lifetime'
+                    : tierId === 'annual'
+                      ? 'Get annual'
+                      : 'Get monthly'
 
               return (
                 <div
-                  key={planId}
-                  className={`billing-plan ${isPro ? 'is-current' : ''}`}
+                  key={tierId}
+                  className={`billing-plan ${isPaid ? 'is-current' : ''}`}
                 >
-                  <strong>{plan.name}</strong>
-                  <span>{plan.tagline}</span>
+                  <strong>{tier.name}</strong>
+                  <span>{tier.tagline}</span>
                   <div>
                     <span className="billing-plan-price">
-                      {plan.priceLabel}
+                      {tier.priceLabel}
                     </span>
-                    {plan.price > 0 ? <span> / month</span> : null}
+                    {tier.periodLabel ? <span> {tier.periodLabel}</span> : null}
                   </div>
                   <ul className="billing-plan-features">
-                    {plan.features.map((feature) => (
+                    {tier.features.map((feature) => (
                       <li key={feature}>
                         <CheckIcon size={16} weight="bold" />
                         <span>{feature}</span>
                       </li>
                     ))}
                   </ul>
-                  <Button asChild variant={isPro ? 'default' : 'outline'}>
-                    <a href={ROUTE_SIGNIN}>
-                      {isPro ? 'Get started with Pro' : 'Get started free'}
-                    </a>
+                  <Button asChild variant={isPaid ? 'default' : 'outline'}>
+                    <a href={ROUTE_SIGNIN}>{ctaLabel}</a>
                   </Button>
                 </div>
               )

@@ -73,6 +73,15 @@ export const subscriptionStatusEnum = pgEnum('subscription_status', [
   'inactive',
 ])
 
+// Billing cycle for a paying Pro user. `monthly` and `annual` correspond to
+// recurring Stripe subscriptions; `lifetime` is a one-off payment with no
+// renewal. Free/comp users have a NULL cycle.
+export const billingCycleEnum = pgEnum('billing_cycle', [
+  'monthly',
+  'annual',
+  'lifetime',
+])
+
 export const bookmarkTypeEnum = pgEnum('type', [
   'link',
   'video',
@@ -299,6 +308,7 @@ export const profiles = pgTable(
   {
     apiKey: uuid('api_key').notNull().defaultRandom(),
     avatarUrl: text('avatar_url'),
+    billingCycle: billingCycleEnum('billing_cycle'),
     cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
     currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }),
     // Per-user override of the free daily bookmark limit (admin-managed).

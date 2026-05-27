@@ -16,7 +16,9 @@ import { getPublicShareInfiniteOptions } from '@/utils/fetching/shares'
 export const Route = createFileRoute('/share/$token')({
   component: SharePage,
   head: ({ params }) => ({
-    meta: [{ title: `Shared — ${CONTENT.appName} (${params.token.slice(0, 8)})` }],
+    meta: [
+      { title: `Shared — ${CONTENT.appName} (${params.token.slice(0, 8)})` },
+    ],
   }),
   loader: async ({ context, params }) => {
     return context.queryClient.ensureInfiniteQueryData(
@@ -49,7 +51,7 @@ function SharePage() {
     )
 
   return (
-      <>
+    <>
       <header className="sticky top-0 z-10 border-b bg-theme1 px-s p-xs">
         <Link href="/" className="flex items-center gap-2xs">
           <img src="/otter-logo.svg" width="33" height="33" alt="Otter logo" />
@@ -62,39 +64,39 @@ function SharePage() {
           articles, and media.
         </p>
       </header>
-    <Container className="pt-m">
-      <div className="feed">
-        <Flex gap="xs" direction="column">
-          <h3
-            className={cn(
-              headingVariants({ variant: 'feedTitle' }),
-              'flex items-center gap-2xs',
+      <Container className="pt-m">
+        <div className="feed">
+          <Flex gap="xs" direction="column">
+            <h3
+              className={cn(
+                headingVariants({ variant: 'feedTitle' }),
+                'flex items-center gap-2xs',
+              )}
+            >
+              {icon}
+              {firstPage.name}
+            </h3>
+            <p className="text-step--1 text-theme10">
+              Shared by {ownerLabel} · {firstPage.count}{' '}
+              {firstPage.count === 1 ? 'bookmark' : 'bookmarks'}
+            </p>
+          </Flex>
+
+          <div className="mt-m grid gap-m">
+            {items.length ? (
+              items.map((item) => (
+                <PublicBookmarkItem {...item} key={item.id} />
+              ))
+            ) : (
+              <div>{CONTENT.noItems}</div>
             )}
-          >
-            {icon}
-            {firstPage.name}
-          </h3>
-          <p className="text-step--1 text-theme10">
-            Shared by {ownerLabel} · {firstPage.count}{' '}
-            {firstPage.count === 1 ? 'bookmark' : 'bookmarks'}
-          </p>
-        </Flex>
+          </div>
 
-        <div className="mt-m grid gap-m">
-          {items.length ? (
-            items.map((item) => (
-              <PublicBookmarkItem {...item} key={item.id} />
-            ))
-          ) : (
-            <div>{CONTENT.noItems}</div>
-          )}
+          <div ref={sentinelRef} className="mt-m flex justify-center">
+            {isFetchingNextPage ? <Loader /> : null}
+          </div>
         </div>
-
-        <div ref={sentinelRef} className="mt-m flex justify-center">
-          {isFetchingNextPage ? <Loader /> : null}
-        </div>
-      </div>
-    </Container>
+      </Container>
     </>
   )
 }

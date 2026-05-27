@@ -135,6 +135,23 @@ This is a **build-time** flag (it must be set when running `pnpm build` /
 When `false`, the `STRIPE_*` and `FREE_DAILY_BOOKMARK_LIMIT` vars are
 unused and can be omitted.
 
+### Billing tiers
+
+When billing is enabled, Otter offers one Stripe product with three prices:
+
+- `STRIPE_PRICE_ID_MONTHLY` — recurring monthly (£5)
+- `STRIPE_PRICE_ID_ANNUAL` — recurring annual (£48)
+- `STRIPE_PRICE_ID_LIFETIME` — one-off lifetime purchase (£199)
+
+Create the product and three prices in the Stripe Dashboard, then paste each
+price ID into the matching env var. The checkout flow picks the right price
+based on the tier the user selects, and switches Stripe checkout mode from
+`subscription` to `payment` for lifetime purchases.
+
+Lifetime customers have no Stripe subscription, no renewal date, and cannot
+cancel — they keep Pro access forever. The admin dashboard breaks down
+active users by monthly / annual / lifetime.
+
 ## Troubleshooting
 
 ### `pnpm db:migrate` fails with an unhelpful error

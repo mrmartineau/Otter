@@ -25,6 +25,7 @@ export const listUsers = async (context: HonoContext) => {
 
     const rows = await requestContext.db
       .select({
+        billingCycle: profiles.billingCycle,
         bookmarkCount: count(bookmarks.id),
         createdAt: authUsers.createdAt,
         email: authUsers.email,
@@ -47,12 +48,14 @@ export const listUsers = async (context: HonoContext) => {
         profiles.username,
         profiles.role,
         profiles.plan,
+        profiles.billingCycle,
         profiles.subscriptionStatus,
         profiles.dailyBookmarkLimitOverride,
       )
       .orderBy(desc(authUsers.createdAt))
 
     const data: AdminUser[] = rows.map((row) => ({
+      billing_cycle: row.billingCycle,
       bookmark_count: row.bookmarkCount,
       created_at: row.createdAt.toISOString(),
       daily_bookmark_limit_override: row.override,

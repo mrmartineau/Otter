@@ -1,6 +1,6 @@
-import { count, eq, gte } from 'drizzle-orm'
+import { and, count, eq, gte } from 'drizzle-orm'
 import type { Context } from 'hono'
-import { API_HEADERS, BILLING_PLANS } from '@/constants'
+import { API_HEADERS, BILLING_TIERS } from '@/constants'
 import type { AdminStats } from '@/types/db'
 import { errorResponse } from '@/utils/fetching/errorResponse'
 import { getErrorMessage } from '@/utils/get-error-message'
@@ -41,6 +41,9 @@ export const getAdminStats = async (context: HonoContext) => {
       proUsers,
       compUsers,
       adminUsers,
+      monthlySubs,
+      annualSubs,
+      lifetimeUsers,
       totalBookmarks,
       publicBookmarks,
       bookmarks7,
@@ -66,6 +69,28 @@ export const getAdminStats = async (context: HonoContext) => {
           .select({ value: count() })
           .from(profiles)
           .where(eq(profiles.role, 'admin')),
+      ),
+      firstValue(
+        db
+          .select({ value: count() })
+          .from(profiles)
+          .where(
+            and(eq(profiles.plan, 'pro'), eq(profiles.billingCycle, 'monthly')),
+          ),
+      ),
+      firstValue(
+        db
+          .select({ value: count() })
+          .from(profiles)
+          .where(
+            and(eq(profiles.plan, 'pro'), eq(profiles.billingCycle, 'annual')),
+          ),
+      ),
+      firstValue(
+        db
+          .select({ value: count() })
+          .from(profiles)
+          .where(eq(profiles.billingCycle, 'lifetime')),
       ),
       firstValue(db.select({ value: count() }).from(bookmarks)),
       firstValue(
@@ -100,13 +125,22 @@ export const getAdminStats = async (context: HonoContext) => {
       ),
     ])
 
+    // MRR ≈ monthly subs + annual subs amortised to a month. Lifetime is a
+    // one-off so it does not contribute to monthly recurring revenue.
+    const estimatedMrr =
+      monthlySubs * BILLING_TIERS.monthly.price +
+      annualSubs * (BILLING_TIERS.annual.price / 12)
+
     const data: AdminStats = {
       admin_users: adminUsers,
+      annual_subs: annualSubs,
       bookmarks_last_7_days: bookmarks7,
       bookmarks_last_30_days: bookmarks30,
       comp_users: compUsers,
-      estimated_mrr: proUsers * BILLING_PLANS.pro.price,
+      estimated_mrr: Math.round(estimatedMrr),
       free_users: Math.max(0, totalUsers - proUsers - compUsers),
+      lifetime_users: lifetimeUsers,
+      monthly_subs: monthlySubs,
       pro_users: proUsers,
       public_bookmarks: publicBookmarks,
       signups_last_7_days: signups7,

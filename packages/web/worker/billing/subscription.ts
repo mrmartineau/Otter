@@ -34,6 +34,7 @@ export const getBillingStatus = async (context: HonoContext) => {
 
     const [profile] = await db
       .select({
+        billingCycle: profiles.billingCycle,
         cancelAtPeriodEnd: profiles.cancelAtPeriodEnd,
         currentPeriodEnd: profiles.currentPeriodEnd,
         plan: profiles.plan,
@@ -47,6 +48,7 @@ export const getBillingStatus = async (context: HonoContext) => {
     const quota = await getBookmarkQuota(db, context.env, userId)
 
     const data: BillingStatus = {
+      billing_cycle: profile?.billingCycle ?? null,
       cancel_at_period_end: profile?.cancelAtPeriodEnd ?? false,
       current_period_end: profile?.currentPeriodEnd?.toISOString() ?? null,
       has_stripe_customer: Boolean(profile?.stripeCustomerId),

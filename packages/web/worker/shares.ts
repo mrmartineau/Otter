@@ -31,10 +31,7 @@ const shareBookmarksCondition = (
   name: string,
   userId: string,
 ) => {
-  const base = and(
-    eq(bookmarks.user, userId),
-    eq(bookmarks.status, 'active'),
-  )
+  const base = and(eq(bookmarks.user, userId), eq(bookmarks.status, 'active'))
 
   if (kind === 'tag') {
     if (name === 'Untagged') {

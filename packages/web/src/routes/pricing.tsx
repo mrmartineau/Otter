@@ -5,12 +5,13 @@ import { Container } from '@/components/Container'
 import {
   ALLOW_SIGNUP,
   BILLING_ENABLED,
-  BILLING_PLANS,
+  BILLING_TIERS,
   createTitle,
-  type PlanId,
   ROUTE_HOME,
   ROUTE_SETTINGS_BILLING,
   ROUTE_SIGNIN,
+  TIER_DISPLAY_ORDER,
+  type TierId,
 } from '@/constants'
 
 export const Route = createFileRoute('/pricing')({
@@ -36,37 +37,43 @@ function Pricing() {
     <Container className="py-l flow">
       <h1>Simple pricing</h1>
       <p>
-        Otter is free to start. Upgrade to Pro whenever you need to save without
-        limits.
+        Otter is free to start. Subscribe monthly or annually, or pay once for
+        lifetime access.
       </p>
 
       <div className="billing-plan-grid">
-        {(Object.keys(BILLING_PLANS) as PlanId[]).map((planId) => {
-          const plan = BILLING_PLANS[planId]
-          const isPro = planId === 'pro'
+        {TIER_DISPLAY_ORDER.map((tierId: TierId) => {
+          const tier = BILLING_TIERS[tierId]
+          const isPaid = tierId !== 'free'
+          const ctaLabel =
+            tierId === 'free'
+              ? 'Get started'
+              : tierId === 'lifetime'
+                ? 'Buy lifetime'
+                : 'Subscribe'
 
           return (
             <div
-              key={planId}
-              className={`billing-plan ${isPro ? 'is-current' : ''}`}
+              key={tierId}
+              className={`billing-plan ${isPaid ? 'is-current' : ''}`}
             >
-              <strong>{plan.name}</strong>
-              <span>{plan.tagline}</span>
+              <strong>{tier.name}</strong>
+              <span>{tier.tagline}</span>
               <div>
-                <span className="billing-plan-price">{plan.priceLabel}</span>
-                {plan.price > 0 ? <span> / month</span> : null}
+                <span className="billing-plan-price">{tier.priceLabel}</span>
+                {tier.periodLabel ? <span> {tier.periodLabel}</span> : null}
               </div>
               <ul className="billing-plan-features">
-                {plan.features.map((feature) => (
+                {tier.features.map((feature) => (
                   <li key={feature}>
                     <CheckIcon size={16} weight="bold" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
-              <Button variant={isPro ? 'default' : 'outline'} asChild>
-                <Link to={isPro ? ROUTE_SETTINGS_BILLING : ROUTE_SIGNIN}>
-                  {isPro ? 'Get Pro' : 'Get started'}
+              <Button variant={isPaid ? 'default' : 'outline'} asChild>
+                <Link to={isPaid ? ROUTE_SETTINGS_BILLING : ROUTE_SIGNIN}>
+                  {ctaLabel}
                 </Link>
               </Button>
             </div>

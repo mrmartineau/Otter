@@ -104,9 +104,7 @@ export const classifyBookmark = async ({
   }
 
   const existingTagSet = new Set(existingTags.map((t) => t.toLowerCase()))
-  const bookmarkTypeSet = new Set(
-    BOOKMARK_TYPES.map((t) => t.toLowerCase()),
-  )
+  const bookmarkTypeSet = new Set(BOOKMARK_TYPES.map((t) => t.toLowerCase()))
 
   const tags = Array.isArray(response?.tags)
     ? response.tags
