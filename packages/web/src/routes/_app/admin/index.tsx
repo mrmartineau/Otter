@@ -30,7 +30,7 @@ const Stat = ({ label, value, hint }: StatProps) => (
 
 function RouteComponent() {
   const { data: stats } = useSuspenseQuery(getAdminStatsOptions())
-  const fmt = (value: number) => value.toLocaleString()
+  const fmt = (value: number) => value?.toLocaleString() ?? 0
 
   return (
     <div className="flow">
