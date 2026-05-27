@@ -9,7 +9,7 @@ import { Container } from '@/components/Container'
 import { Flex } from '@/components/Flex'
 import { FormGroup } from '@/components/FormGroup'
 import { Input } from '@/components/Input'
-import { ROUTE_HOME } from '@/constants'
+import { ALLOW_SIGNUP, BILLING_ENABLED, ROUTE_HOME } from '@/constants'
 import { useToggle } from '@/hooks/useToggle'
 import { authClient } from '@/utils/auth/client'
 
@@ -86,10 +86,10 @@ function RouteComponent() {
         className="mx-auto mt-l"
         alt="Otter logo"
       />
-      <h2 className="mt-s text-center">Create an account</h2>
+      <h2 className="my-s text-center">Create an account</h2>
 
       <form onSubmit={handleRegister}>
-        <Flex direction={'column'} gap="m">
+        <Flex direction={'column'} gap="xs">
           <FormGroup label="Name" name="name">
             <Input
               id="name"
@@ -130,14 +130,13 @@ function RouteComponent() {
             />
           </FormGroup>
 
-          <Flex gap="m" justify="between">
-            <Button type="submit" disabled={isLoading}>
-              Sign Up
-            </Button>
-            <Link to="/signin" className="self-center">
-              Already have an account? Sign in
-            </Link>
-          </Flex>
+          <Button type="submit" disabled={isLoading}>
+            Sign Up
+          </Button>
+
+          <Link to="/signin" className="text-sm">
+            Already have an account? Sign in
+          </Link>
 
           {error ? (
             <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">
@@ -150,6 +149,12 @@ function RouteComponent() {
             </p>
           ) : null}
         </Flex>
+
+        {ALLOW_SIGNUP && BILLING_ENABLED ? (
+          <p className="mt-m text-center">
+            <Link to="/pricing">Plans &amp; pricing</Link>
+          </p>
+        ) : null}
       </form>
     </Container>
   )

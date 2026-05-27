@@ -34,6 +34,7 @@ import {
   ROUTE_PRICING,
   ROUTE_RECENT,
   ROUTE_SIGNIN,
+  ROUTE_SIGNUP
 } from '../../constants'
 
 const RECENT_PREVIEW_LIMIT = 5
@@ -157,6 +158,12 @@ function Index() {
               {CONTENT.signInTitle}
             </a>
           </Button>
+          {ALLOW_SIGNUP ? (<Button asChild>
+            <a href={ROUTE_SIGNUP}>
+              <UserCircleIcon weight="duotone" width="20" height="20" />
+              {CONTENT.signupTitle}
+            </a>
+          </Button>) : null}
           <Button asChild variant="outline">
             <a
               href="https://github.com/mrmartineau/Otter"

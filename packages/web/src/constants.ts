@@ -93,6 +93,7 @@ export const ROUTE_DASHBOARD = '/dashboard'
 export const ROUTE_HOME = ROUTE_DASHBOARD
 export const ROUTE_FEED = '/feed'
 export const ROUTE_SIGNIN = '/signin'
+export const ROUTE_SIGNUP = '/register'
 export const ROUTE_NEW_BOOKMARK = '/new/bookmark'
 export const ROUTE_NEW_BOOKMARK_CONFIRMATION = '/new/bookmark/confirmation'
 export const ROUTE_STARS = '/stars'
