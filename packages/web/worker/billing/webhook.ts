@@ -124,7 +124,11 @@ export const handleStripeWebhook = async (context: HonoContext) => {
 
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription
+        const eventSub = event.data.object as Stripe.Subscription
+        // Stripe can deliver subscription events out of order. Re-fetch the
+        // live subscription so a delayed older event cannot overwrite newer
+        // state we already wrote.
+        const subscription = await stripe.subscriptions.retrieve(eventSub.id)
         const userId = await resolveUserId(db, subscription)
         if (userId) {
           await applySubscription(db, userId, subscription)

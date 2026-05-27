@@ -65,11 +65,16 @@ export const createCheckoutSession = async (context: HonoContext) => {
     let customerId = account?.stripeCustomerId ?? null
 
     if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: account?.email,
-        metadata: { user_id: userId },
-        name: account?.name ?? undefined,
-      })
+      // Idempotency key prevents parallel checkout calls from creating
+      // duplicate Stripe customers for the same user.
+      const customer = await stripe.customers.create(
+        {
+          email: account?.email,
+          metadata: { user_id: userId },
+          name: account?.name ?? undefined,
+        },
+        { idempotencyKey: `customer-create:${userId}` },
+      )
       customerId = customer.id
 
       await db

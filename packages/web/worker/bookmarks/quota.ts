@@ -1,4 +1,4 @@
-import { and, count, eq, gte } from 'drizzle-orm'
+import { and, count, eq, gte, sql } from 'drizzle-orm'
 import { BILLING_ENABLED } from '@/constants'
 import type { BookmarkQuota } from '@/types/db'
 import { errorResponse } from '@/utils/fetching/errorResponse'
@@ -93,4 +93,42 @@ export const enforceBookmarkQuota = async (
   }
 
   return null
+}
+
+/**
+ * Runs `work` inside a transaction with a row-level lock on the user's
+ * profile, ensuring concurrent createBookmark calls cannot both pass the
+ * quota check and bypass the daily limit. Returns the work's result, or a
+ * 402 Response if the quota would be exceeded.
+ *
+ * No-op (just runs `work` without a transaction) when billing is disabled —
+ * there is no quota to enforce.
+ */
+export const withBookmarkQuotaLock = async <T>(
+  db: Db,
+  env: WorkerEnv,
+  userId: string,
+  addCount: number,
+  work: (tx: Db) => Promise<T>,
+): Promise<T | Response> => {
+  if (!BILLING_ENABLED) {
+    return work(db)
+  }
+
+  return db.transaction(async (tx) => {
+    // Serialize quota checks per user by locking the profile row.
+    await tx.execute(
+      sql`select 1 from ${profiles} where ${profiles.id} = ${userId} for update`,
+    )
+    const quotaError = await enforceBookmarkQuota(
+      tx as unknown as Db,
+      env,
+      userId,
+      addCount,
+    )
+    if (quotaError) {
+      return quotaError
+    }
+    return work(tx as unknown as Db)
+  })
 }

@@ -338,7 +338,7 @@ export const profiles = pgTable(
     check('username_length', sql`char_length(${table.username}) >= 3`),
     uniqueIndex('profiles_api_key_key').on(table.apiKey),
     uniqueIndex('profiles_username_key').on(table.username),
-    index('profiles_stripe_customer_id_idx').on(table.stripeCustomerId),
+    uniqueIndex('profiles_stripe_customer_id_idx').on(table.stripeCustomerId),
   ],
 )
 

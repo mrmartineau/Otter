@@ -144,10 +144,19 @@ export const updateUserAdmin = async (context: HonoContext) => {
 
     update.updatedAt = new Date()
 
-    await requestContext.db
+    const updated = await requestContext.db
       .update(profiles)
       .set(update)
       .where(eq(profiles.id, id))
+      .returning({ id: profiles.id })
+
+    if (updated.length === 0) {
+      return errorResponse({
+        error: 'User not found',
+        reason: 'No profile matched the given id',
+        status: 404,
+      })
+    }
 
     return new Response(JSON.stringify({ data: { id }, error: null }), {
       headers: API_HEADERS,
