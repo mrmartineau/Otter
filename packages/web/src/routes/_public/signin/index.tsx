@@ -9,7 +9,7 @@ import { Container } from '@/components/Container'
 import { Flex } from '@/components/Flex'
 import { FormGroup } from '@/components/FormGroup'
 import { Input } from '@/components/Input'
-import { ALLOW_SIGNUP, BILLING_ENABLED, ROUTE_HOME } from '@/constants'
+import { ALLOW_SIGNUP, ROUTE_HOME } from '@/constants'
 import { useToggle } from '@/hooks/useToggle'
 import { authClient } from '@/utils/auth/client'
 
