@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "@react-native-community/netinfo": "11.4.1",
+    "expo": "~53.0.0",
+    "expo-status-bar": "~2.2.0",
+    "expo-system-ui": "~5.0.0",
+    "react": "19.0.0",
+    "react-native": "0.79.6",
+    "react-native-safe-area-context": "5.4.0",
+    "react-native-webview": "13.13.5"
+  },
+  "devDependencies": {
+    "@bacons/apple-targets": "^4.0.7",
+    "@types/react": "~19.0.10",
+    "typescript": "~5.8.3"
+  },
+  "main": "index.ts",
+  "name": "@mrmartineau/otter-native",
+  "private": true,
+  "scripts": {
+    "build:dev": "eas build --profile development --platform ios",
+    "build:preview": "eas build --profile preview --platform ios",
+    "build:prod": "eas build --profile production --platform ios",
+    "ios": "expo run:ios",
+    "prebuild": "expo prebuild --platform ios --clean",
+    "start": "expo start",
+    "submit:prod": "eas submit --profile production --platform ios",
+    "type-check": "tsc --noEmit"
+  },
+  "version": "0.0.0"
+}

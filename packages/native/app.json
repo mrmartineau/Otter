@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Otter",
+    "slug": "otter-native",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "scheme": "otter",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#ffffff",
+    "newArchEnabled": true,
+    "platforms": ["ios"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "wtf.zander.otter",
+      "requireFullScreen": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false
+        }
+      }
+    },
+    "splash": {
+      "backgroundColor": "#ffffff",
+      "resizeMode": "contain",
+      "image": "./assets/splash.png"
+    },
+    "plugins": [
+      [
+        "expo-system-ui",
+        {}
+      ],
+      [
+        "@bacons/apple-targets",
+        {
+          "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+        }
+      ]
+    ]
+  }
+}
