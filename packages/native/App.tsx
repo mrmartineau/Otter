@@ -1,11 +1,12 @@
 import NetInfo from '@react-native-community/netinfo'
 import { StatusBar } from 'expo-status-bar'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Linking, Platform, StyleSheet, View } from 'react-native'
+import { AppState, Linking, Platform, StyleSheet, View } from 'react-native'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { WebView } from 'react-native-webview'
 import type { WebViewNavigation } from 'react-native-webview/lib/WebViewTypes'
 
+import { syncToAppGroup } from './modules/cookie-bridge'
 import { BACKGROUND_COLOR, isOtterUrl, OTTER_URL } from './src/config'
 import { ErrorView } from './src/ErrorView'
 import { LoadingOverlay } from './src/LoadingOverlay'
@@ -22,6 +23,25 @@ export default function App() {
     setLoading(true)
     webViewRef.current?.reload()
   }, [])
+
+  // Push the current session cookies into the shared App Group so the share
+  // extension can reuse the logged-in session. Fire-and-forget; no-op if the
+  // native module / App Group isn't available.
+  const syncCookies = useCallback(() => {
+    syncToAppGroup().catch(() => {})
+  }, [])
+
+  // Sync again whenever the app goes to the background — captures any login
+  // that happened during the session right before the user shares from another
+  // app.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'background' || state === 'inactive') {
+        syncCookies()
+      }
+    })
+    return () => sub.remove()
+  }, [syncCookies])
 
   // Track connectivity so we can show a dedicated offline state and auto-recover
   // when the connection returns while the error screen is up.
@@ -59,7 +79,11 @@ export default function App() {
     [],
   )
 
-  const handleLoadEnd = useCallback(() => setLoading(false), [])
+  const handleLoadEnd = useCallback(() => {
+    setLoading(false)
+    // A finished navigation may have completed a login → mirror cookies.
+    syncCookies()
+  }, [syncCookies])
 
   const handleError = useCallback(() => {
     setErrored(true)

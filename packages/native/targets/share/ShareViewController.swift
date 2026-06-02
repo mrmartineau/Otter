@@ -10,6 +10,10 @@
 import UIKit
 import WebKit
 
+// Shared App Group — must match the entitlement on the main app and the
+// CookieBridge native module (modules/cookie-bridge).
+private let appGroupId = "group.wtf.zander.otter"
+
 class ShareViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
 
     private var webView: WKWebView!
@@ -71,19 +75,44 @@ class ShareViewController: UIViewController, WKNavigationDelegate, WKUIDelegate 
             closeButton.heightAnchor.constraint(equalToConstant: 26),
         ])
 
-        // Pull the shared URL from NSExtensionItem attachments, then open
-        // Otter's new-bookmark route with that URL in the query string.
-        extractURL { [weak self] url in
-            guard let self = self, let url = url else {
-                self?.close()
-                return
-            }
-            let base = "https://otter.zander.wtf/new/bookmark?bookmarklet=true&url="
-            let encoded = url.absoluteString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-            if let bookmarkURL = URL(string: base + encoded) {
-                self.webView.load(URLRequest(url: bookmarkURL))
+        // Inject the session cookies the main app pushed into the App Group,
+        // THEN pull the shared URL and load — so the bookmark flow opens
+        // already logged-in.
+        injectSharedCookies { [weak self] in
+            guard let self = self else { return }
+            self.extractURL { [weak self] url in
+                guard let self = self, let url = url else {
+                    self?.close()
+                    return
+                }
+                let base = "https://otter.zander.wtf/new/bookmark?bookmarklet=true&url="
+                let encoded = url.absoluteString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+                if let bookmarkURL = URL(string: base + encoded) {
+                    self.webView.load(URLRequest(url: bookmarkURL))
+                }
             }
         }
+    }
+
+    /// Copies cookies from the shared App Group cookie store into this web
+    /// view's cookie store before the first load. Completion runs on the main
+    /// thread once every cookie has been written (or immediately if none).
+    private func injectSharedCookies(completion: @escaping () -> Void) {
+        let groupStore = HTTPCookieStorage.sharedCookieStorage(
+            forGroupContainerIdentifier: appGroupId
+        )
+        guard let cookies = groupStore.cookies, !cookies.isEmpty else {
+            completion()
+            return
+        }
+
+        let store = webView.configuration.websiteDataStore.httpCookieStore
+        let group = DispatchGroup()
+        for cookie in cookies {
+            group.enter()
+            store.setCookie(cookie) { group.leave() }
+        }
+        group.notify(queue: .main) { completion() }
     }
 
     private func extractURL(completion: @escaping (URL?) -> Void) {

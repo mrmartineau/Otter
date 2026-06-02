@@ -14,6 +14,7 @@ from any app.
 | Loading indicator | `src/LoadingOverlay.tsx` | Opaque brand-coloured overlay until first paint — no white flash. |
 | Offline / error state | `src/ErrorView.tsx` + NetInfo | Distinguishes offline from load failure; auto-retries on reconnect. |
 | Share Extension | `targets/share/` | Native Swift target via `@bacons/apple-targets`, ported from `packages/app/otter`. Opens `…/new/bookmark` with the shared URL. |
+| Shared login (app → extension) | App Group `group.wtf.zander.otter` + `modules/cookie-bridge` | App pushes session cookies into the group container; the extension injects them before loading, so sharing reuses the app's logged-in session. |
 | iPad + iPhone | `app.json` `ios.supportsTablet`, `requireFullScreen:false` | Universal app, supports Stage Manager / multitasking. |
 
 ## Setup
@@ -135,6 +136,36 @@ require a new store build — OTA cannot update native code.
   `FMT_USE_CONSTEVAL=0` in `fmt/base.h` at pod-install). If you bump the Expo
   SDK and `fmt` is fixed upstream, this plugin becomes a no-op and can be
   removed.
+
+## Shared login between app and share extension
+
+The share extension runs in its own sandbox, so it can't see the app's WebView
+cookies by default. They're bridged through an **App Group**:
+
+- **App side** (`modules/cookie-bridge`, a local Expo native module): on each
+  finished navigation and when the app backgrounds, the app copies Otter's
+  session cookies from `HTTPCookieStorage.shared` into the App Group cookie
+  store (`HTTPCookieStorage.sharedCookieStorage(forGroupContainerIdentifier:)`).
+- **Extension side** (`ShareViewController.injectSharedCookies`): before its
+  first load, it reads those cookies and injects them into its WebView's
+  `httpCookieStore`, then loads — so sharing opens already logged-in.
+
+Requirements / caveats:
+
+- **App Group** `group.wtf.zander.otter` is set on both targets
+  (`app.json` → `ios.entitlements` and
+  `targets/share/expo-target.config.js` → `entitlements`). For **device /
+  release** builds you must register this App Group in the Apple Developer
+  portal and add it to both App IDs (`wtf.zander.otter` and the
+  `…​.OtterShare` extension). The simulator doesn't enforce this.
+- This relies on `sharedCookiesEnabled` mirroring the WebView's (HttpOnly)
+  session cookie into `HTTPCookieStorage.shared`. If a future Otter auth change
+  stops that propagation, the extension falls back to its own persistent
+  session (log in once inside the share sheet).
+- The local native module lives in `modules/cookie-bridge`. Its podspec pins
+  `:ios => '15.1'` to match the app target — a higher value makes CocoaPods
+  silently drop the pod (`supports_platform?`). `package.json` →
+  `expo.autolinking.nativeModulesDir` points autolinking at `./modules`.
 
 ## Tuning notes
 
