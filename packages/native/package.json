@@ -25,7 +25,8 @@
     "prebuild": "expo prebuild --platform ios --clean",
     "start": "expo start",
     "submit:prod": "eas submit --profile production --platform ios",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "android": "expo run:android"
   },
   "version": "0.0.0"
 }
