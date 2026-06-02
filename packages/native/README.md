@@ -124,6 +124,18 @@ eas update --branch production --message "fix: …"
 Native changes (anything touching the Share Extension or native deps) always
 require a new store build — OTA cannot update native code.
 
+## Troubleshooting
+
+- **`pod install` fails: `SDK "iphoneos" cannot be located`** — `xcode-select`
+  points at the Command Line Tools, not Xcode. Fix:
+  `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`.
+- **Build fails compiling `fmt`: `call to consteval function … is not a constant
+  expression`** — RN 0.79's bundled `fmt` doesn't compile under Xcode 26+ Clang.
+  Handled automatically by `plugins/withFmtConstevalFix.js` (forces
+  `FMT_USE_CONSTEVAL=0` in `fmt/base.h` at pod-install). If you bump the Expo
+  SDK and `fmt` is fixed upstream, this plugin becomes a no-op and can be
+  removed.
+
 ## Tuning notes
 
 - **Otter URL** lives in `src/config.ts` (`OTTER_URL` / `OTTER_HOST`). Change

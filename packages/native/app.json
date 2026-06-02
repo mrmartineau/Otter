@@ -31,6 +31,7 @@
         "expo-system-ui",
         {}
       ],
+      "./plugins/withFmtConstevalFix",
       [
         "@bacons/apple-targets",
         {
