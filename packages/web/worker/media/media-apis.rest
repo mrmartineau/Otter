@@ -7,9 +7,15 @@
 
 ###
 
-# Books
+# Books — Google Books (primary, needs a free API key)
+# Use the `volumeInfo.imageLinks.thumbnail` field to get the cover image
+GET https://www.googleapis.com/books/v1/volumes?q=the%20trading%20game&maxResults=10&printType=books&fields=items(id,volumeInfo(title,authors,imageLinks))&key={{$dotenv MEDIA_GOOGLE_BOOKS_API_KEY}}
+
+###
+
+# Books — Open Library (fallback, no key)
 # Use the `editions.docs[0].cover_i` field to get the cover image
-GET https://openlibrary.org/search.json?q=the%20trading%20game&_spellcheck_count=0&limit=10&fields=key,cover_i,title,subtitle,author_name,editions,name&mode=everything&lang=en&sort=new
+GET https://openlibrary.org/search.json?q=the%20trading%20game&limit=10&fields=key,cover_i,title,author_name,editions&lang=en
 
 ###
 # GET https://covers.openlibrary.org/b/id/15110328-M.jpg?default=https://openlibrary.org/static/images/icons/avatar_book-sm.png
