@@ -1,6 +1,6 @@
 .media-columns {
   display: grid;
-  grid-template-columns: 268px 268px 268px;
+  grid-template-columns: repeat(3, minmax(268px, 1fr));
   gap: var(--space-m);
   overflow-x: auto;
   width: 100dvw;
