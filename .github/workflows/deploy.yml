@@ -26,10 +26,10 @@ jobs:
         with:
           node-version: 'latest'
           cache: 'pnpm'
-      - name: Install dependencies
-        run: pnpm install
       - name: Install safe-chain
         run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Build site
         run: pnpm web:build
       - name: Deploy to Cloudflare
