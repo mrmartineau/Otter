@@ -1,4 +1,13 @@
-import { and, arrayContains, count, desc, eq, ilike, or } from 'drizzle-orm'
+import {
+  and,
+  arrayContains,
+  count,
+  desc,
+  eq,
+  ilike,
+  or,
+  sql,
+} from 'drizzle-orm'
 import { TidyURL } from 'tidy-url'
 import type { BookmarkStatus, BookmarkType } from '@/types/db'
 import { matchTagsSource } from '@/utils/matchTags'
@@ -107,10 +116,8 @@ const bookmarkFilters = (
     args.tag ? arrayContains(bookmarks.tags, [args.tag as string]) : undefined,
     searchTerm
       ? or(
-          ilike(bookmarks.title, `%${searchTerm}%`),
+          sql`${bookmarks.searchText} @@ websearch_to_tsquery('english', ${searchTerm})`,
           ilike(bookmarks.url, `%${searchTerm}%`),
-          ilike(bookmarks.description, `%${searchTerm}%`),
-          ilike(bookmarks.note, `%${searchTerm}%`),
           arrayContains(bookmarks.tags, [searchTerm]),
         )
       : undefined,
@@ -136,7 +143,14 @@ const listBookmarkRows = async (
     .orderBy(
       ...(top
         ? [desc(bookmarks.clickCount), desc(bookmarks.createdAt)]
-        : [desc(bookmarks.createdAt)]),
+        : searchTerm
+          ? [
+              desc(
+                sql`ts_rank(${bookmarks.searchText}, websearch_to_tsquery('english', ${searchTerm}))`,
+              ),
+              desc(bookmarks.createdAt),
+            ]
+          : [desc(bookmarks.createdAt)]),
     )
     .limit(limit)
     .offset(offset)
