@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   queryOptions,
   useMutation,
   useQueryClient,
@@ -26,11 +27,17 @@ type SingleResponse<T> = {
   error: null
 }
 
-const groupMediaByStatus = (media: Media[]) => {
-  return Object.groupBy(
-    media,
-    (item) => item.status ?? 'wishlist',
-  ) as GroupedMedia
+const groupMediaByStatus = (media: Media[]): GroupedMedia => {
+  // Always include every status so empty kanban columns stay present,
+  // and keep each column ordered by sort_order.
+  const grouped: GroupedMedia = { done: [], now: [], skipped: [], wishlist: [] }
+  for (const item of media) {
+    grouped[item.status ?? 'wishlist'].push(item)
+  }
+  for (const items of Object.values(grouped)) {
+    items.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+  }
+  return grouped
 }
 
 const parseJsonResponse = async <T>(response: Response): Promise<T> => {
@@ -235,12 +242,13 @@ const getMediaSearch = async ({
   query: string
   type: MediaType
 }) => {
-  const response = await fetch(`/api/media-search?query=${query}&type=${type}`)
-  const data = await response.json()
-  return data as {
+  const response = await fetch(
+    `/api/media-search?query=${encodeURIComponent(query)}&type=${type}`,
+  )
+  return await parseJsonResponse<{
     count: number
     data: MediaSearchItem[]
-  }
+  }>(response)
 }
 
 export const getMediaSearchOptions = ({
@@ -252,8 +260,13 @@ export const getMediaSearchOptions = ({
 }) => {
   return queryOptions({
     enabled: !!query && !!type,
-    // @ts-expect-error - This will only run if query and type are defined
-    queryFn: () => getMediaSearch({ query, type }),
-    queryKey: ['media', query, type],
+    // Keep showing the previous results while a new search is in flight
+    placeholderData: keepPreviousData,
+    queryFn: () =>
+      getMediaSearch({ query: query as string, type: type as MediaType }),
+    // Distinct from the ['media'] list key so list invalidation after
+    // create/update doesn't refetch searches (and vice versa)
+    queryKey: ['media-search', query, type],
+    staleTime: 5 * 60 * 1000,
   })
 }
