@@ -8,6 +8,7 @@ import { bookmarks } from '../../db/schema'
 import { requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 import { bookmarkToRow } from './mapper'
+import { withBookmarkQuotaLock } from './quota'
 import { scheduleBookmarkSideEffects } from './sideEffects'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
@@ -116,14 +117,28 @@ export const createBookmark = async (context: HonoContext) => {
     }
 
     const body = await readJson(context)
-    const [bookmark] = await auth.requestContext.db
-      .insert(bookmarks)
-      .values({
-        ...toBookmarkSet(body),
-        user: auth.userId,
-      })
-      .returning()
-    const bookmarkRow = bookmarkToRow(bookmark)
+    const result = await withBookmarkQuotaLock(
+      auth.requestContext.db,
+      context.env,
+      auth.userId,
+      1,
+      async (tx) => {
+        const [bookmark] = await tx
+          .insert(bookmarks)
+          .values({
+            ...toBookmarkSet(body),
+            user: auth.userId,
+          })
+          .returning()
+        return bookmark
+      },
+    )
+
+    if (result instanceof Response) {
+      return result
+    }
+
+    const bookmarkRow = bookmarkToRow(result)
 
     scheduleBookmarkSideEffects(context, {
       record: bookmarkRow,

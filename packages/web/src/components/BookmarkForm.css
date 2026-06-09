@@ -43,4 +43,23 @@
     background-color: var(--theme1);
     border-top: 1px solid var(--theme3);
   }
+
+  .bookmark-quota {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    padding: var(--space-2xs) var(--space-s);
+    margin-bottom: var(--space-s);
+    border-radius: var(--radii-l);
+    background-color: var(--theme2);
+    border: 1px solid var(--border);
+    font-size: var(--step--1);
+  }
+
+  .bookmark-quota.is-full {
+    background-color: var(--theme3);
+    border-color: var(--accent9);
+  }
 }

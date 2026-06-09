@@ -28,7 +28,6 @@ BETTER_AUTH_SECRET=replace-with-a-random-secret
 BETTER_AUTH_URL=http://localhost:5678
 RAYCAST_OAUTH_CLIENT_ID=
 VITE_ALLOW_SIGNUP=false
-BETTER_AUTH_DISABLE_SIGNUP=true
 BOT_MASTODON_ACCESS_TOKEN=
 PERSONAL_MASTODON_ACCESS_TOKEN=
 WEBHOOK_SECRET=replace-with-a-random-secret
@@ -56,7 +55,6 @@ Update `packages/web/.dev.vars`:
 
 ```bash
 VITE_ALLOW_SIGNUP=true
-BETTER_AUTH_DISABLE_SIGNUP=false
 ```
 
 ### 6. Start the app
@@ -105,7 +103,6 @@ BETTER_AUTH_SECRET=
 BETTER_AUTH_URL=http://localhost:5678
 RAYCAST_OAUTH_CLIENT_ID=
 VITE_ALLOW_SIGNUP=false
-BETTER_AUTH_DISABLE_SIGNUP=true
 BOT_MASTODON_ACCESS_TOKEN=
 PERSONAL_MASTODON_ACCESS_TOKEN=
 WEBHOOK_SECRET=
@@ -118,6 +115,42 @@ Runtime notes:
 - `BETTER_AUTH_URL` must match the real app origin exactly.
 - `pnpm dev` reads `.dev.vars`; a plain `.env` file is not enough for Worker runtime env vars.
 - If Hyperdrive is used, treat it as optional infrastructure in front of Neon.
+
+### Self-hosting without Stripe
+
+To run your own free-for-everyone instance, set:
+
+```bash
+VITE_BILLING_ENABLED=false
+```
+
+This is a **build-time** flag (it must be set when running `pnpm build` /
+`pnpm deploy`, not toggled at runtime). When `false`, Otter:
+
+- skips the daily bookmark quota — every user is unlimited
+- gives every user full AI access (titles, summaries, classification)
+- hides billing/pricing/upgrade UI and removes `/billing/*` API routes
+- redirects `/settings/billing` and `/pricing` to the dashboard
+
+When `false`, the `STRIPE_*` and `FREE_DAILY_BOOKMARK_LIMIT` vars are
+unused and can be omitted.
+
+### Billing tiers
+
+When billing is enabled, Otter offers one Stripe product with three prices:
+
+- `STRIPE_PRICE_ID_MONTHLY` — recurring monthly (£5)
+- `STRIPE_PRICE_ID_ANNUAL` — recurring annual (£48)
+- `STRIPE_PRICE_ID_LIFETIME` — one-off lifetime purchase (£199)
+
+Create the product and three prices in the Stripe Dashboard, then paste each
+price ID into the matching env var. The checkout flow picks the right price
+based on the tier the user selects, and switches Stripe checkout mode from
+`subscription` to `payment` for lifetime purchases.
+
+Lifetime customers have no Stripe subscription, no renewal date, and cannot
+cancel — they keep Pro access forever. The admin dashboard breaks down
+active users by monthly / annual / lifetime.
 
 ## Troubleshooting
 

@@ -94,7 +94,7 @@
     pointer-events: none;
     font-family: var(--font-mono);
     font-size: var(--step--3);
-    padding-x: var(--space-3xs);
+    padding-inline: var(--space-3xs);
   }
 }
 

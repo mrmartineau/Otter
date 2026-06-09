@@ -47,10 +47,7 @@ function RouteComponent() {
           ))}
         </ul>
         <Flex gap="m" justify="center">
-          <Button
-            onClick={() => handleConsent(true)}
-            disabled={isLoading}
-          >
+          <Button onClick={() => handleConsent(true)} disabled={isLoading}>
             Authorize
           </Button>
           <Button

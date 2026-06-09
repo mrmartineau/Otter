@@ -1,0 +1,108 @@
+.admin-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-s);
+}
+
+.admin-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  padding: var(--space-s);
+  border-radius: var(--radii-l);
+  background-color: var(--theme2);
+  border: 1px solid var(--border);
+}
+
+.admin-stat-value {
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.admin-stat-label {
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--theme10);
+}
+
+.admin-stat-hint {
+  font-size: var(--step--2);
+  color: var(--theme10);
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radii-l);
+  border: 1px solid var(--border);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--step--1);
+}
+
+.admin-table th,
+.admin-table td {
+  padding: var(--space-2xs) var(--space-s);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.admin-table th {
+  font-size: var(--step--2);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--theme10);
+  background-color: var(--theme2);
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-user-email {
+  color: var(--theme10);
+  font-size: var(--step--2);
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px 2px;
+  border-radius: var(--radii-full);
+  font-size: var(--step--2);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background-color: var(--theme4);
+  color: var(--theme11);
+  line-height: 1;
+  font-family: var(--font-mono);
+}
+
+.admin-badge.is-pro {
+  background-color: var(--accent9);
+  color: #f5f5f0;
+}
+
+.admin-badge.is-admin {
+  background-color: var(--theme11);
+  color: var(--theme1);
+}
+
+.admin-badge.is-comp {
+  background-color: var(--jade9, #29a383);
+  color: #f5f5f0;
+}
+
+.admin-override-input {
+  width: 5rem;
+}

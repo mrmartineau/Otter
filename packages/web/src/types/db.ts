@@ -110,10 +110,32 @@ export interface BookmarkFormValues
   id?: string
 }
 
+export type UserRole = 'user' | 'admin'
+export type SubscriptionPlan = 'free' | 'pro' | 'comp'
+export type SubscriptionStatus =
+  | 'active'
+  | 'trialing'
+  | 'past_due'
+  | 'canceled'
+  | 'incomplete'
+  | 'inactive'
+
+/**
+ * Billing cycle for a paying Pro user.
+ *
+ * - `monthly` / `annual` — recurring Stripe subscription
+ * - `lifetime` — one-off payment, no renewal
+ *
+ * Null for free, comp and admin users.
+ */
+export type BillingCycle = 'monthly' | 'annual' | 'lifetime'
+
 export interface UserProfile {
   api_key: string | null
   avatar_url: string | null
   id: string
+  plan: SubscriptionPlan
+  role: UserRole
   settings_collections_visible: boolean
   settings_group_by_date: boolean | null
   settings_pinned_tags: string[]
@@ -122,6 +144,54 @@ export interface UserProfile {
   settings_types_visible: boolean
   updated_at: string | null
   username: string | null
+}
+
+export interface BookmarkQuota {
+  limit: number | null
+  used: number
+  remaining: number | null
+}
+
+export interface BillingStatus {
+  plan: SubscriptionPlan
+  status: SubscriptionStatus
+  billing_cycle: BillingCycle | null
+  cancel_at_period_end: boolean
+  current_period_end: string | null
+  has_stripe_customer: boolean
+  quota: BookmarkQuota
+}
+
+export interface AdminUser {
+  id: string
+  email: string
+  name: string
+  username: string | null
+  role: UserRole
+  plan: SubscriptionPlan
+  subscription_status: SubscriptionStatus
+  billing_cycle: BillingCycle | null
+  daily_bookmark_limit_override: number | null
+  bookmark_count: number
+  created_at: string
+}
+
+export interface AdminStats {
+  total_users: number
+  pro_users: number
+  comp_users: number
+  free_users: number
+  admin_users: number
+  monthly_subs: number
+  annual_subs: number
+  lifetime_users: number
+  total_bookmarks: number
+  public_bookmarks: number
+  bookmarks_last_7_days: number
+  bookmarks_last_30_days: number
+  signups_last_7_days: number
+  signups_last_30_days: number
+  estimated_mrr: number
 }
 
 export interface UserIntegration {

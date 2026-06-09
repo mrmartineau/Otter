@@ -1,11 +1,18 @@
 import { Hono } from 'hono'
 
 import { createAuth } from '../auth/server'
+import { BILLING_ENABLED } from '../src/constants'
+import { getAdminStats } from './admin/stats'
+import { listUsers, updateUserAdmin } from './admin/users'
 import { classifyBookmark } from './ai/classify'
 import { descriptionSystemPrompt } from './ai/description'
 import { generateResponse } from './ai/generateResponse'
 import { MAX_CONTENT_LENGTH, summariseSystemPrompt } from './ai/summarise'
 import { titleSystemPrompt } from './ai/title'
+import { createCheckoutSession } from './billing/checkout'
+import { createPortalSession } from './billing/portal'
+import { getBillingStatus } from './billing/subscription'
+import { handleStripeWebhook } from './billing/webhook'
 import { sendBlueskyPost } from './bluesky/sendBlueskyPost'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
 import { getRecentPublicBookmarks } from './bookmarks/getRecentPublicBookmarks'
@@ -18,6 +25,7 @@ import {
   updateBookmarkById,
 } from './bookmarks/item'
 import { getNewBookmark, postNewBookmark } from './bookmarks/new'
+import { requireEntitledContext } from './context'
 import { getDashboard } from './dashboard'
 import type { WorkerEnv } from './env'
 import {
@@ -48,15 +56,15 @@ import {
 } from './meta'
 import { dbMiddleware } from './middleware/db'
 import { getCurrentProfile, updateCurrentProfile } from './profile'
+import { feedToJson } from './rss/rss-to-json'
+import { handleScrapeContent } from './scraper/scrape-content'
+import { getSearch } from './search/search'
 import {
   createOrRotateShare,
   deleteShare,
   getPublicShare,
   listShares,
 } from './shares'
-import { feedToJson } from './rss/rss-to-json'
-import { handleScrapeContent } from './scraper/scrape-content'
-import { getSearch } from './search/search'
 import {
   getToot,
   getToots,
@@ -79,44 +87,6 @@ api.get('/scrape', async (c) => {
 })
 api.get('/scrape-content', async (c) => {
   return await handleScrapeContent(c.req)
-})
-api.post('/ai/title', async (context) => {
-  const { prompt } = await context.req.json()
-  return await generateResponse({
-    context,
-    prompt,
-    systemPrompt: titleSystemPrompt,
-  })
-})
-api.post('/ai/description', async (context) => {
-  const { title, prompt } = await context.req.json()
-  return await generateResponse({
-    context,
-    prompt,
-    systemPrompt: descriptionSystemPrompt(title),
-  })
-})
-api.post('/ai/summarise', async (context) => {
-  const { prompt } = await context.req.json()
-  const truncated = prompt.slice(0, MAX_CONTENT_LENGTH)
-  return await generateResponse({
-    context,
-    prompt: truncated,
-    systemPrompt: summariseSystemPrompt,
-  })
-})
-api.post('/ai/classify', async (context) => {
-  const { title, description, url, tags, currentType } =
-    await context.req.json()
-  const result = await classifyBookmark({
-    context,
-    currentType: currentType ?? 'link',
-    description: description ?? '',
-    existingTags: tags ?? [],
-    title: title ?? '',
-    url: url ?? '',
-  })
-  return context.json(result)
 })
 api.get('/rss', async (c) => {
   const feed = c.req.query('feed')
@@ -153,6 +123,84 @@ api.get('/me', async (c) => {
 })
 api.patch('/me', async (c) => {
   return await updateCurrentProfile(c)
+})
+
+// AI — Pro-only. Each route requires an entitled (Pro/comp/admin) user.
+api.post('/ai/title', async (context) => {
+  const gate = await requireEntitledContext(context)
+  if (gate instanceof Response) return gate
+  const { prompt } = await context.req.json()
+  return await generateResponse({
+    context,
+    prompt,
+    systemPrompt: titleSystemPrompt,
+  })
+})
+api.post('/ai/description', async (context) => {
+  const gate = await requireEntitledContext(context)
+  if (gate instanceof Response) return gate
+  const { title, prompt } = await context.req.json()
+  return await generateResponse({
+    context,
+    prompt,
+    systemPrompt: descriptionSystemPrompt(title),
+  })
+})
+api.post('/ai/summarise', async (context) => {
+  const gate = await requireEntitledContext(context)
+  if (gate instanceof Response) return gate
+  const { prompt } = await context.req.json()
+  const truncated = prompt.slice(0, MAX_CONTENT_LENGTH)
+  return await generateResponse({
+    context,
+    prompt: truncated,
+    systemPrompt: summariseSystemPrompt,
+  })
+})
+api.post('/ai/classify', async (context) => {
+  const gate = await requireEntitledContext(context)
+  if (gate instanceof Response) return gate
+  const { title, description, url, tags, currentType } =
+    await context.req.json()
+  const result = await classifyBookmark({
+    context,
+    currentType: currentType ?? 'link',
+    description: description ?? '',
+    existingTags: tags ?? [],
+    title: title ?? '',
+    url: url ?? '',
+  })
+  return context.json(result)
+})
+
+// Billing — Stripe checkout, portal, subscription status and webhook.
+// The webhook is intentionally unauthenticated; it is verified by signature.
+// Routes are only mounted when BILLING_ENABLED — otherwise the deployment
+// is a single-tier free instance with no payment endpoints.
+if (BILLING_ENABLED) {
+  api.post('/billing/webhook', async (c) => {
+    return await handleStripeWebhook(c)
+  })
+  api.get('/billing', async (c) => {
+    return await getBillingStatus(c)
+  })
+  api.post('/billing/checkout', async (c) => {
+    return await createCheckoutSession(c)
+  })
+  api.post('/billing/portal', async (c) => {
+    return await createPortalSession(c)
+  })
+}
+
+// Admin — gated by requireAdminContext inside each handler.
+api.get('/admin/stats', async (c) => {
+  return await getAdminStats(c)
+})
+api.get('/admin/users', async (c) => {
+  return await listUsers(c)
+})
+api.patch('/admin/users/:id', async (c) => {
+  return await updateUserAdmin(c)
 })
 
 api.post('/new', async (c) => {

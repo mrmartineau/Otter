@@ -5,6 +5,7 @@ import {
   GaugeIcon,
   ListBulletsIcon,
   RocketLaunchIcon,
+  ShieldStarIcon,
   StarIcon,
   TrashIcon,
   TwitterLogoIcon,
@@ -17,6 +18,7 @@ import { useClickAway } from 'use-click-away'
 import {
   CONTENT,
   REPO_URL,
+  ROUTE_ADMIN,
   ROUTE_DASHBOARD,
   ROUTE_FEED,
   ROUTE_HOME,
@@ -40,6 +42,7 @@ import { SidebarLink } from './SidebarLink'
 import { Spinner } from './Spinner'
 import { AllTags } from './TagList'
 import { TypeList } from './TypeList'
+import { useUser } from './UserProvider'
 
 interface SidebarProps {
   version?: string
@@ -47,6 +50,7 @@ interface SidebarProps {
 
 export const Sidebar = ({ version }: SidebarProps) => {
   const { handleCloseSidebar } = useSidebar()
+  const { profile } = useUser()
   const { data: dbMeta } = useSuspenseQuery(getMetaOptions())
   const isLoading = useRouterState({ select: (s) => s.status === 'pending' })
 
@@ -134,6 +138,12 @@ export const Sidebar = ({ version }: SidebarProps) => {
           <UserCircleIcon aria-label="Settings" size={18} weight="duotone" />
           {CONTENT.settingsNav}
         </SidebarLink>
+        {profile?.role === 'admin' ? (
+          <SidebarLink href={ROUTE_ADMIN} activePath="admin">
+            <ShieldStarIcon aria-label="Admin" size={18} weight="duotone" />
+            {CONTENT.adminNav}
+          </SidebarLink>
+        ) : null}
         <LogoutButton />
         <SidebarLink href={`${REPO_URL}/releases/tag/v${version}`}>
           <RocketLaunchIcon aria-label="Trash" size={18} weight="duotone" />

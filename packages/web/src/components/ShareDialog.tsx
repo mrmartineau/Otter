@@ -8,17 +8,17 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import {
+  getSharesOptions,
+  type Share,
+  type ShareKind,
+  useDisableShareMutation,
+  useEnableShareMutation,
+} from '@/utils/fetching/shares'
 import { Button } from './Button'
 import { Dialog, DialogContent, DialogTrigger } from './Dialog'
 import { Flex } from './Flex'
 import { Input } from './Input'
-import {
-  type Share,
-  type ShareKind,
-  getSharesOptions,
-  useDisableShareMutation,
-  useEnableShareMutation,
-} from '@/utils/fetching/shares'
 
 interface ShareDialogProps {
   kind: ShareKind
@@ -38,8 +38,7 @@ export const ShareDialog = ({ kind, name }: ShareDialogProps) => {
   const { data: shares } = useQuery(getSharesOptions())
 
   const existing = useMemo<Share | undefined>(
-    () =>
-      shares?.find((share) => share.kind === kind && share.name === name),
+    () => shares?.find((share) => share.kind === kind && share.name === name),
     [shares, kind, name],
   )
   const shareUrl = existing ? buildShareUrl(existing.token) : null

@@ -16,7 +16,7 @@
   height: var(--header-height);
   min-height: var(--header-height);
   margin-left: auto;
-  padding-x: var(--space-2xs);
+  padding-inline: var(--space-2xs);
   z-index: var(--z-2);
   border-bottom: 1px solid var(--border);
   background-color: var(--background);

@@ -12,6 +12,7 @@ import { bookmarks } from '../../db/schema'
 import { type RequestContext, requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 import { bookmarkToRow } from './mapper'
+import { withBookmarkQuotaLock } from './quota'
 import { scheduleBookmarkSideEffects } from './sideEffects'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
@@ -117,11 +118,19 @@ export const postNewBookmark = async (context: HonoContext) => {
       return toBookmarkInsert({ url, ...rest }, auth.userId)
     }
     const payload = await pMap(requestBody, mapper, { concurrency: 2 })
-    const data = await auth.requestContext.db
-      .insert(bookmarks)
-      .values(payload)
-      .returning()
-    const rows = data.map(bookmarkToRow)
+    const result = await withBookmarkQuotaLock(
+      auth.requestContext.db,
+      context.env,
+      auth.userId,
+      requestBody.length,
+      async (tx) => tx.insert(bookmarks).values(payload).returning(),
+    )
+
+    if (result instanceof Response) {
+      return result
+    }
+
+    const rows = result.map(bookmarkToRow)
 
     for (const row of rows) {
       scheduleBookmarkSideEffects(context, {
@@ -174,24 +183,36 @@ export const getNewBookmark = async (context: HonoContext) => {
 
     const dbTags = await getTagMetadata(auth.requestContext)
     const metadata = await getScrapeData(url)
-    const data = await auth.requestContext.db
-      .insert(bookmarks)
-      .values([
-        toBookmarkInsert(
-          {
-            description: metadata.description,
-            feed: metadata.feeds,
-            image: metadata.image,
-            tags: matchTags(metadata, dbTags),
-            title: metadata.title,
-            type: metadata.urlType,
-            url: metadata.cleaned_url || metadata.url,
-          },
-          auth.userId,
-        ),
-      ])
-      .returning()
-    const rows = data.map(bookmarkToRow)
+    const result = await withBookmarkQuotaLock(
+      auth.requestContext.db,
+      context.env,
+      auth.userId,
+      1,
+      async (tx) =>
+        tx
+          .insert(bookmarks)
+          .values([
+            toBookmarkInsert(
+              {
+                description: metadata.description,
+                feed: metadata.feeds,
+                image: metadata.image,
+                tags: matchTags(metadata, dbTags),
+                title: metadata.title,
+                type: metadata.urlType,
+                url: metadata.cleaned_url || metadata.url,
+              },
+              auth.userId,
+            ),
+          ])
+          .returning(),
+    )
+
+    if (result instanceof Response) {
+      return result
+    }
+
+    const rows = result.map(bookmarkToRow)
 
     for (const row of rows) {
       scheduleBookmarkSideEffects(context, {

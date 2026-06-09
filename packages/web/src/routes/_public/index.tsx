@@ -3,6 +3,7 @@ import {
   BookmarkSimpleIcon,
   BrainIcon,
   BrowserIcon,
+  CheckIcon,
   DeviceMobileIcon,
   FilmStripIcon,
   GlobeIcon,
@@ -24,10 +25,17 @@ import type { Bookmark } from '@/types/db'
 import { getRecentPublicBookmarksOptions } from '@/utils/fetching/recentPublicBookmarks'
 import { useSession } from '../../components/AuthProvider'
 import {
+  ALLOW_SIGNUP,
+  BILLING_ENABLED,
+  BILLING_TIERS,
   CONTENT,
   ROUTE_HOME,
+  ROUTE_PRICING,
   ROUTE_RECENT,
   ROUTE_SIGNIN,
+  ROUTE_SIGNUP,
+  TIER_DISPLAY_ORDER,
+  type TierId,
 } from '../../constants'
 
 const RECENT_PREVIEW_LIMIT = 5
@@ -151,6 +159,14 @@ function Index() {
               {CONTENT.signInTitle}
             </a>
           </Button>
+          {ALLOW_SIGNUP ? (
+            <Button asChild>
+              <a href={ROUTE_SIGNUP}>
+                <UserCircleIcon weight="duotone" width="20" height="20" />
+                {CONTENT.signupTitle}
+              </a>
+            </Button>
+          ) : null}
           <Button asChild variant="outline">
             <a
               href="https://github.com/mrmartineau/Otter"
@@ -206,6 +222,58 @@ function Index() {
         </div>
       </section>
 
+      {/* Pricing — only shown when new signups are allowed and billing is on. */}
+      {ALLOW_SIGNUP && BILLING_ENABLED ? (
+        <section className="max-w-[1000px] mx-auto px-s pb-3xl">
+          <h2 className="text-step-1 mb-3xs">Pricing</h2>
+          <p className="text-step--1 text-[var(--text)] mb-m">
+            Start free with {BILLING_TIERS.free.features[0]}. Subscribe monthly
+            or annually, or pay once for lifetime access.
+          </p>
+          <div className="billing-plan-grid">
+            {TIER_DISPLAY_ORDER.map((tierId: TierId) => {
+              const tier = BILLING_TIERS[tierId]
+              const isPaid = tierId !== 'free'
+              const ctaLabel =
+                tierId === 'free'
+                  ? 'Get started free'
+                  : tierId === 'lifetime'
+                    ? 'Get lifetime'
+                    : tierId === 'annual'
+                      ? 'Get annual'
+                      : 'Get monthly'
+
+              return (
+                <div
+                  key={tierId}
+                  className={`billing-plan ${isPaid ? 'is-current' : ''}`}
+                >
+                  <strong>{tier.name}</strong>
+                  <span>{tier.tagline}</span>
+                  <div>
+                    <span className="billing-plan-price">
+                      {tier.priceLabel}
+                    </span>
+                    {tier.periodLabel ? <span> {tier.periodLabel}</span> : null}
+                  </div>
+                  <ul className="billing-plan-features">
+                    {tier.features.map((feature) => (
+                      <li key={feature}>
+                        <CheckIcon size={16} weight="bold" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button asChild variant={isPaid ? 'default' : 'outline'}>
+                    <a href={ROUTE_SIGNIN}>{ctaLabel}</a>
+                  </Button>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+      ) : null}
+
       {/* Footer */}
       <footer className="text-center pb-l px-s text-step--1">
         <Flex align="center" justify="center" gap="s" wrap="wrap">
@@ -215,6 +283,14 @@ function Index() {
               Zander Martineau
             </a>
           </span>
+          {ALLOW_SIGNUP && BILLING_ENABLED ? (
+            <>
+              <span>·</span>
+              <Link href={ROUTE_PRICING} className="underline">
+                Pricing
+              </Link>
+            </>
+          ) : null}
           <span>·</span>
           <Link href="/privacy" className="underline">
             Privacy Policy

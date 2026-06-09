@@ -5,6 +5,7 @@ import { betterAuth } from 'better-auth/minimal'
 import { jwt } from 'better-auth/plugins'
 import type { Db } from '../db/client'
 import type { DbEnv } from '../db/client'
+import { ALLOW_SIGNUP } from '../src/constants'
 import {
   authAccounts,
   authJwks,
@@ -22,7 +23,6 @@ export type AuthEnv = DbEnv & {
   BETTER_AUTH_SECRET?: string
   BETTER_AUTH_URL?: string
   BETTER_AUTH_TRUSTED_ORIGINS?: string
-  BETTER_AUTH_DISABLE_SIGNUP?: string
   RAYCAST_OAUTH_CLIENT_ID?: string
 }
 
@@ -37,9 +37,6 @@ const getTrustedOrigins = (env: AuthEnv) => {
 
   return env.BETTER_AUTH_URL ? [env.BETTER_AUTH_URL] : undefined
 }
-
-const isSignUpDisabled = (env: AuthEnv) =>
-  env.BETTER_AUTH_DISABLE_SIGNUP !== 'false'
 
 export const getOAuthAudience = (env: AuthEnv) => {
   return (env.BETTER_AUTH_URL ?? 'http://localhost:5678').replace(/\/+$/, '')
@@ -90,7 +87,10 @@ export const createAuth = (env: AuthEnv, db: Db) => {
       },
     },
     emailAndPassword: {
-      disableSignUp: isSignUpDisabled(env),
+      // Single source of truth for the signup flag: the VITE_ALLOW_SIGNUP
+      // build-time env var, exposed as ALLOW_SIGNUP. Used by both the SPA
+      // and (via this bundled constant) the worker.
+      disableSignUp: !ALLOW_SIGNUP,
       enabled: true,
       password: {
         hash: (password) => hash(password, 10),

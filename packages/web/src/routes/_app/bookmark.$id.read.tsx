@@ -8,6 +8,8 @@ import { Flex } from '@/components/Flex'
 import { Link } from '@/components/Link'
 import { Loader } from '@/components/Loader'
 import { Markdown } from '@/components/Markdown'
+import { useUser } from '@/components/UserProvider'
+import { BILLING_ENABLED, ROUTE_SETTINGS_BILLING } from '@/constants'
 import { getBookmark } from '@/utils/fetching/bookmarks'
 import { simpleUrl } from '@/utils/simpleUrl'
 import type { AiGenerateResponse } from '../../../worker/ai/generateResponse'
@@ -112,9 +114,18 @@ function RouteComponent() {
   const { data: content } = useSuspenseQuery(getContentOptions(url!))
   const [viewMode, setViewMode] = useState<ViewMode>('read')
 
+  // AI summaries are a Pro feature — except when billing is disabled, in
+  // which case everyone gets full access.
+  const { profile } = useUser()
+  const isEntitled =
+    !BILLING_ENABLED ||
+    profile?.plan === 'pro' ||
+    profile?.plan === 'comp' ||
+    profile?.role === 'admin'
+
   const summaryQuery = useQuery({
     ...getSummaryOptions(content?.content ?? ''),
-    enabled: viewMode === 'summary' && !!content?.content,
+    enabled: viewMode === 'summary' && !!content?.content && isEntitled,
   })
 
   const hasContent = !!content?.content
@@ -187,24 +198,28 @@ function RouteComponent() {
               No readable content available for this page.
             </p>
           )
-        ) : (
-          <>
-            {summaryQuery.isLoading ? (
-              <Flex align="center" gap="2xs" className="mt-m">
-                <Loader />
-                <span className="text-theme11">Generating summary…</span>
-              </Flex>
-            ) : summaryQuery.error ? (
-              <p className="text-theme11 mt-m">
-                Failed to generate summary. Please try again.
-              </p>
-            ) : summaryQuery.data ? (
-              <Markdown preventClamping textSize={0}>
-                {summaryQuery.data}
-              </Markdown>
-            ) : null}
-          </>
-        )}
+        ) : !isEntitled ? (
+          <p className="text-theme11 mt-m">
+            AI summaries are a Pro feature.{' '}
+            <Link href={ROUTE_SETTINGS_BILLING} variant="accent">
+              Upgrade to Pro
+            </Link>{' '}
+            to use them.
+          </p>
+        ) : summaryQuery.isLoading ? (
+          <Flex align="center" gap="2xs" className="mt-m">
+            <Loader />
+            <span className="text-theme11">Generating summary…</span>
+          </Flex>
+        ) : summaryQuery.error ? (
+          <p className="text-theme11 mt-m">
+            Failed to generate summary. Please try again.
+          </p>
+        ) : summaryQuery.data ? (
+          <Markdown preventClamping textSize={0}>
+            {summaryQuery.data}
+          </Markdown>
+        ) : null}
       </div>
     </div>
   )
