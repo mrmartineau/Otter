@@ -24,6 +24,7 @@ import { Route as AppStarsRouteImport } from './routes/_app/stars'
 import { Route as AppSearchRouteImport } from './routes/_app/search'
 import { Route as AppPublicRouteImport } from './routes/_app/public'
 import { Route as AppMediaRouteImport } from './routes/_app/media'
+import { Route as AppJournalRouteImport } from './routes/_app/journal'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
@@ -116,6 +117,11 @@ const AppPublicRoute = AppPublicRouteImport.update({
 const AppMediaRoute = AppMediaRouteImport.update({
   id: '/media',
   path: '/media',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppJournalRoute = AppJournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppFeedRoute = AppFeedRouteImport.update({
@@ -230,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRoute
+  '/journal': typeof AppJournalRoute
   '/media': typeof AppMediaRoute
   '/public': typeof AppPublicRoute
   '/search': typeof AppSearchRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRoute
+  '/journal': typeof AppJournalRoute
   '/media': typeof AppMediaRoute
   '/public': typeof AppPublicRoute
   '/search': typeof AppSearchRoute
@@ -302,6 +310,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feed': typeof AppFeedRoute
+  '/_app/journal': typeof AppJournalRoute
   '/_app/media': typeof AppMediaRoute
   '/_app/public': typeof AppPublicRoute
   '/_app/search': typeof AppSearchRoute
@@ -340,6 +349,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/dashboard'
     | '/feed'
+    | '/journal'
     | '/media'
     | '/public'
     | '/search'
@@ -375,6 +385,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/dashboard'
     | '/feed'
+    | '/journal'
     | '/media'
     | '/public'
     | '/search'
@@ -411,6 +422,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/dashboard'
     | '/_app/feed'
+    | '/_app/journal'
     | '/_app/media'
     | '/_app/public'
     | '/_app/search'
@@ -554,6 +566,13 @@ declare module '@tanstack/react-router' {
       path: '/media'
       fullPath: '/media'
       preLoaderRoute: typeof AppMediaRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/journal': {
+      id: '/_app/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof AppJournalRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/feed': {
@@ -746,6 +765,7 @@ interface AppRouteRouteChildren {
   AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
   AppFeedRoute: typeof AppFeedRoute
+  AppJournalRoute: typeof AppJournalRoute
   AppMediaRoute: typeof AppMediaRoute
   AppPublicRoute: typeof AppPublicRoute
   AppSearchRoute: typeof AppSearchRoute
@@ -766,6 +786,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,
   AppFeedRoute: AppFeedRoute,
+  AppJournalRoute: AppJournalRoute,
   AppMediaRoute: AppMediaRoute,
   AppPublicRoute: AppPublicRoute,
   AppSearchRoute: AppSearchRoute,

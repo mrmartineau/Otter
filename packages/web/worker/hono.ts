@@ -27,6 +27,17 @@ import {
   upsertBlueskyIntegration,
 } from './integrations'
 import {
+  createJournal,
+  createJournalEntry,
+  deleteJournal,
+  deleteJournalEntry,
+  getJournalEntries,
+  getJournalEntry,
+  getJournals,
+  updateJournal,
+  updateJournalEntry,
+} from './journal/journal'
+import {
   handleMcpDelete,
   handleMcpGet,
   handleMcpOptions,
@@ -233,6 +244,33 @@ api.delete('/media/:id', async (c) => {
 })
 api.get('/media-search', async (c) => {
   return await getMediaSearch(c.req)
+})
+api.get('/journals', async (c) => {
+  return await getJournals(c)
+})
+api.post('/journals', async (c) => {
+  return await createJournal(c)
+})
+api.patch('/journals/:id', async (c) => {
+  return await updateJournal(c)
+})
+api.delete('/journals/:id', async (c) => {
+  return await deleteJournal(c)
+})
+api.get('/journal-entries', async (c) => {
+  return await getJournalEntries(c)
+})
+api.post('/journal-entries', async (c) => {
+  return await createJournalEntry(c)
+})
+api.get('/journal-entries/:id', async (c) => {
+  return await getJournalEntry(c)
+})
+api.patch('/journal-entries/:id', async (c) => {
+  return await updateJournalEntry(c)
+})
+api.delete('/journal-entries/:id', async (c) => {
+  return await deleteJournalEntry(c)
 })
 api.get('/meta', async (c) => {
   return await getMeta(c)
