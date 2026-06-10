@@ -60,6 +60,10 @@
       "zone_name": "zander.wtf"
     }
   ],
+  /* Periodic platform-feed sync (Bluesky bookmarks, GitHub stars, …) */
+  "triggers": {
+    "crons": ["17 */6 * * *"]
+  },
   /**
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables

@@ -47,16 +47,25 @@ import {
   renameTag,
 } from './meta'
 import { dbMiddleware } from './middleware/db'
+import {
+  convertPlatformItemToBookmark,
+  deletePlatformConnection,
+  getPlatformConnections,
+  getPlatformItems,
+  syncPlatform,
+  togglePlatformConnection,
+  upsertPlatformConnection,
+} from './platforms/api'
 import { getCurrentProfile, updateCurrentProfile } from './profile'
+import { feedToJson } from './rss/rss-to-json'
+import { handleScrapeContent } from './scraper/scrape-content'
+import { getSearch } from './search/search'
 import {
   createOrRotateShare,
   deleteShare,
   getPublicShare,
   listShares,
 } from './shares'
-import { feedToJson } from './rss/rss-to-json'
-import { handleScrapeContent } from './scraper/scrape-content'
-import { getSearch } from './search/search'
 import {
   getToot,
   getToots,
@@ -262,6 +271,27 @@ api.put('/integrations/bluesky', async (c) => {
 })
 api.patch('/integrations/bluesky', async (c) => {
   return await toggleBlueskyIntegration(c)
+})
+api.get('/platforms', async (c) => {
+  return await getPlatformConnections(c)
+})
+api.put('/platforms/:platform', async (c) => {
+  return await upsertPlatformConnection(c)
+})
+api.patch('/platforms/:platform', async (c) => {
+  return await togglePlatformConnection(c)
+})
+api.delete('/platforms/:platform', async (c) => {
+  return await deletePlatformConnection(c)
+})
+api.post('/platforms/:platform/sync', async (c) => {
+  return await syncPlatform(c)
+})
+api.get('/platform-items', async (c) => {
+  return await getPlatformItems(c)
+})
+api.post('/platform-items/:id/bookmark', async (c) => {
+  return await convertPlatformItemToBookmark(c)
 })
 api.post('/toot', async (c) => {
   return await sendToots(c)

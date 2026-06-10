@@ -13,7 +13,13 @@ export interface DbMetaResponse {
   likedToots: number
   tweets: number
   likedTweets: number
+  platforms?: MetaPlatform[]
   collections?: CollectionType[]
+}
+
+export interface MetaPlatform {
+  count: number
+  platform: string
 }
 
 export interface MetaTag {

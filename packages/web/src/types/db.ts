@@ -136,6 +136,37 @@ export interface UserIntegration {
   user_id: string
 }
 
+export interface PlatformItem {
+  bookmark_id: string | null
+  created_at: string
+  description: string | null
+  external_id: string
+  id: string
+  image: string | null
+  ingested_at: string
+  metadata: Json | null
+  platform: string
+  title: string | null
+  url: string | null
+  user_id: string
+}
+
+export interface PlatformItemAuthor {
+  avatar: string | null
+  displayName: string | null
+  handle: string
+}
+
+export interface PlatformConnection {
+  configured_fields: string[]
+  created_at: string
+  enabled: boolean
+  last_error: string | null
+  last_synced_at: string | null
+  platform: string
+  updated_at: string | null
+}
+
 export interface Collection {
   bookmark_count: number | null
   collection: string | null

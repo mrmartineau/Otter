@@ -5,7 +5,7 @@ import { apiParameters } from '@/utils/fetching/apiParameters'
 import { errorResponse } from '@/utils/fetching/errorResponse'
 import type { MetaTag, MetaType } from '@/utils/fetching/meta'
 import { getErrorMessage } from '@/utils/get-error-message'
-import { bookmarks, toots, tweets } from '../db/schema'
+import { bookmarks, platformItems, toots, tweets } from '../db/schema'
 import { bookmarkToRow } from './bookmarks/mapper'
 import { summariseCollections, tagBelongsToCollection } from './collections'
 import { requireRequestContext } from './context'
@@ -118,6 +118,7 @@ export const getMeta = async (context: HonoContext) => {
       likedToots,
       tweetsCount,
       likedTweets,
+      platformCounts,
     ] = await Promise.all([
       countBookmarks(auth),
       countBookmarks(auth, gte(bookmarks.clickCount, 1)),
@@ -163,6 +164,17 @@ export const getMeta = async (context: HonoContext) => {
           .where(eq(tweets.likedTweet, true))
         return value ?? 0
       })(),
+      (async () => {
+        const rows = await auth.requestContext.db
+          .select({ platform: platformItems.platform, value: count() })
+          .from(platformItems)
+          .where(eq(platformItems.userId, auth.userId))
+          .groupBy(platformItems.platform)
+        return rows.map((row) => ({
+          count: row.value ?? 0,
+          platform: row.platform,
+        }))
+      })(),
     ])
 
     return new Response(
@@ -171,6 +183,7 @@ export const getMeta = async (context: HonoContext) => {
         collections: summariseCollections(rows),
         likedToots,
         likedTweets,
+        platforms: platformCounts,
         public: publicItems,
         stars,
         tags: tagCounts(rows),

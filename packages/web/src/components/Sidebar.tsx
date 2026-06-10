@@ -29,6 +29,7 @@ import {
   ROUTE_TRASH,
   ROUTE_TWEETS_MINE,
 } from '@/constants'
+import { isPlatformId, PLATFORMS } from '@/platforms/catalog'
 import { getMetaOptions } from '@/utils/fetching/meta'
 import { useSidebar } from '../hooks/useSidebar'
 import { CollectionList } from './CollectionList'
@@ -36,6 +37,7 @@ import { Flex } from './Flex'
 import { Link } from './Link'
 import LogoutButton from './LogoutButton'
 import { MastodonLogo } from './MastodonLogo'
+import { PlatformIcon } from './PlatformIcon'
 import { SidebarLink } from './SidebarLink'
 import { Spinner } from './Spinner'
 import { AllTags } from './TagList'
@@ -112,6 +114,23 @@ export const Sidebar = ({ version }: SidebarProps) => {
             <TwitterLogoIcon size={18} weight="duotone" />
             {CONTENT.tweetsNav}
           </SidebarLink>
+          {dbMeta?.platforms?.map(({ platform, count }) =>
+            isPlatformId(platform) ? (
+              <SidebarLink
+                href={`/platform/${platform}`}
+                activePath={`/platform/${platform}`}
+                count={count}
+                key={platform}
+              >
+                <PlatformIcon
+                  platform={platform}
+                  aria-label={PLATFORMS[platform].title}
+                  size={18}
+                />
+                {PLATFORMS[platform].title}
+              </SidebarLink>
+            ) : null,
+          )}
           <TypeList types={dbMeta?.types} />
           <AllTags tags={dbMeta?.tags} />
           <CollectionList

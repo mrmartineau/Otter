@@ -481,6 +481,66 @@ export const shares = pgTable(
   ],
 )
 
+export const platformConnections = pgTable(
+  'platform_connections',
+  {
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    credentials: json('credentials').notNull(),
+    enabled: boolean('enabled').notNull().default(true),
+    id: uuid('id').primaryKey().defaultRandom(),
+    lastError: text('last_error'),
+    lastSyncedAt: timestamp('last_synced_at', { withTimezone: true }),
+    platform: text('platform').notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => authUsers.id, { onDelete: 'cascade' }),
+  },
+  (table) => [
+    uniqueIndex('platform_connections_user_platform_key').on(
+      table.userId,
+      table.platform,
+    ),
+    index('platform_connections_user_id_idx').on(table.userId),
+  ],
+)
+
+export const platformItems = pgTable(
+  'platform_items',
+  {
+    bookmarkId: uuid('bookmark_id').references(() => bookmarks.id, {
+      onDelete: 'set null',
+    }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    description: text('description'),
+    externalId: text('external_id').notNull(),
+    id: uuid('id').primaryKey().defaultRandom(),
+    image: text('image'),
+    ingestedAt: timestamp('ingested_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    metadata: json('metadata'),
+    platform: text('platform').notNull(),
+    title: text('title'),
+    url: text('url'),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => authUsers.id, { onDelete: 'cascade' }),
+  },
+  (table) => [
+    uniqueIndex('platform_items_user_platform_external_key').on(
+      table.userId,
+      table.platform,
+      table.externalId,
+    ),
+    index('platform_items_user_platform_idx').on(table.userId, table.platform),
+  ],
+)
+
 export const userIntegrations = pgTable('user_integrations', {
   blueskyAppPassword: text('bluesky_app_password'),
   blueskyEnabled: boolean('bluesky_enabled').notNull().default(false),

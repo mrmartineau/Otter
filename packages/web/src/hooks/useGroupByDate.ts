@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 
 import { useUser } from '../components/UserProvider'
-import type { Bookmark, Toot, Tweet } from '../types/db'
+import type { Bookmark, PlatformItem, Toot, Tweet } from '../types/db'
 
-export type FeedItemModel = Tweet | Bookmark | Toot
+export type FeedItemModel = Tweet | Bookmark | Toot | PlatformItem
 export const groupItemsByDate = (items: FeedItemModel[] = []) => {
   const groupedItems = items.reduce<Record<string, FeedItemModel[]>>(
     (acc, item) => {

@@ -6,6 +6,7 @@ import { Link } from '@/components/Link'
 import { CONTENT } from '@/constants'
 import { getUserProfileOptions } from '@/utils/fetching/user'
 import { BlueskySettings } from './-bluesky-settings'
+import { PlatformConnections } from './-platform-connections'
 
 export const Route = createFileRoute('/_app/settings/integrations')({
   component: RouteComponent,
@@ -32,7 +33,9 @@ function RouteComponent() {
 
   return (
     <article className="flow">
-      <h3>Bluesky</h3>
+      <h3>Platform feeds</h3>
+      <PlatformConnections />
+      <h3>Bluesky cross-posting</h3>
       {userId ? <BlueskySettings userId={userId} /> : null}
       <h3>API key</h3>
       <CodeBlock>{apiKey}</CodeBlock>

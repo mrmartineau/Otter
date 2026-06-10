@@ -10,12 +10,13 @@ import { type FeedItemModel, useGroupByDate } from '@/hooks/useGroupByDate'
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { getCollectionsTagsOptions } from '@/utils/fetching/collections'
 import type { ShareKind } from '@/utils/fetching/shares'
-import type { Bookmark, Toot, Tweet } from '../types/db'
+import type { Bookmark, PlatformItem, Toot, Tweet } from '../types/db'
 import { cn } from '../utils/classnames'
 import { BookmarkFeedItem } from './BookmarkFeedItem'
 import { Flex } from './Flex'
 import { headingVariants } from './Heading'
 import { Loader } from './Loader'
+import { PlatformItemCard } from './PlatformItemCard'
 import { ShareDialog } from './ShareDialog'
 import { SidebarLink } from './SidebarLink'
 import { TootFeedItem } from './TootFeedItem'
@@ -35,7 +36,7 @@ interface FeedProps {
   count: number
   limit?: number
   allowGroupByDate?: boolean
-  feedType?: 'tweets' | 'bookmarks' | 'toots'
+  feedType?: 'tweets' | 'bookmarks' | 'toots' | 'platformItems'
   showFeedOptions?: boolean
   from?: FileRouteTypes['fullPaths']
   hasNextPage?: boolean
@@ -52,6 +53,9 @@ export function isTweet(item: FeedItemModel): item is Tweet {
 }
 export function isToot(item: FeedItemModel): item is Toot {
   return 'toot_id' in item
+}
+export function isPlatformItem(item: FeedItemModel): item is PlatformItem {
+  return 'external_id' in item
 }
 
 export const Feed = memo(
@@ -180,6 +184,8 @@ export const Feed = memo(
                           return <TweetFeedItem {...item} key={item.id} />
                         } else if (isToot(item)) {
                           return <TootFeedItem {...item} key={item.id} />
+                        } else if (isPlatformItem(item)) {
+                          return <PlatformItemCard {...item} key={item.id} />
                         }
                         return (
                           <BookmarkFeedItem
@@ -209,6 +215,8 @@ export const Feed = memo(
                   return <TweetFeedItem {...item} key={item.id} />
                 } else if (isToot(item)) {
                   return <TootFeedItem {...item} key={item.id} />
+                } else if (isPlatformItem(item)) {
+                  return <PlatformItemCard {...item} key={item.id} />
                 }
                 return (
                   <BookmarkFeedItem
