@@ -3,6 +3,7 @@ import type { Context } from 'hono'
 import { API_HEADERS } from '@/constants'
 import type { Journal, JournalEntry, JournalStatus } from '@/types/db'
 import { getErrorMessage } from '@/utils/get-error-message'
+import type { Db } from '../../db/client'
 import { journalEntries, journals } from '../../db/schema'
 import { requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
@@ -115,6 +116,16 @@ const toJournalEntrySet = (body: Record<string, unknown>) => {
   if ('time' in body) values.time = body.time as string | null
 
   return values
+}
+
+const userOwnsJournal = async (db: Db, journalId: number, userId: string) => {
+  const [item] = await db
+    .select({ id: journals.id })
+    .from(journals)
+    .where(and(eq(journals.id, journalId), eq(journals.owner, userId)))
+    .limit(1)
+
+  return Boolean(item)
 }
 
 /**
@@ -286,7 +297,13 @@ export const getJournalEntries = async (context: HonoContext) => {
     const data = await auth.requestContext.db
       .select()
       .from(journalEntries)
-      .leftJoin(journals, eq(journalEntries.journal, journals.id))
+      .leftJoin(
+        journals,
+        and(
+          eq(journalEntries.journal, journals.id),
+          eq(journals.owner, auth.userId),
+        ),
+      )
       .where(and(...conditions))
       .orderBy(
         sql`${journalEntries.date} desc nulls last`,
@@ -322,7 +339,13 @@ export const getJournalEntry = async (context: HonoContext) => {
     const [item] = await auth.requestContext.db
       .select()
       .from(journalEntries)
-      .leftJoin(journals, eq(journalEntries.journal, journals.id))
+      .leftJoin(
+        journals,
+        and(
+          eq(journalEntries.journal, journals.id),
+          eq(journals.owner, auth.userId),
+        ),
+      )
       .where(
         and(
           eq(journalEntries.id, Number(context.req.param('id'))),
@@ -360,10 +383,23 @@ export const createJournalEntry = async (context: HonoContext) => {
     }
 
     const body = (await context.req.json()) as Record<string, unknown>
+    const values = toJournalEntrySet(body)
+
+    if (
+      values.journal != null &&
+      !(await userOwnsJournal(
+        auth.requestContext.db,
+        values.journal,
+        auth.userId,
+      ))
+    ) {
+      return notFoundResponse('Journal not found or access denied')
+    }
+
     const [item] = await auth.requestContext.db
       .insert(journalEntries)
       .values({
-        ...toJournalEntrySet(body),
+        ...values,
         owner: auth.userId,
       })
       .returning()
@@ -389,9 +425,22 @@ export const updateJournalEntry = async (context: HonoContext) => {
     }
 
     const body = (await context.req.json()) as Record<string, unknown>
+    const values = toJournalEntrySet(body)
+
+    if (
+      values.journal != null &&
+      !(await userOwnsJournal(
+        auth.requestContext.db,
+        values.journal,
+        auth.userId,
+      ))
+    ) {
+      return notFoundResponse('Journal not found or access denied')
+    }
+
     const [item] = await auth.requestContext.db
       .update(journalEntries)
-      .set(toJournalEntrySet(body))
+      .set(values)
       .where(
         and(
           eq(journalEntries.id, Number(context.req.param('id'))),

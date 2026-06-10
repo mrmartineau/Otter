@@ -246,5 +246,4 @@ export type JournalEntryUpdate = Partial<JournalEntryInsert>
 
 export interface JournalEntryFilters {
   journal?: number
-  search?: string
 }

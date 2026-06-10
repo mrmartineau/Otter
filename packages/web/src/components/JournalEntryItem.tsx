@@ -10,8 +10,11 @@ import { useDeleteJournalEntry } from '@/utils/fetching/journal'
 import { Flex } from './Flex'
 
 const formatEntryDate = (date: string) => {
+  // Date-only strings parse as UTC midnight, so format in UTC too —
+  // otherwise users behind UTC see the previous calendar day.
   return new Intl.DateTimeFormat('en-GB', {
     dateStyle: 'full',
+    timeZone: 'UTC',
   }).format(new Date(date))
 }
 

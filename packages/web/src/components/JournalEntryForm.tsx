@@ -6,7 +6,16 @@ import { FormGroup } from '@/components/FormGroup'
 import { Input } from '@/components/Input'
 import { Textarea } from '@/components/Textarea'
 import type { Journal, JournalEntryInsert } from '@/types/db'
+import { cn } from '@/utils/classnames'
 import { IconControl } from './IconControl'
+
+// Local calendar day, not UTC — toISOString() can roll over to the
+// wrong day for users behind/ahead of UTC.
+const todayLocal = () => {
+  const now = new Date()
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
+  return now.toISOString().slice(0, 10)
+}
 
 type JournalEntryFormValues = Omit<JournalEntryInsert, 'journal'> & {
   journal: string
@@ -31,7 +40,7 @@ export const JournalEntryForm = ({
 
   const { register, handleSubmit } = useForm<JournalEntryFormValues>({
     defaultValues: {
-      date: new Date().toISOString().slice(0, 10),
+      date: todayLocal(),
       entry: '',
       ...initialValues,
       journal:
@@ -47,7 +56,7 @@ export const JournalEntryForm = ({
   }
 
   return (
-    <div className="journal-entry-form" {...rest}>
+    <div className={cn('journal-entry-form', className)} {...rest}>
       <h2 className="mb-s">{isNew ? 'New journal entry' : 'Edit entry'}</h2>
       <form
         onSubmit={handleSubmit(handleSubmitForm)}
