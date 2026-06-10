@@ -1,0 +1,1 @@
+CREATE INDEX "bookmarks_public_status_created_at_idx" ON "bookmarks" USING btree ("public","status","created_at" DESC NULLS LAST);

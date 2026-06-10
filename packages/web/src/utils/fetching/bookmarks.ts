@@ -156,6 +156,25 @@ export const incrementBookmarkClickCount = async (id: string) => {
   return await parseJsonResponse<SingleResponse<Bookmark>>(response)
 }
 
+export type BookmarkImportResult = {
+  found: number
+  imported: number
+  skipped: number
+}
+
+export const importBookmarksFile = async (file: File) => {
+  const body = new FormData()
+  body.append('file', file)
+
+  const response = await fetch('/api/bookmarks/import', {
+    body,
+    credentials: 'include',
+    method: 'POST',
+  })
+
+  return await parseJsonResponse<SingleResponse<BookmarkImportResult>>(response)
+}
+
 export const checkBookmarkUrl = async (urlInput: string) => {
   const response = await fetch(
     `/api/check-url${queryString({ url_input: urlInput })}`,

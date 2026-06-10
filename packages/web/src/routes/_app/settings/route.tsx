@@ -2,6 +2,7 @@ import {
   GearIcon,
   HashIcon,
   PlugsIcon,
+  SwapIcon,
   UserCircleIcon,
 } from '@phosphor-icons/react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
@@ -42,6 +43,10 @@ function RouteComponent() {
         <SidebarLink href="/settings/tags">
           <HashIcon weight="duotone" size={18} />
           Manage tags
+        </SidebarLink>
+        <SidebarLink href="/settings/data">
+          <SwapIcon weight="duotone" size={18} />
+          Import &amp; export
         </SidebarLink>
       </Flex>
 

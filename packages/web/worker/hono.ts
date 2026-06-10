@@ -9,6 +9,7 @@ import { titleSystemPrompt } from './ai/title'
 import { sendBlueskyPost } from './bluesky/sendBlueskyPost'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
 import { getRecentPublicBookmarks } from './bookmarks/getRecentPublicBookmarks'
+import { exportBookmarks, importBookmarks } from './bookmarks/importExport'
 import {
   checkBookmarkUrl,
   createBookmark,
@@ -177,6 +178,12 @@ api.get('/bookmarks', async (c) => {
 })
 api.post('/bookmarks', async (c) => {
   return await createBookmark(c)
+})
+api.post('/bookmarks/import', async (c) => {
+  return await importBookmarks(c)
+})
+api.get('/bookmarks/export', async (c) => {
+  return await exportBookmarks(c)
 })
 api.get('/bookmarks/:id', async (c) => {
   return await getBookmarkById(c)
