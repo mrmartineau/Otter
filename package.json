@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/mrmartineau/otter",
   "name": "@mrmartineau/otter",
-  "packageManager": "pnpm@11.1.2",
+  "packageManager": "pnpm@11.5.2",
   "private": true,
   "repository": {
     "type": "git",
@@ -19,6 +19,8 @@
     "check": "biome check --write",
     "chrome-extension:build": "pnpm --filter=@mrmartineau/otter-chrome-extension run build",
     "preview": "vite preview",
+    "tui:build": "pnpm --filter=@mrmartineau/otter-tui run build",
+    "tui:dev": "pnpm --filter=@mrmartineau/otter-tui run dev",
     "type-check": "tsc --noEmit",
     "web:build": "pnpm --filter=@mrmartineau/otter-web run build",
     "web:dev": "pnpm --filter=@mrmartineau/otter-web run dev"
