@@ -353,6 +353,14 @@ export const bookmarks = pgTable(
       table.createdAt.desc(),
     ),
     index('bookmarks_user_status_idx').on(table.user, table.status),
+    // Serves the cross-user public feed (getRecentPublicBookmarks):
+    // WHERE public AND status='active' ORDER BY created_at DESC. `public`
+    // leads because it is the selective predicate (status is near-constant).
+    index('bookmarks_public_status_created_at_idx').on(
+      table.public,
+      table.status,
+      table.createdAt.desc(),
+    ),
     index('bookmarks_search_text_idx').using('gin', table.searchText),
     index('bookmarks_tags_idx').using('gin', table.tags),
     index('bookmarks_url_trgm_idx').using('gin', table.url.op('gin_trgm_ops')),
