@@ -35,6 +35,7 @@ import { Route as AppTypeTypeRouteImport } from './routes/_app/type.$type'
 import { Route as AppTagTagRouteImport } from './routes/_app/tag.$tag'
 import { Route as AppSettingsTagsRouteImport } from './routes/_app/settings/tags'
 import { Route as AppSettingsIntegrationsRouteImport } from './routes/_app/settings/integrations'
+import { Route as AppSettingsDataRouteImport } from './routes/_app/settings/data'
 import { Route as AppSettingsAccountRouteImport } from './routes/_app/settings/account'
 import { Route as AppOauthConsentRouteImport } from './routes/_app/oauth/consent'
 import { Route as AppNewBookmarkRouteImport } from './routes/_app/new.bookmark'
@@ -174,6 +175,11 @@ const AppSettingsIntegrationsRoute = AppSettingsIntegrationsRouteImport.update({
   path: '/integrations',
   getParentRoute: () => AppSettingsRouteRoute,
 } as any)
+const AppSettingsDataRoute = AppSettingsDataRouteImport.update({
+  id: '/data',
+  path: '/data',
+  getParentRoute: () => AppSettingsRouteRoute,
+} as any)
 const AppSettingsAccountRoute = AppSettingsAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -238,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
+  '/settings/data': typeof AppSettingsDataRoute
   '/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
@@ -272,6 +279,7 @@ export interface FileRoutesByTo {
   '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
+  '/settings/data': typeof AppSettingsDataRoute
   '/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
@@ -309,6 +317,7 @@ export interface FileRoutesById {
   '/_app/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/_app/oauth/consent': typeof AppOauthConsentRoute
   '/_app/settings/account': typeof AppSettingsAccountRoute
+  '/_app/settings/data': typeof AppSettingsDataRoute
   '/_app/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/_app/settings/tags': typeof AppSettingsTagsRoute
   '/_app/tag/$tag': typeof AppTagTagRoute
@@ -345,6 +354,7 @@ export interface FileRouteTypes {
     | '/new/bookmark'
     | '/oauth/consent'
     | '/settings/account'
+    | '/settings/data'
     | '/settings/integrations'
     | '/settings/tags'
     | '/tag/$tag'
@@ -379,6 +389,7 @@ export interface FileRouteTypes {
     | '/new/bookmark'
     | '/oauth/consent'
     | '/settings/account'
+    | '/settings/data'
     | '/settings/integrations'
     | '/settings/tags'
     | '/tag/$tag'
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/_app/new/bookmark'
     | '/_app/oauth/consent'
     | '/_app/settings/account'
+    | '/_app/settings/data'
     | '/_app/settings/integrations'
     | '/_app/settings/tags'
     | '/_app/tag/$tag'
@@ -621,6 +633,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsIntegrationsRouteImport
       parentRoute: typeof AppSettingsRouteRoute
     }
+    '/_app/settings/data': {
+      id: '/_app/settings/data'
+      path: '/data'
+      fullPath: '/settings/data'
+      preLoaderRoute: typeof AppSettingsDataRouteImport
+      parentRoute: typeof AppSettingsRouteRoute
+    }
     '/_app/settings/account': {
       id: '/_app/settings/account'
       path: '/account'
@@ -682,12 +701,14 @@ declare module '@tanstack/react-router' {
 
 interface AppSettingsRouteRouteChildren {
   AppSettingsAccountRoute: typeof AppSettingsAccountRoute
+  AppSettingsDataRoute: typeof AppSettingsDataRoute
   AppSettingsIntegrationsRoute: typeof AppSettingsIntegrationsRoute
   AppSettingsTagsRoute: typeof AppSettingsTagsRoute
 }
 
 const AppSettingsRouteRouteChildren: AppSettingsRouteRouteChildren = {
   AppSettingsAccountRoute: AppSettingsAccountRoute,
+  AppSettingsDataRoute: AppSettingsDataRoute,
   AppSettingsIntegrationsRoute: AppSettingsIntegrationsRoute,
   AppSettingsTagsRoute: AppSettingsTagsRoute,
 }
