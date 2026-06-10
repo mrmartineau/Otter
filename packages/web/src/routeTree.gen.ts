@@ -24,6 +24,7 @@ import { Route as AppStarsRouteImport } from './routes/_app/stars'
 import { Route as AppSearchRouteImport } from './routes/_app/search'
 import { Route as AppPublicRouteImport } from './routes/_app/public'
 import { Route as AppMediaRouteImport } from './routes/_app/media'
+import { Route as AppJournalRouteImport } from './routes/_app/journal'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
@@ -36,6 +37,7 @@ import { Route as AppTypeTypeRouteImport } from './routes/_app/type.$type'
 import { Route as AppTagTagRouteImport } from './routes/_app/tag.$tag'
 import { Route as AppSettingsTagsRouteImport } from './routes/_app/settings/tags'
 import { Route as AppSettingsIntegrationsRouteImport } from './routes/_app/settings/integrations'
+import { Route as AppSettingsDataRouteImport } from './routes/_app/settings/data'
 import { Route as AppSettingsAccountRouteImport } from './routes/_app/settings/account'
 import { Route as AppOauthConsentRouteImport } from './routes/_app/oauth/consent'
 import { Route as AppNewBookmarkRouteImport } from './routes/_app/new.bookmark'
@@ -119,6 +121,11 @@ const AppMediaRoute = AppMediaRouteImport.update({
   path: '/media',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppJournalRoute = AppJournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppFeedRoute = AppFeedRouteImport.update({
   id: '/feed',
   path: '/feed',
@@ -181,6 +188,11 @@ const AppSettingsIntegrationsRoute = AppSettingsIntegrationsRouteImport.update({
   path: '/integrations',
   getParentRoute: () => AppSettingsRouteRoute,
 } as any)
+const AppSettingsDataRoute = AppSettingsDataRouteImport.update({
+  id: '/data',
+  path: '/data',
+  getParentRoute: () => AppSettingsRouteRoute,
+} as any)
 const AppSettingsAccountRoute = AppSettingsAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -236,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRoute
+  '/journal': typeof AppJournalRoute
   '/media': typeof AppMediaRoute
   '/public': typeof AppPublicRoute
   '/search': typeof AppSearchRoute
@@ -251,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
+  '/settings/data': typeof AppSettingsDataRoute
   '/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
@@ -272,6 +286,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRoute
+  '/journal': typeof AppJournalRoute
   '/media': typeof AppMediaRoute
   '/public': typeof AppPublicRoute
   '/search': typeof AppSearchRoute
@@ -287,6 +302,7 @@ export interface FileRoutesByTo {
   '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
+  '/settings/data': typeof AppSettingsDataRoute
   '/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
@@ -310,6 +326,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feed': typeof AppFeedRoute
+  '/_app/journal': typeof AppJournalRoute
   '/_app/media': typeof AppMediaRoute
   '/_app/public': typeof AppPublicRoute
   '/_app/search': typeof AppSearchRoute
@@ -326,6 +343,7 @@ export interface FileRoutesById {
   '/_app/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/_app/oauth/consent': typeof AppOauthConsentRoute
   '/_app/settings/account': typeof AppSettingsAccountRoute
+  '/_app/settings/data': typeof AppSettingsDataRoute
   '/_app/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/_app/settings/tags': typeof AppSettingsTagsRoute
   '/_app/tag/$tag': typeof AppTagTagRoute
@@ -349,6 +367,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/dashboard'
     | '/feed'
+    | '/journal'
     | '/media'
     | '/public'
     | '/search'
@@ -364,6 +383,7 @@ export interface FileRouteTypes {
     | '/new/bookmark'
     | '/oauth/consent'
     | '/settings/account'
+    | '/settings/data'
     | '/settings/integrations'
     | '/settings/tags'
     | '/tag/$tag'
@@ -385,6 +405,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/dashboard'
     | '/feed'
+    | '/journal'
     | '/media'
     | '/public'
     | '/search'
@@ -400,6 +421,7 @@ export interface FileRouteTypes {
     | '/new/bookmark'
     | '/oauth/consent'
     | '/settings/account'
+    | '/settings/data'
     | '/settings/integrations'
     | '/settings/tags'
     | '/tag/$tag'
@@ -422,6 +444,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/dashboard'
     | '/_app/feed'
+    | '/_app/journal'
     | '/_app/media'
     | '/_app/public'
     | '/_app/search'
@@ -438,6 +461,7 @@ export interface FileRouteTypes {
     | '/_app/new/bookmark'
     | '/_app/oauth/consent'
     | '/_app/settings/account'
+    | '/_app/settings/data'
     | '/_app/settings/integrations'
     | '/_app/settings/tags'
     | '/_app/tag/$tag'
@@ -568,6 +592,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMediaRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/journal': {
+      id: '/_app/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof AppJournalRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/feed': {
       id: '/_app/feed'
       path: '/feed'
@@ -652,6 +683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsIntegrationsRouteImport
       parentRoute: typeof AppSettingsRouteRoute
     }
+    '/_app/settings/data': {
+      id: '/_app/settings/data'
+      path: '/data'
+      fullPath: '/settings/data'
+      preLoaderRoute: typeof AppSettingsDataRouteImport
+      parentRoute: typeof AppSettingsRouteRoute
+    }
     '/_app/settings/account': {
       id: '/_app/settings/account'
       path: '/account'
@@ -720,12 +758,14 @@ declare module '@tanstack/react-router' {
 
 interface AppSettingsRouteRouteChildren {
   AppSettingsAccountRoute: typeof AppSettingsAccountRoute
+  AppSettingsDataRoute: typeof AppSettingsDataRoute
   AppSettingsIntegrationsRoute: typeof AppSettingsIntegrationsRoute
   AppSettingsTagsRoute: typeof AppSettingsTagsRoute
 }
 
 const AppSettingsRouteRouteChildren: AppSettingsRouteRouteChildren = {
   AppSettingsAccountRoute: AppSettingsAccountRoute,
+  AppSettingsDataRoute: AppSettingsDataRoute,
   AppSettingsIntegrationsRoute: AppSettingsIntegrationsRoute,
   AppSettingsTagsRoute: AppSettingsTagsRoute,
 }
@@ -763,6 +803,7 @@ interface AppRouteRouteChildren {
   AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
   AppFeedRoute: typeof AppFeedRoute
+  AppJournalRoute: typeof AppJournalRoute
   AppMediaRoute: typeof AppMediaRoute
   AppPublicRoute: typeof AppPublicRoute
   AppSearchRoute: typeof AppSearchRoute
@@ -785,6 +826,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,
   AppFeedRoute: AppFeedRoute,
+  AppJournalRoute: AppJournalRoute,
   AppMediaRoute: AppMediaRoute,
   AppPublicRoute: AppPublicRoute,
   AppSearchRoute: AppSearchRoute,

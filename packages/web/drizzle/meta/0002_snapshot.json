@@ -69,7 +69,7 @@
       ]
     }
   },
-  "id": "f8fc59c7-d67c-40a9-bcd8-f56a784782fc",
+  "id": "a7af9296-a811-4810-81cd-0f24a3ebaa63",
   "policies": {},
   "prevId": "fae7df6d-6cf0-43c2-9869-6f3ce49b72be",
   "roles": {},
@@ -313,6 +313,16 @@
           "primaryKey": false,
           "type": "boolean"
         },
+        "search_text": {
+          "generated": {
+            "as": "setweight(to_tsvector('english', coalesce(\"bookmarks\".\"title\", '')), 'A') || setweight(to_tsvector('english', coalesce(\"bookmarks\".\"description\", '')), 'B') || setweight(to_tsvector('english', coalesce(\"bookmarks\".\"note\", '')), 'C')",
+            "type": "stored"
+          },
+          "name": "search_text",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "tsvector"
+        },
         "star": {
           "default": false,
           "name": "star",
@@ -380,8 +390,81 @@
         }
       },
       "indexes": {
-        "bookmarks_status_idx": {
+        "bookmarks_search_text_idx": {
           "columns": [
+            {
+              "asc": true,
+              "expression": "search_text",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "gin",
+          "name": "bookmarks_search_text_idx",
+          "with": {}
+        },
+        "bookmarks_tags_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "tags",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "gin",
+          "name": "bookmarks_tags_idx",
+          "with": {}
+        },
+        "bookmarks_url_trgm_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "url",
+              "isExpression": false,
+              "nulls": "last",
+              "opclass": "gin_trgm_ops"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "gin",
+          "name": "bookmarks_url_trgm_idx",
+          "with": {}
+        },
+        "bookmarks_user_created_at_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "user",
+              "isExpression": false,
+              "nulls": "last"
+            },
+            {
+              "asc": false,
+              "expression": "created_at",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "bookmarks_user_created_at_idx",
+          "with": {}
+        },
+        "bookmarks_user_status_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "user",
+              "isExpression": false,
+              "nulls": "last"
+            },
             {
               "asc": true,
               "expression": "status",
@@ -392,143 +475,12 @@
           "concurrently": false,
           "isUnique": false,
           "method": "btree",
-          "name": "bookmarks_status_idx",
-          "with": {}
-        },
-        "bookmarks_user_idx": {
-          "columns": [
-            {
-              "asc": true,
-              "expression": "user",
-              "isExpression": false,
-              "nulls": "last"
-            }
-          ],
-          "concurrently": false,
-          "isUnique": false,
-          "method": "btree",
-          "name": "bookmarks_user_idx",
+          "name": "bookmarks_user_status_idx",
           "with": {}
         }
       },
       "isRLSEnabled": false,
       "name": "bookmarks",
-      "policies": {},
-      "schema": "",
-      "uniqueConstraints": {}
-    },
-    "public.feed_subscriptions": {
-      "checkConstraints": {},
-      "columns": {
-        "created_at": {
-          "default": "now()",
-          "name": "created_at",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "timestamp with time zone"
-        },
-        "description": {
-          "name": "description",
-          "notNull": false,
-          "primaryKey": false,
-          "type": "text"
-        },
-        "feed_url": {
-          "name": "feed_url",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "text"
-        },
-        "folder": {
-          "name": "folder",
-          "notNull": false,
-          "primaryKey": false,
-          "type": "text"
-        },
-        "id": {
-          "default": "gen_random_uuid()",
-          "name": "id",
-          "notNull": true,
-          "primaryKey": true,
-          "type": "uuid"
-        },
-        "site_url": {
-          "name": "site_url",
-          "notNull": false,
-          "primaryKey": false,
-          "type": "text"
-        },
-        "title": {
-          "name": "title",
-          "notNull": false,
-          "primaryKey": false,
-          "type": "text"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "notNull": false,
-          "primaryKey": false,
-          "type": "timestamp with time zone"
-        },
-        "user_id": {
-          "name": "user_id",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "uuid"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "foreignKeys": {
-        "feed_subscriptions_user_id_user_id_fk": {
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "name": "feed_subscriptions_user_id_user_id_fk",
-          "onDelete": "cascade",
-          "onUpdate": "no action",
-          "tableFrom": "feed_subscriptions",
-          "tableTo": "user"
-        }
-      },
-      "indexes": {
-        "feed_subscriptions_user_feed_url_key": {
-          "columns": [
-            {
-              "asc": true,
-              "expression": "user_id",
-              "isExpression": false,
-              "nulls": "last"
-            },
-            {
-              "asc": true,
-              "expression": "feed_url",
-              "isExpression": false,
-              "nulls": "last"
-            }
-          ],
-          "concurrently": false,
-          "isUnique": true,
-          "method": "btree",
-          "name": "feed_subscriptions_user_feed_url_key",
-          "with": {}
-        },
-        "feed_subscriptions_user_id_idx": {
-          "columns": [
-            {
-              "asc": true,
-              "expression": "user_id",
-              "isExpression": false,
-              "nulls": "last"
-            }
-          ],
-          "concurrently": false,
-          "isUnique": false,
-          "method": "btree",
-          "name": "feed_subscriptions_user_id_idx",
-          "with": {}
-        }
-      },
-      "isRLSEnabled": false,
-      "name": "feed_subscriptions",
       "policies": {},
       "schema": "",
       "uniqueConstraints": {}
@@ -1468,13 +1420,6 @@
         "settings_collections_visible": {
           "default": false,
           "name": "settings_collections_visible",
-          "notNull": true,
-          "primaryKey": false,
-          "type": "boolean"
-        },
-        "settings_feeds_visible": {
-          "default": false,
-          "name": "settings_feeds_visible",
           "notNull": true,
           "primaryKey": false,
           "type": "boolean"

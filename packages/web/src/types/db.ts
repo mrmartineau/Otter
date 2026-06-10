@@ -194,3 +194,57 @@ export interface MediaFilters {
   type?: MediaType
   status?: MediaStatus
 }
+
+export type JournalStatus =
+  | 'active'
+  | 'inactive'
+  | 'deleted'
+  | 'archived'
+  | 'draft'
+
+export interface Journal {
+  created_at: string | null
+  description: string | null
+  id: number
+  name: string
+  owner: string | null
+  status: JournalStatus
+}
+
+export type JournalInsert = Omit<
+  Journal,
+  'created_at' | 'id' | 'owner' | 'status'
+> & {
+  id?: number
+  status?: JournalStatus
+}
+
+export type JournalUpdate = Partial<JournalInsert>
+
+export interface JournalEntry {
+  created_at: string | null
+  date: string | null
+  end_date: string | null
+  entry: string | null
+  id: number
+  journal: number | null
+  journals: Pick<Journal, 'id' | 'name'> | null
+  media: string[] | null
+  owner: string | null
+  status: JournalStatus
+  time: string | null
+}
+
+export type JournalEntryInsert = Omit<
+  JournalEntry,
+  'created_at' | 'id' | 'journals' | 'owner' | 'status'
+> & {
+  id?: number
+  status?: JournalStatus
+}
+
+export type JournalEntryUpdate = Partial<JournalEntryInsert>
+
+export interface JournalEntryFilters {
+  journal?: number
+}

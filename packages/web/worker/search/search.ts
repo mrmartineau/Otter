@@ -5,8 +5,10 @@ import {
   count,
   desc,
   eq,
+  getTableColumns,
   ilike,
   or,
+  sql,
 } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
@@ -22,6 +24,18 @@ import { requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
+
+const parseBoolean = (value: unknown) => {
+  if (value === true || value === 'true') {
+    return true
+  }
+
+  if (value === false || value === 'false') {
+    return false
+  }
+
+  return undefined
+}
 
 /**
  * /api/search?q=example
@@ -51,36 +65,60 @@ export const getSearch = async (context: HonoContext) => {
       order,
       status,
       type,
+      tag,
     } = apiParameters(searchParams)
-    const pattern = `%${searchTerm}%`
+    const star = parseBoolean(searchParams.star)
+    const hasSearchTerm = searchTerm.trim() !== ''
+    const tsQuery = sql`websearch_to_tsquery('english', ${searchTerm})`
     const where = and(
       eq(bookmarks.user, userId),
       status ? eq(bookmarks.status, status) : undefined,
       type ? eq(bookmarks.type, type as BookmarkType) : undefined,
-      or(
-        ilike(bookmarks.title, pattern),
-        ilike(bookmarks.url, pattern),
-        ilike(bookmarks.description, pattern),
-        ilike(bookmarks.note, pattern),
-        searchTerm ? arrayContains(bookmarks.tags, [searchTerm]) : undefined,
-      ),
+      star === undefined ? undefined : eq(bookmarks.star, star),
+      tag ? arrayContains(bookmarks.tags, [tag]) : undefined,
+      hasSearchTerm
+        ? or(
+            sql`${bookmarks.searchText} @@ ${tsQuery}`,
+            ilike(bookmarks.url, `%${searchTerm}%`),
+            arrayContains(bookmarks.tags, [searchTerm]),
+          )
+        : undefined,
     )
-    const [{ value: total }] = await requestContext.db
-      .select({ value: count() })
+    const orderBy =
+      order === 'asc'
+        ? [asc(bookmarks.createdAt)]
+        : hasSearchTerm
+          ? [
+              desc(sql`ts_rank(${bookmarks.searchText}, ${tsQuery})`),
+              desc(bookmarks.createdAt),
+            ]
+          : [desc(bookmarks.createdAt)]
+    const rows = await requestContext.db
+      .select({
+        ...getTableColumns(bookmarks),
+        fullCount: sql`count(*) over ()`.mapWith(Number),
+      })
       .from(bookmarks)
       .where(where)
-    const data = await requestContext.db
-      .select()
-      .from(bookmarks)
-      .where(where)
-      .orderBy(
-        order === 'asc' ? asc(bookmarks.createdAt) : desc(bookmarks.createdAt),
-      )
+      .orderBy(...orderBy)
       .limit(limit)
       .offset(offset)
+    let total = rows[0]?.fullCount ?? 0
+
+    // An offset past the last row returns no rows (and no window count) even
+    // when there are matches — fall back to a count query so pagination
+    // metadata stays correct.
+    if (rows.length === 0 && offset > 0) {
+      const [{ value }] = await requestContext.db
+        .select({ value: count() })
+        .from(bookmarks)
+        .where(where)
+      total = value ?? 0
+    }
+
     const responseBody = apiResponseGenerator({
-      count: total ?? 0,
-      data: data.map(bookmarkToRow),
+      count: total,
+      data: rows.map(bookmarkToRow),
       limit,
       offset,
       path: context.req.url,

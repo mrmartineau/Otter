@@ -12,6 +12,7 @@ Otter is a self-hosted bookmark manager and media tracker. This is a **pnpm mono
 | `packages/web-extension` | Cross-browser extension (Chrome + Firefox) — save bookmarks from the browser | Webpack, `TARGET=chrome\|firefox` builds |
 | `packages/raycast-extension` | Raycast commands (search / recent / add / menubar) — auths via the web OAuth provider | Raycast API |
 | `packages/app` | Native macOS/iOS app (Safari web-extension + share sheet) | Xcode / Swift |
+| `packages/tui` | Terminal UI (`otter-tui`) — browse/search/star/add bookmarks from the shell, auths via profile API key | TypeScript, zero runtime deps, Node ≥ 20 |
 | `packages/chrome-extension` | Legacy Chrome extension, superseded by `web-extension` | Webpack |
 
 ## Commands

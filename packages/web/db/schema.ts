@@ -1,8 +1,10 @@
-import { sql } from 'drizzle-orm'
+import { type SQL, sql } from 'drizzle-orm'
 import {
   bigint,
   boolean,
   check,
+  customType,
+  date,
   index,
   json,
   numeric,
@@ -11,10 +13,17 @@ import {
   primaryKey,
   smallint,
   text,
+  time,
   timestamp,
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core'
+
+const tsvector = customType<{ data: string }>({
+  dataType() {
+    return 'tsvector'
+  },
+})
 
 export const feedsTypeEnum = pgEnum('feeds_type', ['rss', 'api'])
 
@@ -50,6 +59,14 @@ export const mediaTypeEnum = pgEnum('media_type', [
 ])
 
 export const bookmarkStatusEnum = pgEnum('status', ['active', 'inactive'])
+
+export const journalStatusEnum = pgEnum('journal_status', [
+  'active',
+  'inactive',
+  'deleted',
+  'archived',
+  'draft',
+])
 
 export const shareKindEnum = pgEnum('share_kind', ['tag', 'collection'])
 
@@ -329,6 +346,11 @@ export const bookmarks = pgTable(
       .default(sql`timezone('utc', now())`),
     note: text('note'),
     public: boolean('public').notNull().default(false),
+    // Weighted full-text document over title (A), description (B) and note (C)
+    searchText: tsvector('search_text').generatedAlwaysAs(
+      (): SQL =>
+        sql`setweight(to_tsvector('english', coalesce(${bookmarks.title}, '')), 'A') || setweight(to_tsvector('english', coalesce(${bookmarks.description}, '')), 'B') || setweight(to_tsvector('english', coalesce(${bookmarks.note}, '')), 'C')`,
+    ),
     star: boolean('star').notNull().default(false),
     status: bookmarkStatusEnum('status').notNull().default('active'),
     tags: text('tags').array(),
@@ -339,8 +361,22 @@ export const bookmarks = pgTable(
     user: uuid('user').references(() => authUsers.id),
   },
   (table) => [
-    index('bookmarks_user_idx').on(table.user),
-    index('bookmarks_status_idx').on(table.status),
+    index('bookmarks_user_created_at_idx').on(
+      table.user,
+      table.createdAt.desc(),
+    ),
+    index('bookmarks_user_status_idx').on(table.user, table.status),
+    // Serves the cross-user public feed (getRecentPublicBookmarks):
+    // WHERE public AND status='active' ORDER BY created_at DESC. `public`
+    // leads because it is the selective predicate (status is near-constant).
+    index('bookmarks_public_status_created_at_idx').on(
+      table.public,
+      table.status,
+      table.createdAt.desc(),
+    ),
+    index('bookmarks_search_text_idx').using('gin', table.searchText),
+    index('bookmarks_tags_idx').using('gin', table.tags),
+    index('bookmarks_url_trgm_idx').using('gin', table.url.op('gin_trgm_ops')),
   ],
 )
 
@@ -435,6 +471,89 @@ export const media = pgTable(
     user: uuid('user').references(() => authUsers.id),
   },
   (table) => [index('media_user_idx').on(table.user)],
+)
+
+export const journals = pgTable(
+  'journals',
+  {
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    description: text('description'),
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedByDefaultAsIdentity({
+        name: 'journals_id_seq',
+      }),
+    name: text('name').notNull(),
+    owner: uuid('owner').references(() => authUsers.id),
+    status: journalStatusEnum('status').notNull().default('active'),
+  },
+  (table) => [index('journals_owner_idx').on(table.owner)],
+)
+
+export const journalEntries = pgTable(
+  'journal_entries',
+  {
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    date: date('date'),
+    endDate: date('end_date'),
+    entry: text('entry'),
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedByDefaultAsIdentity({
+        name: 'journal_entries_id_seq',
+      }),
+    journal: bigint('journal', { mode: 'number' }).references(
+      () => journals.id,
+    ),
+    media: text('media').array(),
+    owner: uuid('owner').references(() => authUsers.id),
+    status: journalStatusEnum('status').notNull().default('active'),
+    time: time('time'),
+  },
+  (table) => [
+    index('journal_entries_owner_idx').on(table.owner),
+    index('journal_entries_journal_idx').on(table.journal),
+  ],
+)
+
+export const checklists = pgTable(
+  'checklists',
+  {
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedByDefaultAsIdentity({
+        name: 'checklists_id_seq',
+      }),
+    name: text('name').notNull(),
+    owner: uuid('owner').references(() => authUsers.id),
+    status: journalStatusEnum('status').notNull().default('active'),
+  },
+  (table) => [index('checklists_owner_idx').on(table.owner)],
+)
+
+export const checklistEntries = pgTable(
+  'checklist_entries',
+  {
+    checklistId: bigint('checklist_id', { mode: 'number' })
+      .notNull()
+      .references(() => checklists.id),
+    count: bigint('count', { mode: 'number' }),
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedByDefaultAsIdentity({
+        name: 'checklist_entries_id_seq',
+      }),
+    journalEntryId: bigint('journal_entry_id', { mode: 'number' })
+      .notNull()
+      .references(() => journalEntries.id),
+    note: text('note'),
+    owner: uuid('owner').references(() => authUsers.id),
+    status: journalStatusEnum('status').notNull().default('active'),
+  },
+  (table) => [
+    index('checklist_entries_checklist_id_idx').on(table.checklistId),
+    index('checklist_entries_journal_entry_id_idx').on(table.journalEntryId),
+  ],
 )
 
 export const toots = pgTable(

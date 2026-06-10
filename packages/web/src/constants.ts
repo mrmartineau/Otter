@@ -26,6 +26,8 @@ export const CONTENT = {
   flatFeed: 'Flat',
   groupByDay: 'By day',
   integrationsSettingsTitle: 'Integrations',
+  journalNav: 'Journal',
+  journalTitle: 'Journal',
 
   // used in the feed popover
   latestRssItems: 'Latest RSS feed items',
@@ -94,6 +96,7 @@ export const ROUTE_TOOTS_LIKES = '/toots/likes'
 export const ROUTE_TWEETS_MINE = '/tweets'
 export const ROUTE_TWEETS_LIKES = '/tweets/likes'
 export const ROUTE_MEDIA = '/media'
+export const ROUTE_JOURNAL = '/journal'
 
 // API Routes
 export const API_AUTH = '/api/auth.json'
