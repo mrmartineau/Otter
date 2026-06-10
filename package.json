@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/mrmartineau/otter",
   "name": "@mrmartineau/otter",
-  "packageManager": "pnpm@11.1.2",
+  "packageManager": "pnpm@11.5.2",
   "private": true,
   "repository": {
     "type": "git",
