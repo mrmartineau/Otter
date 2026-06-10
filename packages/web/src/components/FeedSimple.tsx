@@ -3,8 +3,9 @@ import { ErrorBoundary } from 'react-error-boundary'
 import type { FeedItemModel } from '../hooks/useGroupByDate'
 import { cn } from '../utils/classnames'
 import { BookmarkFeedItem } from './BookmarkFeedItem'
-import { isToot, isTweet } from './Feed'
+import { isPlatformItem, isToot, isTweet } from './Feed'
 import { headingVariants } from './Heading'
+import { PlatformItemCard } from './PlatformItemCard'
 import { TootFeedItem } from './TootFeedItem'
 import { TweetFeedItem } from './TweetFeedItem'
 
@@ -40,6 +41,8 @@ export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
             return <TweetFeedItem {...item} key={item.id} />
           } else if (isToot(item)) {
             return <TootFeedItem {...item} key={item.id} />
+          } else if (isPlatformItem(item)) {
+            return <PlatformItemCard {...item} key={item.id} />
           }
           return (
             <ErrorBoundary
