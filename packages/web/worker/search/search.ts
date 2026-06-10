@@ -25,6 +25,18 @@ import type { WorkerEnv } from '../env'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
 
+const parseBoolean = (value: unknown) => {
+  if (value === true || value === 'true') {
+    return true
+  }
+
+  if (value === false || value === 'false') {
+    return false
+  }
+
+  return undefined
+}
+
 /**
  * /api/search?q=example
  * This endpoint searches bookmarks with API-key or session auth.
@@ -53,13 +65,17 @@ export const getSearch = async (context: HonoContext) => {
       order,
       status,
       type,
+      tag,
     } = apiParameters(searchParams)
+    const star = parseBoolean(searchParams.star)
     const hasSearchTerm = searchTerm.trim() !== ''
     const tsQuery = sql`websearch_to_tsquery('english', ${searchTerm})`
     const where = and(
       eq(bookmarks.user, userId),
       status ? eq(bookmarks.status, status) : undefined,
       type ? eq(bookmarks.type, type as BookmarkType) : undefined,
+      star === undefined ? undefined : eq(bookmarks.star, star),
+      tag ? arrayContains(bookmarks.tags, [tag]) : undefined,
       hasSearchTerm
         ? or(
             sql`${bookmarks.searchText} @@ ${tsQuery}`,
