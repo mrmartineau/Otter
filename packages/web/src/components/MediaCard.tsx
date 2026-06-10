@@ -61,9 +61,8 @@ export const MediaCard = ({
     >
       {media.image ? (
         <img src={media.image} alt={media.name} className="rounded-md" />
-      ) : (
-        <div className="media-card-title">{media.name}</div>
-      )}
+      ) : null}
+      <div className="media-card-title">{media.name}</div>
 
       {media.rating ? <Rating rating={media.rating} /> : null}
 

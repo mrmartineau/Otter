@@ -4,6 +4,18 @@
 
 .media-form-columns {
   display: grid;
-  grid-template-columns: 100px 2fr 1.5fr;
-  gap: var(--spacing-s);
+  grid-template-columns: 3fr 2fr;
+  gap: var(--space-m);
+  align-items: start;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.media-form-search {
+  padding: var(--space-xs);
+  border-radius: var(--radii-m);
+  background-color: var(--theme2);
+  border: 1px solid var(--border);
 }

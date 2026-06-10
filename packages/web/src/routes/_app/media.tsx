@@ -53,6 +53,7 @@ function RouteComponent() {
   const [filters, setFilters] = useState<MediaFilters>({})
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingMedia, setEditingMedia] = useState<Media | null>(null)
+  const [newMediaStatus, setNewMediaStatus] = useState<MediaStatus>('wishlist')
   const { data: mediaResponse } = useSuspenseQuery(getMediaOptions())
   const allMedia = mediaResponse?.data
   const [media, setMedia] = useState(allMedia)
@@ -107,6 +108,12 @@ function RouteComponent() {
 
   const handleEditMedia = (media: Media) => {
     setEditingMedia(media)
+    setIsDialogOpen(true)
+  }
+
+  const handleAddMedia = (status: MediaStatus = 'wishlist') => {
+    setEditingMedia(null)
+    setNewMediaStatus(status)
     setIsDialogOpen(true)
   }
 
@@ -221,15 +228,18 @@ function RouteComponent() {
             }}
           >
             <DialogTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => handleAddMedia()}>
                 <PlusCircleIcon size={18} weight="duotone" />
                 Add Media
               </Button>
             </DialogTrigger>
             <DialogContent placement="center" width="m">
               <MediaForm
+                // Remount the form when switching between new/edit targets
+                // so react-hook-form picks up fresh default values
+                key={editingMedia ? editingMedia.id : `new-${newMediaStatus}`}
                 type={editingMedia ? 'edit' : 'new'}
-                initialValues={editingMedia || undefined}
+                initialValues={editingMedia ?? { status: newMediaStatus }}
                 platforms={platforms}
                 onFormSubmit={
                   editingMedia ? handleUpdateMedia : handleCreateMedia
@@ -332,7 +342,8 @@ function RouteComponent() {
                 key={status}
                 status={status}
                 title={title}
-                media={filteredMedia[status]}
+                media={filteredMedia[status] ?? []}
+                onAdd={handleAddMedia}
                 onEdit={handleEditMedia}
               />
             ))}

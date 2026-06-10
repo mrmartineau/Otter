@@ -1,23 +1,29 @@
 import { CollisionPriority } from '@dnd-kit/abstract'
 import { useDroppable } from '@dnd-kit/react'
+import { PlusIcon } from '@phosphor-icons/react'
 import type { ComponentProps } from 'react'
 import titleFmt from 'title'
 import type { Media, MediaStatus } from '@/types/db'
 import { cn } from '@/utils/classnames'
+import { IconButton } from './IconButton'
 import { MediaCard } from './MediaCard'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from './Tooltip'
 
-const getStatusColor = (status: string) => {
+const getStatusDotColor = (status: string) => {
   switch (status) {
     case 'wishlist':
-      return 'border-blue-200 text-blue-200'
+      return 'bg-blue-400'
     case 'now':
-      return 'border-green-200 text-green-200'
-    // case 'skipped':
-    //   return 'border-yellow-200 text-yellow-200'
+      return 'bg-green-400'
     case 'done':
-      return 'border-purple-200 text-purple-200'
+      return 'bg-purple-400'
     default:
-      return 'border-gray-200 text-gray-200'
+      return 'bg-gray-400'
   }
 }
 
@@ -26,6 +32,7 @@ interface MediaColumnProps extends ComponentProps<'div'> {
   media: Media[]
   title: string
   onEdit?: (media: Media) => void
+  onAdd?: (status: MediaStatus) => void
 }
 
 export const MediaColumn = ({
@@ -34,6 +41,7 @@ export const MediaColumn = ({
   title,
   className,
   onEdit,
+  onAdd,
   ...rest
 }: MediaColumnProps) => {
   const { isDropTarget, ref } = useDroppable({
@@ -43,39 +51,58 @@ export const MediaColumn = ({
     type: 'column',
   })
 
-  const isOverContainer = isDropTarget
-
   return (
     <div
       ref={ref}
       className={cn(
-        'media-column flex flex-col gap-4 h-full min-h-[500px]',
+        'media-column',
+        isDropTarget && 'media-column-drop-target',
         className,
       )}
       {...rest}
     >
-      <div className={cn('column-header p-2 border-b', getStatusColor(status))}>
-        <h3 className="font-semibold text-lg">{titleFmt(title)}</h3>
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {media.length} items
-        </span>
+      <div className="media-column-header">
+        <span
+          className={cn(
+            'size-2.5 rounded-full shrink-0',
+            getStatusDotColor(status),
+          )}
+        />
+        <h3 className="font-semibold">{titleFmt(title)}</h3>
+        <span className="media-column-count">{media.length}</span>
+        {onAdd ? (
+          <TooltipProvider delayDuration={800}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <IconButton
+                  size="s"
+                  className="ml-auto"
+                  onClick={() => onAdd(status)}
+                  aria-label={`Add item to ${title}`}
+                >
+                  <PlusIcon size={16} weight="duotone" />
+                </IconButton>
+              </TooltipTrigger>
+              <TooltipContent>Add item to {titleFmt(title)}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : null}
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className={cn('space-y-3', { 'bg-gray-400': isOverContainer })}>
-          {media.map((item) => (
-            <MediaCard
-              key={item.id}
-              media={item}
-              onEdit={onEdit}
-              status={status}
-            />
-          ))}
-        </div>
+      <div className="media-column-items">
+        {media.map((item) => (
+          <MediaCard
+            key={item.id}
+            media={item}
+            onEdit={onEdit}
+            status={status}
+          />
+        ))}
 
         {media.length === 0 ? (
-          <div className="text-center text-base py-8">
-            No items in this column
+          <div className="media-column-empty">
+            Nothing here yet — drag an item over
+            {onAdd ? ' or hit the + above' : ''}
           </div>
         ) : null}
       </div>

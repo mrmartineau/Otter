@@ -16,6 +16,10 @@ VITE_ALLOW_SIGNUP=false
 RAYCAST_OAUTH_CLIENT_ID=
 
 # Optional integrations
+# Google Books API key for book search (free: https://console.cloud.google.com/apis/library/books.googleapis.com)
+MEDIA_GOOGLE_BOOKS_API_KEY=
+# GameBrain API key for game search (https://gamebrain.co)
+MEDIA_GAMEBRAIN_API_KEY=
 BOT_MASTODON_ACCESS_TOKEN=
 PERSONAL_MASTODON_ACCESS_TOKEN=
 WEBHOOK_SECRET=replace-with-a-random-secret
