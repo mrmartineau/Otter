@@ -24,8 +24,10 @@ const borderColor = fg(palette.border)
 
 const CURSOR_BLOCK = '▌'
 
+// Each bookmark renders as two lines plus a blank separator between items,
+// so N items occupy 3N - 1 rows.
 export const visibleItems = (height: number) =>
-  Math.max(1, Math.floor((height - 4) / 2))
+  Math.max(1, Math.floor((height - 3) / 3))
 
 const filterChips = (state: AppState) => {
   const chips: string[] = []
@@ -144,8 +146,14 @@ const listBody = (state: AppState, width: number, bodyHeight: number) => {
   }
 
   for (const [index, bookmark] of state.items.entries()) {
-    if (lines.length + 2 > bodyHeight) {
+    const needed = index === 0 ? 2 : 3
+
+    if (lines.length + needed > bodyHeight) {
       break
+    }
+
+    if (index > 0) {
+      lines.push('')
     }
 
     lines.push(...bookmarkLines(bookmark, index === state.selected, width))
