@@ -3,6 +3,7 @@ import {
   bigint,
   boolean,
   check,
+  date,
   index,
   json,
   numeric,
@@ -11,6 +12,7 @@ import {
   primaryKey,
   smallint,
   text,
+  time,
   timestamp,
   uniqueIndex,
   uuid,
@@ -50,6 +52,14 @@ export const mediaTypeEnum = pgEnum('media_type', [
 ])
 
 export const bookmarkStatusEnum = pgEnum('status', ['active', 'inactive'])
+
+export const journalStatusEnum = pgEnum('journal_status', [
+  'active',
+  'inactive',
+  'deleted',
+  'archived',
+  'draft',
+])
 
 export const shareKindEnum = pgEnum('share_kind', ['tag', 'collection'])
 
@@ -406,6 +416,89 @@ export const media = pgTable(
     user: uuid('user').references(() => authUsers.id),
   },
   (table) => [index('media_user_idx').on(table.user)],
+)
+
+export const journals = pgTable(
+  'journals',
+  {
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    description: text('description'),
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedByDefaultAsIdentity({
+        name: 'journals_id_seq',
+      }),
+    name: text('name').notNull(),
+    owner: uuid('owner').references(() => authUsers.id),
+    status: journalStatusEnum('status').notNull().default('active'),
+  },
+  (table) => [index('journals_owner_idx').on(table.owner)],
+)
+
+export const journalEntries = pgTable(
+  'journal_entries',
+  {
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    date: date('date'),
+    endDate: date('end_date'),
+    entry: text('entry'),
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedByDefaultAsIdentity({
+        name: 'journal_entries_id_seq',
+      }),
+    journal: bigint('journal', { mode: 'number' }).references(
+      () => journals.id,
+    ),
+    media: text('media').array(),
+    owner: uuid('owner').references(() => authUsers.id),
+    status: journalStatusEnum('status').notNull().default('active'),
+    time: time('time'),
+  },
+  (table) => [
+    index('journal_entries_owner_idx').on(table.owner),
+    index('journal_entries_journal_idx').on(table.journal),
+  ],
+)
+
+export const checklists = pgTable(
+  'checklists',
+  {
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedByDefaultAsIdentity({
+        name: 'checklists_id_seq',
+      }),
+    name: text('name').notNull(),
+    owner: uuid('owner').references(() => authUsers.id),
+    status: journalStatusEnum('status').notNull().default('active'),
+  },
+  (table) => [index('checklists_owner_idx').on(table.owner)],
+)
+
+export const checklistEntries = pgTable(
+  'checklist_entries',
+  {
+    checklistId: bigint('checklist_id', { mode: 'number' })
+      .notNull()
+      .references(() => checklists.id),
+    count: bigint('count', { mode: 'number' }),
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedByDefaultAsIdentity({
+        name: 'checklist_entries_id_seq',
+      }),
+    journalEntryId: bigint('journal_entry_id', { mode: 'number' })
+      .notNull()
+      .references(() => journalEntries.id),
+    note: text('note'),
+    owner: uuid('owner').references(() => authUsers.id),
+    status: journalStatusEnum('status').notNull().default('active'),
+  },
+  (table) => [
+    index('checklist_entries_checklist_id_idx').on(table.checklistId),
+    index('checklist_entries_journal_entry_id_idx').on(table.journalEntryId),
+  ],
 )
 
 export const toots = pgTable(
