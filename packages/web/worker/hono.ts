@@ -9,6 +9,7 @@ import { titleSystemPrompt } from './ai/title'
 import { sendBlueskyPost } from './bluesky/sendBlueskyPost'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
 import { getRecentPublicBookmarks } from './bookmarks/getRecentPublicBookmarks'
+import { exportBookmarks, importBookmarks } from './bookmarks/importExport'
 import {
   checkBookmarkUrl,
   createBookmark,
@@ -48,15 +49,15 @@ import {
 } from './meta'
 import { dbMiddleware } from './middleware/db'
 import { getCurrentProfile, updateCurrentProfile } from './profile'
+import { feedToJson } from './rss/rss-to-json'
+import { handleScrapeContent } from './scraper/scrape-content'
+import { getSearch } from './search/search'
 import {
   createOrRotateShare,
   deleteShare,
   getPublicShare,
   listShares,
 } from './shares'
-import { feedToJson } from './rss/rss-to-json'
-import { handleScrapeContent } from './scraper/scrape-content'
-import { getSearch } from './search/search'
 import {
   getToot,
   getToots,
@@ -166,6 +167,12 @@ api.get('/bookmarks', async (c) => {
 })
 api.post('/bookmarks', async (c) => {
   return await createBookmark(c)
+})
+api.post('/bookmarks/import', async (c) => {
+  return await importBookmarks(c)
+})
+api.get('/bookmarks/export', async (c) => {
+  return await exportBookmarks(c)
 })
 api.get('/bookmarks/:id', async (c) => {
   return await getBookmarkById(c)
