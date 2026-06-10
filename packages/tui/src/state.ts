@@ -28,7 +28,6 @@ export interface AppState {
   tagInput: string
   tags: TagCount[]
   typeFilter: string | null
-  username: string
 }
 
 export const initialState = (): AppState => ({
@@ -49,7 +48,6 @@ export const initialState = (): AppState => ({
   tagInput: '',
   tags: [],
   typeFilter: null,
-  username: '',
 })
 
 /** Bookmark types the `c` key cycles through (subset of the API's types). */

@@ -41,14 +41,36 @@ const version = () => {
 const runLogin = async (): Promise<OtterConfig> => {
   const rl = createInterface({ input: process.stdin, output: process.stdout })
 
+  // Suppress echo while the API key is typed so the secret never lands on
+  // screen (or in the terminal's scrollback). readline routes every write —
+  // prompt and keystrokes alike — through `_writeToOutput`, so we print the
+  // prompt ourselves first, then mask everything but the submitting newline.
+  let masked = false
+  const iface = rl as unknown as {
+    output: { write: (text: string) => void }
+    _writeToOutput?: (text: string) => void
+  }
+  iface._writeToOutput = (text: string) => {
+    if (masked) {
+      if (text.includes('\n')) {
+        iface.output.write('\n')
+      }
+
+      return
+    }
+
+    iface.output.write(text)
+  }
+
   try {
     console.log('🦦 Connect otter-tui to your Otter instance\n')
     const baseUrl = (
       await rl.question('Otter URL (e.g. https://otter.example.com): ')
     ).trim()
-    const apiKey = (
-      await rl.question('API key (Otter → Settings → API key): ')
-    ).trim()
+    process.stdout.write('API key (Otter → Settings → API key): ')
+    masked = true
+    const apiKey = (await rl.question('')).trim()
+    masked = false
 
     if (!baseUrl || !apiKey) {
       throw new Error('Both a URL and an API key are required')

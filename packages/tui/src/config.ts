@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { chmodSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 
@@ -31,14 +31,16 @@ export const loadConfig = (): OtterConfig | null => {
     // missing or invalid file — fall through to env-only
   }
 
-  const baseUrl = process.env.OTTER_BASE_URL || file.baseUrl
-  const apiKey = process.env.OTTER_API_KEY || file.apiKey
+  // Trim before the completeness check so whitespace-only values (e.g. a
+  // stray space in an env var) are treated as missing rather than valid.
+  const baseUrl = (process.env.OTTER_BASE_URL || file.baseUrl)?.trim()
+  const apiKey = (process.env.OTTER_API_KEY || file.apiKey)?.trim()
 
   if (!baseUrl || !apiKey) {
     return null
   }
 
-  return { apiKey: apiKey.trim(), baseUrl: normaliseBaseUrl(baseUrl) }
+  return { apiKey, baseUrl: normaliseBaseUrl(baseUrl) }
 }
 
 export const saveConfig = (config: OtterConfig) => {
@@ -56,6 +58,9 @@ export const saveConfig = (config: OtterConfig) => {
     )}\n`,
     { mode: 0o600 },
   )
+  // `mode` only applies when writeFileSync creates the file; an existing
+  // config keeps its old (possibly looser) permissions, so tighten it here.
+  chmodSync(path, 0o600)
 
   return path
 }

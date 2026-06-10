@@ -174,7 +174,8 @@ const panel = (
   width: number,
   bodyHeight: number,
 ) => {
-  const innerWidth = Math.min(width - 6, 76)
+  // Clamp to ≥0 so a very narrow terminal can't drive `.repeat()` negative.
+  const innerWidth = Math.max(0, Math.min(width - 6, 76))
   const top = `╭─ ${title} ${'─'.repeat(Math.max(0, innerWidth - stringWidth(title) - 3))}╮`
   const bottom = `╰${'─'.repeat(innerWidth)}╯`
   const body = content

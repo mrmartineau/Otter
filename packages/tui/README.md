@@ -23,10 +23,10 @@ No runtime dependencies — just Node.js ≥ 20 and your Otter instance.
 ```sh
 pnpm install
 pnpm --filter=@mrmartineau/otter-tui run build
-node packages/tui/dist/index.js login   # or link it: `pnpm link` → `otter-tui`
+node packages/tui/dist/index.js login   # or link it: `pnpm link --global` → `otter-tui`
 ```
 
-`login` asks for your Otter URL and API key (Otter → Settings → API key), verifies them against `/api/me`, and writes `~/.config/otter/config.json`. The `OTTER_BASE_URL` and `OTTER_API_KEY` environment variables override the file, so you can also skip `login` entirely.
+`login` asks for your Otter URL and API key (Otter → Settings → API key), verifies them against `/api/me`, and writes `$XDG_CONFIG_HOME/otter/config.json` (defaulting to `~/.config/otter/config.json`). The `OTTER_BASE_URL` and `OTTER_API_KEY` environment variables override the file, so you can also skip `login` entirely.
 
 During development you can run the TypeScript sources directly (Node ≥ 22.18):
 

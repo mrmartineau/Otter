@@ -131,6 +131,8 @@ export class OtterClient {
         limit: params.limit,
         offset: params.offset,
         q: searchTerm,
+        star: params.star,
+        tag: params.tag,
         type: params.type,
       },
     })

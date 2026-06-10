@@ -4,7 +4,7 @@
   },
   "description": "Terminal UI for Otter — browse, search and save bookmarks without leaving your shell",
   "devDependencies": {
-    "@types/node": "^22.15.0",
+    "@types/node": "^20.19.0",
     "typescript": "^5.9.3",
     "vitest": "catalog:"
   },

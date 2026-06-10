@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { padToWidth, stringWidth, stripAnsi, truncate } from './ansi.ts'
+import {
+  padToWidth,
+  sanitize,
+  stringWidth,
+  stripAnsi,
+  truncate,
+} from './ansi.ts'
 
 describe('stripAnsi', () => {
   it('removes SGR sequences', () => {
@@ -24,6 +30,21 @@ describe('stringWidth', () => {
   it('counts emoji and CJK as 2 columns', () => {
     expect(stringWidth('🦦')).toBe(2)
     expect(stringWidth('日本')).toBe(4)
+  })
+
+  it('treats emoji skin-tone modifiers as zero width', () => {
+    expect(stringWidth('👍🏽')).toBe(2)
+  })
+})
+
+describe('sanitize', () => {
+  it('strips escape sequences and control characters', () => {
+    expect(sanitize('a\x1b[31mred\x1b[0mb')).toBe('a[31mred[0mb')
+    expect(sanitize('x\x07\x00y')).toBe('xy')
+  })
+
+  it('keeps tab, newline and carriage return', () => {
+    expect(sanitize('a\tb\nc\rd')).toBe('a\tb\nc\rd')
   })
 })
 

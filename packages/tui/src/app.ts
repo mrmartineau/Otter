@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process'
-import { cursor, screen } from './ansi.ts'
-import type { ListParams, OtterClient } from './api.ts'
+import { cursor, sanitize, screen } from './ansi.ts'
+import type { Bookmark, ListParams, OtterClient } from './api.ts'
 import { domain } from './format.ts'
 import type { Key } from './keys.ts'
 import { parseInput } from './keys.ts'
@@ -9,11 +9,14 @@ import { initialState, TYPE_CYCLE } from './state.ts'
 import { renderFrame, tagMatches, visibleItems } from './ui.ts'
 
 const openInBrowser = (url: string) => {
+  // On Windows, `cmd /c start` would route the URL through the cmd parser,
+  // where `&`/`|`/`^` (common in query strings) get interpreted. rundll32
+  // takes the URL as a single argv with no shell, so nothing is reinterpreted.
   const [command, args] =
     process.platform === 'darwin'
       ? ['open', [url]]
       : process.platform === 'win32'
-        ? ['cmd', ['/c', 'start', '', url]]
+        ? ['rundll32', ['url.dll,FileProtocolHandler', url]]
         : ['xdg-open', [url]]
 
   spawn(command, args as string[], { detached: true, stdio: 'ignore' })
@@ -23,12 +26,32 @@ const openInBrowser = (url: string) => {
     .unref()
 }
 
+const clean = (value: string | null) =>
+  value === null ? null : sanitize(value)
+
+/**
+ * Strip terminal control characters from bookmark text before it ever reaches
+ * the renderer or a status line — API content is untrusted and could otherwise
+ * smuggle escape sequences into the terminal.
+ */
+const sanitizeBookmark = (bookmark: Bookmark): Bookmark => ({
+  ...bookmark,
+  description: clean(bookmark.description),
+  note: clean(bookmark.note),
+  tags: bookmark.tags?.map((tag) => sanitize(tag)) ?? null,
+  title: clean(bookmark.title),
+  type: clean(bookmark.type),
+  url: clean(bookmark.url),
+})
+
 export class App {
   client: OtterClient
   state: AppState
   private requestSeq = 0
   private input = process.stdin
   private output = process.stdout
+  /** Carries an incomplete escape sequence between stdin reads. */
+  private inputBuffer = ''
 
   constructor(client: OtterClient) {
     this.client = client
@@ -42,7 +65,10 @@ export class App {
     this.input.resume()
     this.input.setEncoding('utf8')
     this.input.on('data', (chunk) => {
-      for (const key of parseInput(String(chunk))) {
+      const { keys, rest } = parseInput(this.inputBuffer + String(chunk))
+      this.inputBuffer = rest
+
+      for (const key of keys) {
         this.handleKey(key)
       }
     })
@@ -76,8 +102,7 @@ export class App {
 
   private async loadProfile() {
     try {
-      const profile = await this.client.me()
-      this.state.username = profile.username ?? ''
+      await this.client.me()
     } catch (error) {
       this.setStatus(
         `auth check failed: ${error instanceof Error ? error.message : error}`,
@@ -110,7 +135,7 @@ export class App {
       }
 
       state.count = response.count
-      state.items = response.data
+      state.items = response.data.map(sanitizeBookmark)
       state.offset = offset
       state.selected = Math.max(
         0,
@@ -322,7 +347,7 @@ export class App {
     } else if (key.name === 'up') {
       state.tagCursor = Math.max(state.tagCursor - 1, 0)
     } else if (key.name === 'backspace') {
-      state.tagInput = state.tagInput.slice(0, -1)
+      state.tagInput = Array.from(state.tagInput).slice(0, -1).join('')
       state.tagCursor = 0
     } else if (key.name === 'char' && key.char) {
       state.tagInput += key.char
@@ -367,7 +392,10 @@ export class App {
     this.render()
 
     try {
-      state.tags = await this.client.tags()
+      state.tags = (await this.client.tags()).map((entry) => ({
+        ...entry,
+        tag: sanitize(entry.tag),
+      }))
     } catch (error) {
       state.mode = 'list'
       this.setStatus(
@@ -408,6 +436,12 @@ export class App {
     try {
       await this.client.updateBookmark(bookmark.id, { star: bookmark.star })
       this.setStatus(bookmark.star ? '★ starred' : 'unstarred')
+
+      // The item no longer matches a starred-only view — drop it by refetching.
+      if (!bookmark.star && this.state.starOnly) {
+        await this.fetchPage(this.state.offset)
+        return
+      }
     } catch (error) {
       bookmark.star = !bookmark.star
       this.setStatus(

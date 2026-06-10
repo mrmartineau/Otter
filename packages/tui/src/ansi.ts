@@ -54,9 +54,19 @@ const ansiPattern = /\x1b\[[0-9;?]*[A-Za-z]/g
 
 export const stripAnsi = (text: string) => text.replace(ansiPattern, '')
 
+// C0/C1 control characters minus TAB, LF and CR — anything that could move the
+// cursor, change colours or otherwise hijack the terminal. ESC (0x1b) is in
+// the 0x0e–0x1f range, so escape sequences in untrusted text get neutralised.
+// biome-ignore lint/suspicious/noControlCharactersInRegex: stripping terminal control chars from untrusted API text is the point
+const controlPattern = /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]/g
+
+/** Strip terminal control characters from untrusted text (escape injection). */
+export const sanitize = (text: string) => text.replace(controlPattern, '')
+
 const isZeroWidth = (codePoint: number) =>
   (codePoint >= 0x300 && codePoint <= 0x36f) || // combining marks
   codePoint === 0x200d || // zero-width joiner
+  (codePoint >= 0x1f3fb && codePoint <= 0x1f3ff) || // emoji skin-tone modifiers
   (codePoint >= 0xfe00 && codePoint <= 0xfe0f) // variation selectors
 
 const isWide = (codePoint: number) =>

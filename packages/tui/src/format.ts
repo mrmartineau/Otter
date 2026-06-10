@@ -1,5 +1,26 @@
 /** Pure text formatting helpers. */
 
+import { charWidth, stringWidth } from './ansi.ts'
+
+/** Take the longest prefix of `text` that fits within `width` display cells. */
+const sliceToWidth = (text: string, width: number) => {
+  let used = 0
+  let result = ''
+
+  for (const char of text) {
+    const next = used + charWidth(char.codePointAt(0) ?? 0)
+
+    if (next > width) {
+      break
+    }
+
+    result += char
+    used = next
+  }
+
+  return result
+}
+
 const UNITS: [seconds: number, suffix: string][] = [
   [60, 's'],
   [3600, 'm'],
@@ -68,16 +89,19 @@ export const wrapText = (text: string, width: number): string[] => {
     for (const word of paragraph.split(/\s+/)) {
       if (!line) {
         line = word
-      } else if (`${line} ${word}`.length <= width) {
+      } else if (stringWidth(`${line} ${word}`) <= width) {
         line = `${line} ${word}`
       } else {
         lines.push(line)
         line = word
       }
 
-      while (line.length > width) {
-        lines.push(line.slice(0, width))
-        line = line.slice(width)
+      while (stringWidth(line) > width) {
+        // Force at least one code point of progress so a single character wider
+        // than `width` (e.g. a CJK glyph in a 1-cell panel) can't loop forever.
+        const chunk = sliceToWidth(line, width) || (Array.from(line)[0] ?? '')
+        lines.push(chunk)
+        line = line.slice(chunk.length)
       }
     }
 

@@ -53,6 +53,11 @@ describe('wrapText', () => {
     expect(wrapText('abcdefghij', 4)).toEqual(['abcd', 'efgh', 'ij'])
   })
 
+  it('measures wide characters by display width', () => {
+    // Each CJK glyph is 2 cells wide, so only two fit per 4-cell line.
+    expect(wrapText('日本語', 4)).toEqual(['日本', '語'])
+  })
+
   it('preserves paragraph breaks', () => {
     expect(wrapText('one\n\ntwo', 10)).toEqual(['one', '', 'two'])
   })

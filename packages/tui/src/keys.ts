@@ -47,7 +47,13 @@ const csiToKey = (finalByte: string, params: string): Key => {
   return name ? { name } : { name: 'unknown' }
 }
 
-export const parseInput = (input: string): Key[] => {
+/**
+ * Parse a chunk of stdin into key events. A trailing *incomplete* escape
+ * sequence (CSI/SS3 split across terminal reads) is not guessed at — it's
+ * returned in `rest` so the caller can prepend it to the next chunk. A lone
+ * `ESC` is still emitted immediately, so the Escape key stays responsive.
+ */
+export const parseInput = (input: string): { keys: Key[]; rest: string } => {
   const keys: Key[] = []
   let index = 0
 
@@ -68,8 +74,8 @@ export const parseInput = (input: string): Key[] => {
         }
 
         if (end >= input.length) {
-          keys.push({ name: 'escape' })
-          break
+          // Incomplete CSI — hand the tail back to be buffered.
+          return { keys, rest: input.slice(index) }
         }
 
         keys.push(csiToKey(input[end] as string, input.slice(index + 2, end)))
@@ -77,7 +83,12 @@ export const parseInput = (input: string): Key[] => {
         continue
       }
 
-      if (next === 'O' && index + 2 < input.length) {
+      if (next === 'O') {
+        if (index + 2 >= input.length) {
+          // Incomplete SS3 — hand the tail back to be buffered.
+          return { keys, rest: input.slice(index) }
+        }
+
         const name = SS3[input[index + 2] as string]
         keys.push(name ? { name } : { name: 'unknown' })
         index += 3
@@ -121,5 +132,5 @@ export const parseInput = (input: string): Key[] => {
     index += printable.length
   }
 
-  return keys
+  return { keys, rest: '' }
 }
