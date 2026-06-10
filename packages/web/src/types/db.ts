@@ -115,6 +115,7 @@ export interface UserProfile {
   avatar_url: string | null
   id: string
   settings_collections_visible: boolean
+  settings_feeds_visible: boolean
   settings_group_by_date: boolean | null
   settings_pinned_tags: string[]
   settings_tags_visible: boolean

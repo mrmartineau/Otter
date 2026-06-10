@@ -14,6 +14,13 @@
       "tag": "0001_shares",
       "version": "7",
       "when": 1778500000000
+    },
+    {
+      "breakpoints": true,
+      "idx": 2,
+      "tag": "0002_feed_subscriptions",
+      "version": "7",
+      "when": 1781070517268
     }
   ],
   "version": "7"

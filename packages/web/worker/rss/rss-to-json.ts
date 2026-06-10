@@ -26,12 +26,13 @@ const options = {
 }
 const parser = new XMLParser(options)
 
-export const feedToJson = async (
-  feedUrl: string,
-): Promise<Feed | undefined> => {
-  const req = await fetch(feedUrl)
-  const xmlData = await req.text()
-  const data = parser.parse(xmlData)
+export const feedTextToJson = (xmlData: string): Feed | undefined => {
+  let data: any
+  try {
+    data = parser.parse(xmlData)
+  } catch {
+    return undefined
+  }
 
   let feed: Feed | undefined
   if (data.feed) {
@@ -42,6 +43,14 @@ export const feedToJson = async (
   }
 
   return feed
+}
+
+export const feedToJson = async (
+  feedUrl: string,
+): Promise<Feed | undefined> => {
+  const req = await fetch(feedUrl)
+  const xmlData = await req.text()
+  return feedTextToJson(xmlData)
 }
 
 function reformatData(d: any): Feed {
@@ -64,7 +73,7 @@ function reformatData(d: any): Feed {
       title: d.channel.title,
     }
 
-    result.entries = d.channel.item?.map(
+    result.entries = toArray(d.channel.item).map(
       ({ title, link, pubDate, 'content:encoded': content, ...rest }: any) => {
         return {
           content,
@@ -89,7 +98,7 @@ function reformatData(d: any): Feed {
       }
     }
 
-    result.entries = d.entry?.map(
+    result.entries = toArray(d.entry).map(
       ({ title, link, updated, content, ...rest }: any) => {
         if (link) {
           link = fixLink(link)
@@ -114,6 +123,15 @@ function reformatData(d: any): Feed {
   }
 
   return result
+}
+
+// fast-xml-parser returns a bare object (not an array) when a feed
+// only has a single item/entry
+function toArray(value: any): any[] {
+  if (value === undefined || value === null) {
+    return []
+  }
+  return Array.isArray(value) ? value : [value]
 }
 
 function fixLink(l: any) {

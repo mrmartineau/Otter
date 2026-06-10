@@ -31,6 +31,7 @@ import { Route as PublicSigninIndexRouteImport } from './routes/_public/signin/i
 import { Route as PublicResetPasswordIndexRouteImport } from './routes/_public/reset-password/index'
 import { Route as PublicRegisterIndexRouteImport } from './routes/_public/register/index'
 import { Route as PublicForgotPasswordIndexRouteImport } from './routes/_public/forgot-password/index'
+import { Route as AppFeedsIndexRouteImport } from './routes/_app/feeds.index'
 import { Route as AppTypeTypeRouteImport } from './routes/_app/type.$type'
 import { Route as AppTagTagRouteImport } from './routes/_app/tag.$tag'
 import { Route as AppSettingsTagsRouteImport } from './routes/_app/settings/tags'
@@ -38,6 +39,7 @@ import { Route as AppSettingsIntegrationsRouteImport } from './routes/_app/setti
 import { Route as AppSettingsAccountRouteImport } from './routes/_app/settings/account'
 import { Route as AppOauthConsentRouteImport } from './routes/_app/oauth/consent'
 import { Route as AppNewBookmarkRouteImport } from './routes/_app/new.bookmark'
+import { Route as AppFeedsFeedIdRouteImport } from './routes/_app/feeds.$feedId'
 import { Route as AppCollectionCollectionRouteImport } from './routes/_app/collection.$collection'
 import { Route as AppBookmarkIdRouteImport } from './routes/_app/bookmark.$id'
 import { Route as AppNewBookmarkConfirmationRouteImport } from './routes/_app/new.bookmark.confirmation'
@@ -154,6 +156,11 @@ const PublicForgotPasswordIndexRoute =
     path: '/forgot-password/',
     getParentRoute: () => PublicRouteRoute,
   } as any)
+const AppFeedsIndexRoute = AppFeedsIndexRouteImport.update({
+  id: '/feeds/',
+  path: '/feeds/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppTypeTypeRoute = AppTypeTypeRouteImport.update({
   id: '/type/$type',
   path: '/type/$type',
@@ -187,6 +194,11 @@ const AppOauthConsentRoute = AppOauthConsentRouteImport.update({
 const AppNewBookmarkRoute = AppNewBookmarkRouteImport.update({
   id: '/new/bookmark',
   path: '/new/bookmark',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppFeedsFeedIdRoute = AppFeedsFeedIdRouteImport.update({
+  id: '/feeds/$feedId',
+  path: '/feeds/$feedId',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppCollectionCollectionRoute = AppCollectionCollectionRouteImport.update({
@@ -235,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/share/$token': typeof ShareTokenRoute
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
+  '/feeds/$feedId': typeof AppFeedsFeedIdRoute
   '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
@@ -242,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
   '/type/$type': typeof AppTypeTypeRoute
+  '/feeds/': typeof AppFeedsIndexRoute
   '/forgot-password/': typeof PublicForgotPasswordIndexRoute
   '/register/': typeof PublicRegisterIndexRoute
   '/reset-password/': typeof PublicResetPasswordIndexRoute
@@ -269,6 +283,7 @@ export interface FileRoutesByTo {
   '/share/$token': typeof ShareTokenRoute
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
+  '/feeds/$feedId': typeof AppFeedsFeedIdRoute
   '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
@@ -276,6 +291,7 @@ export interface FileRoutesByTo {
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
   '/type/$type': typeof AppTypeTypeRoute
+  '/feeds': typeof AppFeedsIndexRoute
   '/forgot-password': typeof PublicForgotPasswordIndexRoute
   '/register': typeof PublicRegisterIndexRoute
   '/reset-password': typeof PublicResetPasswordIndexRoute
@@ -306,6 +322,7 @@ export interface FileRoutesById {
   '/_public/': typeof PublicIndexRoute
   '/_app/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/_app/collection/$collection': typeof AppCollectionCollectionRoute
+  '/_app/feeds/$feedId': typeof AppFeedsFeedIdRoute
   '/_app/new/bookmark': typeof AppNewBookmarkRouteWithChildren
   '/_app/oauth/consent': typeof AppOauthConsentRoute
   '/_app/settings/account': typeof AppSettingsAccountRoute
@@ -313,6 +330,7 @@ export interface FileRoutesById {
   '/_app/settings/tags': typeof AppSettingsTagsRoute
   '/_app/tag/$tag': typeof AppTagTagRoute
   '/_app/type/$type': typeof AppTypeTypeRoute
+  '/_app/feeds/': typeof AppFeedsIndexRoute
   '/_public/forgot-password/': typeof PublicForgotPasswordIndexRoute
   '/_public/register/': typeof PublicRegisterIndexRoute
   '/_public/reset-password/': typeof PublicResetPasswordIndexRoute
@@ -342,6 +360,7 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/bookmark/$id'
     | '/collection/$collection'
+    | '/feeds/$feedId'
     | '/new/bookmark'
     | '/oauth/consent'
     | '/settings/account'
@@ -349,6 +368,7 @@ export interface FileRouteTypes {
     | '/settings/tags'
     | '/tag/$tag'
     | '/type/$type'
+    | '/feeds/'
     | '/forgot-password/'
     | '/register/'
     | '/reset-password/'
@@ -376,6 +396,7 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/bookmark/$id'
     | '/collection/$collection'
+    | '/feeds/$feedId'
     | '/new/bookmark'
     | '/oauth/consent'
     | '/settings/account'
@@ -383,6 +404,7 @@ export interface FileRouteTypes {
     | '/settings/tags'
     | '/tag/$tag'
     | '/type/$type'
+    | '/feeds'
     | '/forgot-password'
     | '/register'
     | '/reset-password'
@@ -412,6 +434,7 @@ export interface FileRouteTypes {
     | '/_public/'
     | '/_app/bookmark/$id'
     | '/_app/collection/$collection'
+    | '/_app/feeds/$feedId'
     | '/_app/new/bookmark'
     | '/_app/oauth/consent'
     | '/_app/settings/account'
@@ -419,6 +442,7 @@ export interface FileRouteTypes {
     | '/_app/settings/tags'
     | '/_app/tag/$tag'
     | '/_app/type/$type'
+    | '/_app/feeds/'
     | '/_public/forgot-password/'
     | '/_public/register/'
     | '/_public/reset-password/'
@@ -593,6 +617,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicForgotPasswordIndexRouteImport
       parentRoute: typeof PublicRouteRoute
     }
+    '/_app/feeds/': {
+      id: '/_app/feeds/'
+      path: '/feeds'
+      fullPath: '/feeds/'
+      preLoaderRoute: typeof AppFeedsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/type/$type': {
       id: '/_app/type/$type'
       path: '/type/$type'
@@ -640,6 +671,13 @@ declare module '@tanstack/react-router' {
       path: '/new/bookmark'
       fullPath: '/new/bookmark'
       preLoaderRoute: typeof AppNewBookmarkRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/feeds/$feedId': {
+      id: '/_app/feeds/$feedId'
+      path: '/feeds/$feedId'
+      fullPath: '/feeds/$feedId'
+      preLoaderRoute: typeof AppFeedsFeedIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/collection/$collection': {
@@ -735,10 +773,12 @@ interface AppRouteRouteChildren {
   AppTweetsRoute: typeof AppTweetsRoute
   AppBookmarkIdRoute: typeof AppBookmarkIdRouteWithChildren
   AppCollectionCollectionRoute: typeof AppCollectionCollectionRoute
+  AppFeedsFeedIdRoute: typeof AppFeedsFeedIdRoute
   AppNewBookmarkRoute: typeof AppNewBookmarkRouteWithChildren
   AppOauthConsentRoute: typeof AppOauthConsentRoute
   AppTagTagRoute: typeof AppTagTagRoute
   AppTypeTypeRoute: typeof AppTypeTypeRoute
+  AppFeedsIndexRoute: typeof AppFeedsIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
@@ -755,10 +795,12 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppTweetsRoute: AppTweetsRoute,
   AppBookmarkIdRoute: AppBookmarkIdRouteWithChildren,
   AppCollectionCollectionRoute: AppCollectionCollectionRoute,
+  AppFeedsFeedIdRoute: AppFeedsFeedIdRoute,
   AppNewBookmarkRoute: AppNewBookmarkRouteWithChildren,
   AppOauthConsentRoute: AppOauthConsentRoute,
   AppTagTagRoute: AppTagTagRoute,
   AppTypeTypeRoute: AppTypeTypeRoute,
+  AppFeedsIndexRoute: AppFeedsIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(

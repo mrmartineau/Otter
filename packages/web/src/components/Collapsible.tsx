@@ -11,7 +11,7 @@ import { useUser } from './UserProvider'
 
 interface CollapsibleProps1
   extends ComponentProps<typeof CollapsiblePrimitive.Root> {
-  stateKey: 'tags' | 'types' | 'collections'
+  stateKey: 'tags' | 'types' | 'collections' | 'feeds'
 }
 
 export const Collapsible = ({

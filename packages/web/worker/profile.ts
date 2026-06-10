@@ -17,6 +17,7 @@ const updateProfileSchema = z.discriminatedUnion('column', [
     column: z.literal('settings_collections_visible'),
     value: z.boolean(),
   }),
+  z.object({ column: z.literal('settings_feeds_visible'), value: z.boolean() }),
   z.object({ column: z.literal('settings_group_by_date'), value: z.boolean() }),
   z.object({
     column: z.literal('settings_top_tags_count'),
@@ -36,6 +37,8 @@ const getProfileUpdate = (update: z.infer<typeof updateProfileSchema>) => {
       return { avatarUrl: update.value }
     case 'settings_collections_visible':
       return { settingsCollectionsVisible: update.value }
+    case 'settings_feeds_visible':
+      return { settingsFeedsVisible: update.value }
     case 'settings_group_by_date':
       return { settingsGroupByDate: update.value }
     case 'settings_pinned_tags':
