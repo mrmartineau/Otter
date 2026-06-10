@@ -1,0 +1,6 @@
+{
+  "name": "cookie-bridge",
+  "version": "0.0.0",
+  "description": "Bridges Otter session cookies from the app into the shared App Group container so the share extension can reuse the logged-in session.",
+  "main": "index.ts"
+}
