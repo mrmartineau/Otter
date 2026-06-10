@@ -48,7 +48,19 @@ const readImportHtml = async (context: HonoContext) => {
     return await file.text()
   }
 
-  return await context.req.text()
+  const contentLength = Number(context.req.header('content-length'))
+
+  if (contentLength > MAX_IMPORT_BYTES) {
+    throw new Error('File is too large (max 25MB)')
+  }
+
+  const html = await context.req.text()
+
+  if (html.length > MAX_IMPORT_BYTES) {
+    throw new Error('File is too large (max 25MB)')
+  }
+
+  return html
 }
 
 /**

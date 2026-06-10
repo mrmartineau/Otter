@@ -48,12 +48,21 @@ const NAMED_ENTITIES: Record<string, string> = {
   quot: '"',
 }
 
+// String.fromCodePoint throws on code points above U+10FFFF
+const decodeCodePoint = (codePoint: number, fallback: string) => {
+  if (!Number.isFinite(codePoint) || codePoint < 0 || codePoint > 0x10ffff) {
+    return fallback
+  }
+
+  return String.fromCodePoint(codePoint)
+}
+
 export const decodeEntities = (value: string) =>
   value.replace(
     /&(?:#x([0-9a-f]+)|#(\d+)|([a-z]+));/gi,
     (match, hex, dec, named) => {
-      if (hex) return String.fromCodePoint(Number.parseInt(hex, 16))
-      if (dec) return String.fromCodePoint(Number.parseInt(dec, 10))
+      if (hex) return decodeCodePoint(Number.parseInt(hex, 16), match)
+      if (dec) return decodeCodePoint(Number.parseInt(dec, 10), match)
       const entity = NAMED_ENTITIES[(named as string).toLowerCase()]
       return entity ?? match
     },
@@ -113,19 +122,25 @@ export const parseNetscapeBookmarks = (
   for (const match of html.matchAll(TOKEN_PATTERN)) {
     const [token, h3Attrs, h3Text, aAttrs, aText, ddText] = match
 
+    // a <DD> description only belongs to a bookmark when it immediately
+    // follows its <DT><A> — reset lastItem on any folder or list boundary so
+    // folder descriptions are not misattributed to the previous bookmark
     if (h3Attrs !== undefined) {
       pendingFolder = cleanText(h3Text)
+      lastItem = null
       continue
     }
 
     if (/^<DL/i.test(token)) {
       folderStack.push(pendingFolder ?? '')
       pendingFolder = null
+      lastItem = null
       continue
     }
 
     if (/^<\/DL/i.test(token)) {
       folderStack.pop()
+      lastItem = null
       continue
     }
 

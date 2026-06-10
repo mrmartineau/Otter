@@ -105,6 +105,35 @@ describe('parseNetscapeBookmarks', () => {
     expect(items[1].createdAt).toEqual(new Date(1700000000 * 1000))
   })
 
+  it('leaves out-of-range numeric entities as-is instead of throwing', () => {
+    const items = parseNetscapeBookmarks(`
+      <DL><p>
+        <DT><A HREF="https://example.com/">Bad &#x110000; &#99999999999; entity</A>
+      </DL><p>
+    `)
+
+    expect(items).toHaveLength(1)
+    expect(items[0].title).toBe('Bad &#x110000; &#99999999999; entity')
+  })
+
+  it('does not attribute folder descriptions to the previous bookmark', () => {
+    const items = parseNetscapeBookmarks(`
+      <DL><p>
+        <DT><A HREF="https://example.com/">A bookmark</A>
+        <DT><H3>Folder</H3>
+        <DD>A folder description
+        <DL><p>
+          <DT><A HREF="https://example.org/">Inside</A>
+        </DL><p>
+        <DD>A stray description after a list
+      </DL><p>
+    `)
+
+    expect(items).toHaveLength(2)
+    expect(items[0].description).toBeNull()
+    expect(items[1].description).toBeNull()
+  })
+
   it('returns an empty array for content with no bookmarks', () => {
     expect(parseNetscapeBookmarks('<html><body>hello</body></html>')).toEqual(
       [],
