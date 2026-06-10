@@ -18,7 +18,7 @@ import { components as selectComponents } from 'react-select'
 import { toast } from 'sonner'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
-import { Textarea } from '@/components/Textarea'
+import { SlateEditor } from '@/components/SlateEditor'
 import {
   Tooltip,
   TooltipContent,
@@ -471,12 +471,12 @@ export const BookmarkForm = ({
               >
                 <form.Field name="description">
                   {(field) => (
-                    <Textarea
+                    <SlateEditor
                       id="description"
                       name={field.name}
                       value={field.state.value ?? ''}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(next) => field.handleChange(next)}
                     />
                   )}
                 </form.Field>
@@ -549,12 +549,12 @@ export const BookmarkForm = ({
                 <FormGroup label="Note" name="note">
                   <form.Field name="note">
                     {(field) => (
-                      <Textarea
+                      <SlateEditor
                         id="note"
                         name={field.name}
                         value={field.state.value ?? ''}
                         onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
+                        onChange={(next) => field.handleChange(next)}
                       />
                     )}
                   </form.Field>
