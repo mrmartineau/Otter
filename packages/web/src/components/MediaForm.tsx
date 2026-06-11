@@ -1,5 +1,5 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
-import type { ComponentProps } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { type ComponentProps, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDebounceValue } from 'usehooks-ts'
 import { Button } from '@/components/Button'
@@ -66,16 +66,16 @@ export const MediaForm = ({
 
   const watchPlatform = watch('platform')
   const watchType = watch('type')
-  const watchName = watch('name')
-  const [debouncedName] = useDebounceValue(watchName, 1000)
-  const { data: mediaSearch } = useSuspenseQuery(
+  const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch] = useDebounceValue(searchQuery.trim(), 500)
+  const { data: mediaSearch, isFetching: isSearching } = useQuery(
     getMediaSearchOptions({
-      query: debouncedName,
+      query: debouncedSearch,
       type: watchType,
     }),
   )
 
-  const limitedMediaSearch = mediaSearch?.data?.slice(0, 3)
+  const limitedMediaSearch = mediaSearch?.data?.slice(0, 6)
 
   const transformedPlatformsForCombobox = platforms.map((platform) => ({
     label: platform,
@@ -224,7 +224,22 @@ export const MediaForm = ({
           </div>
 
           <div className="flex flex-col gap-s">
-            {limitedMediaSearch?.length ? (
+            {/* SEARCH */}
+            <FormGroup label="Search" name="media-search">
+              <Input
+                id="media-search"
+                type="search"
+                placeholder={`Search for a ${watchType ?? 'media'} title…`}
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                autoComplete="off"
+              />
+            </FormGroup>
+            {!debouncedSearch ? (
+              <div className="text-sm text-muted-foreground">
+                Search to autofill the name and artwork
+              </div>
+            ) : limitedMediaSearch?.length ? (
               limitedMediaSearch?.map((item) => {
                 return (
                   <Button
@@ -252,7 +267,9 @@ export const MediaForm = ({
                 )
               })
             ) : (
-              <div>No results found</div>
+              <div className="text-sm">
+                {isSearching ? 'Searching…' : 'No results found'}
+              </div>
             )}
           </div>
         </div>

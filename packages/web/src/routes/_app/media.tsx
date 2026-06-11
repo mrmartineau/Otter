@@ -228,6 +228,7 @@ function RouteComponent() {
             </DialogTrigger>
             <DialogContent placement="center" width="m">
               <MediaForm
+                key={editingMedia?.id ?? 'new'}
                 type={editingMedia ? 'edit' : 'new'}
                 initialValues={editingMedia || undefined}
                 platforms={platforms}
