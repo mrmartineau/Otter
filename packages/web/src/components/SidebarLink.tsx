@@ -9,6 +9,26 @@ type SidebarLinkProps = LinkProps & {
   activePath?: string
   children: ReactNode
 }
+
+// A link is active when the location matches every search param the link
+// declares. Only the link's own keys are checked, so links with no `search`
+// (e.g. "All feeds", or routes that carry incidental URL state like filters)
+// stay active on a plain pathname match, while each `?folder=` link only
+// activates for its own folder value.
+const searchMatches = (
+  current: Record<string, unknown> | undefined,
+  target: Record<string, unknown> | undefined,
+): boolean => {
+  if (!target) {
+    return true
+  }
+  for (const key of Object.keys(target)) {
+    if (current?.[key] !== target[key]) {
+      return false
+    }
+  }
+  return true
+}
 export const SidebarLink = ({
   count,
   href,
@@ -17,9 +37,14 @@ export const SidebarLink = ({
   ...rest
 }: SidebarLinkProps) => {
   const location = useLocation()
-  const isActive =
-    location.pathname === href ||
-    (activePath ? location.pathname.includes(activePath) : false)
+  // Links can share a pathname and differ only by search params (e.g. feed
+  // folders all point at /feeds and vary by `?folder=`), so the active state
+  // must compare both the pathname and the search params.
+  const search = (rest as { search?: Record<string, unknown> }).search
+  const isActive = activePath
+    ? location.pathname.includes(activePath)
+    : location.pathname === href &&
+      searchMatches(location.search as Record<string, unknown>, search)
 
   const { handleCloseSidebar } = useSidebar()
 

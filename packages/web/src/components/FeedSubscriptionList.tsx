@@ -26,7 +26,8 @@ export const FeedSubscriptionList = () => {
       </CollapsibleTrigger>
       <CollapsibleContent>
         <Flex gapY="3xs" direction="column">
-          <SidebarLink href={ROUTE_FEEDS}>
+          {/* @ts-expect-error How do I type search params? */}
+          <SidebarLink href={ROUTE_FEEDS} search={{ folder: undefined }}>
             <RssSimpleIcon aria-label="All feeds" size={18} weight="duotone" />
             All feeds
           </SidebarLink>
