@@ -10,12 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
-import { Route as RecentRouteImport } from './routes/recent'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
-import { Route as ShareTokenRouteImport } from './routes/share.$token'
+import { Route as PublicRecentRouteImport } from './routes/_public/recent'
 import { Route as AppTweetsRouteImport } from './routes/_app/tweets'
 import { Route as AppTrashRouteImport } from './routes/_app/trash'
 import { Route as AppTopRouteImport } from './routes/_app/top'
@@ -32,6 +32,7 @@ import { Route as PublicSigninIndexRouteImport } from './routes/_public/signin/i
 import { Route as PublicResetPasswordIndexRouteImport } from './routes/_public/reset-password/index'
 import { Route as PublicRegisterIndexRouteImport } from './routes/_public/register/index'
 import { Route as PublicForgotPasswordIndexRouteImport } from './routes/_public/forgot-password/index'
+import { Route as PublicShareTokenRouteImport } from './routes/_public/share.$token'
 import { Route as AppTypeTypeRouteImport } from './routes/_app/type.$type'
 import { Route as AppTagTagRouteImport } from './routes/_app/tag.$tag'
 import { Route as AppSettingsTagsRouteImport } from './routes/_app/settings/tags'
@@ -51,14 +52,14 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RecentRoute = RecentRouteImport.update({
-  id: '/recent',
-  path: '/recent',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogRoute = ChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicRouteRoute = PublicRouteRouteImport.update({
@@ -74,10 +75,10 @@ const PublicIndexRoute = PublicIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PublicRouteRoute,
 } as any)
-const ShareTokenRoute = ShareTokenRouteImport.update({
-  id: '/share/$token',
-  path: '/share/$token',
-  getParentRoute: () => rootRouteImport,
+const PublicRecentRoute = PublicRecentRouteImport.update({
+  id: '/recent',
+  path: '/recent',
+  getParentRoute: () => PublicRouteRoute,
 } as any)
 const AppTweetsRoute = AppTweetsRouteImport.update({
   id: '/tweets',
@@ -161,6 +162,11 @@ const PublicForgotPasswordIndexRoute =
     path: '/forgot-password/',
     getParentRoute: () => PublicRouteRoute,
   } as any)
+const PublicShareTokenRoute = PublicShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
 const AppTypeTypeRoute = AppTypeTypeRouteImport.update({
   id: '/type/$type',
   path: '/type/$type',
@@ -230,8 +236,8 @@ const AppBookmarkIdEditRoute = AppBookmarkIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/changelog': typeof ChangelogRoute
   '/privacy': typeof PrivacyRoute
-  '/recent': typeof RecentRoute
   '/terms': typeof TermsRoute
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
@@ -245,7 +251,7 @@ export interface FileRoutesByFullPath {
   '/top': typeof AppTopRoute
   '/trash': typeof AppTrashRoute
   '/tweets': typeof AppTweetsRoute
-  '/share/$token': typeof ShareTokenRoute
+  '/recent': typeof PublicRecentRoute
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
   '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
@@ -256,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
   '/type/$type': typeof AppTypeTypeRoute
+  '/share/$token': typeof PublicShareTokenRoute
   '/forgot-password/': typeof PublicForgotPasswordIndexRoute
   '/register/': typeof PublicRegisterIndexRoute
   '/reset-password/': typeof PublicResetPasswordIndexRoute
@@ -266,8 +273,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
+  '/changelog': typeof ChangelogRoute
   '/privacy': typeof PrivacyRoute
-  '/recent': typeof RecentRoute
   '/terms': typeof TermsRoute
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
@@ -281,7 +288,7 @@ export interface FileRoutesByTo {
   '/top': typeof AppTopRoute
   '/trash': typeof AppTrashRoute
   '/tweets': typeof AppTweetsRoute
-  '/share/$token': typeof ShareTokenRoute
+  '/recent': typeof PublicRecentRoute
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
   '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
@@ -292,6 +299,7 @@ export interface FileRoutesByTo {
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
   '/type/$type': typeof AppTypeTypeRoute
+  '/share/$token': typeof PublicShareTokenRoute
   '/forgot-password': typeof PublicForgotPasswordIndexRoute
   '/register': typeof PublicRegisterIndexRoute
   '/reset-password': typeof PublicResetPasswordIndexRoute
@@ -304,8 +312,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
   '/_public': typeof PublicRouteRouteWithChildren
+  '/changelog': typeof ChangelogRoute
   '/privacy': typeof PrivacyRoute
-  '/recent': typeof RecentRoute
   '/terms': typeof TermsRoute
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
@@ -319,7 +327,7 @@ export interface FileRoutesById {
   '/_app/top': typeof AppTopRoute
   '/_app/trash': typeof AppTrashRoute
   '/_app/tweets': typeof AppTweetsRoute
-  '/share/$token': typeof ShareTokenRoute
+  '/_public/recent': typeof PublicRecentRoute
   '/_public/': typeof PublicIndexRoute
   '/_app/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/_app/collection/$collection': typeof AppCollectionCollectionRoute
@@ -331,6 +339,7 @@ export interface FileRoutesById {
   '/_app/settings/tags': typeof AppSettingsTagsRoute
   '/_app/tag/$tag': typeof AppTagTagRoute
   '/_app/type/$type': typeof AppTypeTypeRoute
+  '/_public/share/$token': typeof PublicShareTokenRoute
   '/_public/forgot-password/': typeof PublicForgotPasswordIndexRoute
   '/_public/register/': typeof PublicRegisterIndexRoute
   '/_public/reset-password/': typeof PublicResetPasswordIndexRoute
@@ -343,8 +352,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/changelog'
     | '/privacy'
-    | '/recent'
     | '/terms'
     | '/settings'
     | '/dashboard'
@@ -358,7 +367,7 @@ export interface FileRouteTypes {
     | '/top'
     | '/trash'
     | '/tweets'
-    | '/share/$token'
+    | '/recent'
     | '/bookmark/$id'
     | '/collection/$collection'
     | '/new/bookmark'
@@ -369,6 +378,7 @@ export interface FileRouteTypes {
     | '/settings/tags'
     | '/tag/$tag'
     | '/type/$type'
+    | '/share/$token'
     | '/forgot-password/'
     | '/register/'
     | '/reset-password/'
@@ -379,8 +389,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/changelog'
     | '/privacy'
-    | '/recent'
     | '/terms'
     | '/settings'
     | '/dashboard'
@@ -394,7 +404,7 @@ export interface FileRouteTypes {
     | '/top'
     | '/trash'
     | '/tweets'
-    | '/share/$token'
+    | '/recent'
     | '/bookmark/$id'
     | '/collection/$collection'
     | '/new/bookmark'
@@ -405,6 +415,7 @@ export interface FileRouteTypes {
     | '/settings/tags'
     | '/tag/$tag'
     | '/type/$type'
+    | '/share/$token'
     | '/forgot-password'
     | '/register'
     | '/reset-password'
@@ -416,8 +427,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_public'
+    | '/changelog'
     | '/privacy'
-    | '/recent'
     | '/terms'
     | '/_app/settings'
     | '/_app/dashboard'
@@ -431,7 +442,7 @@ export interface FileRouteTypes {
     | '/_app/top'
     | '/_app/trash'
     | '/_app/tweets'
-    | '/share/$token'
+    | '/_public/recent'
     | '/_public/'
     | '/_app/bookmark/$id'
     | '/_app/collection/$collection'
@@ -443,6 +454,7 @@ export interface FileRouteTypes {
     | '/_app/settings/tags'
     | '/_app/tag/$tag'
     | '/_app/type/$type'
+    | '/_public/share/$token'
     | '/_public/forgot-password/'
     | '/_public/register/'
     | '/_public/reset-password/'
@@ -455,10 +467,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
+  ChangelogRoute: typeof ChangelogRoute
   PrivacyRoute: typeof PrivacyRoute
-  RecentRoute: typeof RecentRoute
   TermsRoute: typeof TermsRoute
-  ShareTokenRoute: typeof ShareTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -470,18 +481,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/recent': {
-      id: '/recent'
-      path: '/recent'
-      fullPath: '/recent'
-      preLoaderRoute: typeof RecentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog': {
+      id: '/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof ChangelogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_public': {
@@ -505,12 +516,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicIndexRouteImport
       parentRoute: typeof PublicRouteRoute
     }
-    '/share/$token': {
-      id: '/share/$token'
-      path: '/share/$token'
-      fullPath: '/share/$token'
-      preLoaderRoute: typeof ShareTokenRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_public/recent': {
+      id: '/_public/recent'
+      path: '/recent'
+      fullPath: '/recent'
+      preLoaderRoute: typeof PublicRecentRouteImport
+      parentRoute: typeof PublicRouteRoute
     }
     '/_app/tweets': {
       id: '/_app/tweets'
@@ -622,6 +633,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password/'
       preLoaderRoute: typeof PublicForgotPasswordIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/share/$token': {
+      id: '/_public/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof PublicShareTokenRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/_app/type/$type': {
@@ -808,7 +826,9 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 )
 
 interface PublicRouteRouteChildren {
+  PublicRecentRoute: typeof PublicRecentRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicShareTokenRoute: typeof PublicShareTokenRoute
   PublicForgotPasswordIndexRoute: typeof PublicForgotPasswordIndexRoute
   PublicRegisterIndexRoute: typeof PublicRegisterIndexRoute
   PublicResetPasswordIndexRoute: typeof PublicResetPasswordIndexRoute
@@ -816,7 +836,9 @@ interface PublicRouteRouteChildren {
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
+  PublicRecentRoute: PublicRecentRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicShareTokenRoute: PublicShareTokenRoute,
   PublicForgotPasswordIndexRoute: PublicForgotPasswordIndexRoute,
   PublicRegisterIndexRoute: PublicRegisterIndexRoute,
   PublicResetPasswordIndexRoute: PublicResetPasswordIndexRoute,
@@ -830,10 +852,9 @@ const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   PublicRouteRoute: PublicRouteRouteWithChildren,
+  ChangelogRoute: ChangelogRoute,
   PrivacyRoute: PrivacyRoute,
-  RecentRoute: RecentRoute,
   TermsRoute: TermsRoute,
-  ShareTokenRoute: ShareTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

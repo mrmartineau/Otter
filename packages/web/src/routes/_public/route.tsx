@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { PublicLayout } from '@/components/PublicLayout'
 import { getSession } from '@/utils/fetching/user'
 import { ROUTE_HOME } from '../../constants'
 
@@ -13,5 +14,9 @@ export const Route = createFileRoute('/_public')({
 })
 
 function RouteComponent() {
-  return <Outlet />
+  return (
+    <PublicLayout>
+      <Outlet />
+    </PublicLayout>
+  )
 }

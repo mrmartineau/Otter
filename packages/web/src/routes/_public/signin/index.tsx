@@ -82,13 +82,13 @@ function RouteComponent() {
         src="/otter-logo.svg"
         width="90"
         height="90"
-        className="mx-auto mt-l"
+        className="mx-auto"
         alt="Otter logo"
       />
-      <h2 className="mt-s text-center">Sign in</h2>
+      <h2 className="text-center">Sign in</h2>
 
       <form onSubmit={handleSignIn}>
-        <Flex direction={'column'} gap="m">
+        <Flex direction={'column'} gap="xs">
           <FormGroup label="Email" name="email">
             <Input
               id="email"
@@ -109,21 +109,19 @@ function RouteComponent() {
             />
           </FormGroup>
 
-          <Flex gap="m" justify="between">
-            <Button type="submit" disabled={isLoading}>
-              Sign In
-            </Button>
-            <Flex gap="m">
-              {ALLOW_SIGNUP ? (
-                <Link to="/register" className="self-center">
-                  Register
-                </Link>
-              ) : null}
-              <Link to="/forgot-password" className="self-center">
-                Forgot password?
-              </Link>
-            </Flex>
-          </Flex>
+          <Button type="submit" disabled={isLoading}>
+            Sign In
+          </Button>
+          <Link to="/forgot-password" className="self-center text-sm">
+            Forgot password?
+          </Link>
+
+          {ALLOW_SIGNUP ? (
+            <Link to="/register" className="self-center text-sm">
+              Don't have an account? Register
+            </Link>
+          ) : null}
+
 
           {error ? (
             <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">

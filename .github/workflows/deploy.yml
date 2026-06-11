@@ -11,7 +11,17 @@ on:
   push:
     branches:
       - main
+  # Redeploy after a release so the site picks up the CHANGELOG.md commit —
+  # semantic-release pushes it with the default GITHUB_TOKEN, which does not
+  # trigger the `push` event
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
   workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
 
 jobs:
   Deploy-Production:
@@ -20,7 +30,11 @@ jobs:
       contents: read
       deployments: write
     steps:
+      # Explicit ref: on workflow_run the default sha predates the
+      # CHANGELOG.md commit semantic-release pushed during the Release run
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:

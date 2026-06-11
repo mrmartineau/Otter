@@ -38,18 +38,18 @@ const chapters = [
       },
       {
         description:
-          'Parse RSS feeds and pull rich metadata out of any URL you throw at it.',
-        title: 'RSS & scraping',
-      },
-      {
-        description:
-          'Back up your own toots and the ones you favourited, straight from Mastodon.',
-        title: 'Mastodon backup',
-      },
-      {
-        description:
           'A kanban board for movies, TV shows and games — from “one day” to “done”.',
         title: 'Media tracking',
+      },
+      {
+        description:
+          'Journals to jot down thoughts, track habits and keep a log of your online life.',
+        title: 'Journalling',
+      },
+      {
+        description:
+          'Parse RSS feeds and pull rich metadata out of any URL you throw at it.',
+        title: 'RSS & scraping',
       },
     ],
     numeral: 'I',
@@ -68,8 +68,7 @@ const chapters = [
         title: 'Search that finds it',
       },
       {
-        description:
-          'Let Cloudflare Workers AI rewrite scruffy titles and descriptions for you.',
+        description: 'Let AI rewrite scruffy titles and descriptions for you.',
         title: 'AI assist',
       },
       {
@@ -85,7 +84,7 @@ const chapters = [
     features: [
       {
         description:
-          'Native iOS and macOS app with a share extension — save from anywhere on your phone.',
+          'Native iOS share extension — save from anywhere on your phone.',
         title: 'In your pocket',
       },
       {
@@ -125,7 +124,7 @@ const tickerItems = [
   'Collections',
   'Media tracking',
   'RSS',
-  'Mastodon',
+  'Bluesky',
   'AI assist',
   'MCP server',
   'iOS app',
@@ -147,20 +146,7 @@ function Index() {
   )
 
   return (
-    <div className="landing">
-      <header className="landing-top landing-container">
-        <a href="/" className="landing-wordmark">
-          <img src="/otter-logo.svg" width="32" height="32" alt="" />
-          {CONTENT.appName}
-        </a>
-        <nav className="landing-top-nav landing-mono">
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a>
-          <a href={ROUTE_SIGNIN}>{CONTENT.signInTitle}</a>
-        </nav>
-      </header>
-
+    <>
       <section className="landing-hero landing-container">
         <p className="landing-kicker landing-mono">
           Field notes · a self-hosted bookmark manager &amp; media tracker
@@ -262,10 +248,10 @@ function Index() {
               ))}
             </div>
             <div className="landing-clippings-more">
-              <a href={ROUTE_RECENT} className="landing-btn">
+              <Link href={ROUTE_RECENT} className="landing-btn">
                 All public bookmarks
                 <ArrowRightIcon weight="bold" width="16" height="16" />
-              </a>
+              </Link>
             </div>
           </div>
         </section>
@@ -288,26 +274,6 @@ function Index() {
           </a>
         </div>
       </section>
-
-      <footer className="landing-footer landing-container">
-        <span>
-          Made by{' '}
-          <a
-            href="https://zander.wtf"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Zander Martineau
-          </a>
-        </span>
-        <div className="landing-footer-links">
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
-        </div>
-      </footer>
-    </div>
+    </>
   )
 }

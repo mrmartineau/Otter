@@ -1,0 +1,101 @@
+.public {
+  --paper: var(--sand-1);
+  --ink: var(--sand-12);
+  --ink-soft: var(--sand-11);
+  --rule: color-mix(in srgb, var(--sand-12) 18%, transparent);
+  --pop: var(--accent9);
+  --pop-bright: var(--accent11);
+  --pop-soft: var(--accent5);
+
+  position: relative;
+  min-height: 100dvh;
+  background-color: var(--paper);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+
+  /* paper grain */
+  &::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+.public-mono {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- top bar ---------- */
+
+.public-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s);
+  padding-block: var(--space-s);
+  border-bottom: 2px solid var(--ink);
+  width: stretch;
+  margin-block-end: var(--space-xl);
+}
+
+.public-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  color: var(--ink);
+  font-size: var(--step-1);
+  font-variation-settings:
+    "wght" 700,
+    "wdth" 110;
+
+  &:hover {
+    color: var(--pop-bright);
+  }
+}
+
+.public-top-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+
+  a {
+    color: var(--ink);
+    border-bottom: 2px solid transparent;
+    padding-block: 0.2em;
+
+    /* &:hover {
+      color: var(--pop-bright);
+      border-bottom-color: var(--pop);
+    } */
+  }
+}
+
+/* ---------- footer ---------- */
+
+.public-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  width: stretch;
+  gap: var(--space-s);
+  margin-block-start: auto;
+  border-top: 2px solid var(--ink);
+  padding-block: var(--space-m) var(--space-l);
+  font-family: var(--font-mono);
+  font-size: var(--step--2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+
+  a {
+    color: var(--ink);
+  }
+}
