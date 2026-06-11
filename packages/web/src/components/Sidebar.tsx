@@ -34,6 +34,7 @@ import {
 import { getMetaOptions } from '@/utils/fetching/meta'
 import { useSidebar } from '../hooks/useSidebar'
 import { CollectionList } from './CollectionList'
+import { FeedSubscriptionList } from './FeedSubscriptionList'
 import { Flex } from './Flex'
 import { Link } from './Link'
 import LogoutButton from './LogoutButton'
@@ -120,6 +121,7 @@ export const Sidebar = ({ version }: SidebarProps) => {
             collections={dbMeta?.collections}
             tags={dbMeta?.tags}
           />
+          <FeedSubscriptionList />
           <SidebarLink href={ROUTE_MEDIA} activePath="media">
             <ApertureIcon size={18} weight="duotone" />
             {CONTENT.mediaNav}

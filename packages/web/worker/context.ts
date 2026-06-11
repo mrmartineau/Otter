@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import type { Context, HonoRequest } from 'hono'
-import { createLocalJWKSet, jwtVerify, type JWK, type JWTPayload } from 'jose'
+import { createLocalJWKSet, type JWK, type JWTPayload, jwtVerify } from 'jose'
 import { createAuth, getOAuthAudience } from '../auth/server'
 import type { Db } from '../db/client'
 import { profiles } from '../db/schema'
@@ -25,6 +25,7 @@ export const profileToRow = (profile: Profile): UserProfile => ({
   avatar_url: profile.avatarUrl,
   id: profile.id,
   settings_collections_visible: profile.settingsCollectionsVisible,
+  settings_feeds_visible: profile.settingsFeedsVisible,
   settings_group_by_date: profile.settingsGroupByDate,
   settings_pinned_tags: profile.settingsPinnedTags,
   settings_tags_visible: profile.settingsTagsVisible,

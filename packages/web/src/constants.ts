@@ -18,6 +18,8 @@ export const CONTENT = {
   dashboardTitle: 'Dashboard',
   editTitle: 'Edit',
   feedNav: 'Feed',
+  feedsNav: 'Feeds',
+  feedsTitle: 'Feeds',
   feedTitle: 'Feed',
   findMatchingTags: 'Find matching tags',
   fixWithAi: 'Fix with AI',
@@ -79,6 +81,7 @@ export const createTitle = (pageName?: keyof typeof CONTENT | string) => {
 export const ROUTE_DASHBOARD = '/dashboard'
 export const ROUTE_HOME = ROUTE_DASHBOARD
 export const ROUTE_FEED = '/feed'
+export const ROUTE_FEEDS = '/feeds'
 export const ROUTE_SIGNIN = '/signin'
 export const ROUTE_NEW_BOOKMARK = '/new/bookmark'
 export const ROUTE_NEW_BOOKMARK_CONFIRMATION = '/new/bookmark/confirmation'

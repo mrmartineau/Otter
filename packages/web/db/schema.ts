@@ -302,6 +302,9 @@ export const profiles = pgTable(
     settingsCollectionsVisible: boolean('settings_collections_visible')
       .notNull()
       .default(false),
+    settingsFeedsVisible: boolean('settings_feeds_visible')
+      .notNull()
+      .default(false),
     settingsGroupByDate: boolean('settings_group_by_date').default(false),
     settingsPinnedTags: text('settings_pinned_tags')
       .array()
@@ -391,6 +394,32 @@ export const feeds = pgTable('feeds', {
   type: feedsTypeEnum('type').notNull(),
   url: text('url').notNull(),
 })
+
+export const feedSubscriptions = pgTable(
+  'feed_subscriptions',
+  {
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    description: text('description'),
+    feedUrl: text('feed_url').notNull(),
+    folder: text('folder'),
+    id: uuid('id').primaryKey().defaultRandom(),
+    siteUrl: text('site_url'),
+    title: text('title'),
+    updatedAt: timestamp('updated_at', { withTimezone: true }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => authUsers.id, { onDelete: 'cascade' }),
+  },
+  (table) => [
+    uniqueIndex('feed_subscriptions_user_feed_url_key').on(
+      table.userId,
+      table.feedUrl,
+    ),
+    index('feed_subscriptions_user_id_idx').on(table.userId),
+  ],
+)
 
 export const tags = pgTable(
   'tags',

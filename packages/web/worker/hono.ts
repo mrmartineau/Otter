@@ -22,6 +22,15 @@ import { getNewBookmark, postNewBookmark } from './bookmarks/new'
 import { getDashboard } from './dashboard'
 import type { WorkerEnv } from './env'
 import {
+  createFeedSubscription,
+  deleteFeedSubscription,
+  exportOpml,
+  getFeedSubscription,
+  importOpml,
+  listFeedSubscriptions,
+  updateFeedSubscription,
+} from './feeds/subscriptions'
+import {
   getBlueskyIntegration,
   toggleBlueskyIntegration,
   upsertBlueskyIntegration,
@@ -286,6 +295,27 @@ api.get('/collections-tags', async (c) => {
 })
 api.get('/collections/:collection', async (c) => {
   return await getCollectionBookmarks(c)
+})
+api.get('/feeds', async (c) => {
+  return await listFeedSubscriptions(c)
+})
+api.post('/feeds', async (c) => {
+  return await createFeedSubscription(c)
+})
+api.get('/feeds/export', async (c) => {
+  return await exportOpml(c)
+})
+api.post('/feeds/import', async (c) => {
+  return await importOpml(c)
+})
+api.get('/feeds/:id', async (c) => {
+  return await getFeedSubscription(c)
+})
+api.patch('/feeds/:id', async (c) => {
+  return await updateFeedSubscription(c)
+})
+api.delete('/feeds/:id', async (c) => {
+  return await deleteFeedSubscription(c)
 })
 api.get('/shares', async (c) => {
   return await listShares(c)
