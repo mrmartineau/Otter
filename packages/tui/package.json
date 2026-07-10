@@ -1,5 +1,6 @@
 {
   "bin": {
+    "otter": "dist/index.js",
     "otter-tui": "dist/index.js"
   },
   "description": "Terminal UI for Otter — browse, search and save bookmarks without leaving your shell",

@@ -31,6 +31,7 @@ jobs:
           pnpm --filter @mrmartineau/otter-web \
                --filter @mrmartineau/otter-chrome-extension \
                --filter @mrmartineau/otter-web-extension \
+               --filter @mrmartineau/otter-tui \
                exec semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

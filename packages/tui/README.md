@@ -18,7 +18,16 @@ A fast, dependency-free terminal UI for [Otter](https://github.com/mrmartineau/o
 
 No runtime dependencies — just Node.js ≥ 20 and your Otter instance.
 
-## Setup
+## Install
+
+### Homebrew
+
+```sh
+brew install mrmartineau/tap/otter-tui
+otter login   # `otter-tui` works too
+```
+
+### From source
 
 ```sh
 pnpm install
