@@ -1,4 +1,5 @@
 import type { HonoRequest } from 'hono'
+import { assertSafePublicUrl } from '../url-guard'
 import { xtract } from '../xtractr/index'
 import {
   generateErrorJSONResponse,
@@ -19,6 +20,12 @@ export const handleScrapeContent = async (request: HonoRequest) => {
 
   if (!url.match(/^[a-zA-Z]+:\/\//)) {
     url = `https://${url}`
+  }
+
+  try {
+    assertSafePublicUrl(url)
+  } catch (error) {
+    return generateErrorJSONResponse(error, url)
   }
 
   try {

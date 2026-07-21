@@ -1,5 +1,6 @@
-import { Hono } from 'hono'
+import { Hono, type MiddlewareHandler } from 'hono'
 
+import { getErrorMessage } from '@/utils/get-error-message'
 import { createAuth } from '../auth/server'
 import { classifyBookmark } from './ai/classify'
 import { descriptionSystemPrompt } from './ai/description'
@@ -58,6 +59,7 @@ import {
   getTags,
   renameTag,
 } from './meta'
+import { requireRequestContext } from './context'
 import { dbMiddleware } from './middleware/db'
 import { getCurrentProfile, updateCurrentProfile } from './profile'
 import { feedToJson } from './rss/rss-to-json'
@@ -78,6 +80,7 @@ import {
   searchTweets,
 } from './social'
 import { sendToots } from './toots/sendToots'
+import { assertSafePublicUrl } from './url-guard'
 
 export const api = new Hono<{ Bindings: WorkerEnv }>()
 
@@ -86,13 +89,38 @@ export const api = new Hono<{ Bindings: WorkerEnv }>()
 api.get('/', (c) => {
   return c.text('Otter API', 200)
 })
-api.get('/scrape', async (c) => {
+
+api.use('*', dbMiddleware)
+
+// The scrape/AI/RSS endpoints fetch arbitrary URLs or run paid inference,
+// so they require an authenticated caller and are rate limited per user.
+const authedWithRateLimit =
+  (keyPrefix: string): MiddlewareHandler<{ Bindings: WorkerEnv }> =>
+  async (c, next) => {
+    const requestContext = await requireRequestContext(c)
+
+    if (requestContext instanceof Response) {
+      return requestContext
+    }
+
+    const outcome = await c.env.RATE_LIMITER?.limit({
+      key: `${keyPrefix}:${requestContext.profile?.id ?? 'unknown'}`,
+    })
+
+    if (outcome && !outcome.success) {
+      return c.json({ error: 'Rate limit exceeded' }, 429)
+    }
+
+    await next()
+  }
+
+api.get('/scrape', authedWithRateLimit('scrape'), async (c) => {
   return await handleScrapeContent(c.req)
 })
-api.get('/scrape-content', async (c) => {
+api.get('/scrape-content', authedWithRateLimit('scrape'), async (c) => {
   return await handleScrapeContent(c.req)
 })
-api.post('/ai/title', async (context) => {
+api.post('/ai/title', authedWithRateLimit('ai'), async (context) => {
   const { prompt } = await context.req.json()
   return await generateResponse({
     context,
@@ -100,7 +128,7 @@ api.post('/ai/title', async (context) => {
     systemPrompt: titleSystemPrompt,
   })
 })
-api.post('/ai/description', async (context) => {
+api.post('/ai/description', authedWithRateLimit('ai'), async (context) => {
   const { title, prompt } = await context.req.json()
   return await generateResponse({
     context,
@@ -108,7 +136,7 @@ api.post('/ai/description', async (context) => {
     systemPrompt: descriptionSystemPrompt(title),
   })
 })
-api.post('/ai/summarise', async (context) => {
+api.post('/ai/summarise', authedWithRateLimit('ai'), async (context) => {
   const { prompt } = await context.req.json()
   const truncated = prompt.slice(0, MAX_CONTENT_LENGTH)
   return await generateResponse({
@@ -117,7 +145,7 @@ api.post('/ai/summarise', async (context) => {
     systemPrompt: summariseSystemPrompt,
   })
 })
-api.post('/ai/classify', async (context) => {
+api.post('/ai/classify', authedWithRateLimit('ai'), async (context) => {
   const { title, description, url, tags, currentType } =
     await context.req.json()
   const result = await classifyBookmark({
@@ -130,32 +158,22 @@ api.post('/ai/classify', async (context) => {
   })
   return context.json(result)
 })
-api.get('/rss', async (c) => {
+api.get('/rss', authedWithRateLimit('rss'), async (c) => {
   const feed = c.req.query('feed')
-  let isValidUrl = false
-  if (feed) {
-    try {
-      new URL(feed)
-      isValidUrl = true
-    } catch {
-      isValidUrl = false
-    }
+
+  if (!feed) {
+    return c.json({ error: 'Feed not found' }, 404)
   }
 
-  if (isValidUrl && feed) {
-    const jsonFeed = await feedToJson(feed)
-    return c.json(jsonFeed)
+  try {
+    assertSafePublicUrl(feed)
+  } catch (error) {
+    return c.json({ error: getErrorMessage(error) }, 400)
   }
 
-  return c.json(
-    {
-      error: 'Feed not found',
-    },
-    404,
-  )
+  const jsonFeed = await feedToJson(feed)
+  return c.json(jsonFeed)
 })
-
-api.use('*', dbMiddleware)
 
 api.on(['GET', 'POST'], '/auth/*', async (c) => {
   return await createAuth(c.env, c.var.db).handler(c.req.raw)
