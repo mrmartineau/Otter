@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import type { Context, HonoRequest } from 'hono'
-import { createLocalJWKSet, jwtVerify, type JWK, type JWTPayload } from 'jose'
+import { createLocalJWKSet, type JWK, type JWTPayload, jwtVerify } from 'jose'
 import { createAuth, getOAuthAudience } from '../auth/server'
 import type { Db } from '../db/client'
 import { profiles } from '../db/schema'
@@ -134,8 +134,7 @@ const getProfileByOAuthToken = async (
 
   return {
     profile,
-    scopes:
-      typeof payload?.scope === 'string' ? payload.scope.split(' ') : [],
+    scopes: typeof payload?.scope === 'string' ? payload.scope.split(' ') : [],
   }
 }
 

@@ -1,5 +1,9 @@
 import type { Context } from 'hono'
-import { hasScope, type RequestContext, requireRequestContext } from '../context'
+import {
+  hasScope,
+  type RequestContext,
+  requireRequestContext,
+} from '../context'
 import { toolDefinitions, toolHandlers, toolScopes } from './tools'
 import {
   INTERNAL_ERROR,

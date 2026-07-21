@@ -20,6 +20,7 @@ import {
   updateBookmarkById,
 } from './bookmarks/item'
 import { getNewBookmark, postNewBookmark } from './bookmarks/new'
+import { requireRequestContext } from './context'
 import { getDashboard } from './dashboard'
 import type { WorkerEnv } from './env'
 import {
@@ -59,7 +60,6 @@ import {
   getTags,
   renameTag,
 } from './meta'
-import { requireRequestContext } from './context'
 import { dbMiddleware } from './middleware/db'
 import { getCurrentProfile, updateCurrentProfile } from './profile'
 import { feedToJson } from './rss/rss-to-json'
