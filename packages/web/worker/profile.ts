@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { and, eq, ne } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { z } from 'zod'
 import { profiles } from '../db/schema'
@@ -98,6 +98,27 @@ export const updateCurrentProfile = async (context: HonoContext) => {
         reason: 'Missing or invalid session/API key',
         status: 401,
       })
+    }
+
+    if (parsed.data.column === 'username') {
+      const [existing] = await requestContext.db
+        .select({ id: profiles.id })
+        .from(profiles)
+        .where(
+          and(
+            eq(profiles.username, parsed.data.value),
+            ne(profiles.id, userId),
+          ),
+        )
+        .limit(1)
+
+      if (existing) {
+        return errorResponse({
+          error: 'Username is already taken',
+          reason: 'Please choose a different username',
+          status: 409,
+        })
+      }
     }
 
     await requestContext.db

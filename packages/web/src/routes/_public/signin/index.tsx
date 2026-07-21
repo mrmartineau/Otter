@@ -105,7 +105,7 @@ function RouteComponent() {
               type="password"
               name="password"
               required
-              autoComplete="email"
+              autoComplete="current-password"
             />
           </FormGroup>
 
@@ -121,7 +121,6 @@ function RouteComponent() {
               Don't have an account? Register
             </Link>
           ) : null}
-
 
           {error ? (
             <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">
