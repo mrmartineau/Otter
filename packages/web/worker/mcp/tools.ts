@@ -12,8 +12,12 @@ import { TidyURL } from 'tidy-url'
 import type { BookmarkStatus, BookmarkType } from '@/types/db'
 import { matchTagsSource } from '@/utils/matchTags'
 import { bookmarks } from '../../db/schema'
+import {
+  getCollections,
+  getTagCounts as getTagCountsAggregate,
+  getTypeCounts as getTypeCountsAggregate,
+} from '../bookmarks/aggregates'
 import { bookmarkToRow } from '../bookmarks/mapper'
-import { summariseCollections } from '../collections'
 import type { RequestContext } from '../context'
 import { linkType } from '../scraper/link-type'
 import Scraper from '../scraper/scraper'
@@ -158,46 +162,14 @@ const listBookmarkRows = async (
   return { data: data.map(bookmarkToRow), total }
 }
 
-const getTagCounts = async (ctx: ToolContext) => {
-  const rows = await ctx.requestContext.db
-    .select({ tags: bookmarks.tags })
-    .from(bookmarks)
-    .where(and(eq(bookmarks.user, ctx.userId), eq(bookmarks.status, 'active')))
-  const counts = new Map<string, number>()
+const getTagCounts = async (ctx: ToolContext) =>
+  await getTagCountsAggregate(ctx.requestContext.db, ctx.userId)
 
-  for (const row of rows) {
-    for (const tag of row.tags ?? []) {
-      counts.set(tag, (counts.get(tag) ?? 0) + 1)
-    }
-  }
-
-  return Array.from(counts, ([tag, count]) => ({ count, tag })).sort(
-    (a, b) => b.count - a.count || a.tag.localeCompare(b.tag),
-  )
-}
-
-const getCollectionCounts = async (ctx: ToolContext) => {
-  const rows = await ctx.requestContext.db
-    .select({ tags: bookmarks.tags })
-    .from(bookmarks)
-    .where(and(eq(bookmarks.user, ctx.userId), eq(bookmarks.status, 'active')))
-  return summariseCollections(rows)
-}
+const getCollectionCounts = async (ctx: ToolContext) =>
+  await getCollections(ctx.requestContext.db, ctx.userId)
 
 const getTypeCounts = async (ctx: ToolContext) => {
-  const rows = await ctx.requestContext.db
-    .select({ type: bookmarks.type })
-    .from(bookmarks)
-    .where(and(eq(bookmarks.user, ctx.userId), eq(bookmarks.status, 'active')))
-  const counts = new Map<string, number>()
-
-  for (const row of rows) {
-    if (row.type) {
-      counts.set(row.type, (counts.get(row.type) ?? 0) + 1)
-    }
-  }
-
-  return Array.from(counts, ([type, count]) => ({ count, type }))
+  return await getTypeCountsAggregate(ctx.requestContext.db, ctx.userId)
 }
 
 const searchBookmarks: McpTool = {
