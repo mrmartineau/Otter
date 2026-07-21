@@ -139,28 +139,36 @@ export const getMeta = async (context: HonoContext) => {
         const [{ value }] = await auth.requestContext.db
           .select({ value: count() })
           .from(toots)
-          .where(eq(toots.likedToot, false))
+          .where(
+            and(eq(toots.dbUserId, auth.userId), eq(toots.likedToot, false)),
+          )
         return value ?? 0
       })(),
       (async () => {
         const [{ value }] = await auth.requestContext.db
           .select({ value: count() })
           .from(toots)
-          .where(eq(toots.likedToot, true))
+          .where(
+            and(eq(toots.dbUserId, auth.userId), eq(toots.likedToot, true)),
+          )
         return value ?? 0
       })(),
       (async () => {
         const [{ value }] = await auth.requestContext.db
           .select({ value: count() })
           .from(tweets)
-          .where(eq(tweets.likedTweet, false))
+          .where(
+            and(eq(tweets.dbUserId, auth.userId), eq(tweets.likedTweet, false)),
+          )
         return value ?? 0
       })(),
       (async () => {
         const [{ value }] = await auth.requestContext.db
           .select({ value: count() })
           .from(tweets)
-          .where(eq(tweets.likedTweet, true))
+          .where(
+            and(eq(tweets.dbUserId, auth.userId), eq(tweets.likedTweet, true)),
+          )
         return value ?? 0
       })(),
     ])
