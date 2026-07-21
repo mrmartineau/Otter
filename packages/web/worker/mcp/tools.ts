@@ -628,3 +628,16 @@ export const toolDefinitions: McpToolDefinition[] = tools.map(
 export const toolHandlers: Record<string, ToolHandler> = Object.fromEntries(
   tools.map((t) => [t.definition.name, t.handler]),
 )
+
+// OAuth scope each tool requires. API-key and session callers are fully
+// trusted; OAuth access tokens must carry the listed scope.
+export const toolScopes: Record<string, string> = {
+  create_bookmark: 'bookmarks:write',
+  delete_bookmark: 'bookmarks:write',
+  get_stats: 'bookmarks:read',
+  list_bookmarks: 'bookmarks:read',
+  list_tags: 'bookmarks:read',
+  random_bookmark: 'bookmarks:read',
+  search_bookmarks: 'bookmarks:read',
+  update_bookmark: 'bookmarks:write',
+}
