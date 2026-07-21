@@ -107,7 +107,11 @@ const onContextClick = async (info, tab) => {
   }
 }
 
-browserAPI.action.onClicked.addListener(async (tab) => {
+// Some Chromium-based browsers (e.g. Phi Browser) don't expose the MV3
+// `action` API and only provide the legacy `browserAction` API
+const actionAPI = browserAPI.action ?? browserAPI.browserAction
+
+actionAPI.onClicked.addListener(async (tab) => {
   if ((await isOptionsSetup()) === false) {
     console.info('options not setup')
     browserAPI.tabs.create({ url: browserAPI.runtime.getURL('options.html') })
@@ -117,7 +121,7 @@ browserAPI.action.onClicked.addListener(async (tab) => {
   openBookmarkletPage(tab.url)
 })
 
-browserAPI.contextMenus.onClicked.addListener((info, tab) => {
+browserAPI.contextMenus?.onClicked.addListener((info, tab) => {
   onContextClick(info, tab)
 })
 
@@ -128,7 +132,7 @@ browserAPI.contextMenus.onClicked.addListener((info, tab) => {
  * still need a reliable to to check the active tab has already been saved in Otter and
  * for the check to be run every time a new tab is opened/updated
  */
-browserAPI.webNavigation.onCompleted.addListener(async (details) => {
+browserAPI.webNavigation?.onCompleted.addListener(async (details) => {
   if ((await isOptionsSetup()) === false) {
     return
   }
@@ -165,7 +169,7 @@ browserAPI.webNavigation.onCompleted.addListener(async (details) => {
 //   id: 'otter-context-quick-save',
 // });
 
-browserAPI.contextMenus.create({
+browserAPI.contextMenus?.create({
   contexts: ['page', 'link'],
   id: 'otter-context-save',
   title: 'Save to Otter',
