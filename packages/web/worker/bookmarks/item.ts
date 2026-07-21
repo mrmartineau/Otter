@@ -247,10 +247,17 @@ export const deleteBookmarkById = async (context: HonoContext) => {
     }
 
     const id = getIdParam(context)
-    const [bookmark] = await auth.requestContext.db
-      .delete(bookmarks)
-      .where(and(eq(bookmarks.id, id), eq(bookmarks.user, auth.userId)))
-      .returning()
+    const permanent = context.req.query('permanent') === 'true'
+    const [bookmark] = permanent
+      ? await auth.requestContext.db
+          .delete(bookmarks)
+          .where(and(eq(bookmarks.id, id), eq(bookmarks.user, auth.userId)))
+          .returning()
+      : await auth.requestContext.db
+          .update(bookmarks)
+          .set({ modifiedAt: new Date(), status: 'inactive' })
+          .where(and(eq(bookmarks.id, id), eq(bookmarks.user, auth.userId)))
+          .returning()
 
     if (!bookmark) {
       return errorResponse({

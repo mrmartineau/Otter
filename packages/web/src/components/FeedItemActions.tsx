@@ -67,7 +67,7 @@ export const FeedItemActions = ({
   }
   const handleDeleteBookmark = async () => {
     if (window.confirm('Do you really want to delete this bookmark forever?')) {
-      await deleteBookmark(id)
+      await deleteBookmark(id, { permanent: true })
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
       toast.success('Permanently deleted')
     }

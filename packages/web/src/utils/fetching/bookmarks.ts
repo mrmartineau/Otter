@@ -138,11 +138,17 @@ export const updateBookmark = async (
   return await parseJsonResponse<SingleResponse<Bookmark>>(response)
 }
 
-export const deleteBookmark = async (id: string) => {
-  const response = await fetch(`/api/bookmarks/${id}`, {
-    credentials: 'include',
-    method: 'DELETE',
-  })
+export const deleteBookmark = async (
+  id: string,
+  options?: { permanent?: boolean },
+) => {
+  const response = await fetch(
+    `/api/bookmarks/${id}${options?.permanent ? '?permanent=true' : ''}`,
+    {
+      credentials: 'include',
+      method: 'DELETE',
+    },
+  )
 
   return await parseJsonResponse<SingleResponse<Bookmark>>(response)
 }
