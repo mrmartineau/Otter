@@ -34,6 +34,7 @@ export const CONTENT = {
   newBookmarkTitle: 'New bookmark',
   newDescription: 'Add new item',
   newerBtn: 'Newer',
+  newMediaTitle: 'New media',
   newTitle: 'New item',
 
   // used in the feed pagination area
@@ -81,6 +82,7 @@ export const ROUTE_HOME = ROUTE_DASHBOARD
 export const ROUTE_FEED = '/feed'
 export const ROUTE_SIGNIN = '/signin'
 export const ROUTE_NEW_BOOKMARK = '/new/bookmark'
+export const ROUTE_NEW_MEDIA = '/new/media'
 export const ROUTE_NEW_BOOKMARK_CONFIRMATION = '/new/bookmark/confirmation'
 export const ROUTE_STARS = '/stars'
 export const ROUTE_PUBLIC = '/public'
