@@ -46,12 +46,12 @@ const shareBookmarksCondition = (
     return and(base, arrayContains(bookmarks.tags, [name]))
   }
 
-  // collection: tag is "collection:NAME" or "collection:NAME:..."
+  // collection: any tag equal to NAME or starting with "NAME:"
   return and(
     base,
     or(
-      arrayContains(bookmarks.tags, [`collection:${name}`]),
-      sql`EXISTS (SELECT 1 FROM unnest(${bookmarks.tags}) AS t WHERE t LIKE ${`collection:${name}:%`})`,
+      arrayContains(bookmarks.tags, [name]),
+      sql`EXISTS (SELECT 1 FROM unnest(${bookmarks.tags}) AS t WHERE t LIKE ${`${name}:%`})`,
     ),
   )
 }

@@ -13,8 +13,8 @@ import { scheduleBookmarkSideEffects } from './sideEffects'
 type HonoContext = Context<{ Bindings: WorkerEnv }>
 type BookmarkInsert = typeof bookmarks.$inferInsert
 
-const getAuthed = async (context: HonoContext) => {
-  const requestContext = await requireRequestContext(context)
+const getAuthed = async (context: HonoContext, scopes: string[]) => {
+  const requestContext = await requireRequestContext(context, scopes)
 
   if (requestContext instanceof Response) {
     return requestContext
@@ -70,7 +70,7 @@ const toBookmarkSet = (
 
 export const getBookmarkById = async (context: HonoContext) => {
   try {
-    const auth = await getAuthed(context)
+    const auth = await getAuthed(context, ['bookmarks:read'])
 
     if (auth instanceof Response) {
       return auth
@@ -109,7 +109,7 @@ export const getBookmarkById = async (context: HonoContext) => {
 
 export const createBookmark = async (context: HonoContext) => {
   try {
-    const auth = await getAuthed(context)
+    const auth = await getAuthed(context, ['bookmarks:write'])
 
     if (auth instanceof Response) {
       return auth
@@ -145,7 +145,7 @@ export const createBookmark = async (context: HonoContext) => {
 
 export const updateBookmarkById = async (context: HonoContext) => {
   try {
-    const auth = await getAuthed(context)
+    const auth = await getAuthed(context, ['bookmarks:write'])
 
     if (auth instanceof Response) {
       return auth
@@ -198,7 +198,7 @@ export const updateBookmarkById = async (context: HonoContext) => {
 
 export const incrementBookmarkClickCount = async (context: HonoContext) => {
   try {
-    const auth = await getAuthed(context)
+    const auth = await getAuthed(context, ['bookmarks:read'])
 
     if (auth instanceof Response) {
       return auth
@@ -240,17 +240,24 @@ export const incrementBookmarkClickCount = async (context: HonoContext) => {
 
 export const deleteBookmarkById = async (context: HonoContext) => {
   try {
-    const auth = await getAuthed(context)
+    const auth = await getAuthed(context, ['bookmarks:write'])
 
     if (auth instanceof Response) {
       return auth
     }
 
     const id = getIdParam(context)
-    const [bookmark] = await auth.requestContext.db
-      .delete(bookmarks)
-      .where(and(eq(bookmarks.id, id), eq(bookmarks.user, auth.userId)))
-      .returning()
+    const permanent = context.req.query('permanent') === 'true'
+    const [bookmark] = permanent
+      ? await auth.requestContext.db
+          .delete(bookmarks)
+          .where(and(eq(bookmarks.id, id), eq(bookmarks.user, auth.userId)))
+          .returning()
+      : await auth.requestContext.db
+          .update(bookmarks)
+          .set({ modifiedAt: new Date(), status: 'inactive' })
+          .where(and(eq(bookmarks.id, id), eq(bookmarks.user, auth.userId)))
+          .returning()
 
     if (!bookmark) {
       return errorResponse({
@@ -278,7 +285,7 @@ export const deleteBookmarkById = async (context: HonoContext) => {
 
 export const checkBookmarkUrl = async (context: HonoContext) => {
   try {
-    const auth = await getAuthed(context)
+    const auth = await getAuthed(context, ['bookmarks:read'])
 
     if (auth instanceof Response) {
       return auth

@@ -1,0 +1,28 @@
+name: Homebrew
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  bump-formula:
+    name: Bump otter-tui formula
+    if: startsWith(github.event.release.tag_name, '@mrmartineau/otter-tui-v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find release tarball
+        id: asset
+        run: |
+          url=$(jq -r '.release.assets[] | select(.name | startswith("otter-tui-")) | .browser_download_url' "$GITHUB_EVENT_PATH")
+          if [ -z "$url" ] || [ "$url" = "null" ]; then
+            echo "No otter-tui tarball attached to this release" >&2
+            exit 1
+          fi
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - uses: mislav/bump-homebrew-formula-action@v3
+        with:
+          formula-name: otter-tui
+          homebrew-tap: mrmartineau/homebrew-tap
+          download-url: ${{ steps.asset.outputs.url }}
+        env:
+          COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}

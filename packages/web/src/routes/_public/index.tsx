@@ -1,28 +1,10 @@
-import {
-  ArrowRightIcon,
-  BookmarkSimpleIcon,
-  BrainIcon,
-  BrowserIcon,
-  DeviceMobileIcon,
-  FilmStripIcon,
-  GlobeIcon,
-  LockIcon,
-  MagnifyingGlassIcon,
-  MoonStarsIcon,
-  PlugIcon,
-  RssIcon,
-  TagIcon,
-  UserCircleIcon,
-} from '@phosphor-icons/react'
+import { ArrowRightIcon, ArrowUpRightIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { Button } from '@/components/Button'
-import { Flex } from '@/components/Flex'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Link } from '@/components/Link'
 import { PublicBookmarkItem } from '@/components/PublicBookmarkItem'
 import type { Bookmark } from '@/types/db'
 import { getRecentPublicBookmarksOptions } from '@/utils/fetching/recentPublicBookmarks'
-import { useSession } from '../../components/AuthProvider'
 import {
   CONTENT,
   ROUTE_HOME,
@@ -31,6 +13,7 @@ import {
 } from '../../constants'
 
 const RECENT_PREVIEW_LIMIT = 5
+const GITHUB_URL = 'https://github.com/mrmartineau/Otter'
 
 export const Route = createFileRoute('/_public/')({
   component: Index,
@@ -44,187 +27,245 @@ export const Route = createFileRoute('/_public/')({
   },
 })
 
-const features = [
+const chapters = [
   {
-    description: 'Save links, articles, videos, and more with rich metadata.',
-    icon: BookmarkSimpleIcon,
-    title: 'Bookmarking',
+    features: [
+      {
+        description:
+          'Save links, articles, videos and podcasts. Titles, descriptions and images are scraped for you.',
+        title: 'Bookmarking',
+      },
+      {
+        description:
+          'A kanban board for movies, TV shows and games — from “one day” to “done”.',
+        title: 'Media tracking',
+      },
+      {
+        description:
+          'Journals to jot down thoughts, track habits and keep a log of your online life.',
+        title: 'Journalling',
+      },
+      {
+        description:
+          'Parse RSS feeds and pull rich metadata out of any URL you throw at it.',
+        title: 'RSS & scraping',
+      },
+    ],
+    numeral: 'I',
+    title: 'Collect',
   },
   {
-    description: 'Organise with tags, collections, stars, and filters.',
-    icon: TagIcon,
-    title: 'Tags & Collections',
+    features: [
+      {
+        description:
+          'Tags, collections, stars and filters. File things the way your brain works.',
+        title: 'Tags & collections',
+      },
+      {
+        description:
+          'Full-text search across everything you have ever saved. Nothing sinks to the bottom.',
+        title: 'Search that finds it',
+      },
+      {
+        description: 'Let AI rewrite scruffy titles and descriptions for you.',
+        title: 'AI assist',
+      },
+      {
+        description:
+          'Dark and light mode that quietly follows your system preference.',
+        title: 'Easy on the eyes',
+      },
+    ],
+    numeral: 'II',
+    title: 'Organise',
   },
   {
-    description: 'Full-text search across all your saved items.',
-    icon: MagnifyingGlassIcon,
-    title: 'Search',
-  },
-  {
-    description: 'Kanban board for tracking movies, TV shows, games, and more.',
-    icon: FilmStripIcon,
-    title: 'Media Tracking',
-  },
-  {
-    description: 'Rewrite titles and descriptions with Cloudflare Workers AI.',
-    icon: BrainIcon,
-    title: 'AI-Powered',
-  },
-  {
-    description: 'Parse RSS feeds and scrape metadata from any URL.',
-    icon: RssIcon,
-    title: 'RSS & Scraping',
-  },
-  {
-    description: 'Back up your own toots and favourite toots.',
-    icon: GlobeIcon,
-    title: 'Mastodon Integration',
-  },
-  {
-    description:
-      'Native iOS and macOS app with share extension for quickly saving bookmarks.',
-    icon: DeviceMobileIcon,
-    title: 'Native iOS App',
-  },
-  {
-    description:
-      'Browser extensions for Chrome and Firefox, Raycast extension, and bookmarklet.',
-    icon: BrowserIcon,
-    title: 'Extensions',
-  },
-  {
-    description: 'Automatic colour mode that follows your system preference.',
-    icon: MoonStarsIcon,
-    title: 'Dark & Light Mode',
-  },
-  {
-    description: 'Integrate with AI assistants via the Model Context Protocol.',
-    icon: PlugIcon,
-    title: 'MCP Server',
-  },
-  {
-    description:
-      'Your data stays yours. Run Otter on Cloudflare Workers with Neon Postgres.',
-    icon: LockIcon,
-    title: 'Private & Self-Hosted',
+    features: [
+      {
+        description:
+          'Native iOS share extension — save from anywhere on your phone.',
+        title: 'In your pocket',
+      },
+      {
+        description:
+          'Chrome and Firefox extensions, a Raycast extension and a trusty bookmarklet.',
+        title: 'In your browser',
+      },
+      {
+        description:
+          'A built-in MCP server, so your AI assistant can rummage through your bookmarks too.',
+        title: 'In your AI tools',
+      },
+      {
+        description:
+          'Self-hosted on Cloudflare Workers with your own Postgres. Your data stays yours.',
+        title: 'On your terms',
+      },
+    ],
+    numeral: 'III',
+    title: 'Everywhere',
   },
 ]
 
+let featureCount = 0
+const numberedChapters = chapters.map((chapter) => ({
+  ...chapter,
+  features: chapter.features.map((feature) => ({
+    ...feature,
+    number: String(++featureCount).padStart(2, '0'),
+  })),
+}))
+
+const tickerItems = [
+  'Bookmarks',
+  'Full-text search',
+  'Tags',
+  'Collections',
+  'Media tracking',
+  'RSS',
+  'Bluesky',
+  'AI assist',
+  'MCP server',
+  'iOS app',
+  'Extensions',
+  'Self-hosted',
+]
+const tickerLine = tickerItems.map((item) => `${item} ✱`).join(' ')
+
 function Index() {
-  const navigate = useNavigate()
-  const session = useSession()
-
-  if (session) {
-    navigate({ to: ROUTE_HOME })
-  }
-
   const { data: recentBookmarks } = useSuspenseQuery(
     getRecentPublicBookmarksOptions({ limit: RECENT_PREVIEW_LIMIT }),
   )
 
   return (
-    <div className="min-h-screen">
-      {/* Hero */}
-      <section className="py-3xl text-center px-s">
-        <img
-          src="/otter-logo.svg"
-          width="90"
-          height="90"
-          className="mx-auto"
-          alt="Otter logo"
-        />
-        <h1 className="mt-m">{CONTENT.appName}</h1>
-        <p className="mt-s text-step-1 text-[var(--text)] max-w-[50ch] mx-auto text-balance">
-          A self-hosted bookmark manager and media tracker built for people who
-          value privacy and ownership.
+    <>
+      <section className="landing-hero landing-container">
+        <p className="landing-kicker landing-mono">
+          Field notes · a self-hosted bookmark manager &amp; media tracker
         </p>
-        <Flex
-          align="center"
-          justify="center"
-          gap="s"
-          className="mt-m"
-          wrap="wrap"
-        >
-          <Button asChild>
-            <a href={ROUTE_SIGNIN}>
-              <UserCircleIcon weight="duotone" width="20" height="20" />
-              {CONTENT.signInTitle}
-            </a>
-          </Button>
-          <Button asChild variant="outline">
-            <a
-              href="https://github.com/mrmartineau/Otter"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View on GitHub
-            </a>
-          </Button>
-        </Flex>
-      </section>
-
-      {/* Recent public bookmarks */}
-      {recentBookmarks.data?.length ? (
-        <section className="max-w-[1000px] mx-auto px-s pb-3xl">
-          <h2 className="text-step-1 mb-m">Recent public bookmarks</h2>
-          <div className="grid gap-m">
-            {recentBookmarks.data.map((item: Bookmark) => (
-              <PublicBookmarkItem {...item} key={item.id} />
-            ))}
-          </div>
-          <Flex justify="center" className="mt-m">
-            <Button asChild variant="outline">
-              <a href={ROUTE_RECENT}>
-                View all
-                <ArrowRightIcon weight="bold" width="16" height="16" />
-              </a>
-            </Button>
-          </Flex>
-        </section>
-      ) : null}
-
-      {/* Features */}
-      <section className="max-w-[1000px] mx-auto px-s pb-3xl">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-m">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="rounded-lg border border-[var(--border)] bg-[var(--theme2)] p-m"
-            >
-              <feature.icon
-                weight="duotone"
-                width="28"
-                height="28"
-                className="text-[var(--accent9)] mb-xs"
+        <h1 className="landing-display">
+          Hold on to <em>the good stuff</em>.
+        </h1>
+        <p className="landing-lede">
+          Otter is where your links, articles, videos and half-watched TV shows
+          live. Save it, tag it, find it again — on your own infrastructure,
+          with nobody reading over your shoulder.
+        </p>
+        <div className="landing-cta-row">
+          <a href={ROUTE_SIGNIN} className="landing-btn landing-btn-primary">
+            Start your collection
+            <ArrowRightIcon weight="bold" width="16" height="16" />
+          </a>
+          <a
+            href={GITHUB_URL}
+            className="landing-btn"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Read the source
+            <ArrowUpRightIcon weight="bold" width="16" height="16" />
+          </a>
+        </div>
+        <p className="landing-aside">
+          * Sea otters keep a favourite rock in a pouch under their arm. This is
+          that, for the internet.
+        </p>
+        <div className="landing-stamp" aria-hidden="true">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <path
+                id="landing-stamp-circle"
+                d="M100,100 m-82,0 a82,82 0 1,1 164,0 a82,82 0 1,1 -164,0"
               />
-              <h3 className="text-step-0 mb-3xs">{feature.title}</h3>
-              <p className="text-step--1 text-[var(--text)]">
-                {feature.description}
-              </p>
-            </div>
-          ))}
+            </defs>
+            <text>
+              <textPath href="#landing-stamp-circle">
+                Save it · tag it · find it again ·
+              </textPath>
+            </text>
+          </svg>
+          <img src="/otter-logo.svg" alt="" />
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="text-center pb-l px-s text-step--1">
-        <Flex align="center" justify="center" gap="s" wrap="wrap">
-          <span>
-            Made by{' '}
-            <a href="https://zander.wtf" className="underline">
-              Zander Martineau
-            </a>
-          </span>
-          <span>·</span>
-          <Link href="/privacy" className="underline">
-            Privacy Policy
-          </Link>
-          <span>·</span>
-          <Link href="/terms" className="underline">
-            Terms of Service
-          </Link>
-        </Flex>
-      </footer>
-    </div>
+      <div className="landing-ticker" aria-hidden="true">
+        <div className="landing-ticker-track landing-mono">
+          <span>{tickerLine}</span>
+          <span>{tickerLine}</span>
+        </div>
+      </div>
+
+      <section className="landing-container">
+        <header className="landing-section-header">
+          <p className="landing-kicker landing-mono">The field guide</p>
+          <h2 className="landing-section-title">
+            Everything a hoarder needs, nothing a landlord wants
+          </h2>
+        </header>
+        {numberedChapters.map((chapter) => (
+          <div className="landing-chapter" key={chapter.numeral}>
+            <div className="landing-chapter-heading">
+              <span className="landing-chapter-numeral" aria-hidden="true">
+                {chapter.numeral}.
+              </span>
+              <h3 className="landing-chapter-title">{chapter.title}</h3>
+            </div>
+            <ol className="landing-entries">
+              {chapter.features.map((feature) => (
+                <li className="landing-entry" key={feature.title}>
+                  <span className="landing-entry-num" aria-hidden="true">
+                    {feature.number}
+                  </span>
+                  <h4>{feature.title}</h4>
+                  <p>{feature.description}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))}
+      </section>
+
+      {recentBookmarks.data?.length ? (
+        <section className="landing-clippings">
+          <div className="landing-container">
+            <header className="landing-section-header">
+              <p className="landing-kicker landing-mono">Fresh catch</p>
+              <h2 className="landing-section-title">Recently washed ashore</h2>
+            </header>
+            <div className="landing-clippings-grid">
+              {recentBookmarks.data.map((item: Bookmark) => (
+                <div className="landing-clipping" key={item.id}>
+                  <PublicBookmarkItem {...item} />
+                </div>
+              ))}
+            </div>
+            <div className="landing-clippings-more">
+              <Link href={ROUTE_RECENT} className="landing-btn">
+                All public bookmarks
+                <ArrowRightIcon weight="bold" width="16" height="16" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="landing-final">
+        <div className="landing-container">
+          <h2 className="landing-final-title">
+            Your shelf.
+            <br />
+            Your rules.
+          </h2>
+          <p>
+            Run it yourself on Cloudflare Workers and Postgres, or just sign in
+            and start saving. Either way, no algorithm gets a vote.
+          </p>
+          <a href={ROUTE_SIGNIN} className="landing-btn landing-btn-primary">
+            {CONTENT.signInTitle}
+            <ArrowRightIcon weight="bold" width="16" height="16" />
+          </a>
+        </div>
+      </section>
+    </>
   )
 }

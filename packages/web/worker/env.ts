@@ -11,5 +11,6 @@ export type WorkerEnv = Cloudflare.Env &
     DATABASE_URL?: string
     HYPERDRIVE?: Hyperdrive
     PERSONAL_MASTODON_ACCESS_TOKEN?: string
+    RATE_LIMITER?: RateLimit
     WEBHOOK_SECRET?: string
   }

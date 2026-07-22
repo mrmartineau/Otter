@@ -26,7 +26,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
-    "defuddle": "^0.13.0",
+    "defuddle": "^0.19.1",
     "drizzle-orm": "^0.45.2",
     "email-validator": "^2.0.4",
     "events": "^3.3.0",
@@ -124,8 +124,9 @@
     "dev": "portless run vite",
     "oauth:raycast": "tsx scripts/upsert-raycast-oauth-client.ts",
     "preview": "pnpm run build && vite preview",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest"
   },
   "type": "module",
-  "version": "1.0.1"
+  "version": "1.2.0"
 }

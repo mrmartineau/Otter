@@ -2,26 +2,19 @@ import { move } from '@dnd-kit/helpers'
 import { DragDropProvider, KeyboardSensor, PointerSensor } from '@dnd-kit/react'
 import { CircleIcon, PlusCircleIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link as RouterLink } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/Button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/Dialog'
+import { Dialog, DialogContent } from '@/components/Dialog'
 import { IconControl } from '@/components/IconControl'
 import { Input } from '@/components/Input'
 import { MediaColumn } from '@/components/MediaColumn'
 import { MediaForm } from '@/components/MediaForm'
 import { MediaTypeToIcon } from '@/components/TypeToIcon'
-import { createTitle } from '@/constants'
-import type {
-  Media,
-  MediaFilters,
-  MediaInsert,
-  MediaStatus,
-  MediaUpdate,
-} from '@/types/db'
+import { createTitle, ROUTE_NEW_MEDIA } from '@/constants'
+import type { Media, MediaFilters, MediaStatus, MediaUpdate } from '@/types/db'
 import {
   getMediaOptions,
-  useCreateMedia,
   useUpdateMedia,
   useUpdateMediaStatus,
 } from '@/utils/fetching/media'
@@ -57,7 +50,6 @@ function RouteComponent() {
   const allMedia = mediaResponse?.data
   const [media, setMedia] = useState(allMedia)
   const previousItems = useRef(media)
-  const createMediaMutation = useCreateMedia()
   const updateMediaMutation = useUpdateMedia()
   const updateMediaStatusMutation = useUpdateMediaStatus()
 
@@ -96,14 +88,6 @@ function RouteComponent() {
 
     return result
   }, [media, filters])
-
-  const handleCreateMedia = (formData: MediaInsert) => {
-    createMediaMutation.mutate(formData, {
-      onSuccess: () => {
-        setIsDialogOpen(false)
-      },
-    })
-  }
 
   const handleEditMedia = (media: Media) => {
     setEditingMedia(media)
@@ -211,34 +195,37 @@ function RouteComponent() {
           </div>
         </div>
         <div>
-          <Dialog
-            open={isDialogOpen}
-            onOpenChange={(open) => {
-              setIsDialogOpen(open)
-              if (!open) {
-                setEditingMedia(null)
-              }
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <PlusCircleIcon size={18} weight="duotone" />
-                Add Media
-              </Button>
-            </DialogTrigger>
-            <DialogContent placement="center" width="m">
-              <MediaForm
-                type={editingMedia ? 'edit' : 'new'}
-                initialValues={editingMedia || undefined}
-                platforms={platforms}
-                onFormSubmit={
-                  editingMedia ? handleUpdateMedia : handleCreateMedia
-                }
-              />
-            </DialogContent>
-          </Dialog>
+          <Button variant="outline" asChild>
+            <RouterLink to={ROUTE_NEW_MEDIA}>
+              <PlusCircleIcon size={18} weight="duotone" />
+              Add Media
+            </RouterLink>
+          </Button>
         </div>
       </div>
+
+      <Dialog
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open)
+          if (!open) {
+            setEditingMedia(null)
+          }
+        }}
+      >
+        <DialogContent placement="center" width="m">
+          {editingMedia ? (
+            <MediaForm
+              key={editingMedia.id}
+              type="edit"
+              initialValues={editingMedia}
+              platforms={platforms}
+              onFormSubmit={handleUpdateMedia}
+              isSubmitting={updateMediaMutation.isPending}
+            />
+          ) : null}
+        </DialogContent>
+      </Dialog>
 
       <div className="overflow-x-auto w-full">
         <DragDropProvider

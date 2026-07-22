@@ -1,10 +1,13 @@
 .otter-container {
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
-  padding-x: var(--space-s);
+  margin-inline: auto;
+  padding-inline: var(--space-s);
 }
 
 .otter-container-auth {
   max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
 }

@@ -67,7 +67,7 @@ export const FeedItemActions = ({
   }
   const handleDeleteBookmark = async () => {
     if (window.confirm('Do you really want to delete this bookmark forever?')) {
-      await deleteBookmark(id)
+      await deleteBookmark(id, { permanent: true })
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
       toast.success('Permanently deleted')
     }
@@ -250,7 +250,10 @@ export const FeedItemActions = ({
                 onClick={() => {
                   dropdownItemClicked.current = true
                   playSwitchOn()
-                  handleArchiveBookmark()
+                  // Defer so the dropdown finishes closing before
+                  // window.confirm opens — a synchronous confirm fired into
+                  // Radix's menu teardown gets auto-dismissed (returns false).
+                  setTimeout(handleArchiveBookmark, 0)
                 }}
               >
                 Trash

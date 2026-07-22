@@ -17,7 +17,7 @@ type RecentSearch = {
   offset: number
 }
 
-export const Route = createFileRoute('/recent')({
+export const Route = createFileRoute('/_public/recent')({
   component: RecentPage,
   head: () => ({
     meta: [{ title: `Recent — ${CONTENT.appName}` }],
@@ -45,7 +45,7 @@ function RecentPage() {
   const hasOldItems = offset + limit < count
 
   return (
-    <Container className="py-l">
+    <Container className="pb-l">
       <div className="feed">
         <Flex gap="xs" justify="between" align="center">
           <h3
@@ -55,7 +55,7 @@ function RecentPage() {
             )}
           >
             <ClockIcon weight="fill" size={24} />
-            Recent
+            Recent public bookmarks from the Otter community
           </h3>
         </Flex>
 

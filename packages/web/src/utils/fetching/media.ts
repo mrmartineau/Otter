@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   queryOptions,
   useMutation,
   useQueryClient,
@@ -235,7 +236,9 @@ const getMediaSearch = async ({
   query: string
   type: MediaType
 }) => {
-  const response = await fetch(`/api/media-search?query=${query}&type=${type}`)
+  const response = await fetch(
+    `/api/media-search?query=${encodeURIComponent(query)}&type=${type}`,
+  )
   const data = await response.json()
   return data as {
     count: number
@@ -252,8 +255,9 @@ export const getMediaSearchOptions = ({
 }) => {
   return queryOptions({
     enabled: !!query && !!type,
-    // @ts-expect-error - This will only run if query and type are defined
-    queryFn: () => getMediaSearch({ query, type }),
-    queryKey: ['media', query, type],
+    placeholderData: keepPreviousData,
+    queryFn: () =>
+      getMediaSearch({ query: query as string, type: type as MediaType }),
+    queryKey: ['media-search', query, type],
   })
 }
