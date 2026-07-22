@@ -10,6 +10,17 @@ import type { WorkerEnv } from './env'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
 
+// Postgres unique_violation, possibly wrapped by the driver/ORM
+const isUniqueViolation = (error: unknown): boolean => {
+  if (!error || typeof error !== 'object') {
+    return false
+  }
+  if ((error as { code?: string }).code === '23505') {
+    return true
+  }
+  return isUniqueViolation((error as { cause?: unknown }).cause)
+}
+
 const updateProfileSchema = z.discriminatedUnion('column', [
   z.object({ column: z.literal('settings_tags_visible'), value: z.boolean() }),
   z.object({ column: z.literal('settings_types_visible'), value: z.boolean() }),
@@ -121,15 +132,30 @@ export const updateCurrentProfile = async (context: HonoContext) => {
       }
     }
 
-    await requestContext.db
-      .update(profiles)
-      .set({
-        ...getProfileUpdate(parsed.data),
-        updatedAt: new Date(),
-      })
-      .where(eq(profiles.id, userId))
+    let profile: Awaited<ReturnType<typeof getProfileById>>
 
-    const profile = await getProfileById(requestContext.db, userId)
+    try {
+      await requestContext.db
+        .update(profiles)
+        .set({
+          ...getProfileUpdate(parsed.data),
+          updatedAt: new Date(),
+        })
+        .where(eq(profiles.id, userId))
+      profile = await getProfileById(requestContext.db, userId)
+    } catch (error) {
+      // The pre-check above can race a concurrent username claim; the
+      // unique index is the source of truth, so translate its violation
+      // into the same friendly conflict response.
+      if (parsed.data.column === 'username' && isUniqueViolation(error)) {
+        return errorResponse({
+          error: 'Username is already taken',
+          reason: 'Please choose a different username',
+          status: 409,
+        })
+      }
+      throw error
+    }
 
     return new Response(
       JSON.stringify({
