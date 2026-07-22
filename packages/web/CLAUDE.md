@@ -45,7 +45,7 @@ Tests are colocated as `*.test.ts` next to source.
 - `api` — mounted at `/api`, all backend routes.
 - `app` — top-level: handles `/.well-known/*` OIDC discovery, mounts `api`, and `notFound` serves static assets (the built SPA) falling back to `index.html` for client-side routing. `wrangler.jsonc` sets `run_worker_first: true` so the Worker sees every request before assets.
 
-Routes that don't need the DB (`/`, `/scrape`, `/ai/*`, `/rss`) are declared **before** `api.use('*', dbMiddleware)` so they skip the per-request Postgres connection. Add new DB-free routes above that line.
+Only the `/` health route is declared **before** `api.use('*', dbMiddleware)` and skips the per-request Postgres connection. `/scrape`, `/scrape-content`, `/ai/*` and `/rss` sit behind the `authedWithRateLimit` middleware (auth + per-user rate limiting via the `RATE_LIMITER` binding) and an SSRF guard (`worker/url-guard.ts`). Add new DB-free routes above the dbMiddleware line.
 
 ### Database
 - Schema: `db/schema.ts` (Drizzle, ~25 pgTables: auth tables, `oauth*`, `profiles`, `bookmarks`, `tags`/`bookmarkTags`, `media`, `toots`, `tweets`, `feeds`, `shares`, `userIntegrations`). Edit schema → `db:generate` → `db:migrate`.

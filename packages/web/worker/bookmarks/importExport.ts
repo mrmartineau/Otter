@@ -1,4 +1,4 @@
-import { and, desc, eq } from 'drizzle-orm'
+import { and, desc, eq, sql } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { API_HEADERS } from '@/constants'
 import { errorResponse } from '@/utils/fetching/errorResponse'
@@ -100,10 +100,18 @@ export const importBookmarks = async (context: HonoContext) => {
       })
     }
 
+    // Only look up the URLs present in the import file (single array
+    // parameter) instead of loading every bookmark URL the user has.
+    const parsedUrls = [...new Set(parsed.map((item) => item.url))]
     const existing = await auth.requestContext.db
       .select({ url: bookmarks.url })
       .from(bookmarks)
-      .where(eq(bookmarks.user, auth.userId))
+      .where(
+        and(
+          eq(bookmarks.user, auth.userId),
+          sql`${bookmarks.url} = ANY(${parsedUrls})`,
+        ),
+      )
     const existingUrls = new Set(existing.map((row) => row.url).filter(Boolean))
     const toInsert: BookmarkInsert[] = parsed
       .filter((item) => !existingUrls.has(item.url))

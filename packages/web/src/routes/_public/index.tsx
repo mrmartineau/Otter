@@ -1,11 +1,10 @@
 import { ArrowRightIcon, ArrowUpRightIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Link } from '@/components/Link'
 import { PublicBookmarkItem } from '@/components/PublicBookmarkItem'
 import type { Bookmark } from '@/types/db'
 import { getRecentPublicBookmarksOptions } from '@/utils/fetching/recentPublicBookmarks'
-import { useSession } from '../../components/AuthProvider'
 import {
   CONTENT,
   ROUTE_HOME,
@@ -134,13 +133,6 @@ const tickerItems = [
 const tickerLine = tickerItems.map((item) => `${item} ✱`).join(' ')
 
 function Index() {
-  const navigate = useNavigate()
-  const session = useSession()
-
-  if (session) {
-    navigate({ to: ROUTE_HOME })
-  }
-
   const { data: recentBookmarks } = useSuspenseQuery(
     getRecentPublicBookmarksOptions({ limit: RECENT_PREVIEW_LIMIT }),
   )

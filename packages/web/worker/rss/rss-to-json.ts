@@ -1,4 +1,5 @@
 import { XMLParser } from 'fast-xml-parser'
+import { safeFetch } from '../url-guard'
 
 export interface Feed {
   feed: FeedMetadata
@@ -29,7 +30,7 @@ const parser = new XMLParser(options)
 export const feedToJson = async (
   feedUrl: string,
 ): Promise<Feed | undefined> => {
-  const req = await fetch(feedUrl)
+  const req = await safeFetch(feedUrl)
   const xmlData = await req.text()
   const data = parser.parse(xmlData)
 

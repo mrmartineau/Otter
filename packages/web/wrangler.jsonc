@@ -52,6 +52,20 @@
   "placement": {
     "mode": "smart"
   },
+  /**
+   * Rate limiting for the scrape/AI/RSS proxy endpoints
+   * https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
+   */
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 30,
+        "period": 60
+      }
+    }
+  ],
   /* Custom domain */
   "routes": [
     {

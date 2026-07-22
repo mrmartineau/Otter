@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import type { Context, HonoRequest } from 'hono'
-import { createLocalJWKSet, jwtVerify, type JWK, type JWTPayload } from 'jose'
+import { createLocalJWKSet, type JWK, type JWTPayload, jwtVerify } from 'jose'
 import { createAuth, getOAuthAudience } from '../auth/server'
 import type { Db } from '../db/client'
 import { profiles } from '../db/schema'
@@ -13,6 +13,14 @@ export type RequestContext = {
   db: Db
   profile: UserProfile | null
   user: { id: string; email: string } | null
+  /**
+   * Scopes granted to the caller. `null` means the caller is fully trusted
+   * (session cookie or API key); an array means an OAuth access token whose
+   * grants must be checked before privileged operations. Unauthenticated or
+   * invalid-token contexts get `[]` (no grants) — but always gate on
+   * `user`/`profile` too (`hasScope` does).
+   */
+  grantedScopes: string[] | null
 }
 
 type Profile = typeof profiles.$inferSelect
@@ -120,7 +128,16 @@ const getProfileByOAuthToken = async (
 ) => {
   const payload = await verifyOAuthAccessToken(env, auth, accessToken, scopes)
   const userId = typeof payload?.sub === 'string' ? payload.sub : null
-  return userId ? await getProfileById(db, userId) : null
+  const profile = userId ? await getProfileById(db, userId) : null
+
+  if (!profile) {
+    return null
+  }
+
+  return {
+    profile,
+    scopes: typeof payload?.scope === 'string' ? payload.scope.split(' ') : [],
+  }
 }
 
 export const createRequestContext = async (
@@ -136,6 +153,7 @@ export const createRequestContext = async (
   if (session?.user) {
     return {
       db,
+      grantedScopes: null,
       profile: await getProfileById(db, session.user.id),
       user: {
         email: session.user.email,
@@ -147,24 +165,51 @@ export const createRequestContext = async (
   const bearerToken = getBearerToken(context.req)
 
   if (bearerToken) {
-    const profile =
-      (await getProfileByApiKey(db, bearerToken)) ??
-      (await getProfileByOAuthToken(context.env, db, auth, bearerToken, scopes))
+    const apiKeyProfile = await getProfileByApiKey(db, bearerToken)
+
+    if (apiKeyProfile) {
+      return {
+        db,
+        grantedScopes: null,
+        profile: apiKeyProfile,
+        user: {
+          email: apiKeyProfile.username ?? '',
+          id: apiKeyProfile.id,
+        },
+      }
+    }
+
+    const oauth = await getProfileByOAuthToken(
+      context.env,
+      db,
+      auth,
+      bearerToken,
+      scopes,
+    )
 
     return {
       db,
-      profile,
-      user: profile
+      grantedScopes: oauth?.scopes ?? [],
+      profile: oauth?.profile ?? null,
+      user: oauth
         ? {
-            email: profile.username ?? '',
-            id: profile.id,
+            email: oauth.profile.username ?? '',
+            id: oauth.profile.id,
           }
         : null,
     }
   }
 
-  return { db, profile: null, user: null }
+  return { db, grantedScopes: [], profile: null, user: null }
 }
+
+// Never treat an unauthenticated context as trusted, even though its
+// grantedScopes default would otherwise allow it.
+export const hasScope = (requestContext: RequestContext, scope: string) =>
+  requestContext.user !== null &&
+  requestContext.profile !== null &&
+  (requestContext.grantedScopes === null ||
+    requestContext.grantedScopes.includes(scope))
 
 export const requireRequestContext = async (
   context: Context<{ Bindings: WorkerEnv }>,

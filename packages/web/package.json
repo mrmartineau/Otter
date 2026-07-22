@@ -124,7 +124,8 @@
     "dev": "portless run vite",
     "oauth:raycast": "tsx scripts/upsert-raycast-oauth-client.ts",
     "preview": "pnpm run build && vite preview",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest"
   },
   "type": "module",
   "version": "1.2.0"

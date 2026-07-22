@@ -1,18 +1,21 @@
-import { and, count, eq, gte } from 'drizzle-orm'
+import { and, count, desc, eq, gte, sql } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { apiParameters } from '@/utils/fetching/apiParameters'
 import { errorResponse } from '@/utils/fetching/errorResponse'
-import type { MetaTag, MetaType } from '@/utils/fetching/meta'
 import { getErrorMessage } from '@/utils/get-error-message'
 import { bookmarks, toots, tweets } from '../db/schema'
+import {
+  collectionMatchCondition,
+  getCollections,
+  getTagCounts,
+  getTypeCounts,
+} from './bookmarks/aggregates'
 import { bookmarkToRow } from './bookmarks/mapper'
-import { summariseCollections, tagBelongsToCollection } from './collections'
 import { requireRequestContext } from './context'
 import type { WorkerEnv } from './env'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
-type BookmarkRow = typeof bookmarks.$inferSelect
 
 const getAuthed = async (context: HonoContext) => {
   const requestContext = await requireRequestContext(context, ['profile:read'])
@@ -48,57 +51,6 @@ const countBookmarks = async (
   return value ?? 0
 }
 
-const getActiveBookmarks = async (
-  auth: Exclude<Awaited<ReturnType<typeof getAuthed>>, Response>,
-) =>
-  await auth.requestContext.db
-    .select()
-    .from(bookmarks)
-    .where(and(eq(bookmarks.user, auth.userId), eq(bookmarks.status, 'active')))
-
-const tagCounts = (rows: BookmarkRow[]): MetaTag[] => {
-  const counts = new Map<string, number>()
-  let untagged = 0
-
-  for (const row of rows) {
-    if (!row.tags?.length) {
-      untagged += 1
-      continue
-    }
-
-    for (const tag of row.tags) {
-      counts.set(tag, (counts.get(tag) ?? 0) + 1)
-    }
-  }
-
-  const tags = Array.from(counts, ([tag, count]) => ({ count, tag })).sort(
-    (a, b) =>
-      (b.count ?? 0) - (a.count ?? 0) ||
-      (a.tag ?? '').localeCompare(b.tag ?? ''),
-  )
-
-  if (untagged > 0) {
-    tags.push({ count: untagged, tag: 'Untagged' })
-  }
-
-  return tags
-}
-
-const typeCounts = (rows: BookmarkRow[]): MetaType[] => {
-  const counts = new Map<string, number>()
-
-  for (const row of rows) {
-    if (row.type) {
-      counts.set(row.type, (counts.get(row.type) ?? 0) + 1)
-    }
-  }
-
-  return Array.from(counts, ([type, count]) => ({
-    count,
-    type: type as MetaType['type'],
-  }))
-}
-
 export const getMeta = async (context: HonoContext) => {
   try {
     const auth = await getAuthed(context)
@@ -107,13 +59,16 @@ export const getMeta = async (context: HonoContext) => {
       return auth
     }
 
-    const rows = await getActiveBookmarks(auth)
+    const { db } = auth.requestContext
     const [
       all,
       top,
       publicItems,
       stars,
       trash,
+      tags,
+      types,
+      collections,
       tootsCount,
       likedToots,
       tweetsCount,
@@ -124,7 +79,7 @@ export const getMeta = async (context: HonoContext) => {
       countBookmarks(auth, eq(bookmarks.public, true)),
       countBookmarks(auth, eq(bookmarks.star, true)),
       (async () => {
-        const [{ value }] = await auth.requestContext.db
+        const [{ value }] = await db
           .select({ value: count() })
           .from(bookmarks)
           .where(
@@ -135,32 +90,43 @@ export const getMeta = async (context: HonoContext) => {
           )
         return value ?? 0
       })(),
+      getTagCounts(db, auth.userId, { includeUntagged: true }),
+      getTypeCounts(db, auth.userId),
+      getCollections(db, auth.userId),
       (async () => {
-        const [{ value }] = await auth.requestContext.db
+        const [{ value }] = await db
           .select({ value: count() })
           .from(toots)
-          .where(eq(toots.likedToot, false))
+          .where(
+            and(eq(toots.dbUserId, auth.userId), eq(toots.likedToot, false)),
+          )
         return value ?? 0
       })(),
       (async () => {
-        const [{ value }] = await auth.requestContext.db
+        const [{ value }] = await db
           .select({ value: count() })
           .from(toots)
-          .where(eq(toots.likedToot, true))
+          .where(
+            and(eq(toots.dbUserId, auth.userId), eq(toots.likedToot, true)),
+          )
         return value ?? 0
       })(),
       (async () => {
-        const [{ value }] = await auth.requestContext.db
+        const [{ value }] = await db
           .select({ value: count() })
           .from(tweets)
-          .where(eq(tweets.likedTweet, false))
+          .where(
+            and(eq(tweets.dbUserId, auth.userId), eq(tweets.likedTweet, false)),
+          )
         return value ?? 0
       })(),
       (async () => {
-        const [{ value }] = await auth.requestContext.db
+        const [{ value }] = await db
           .select({ value: count() })
           .from(tweets)
-          .where(eq(tweets.likedTweet, true))
+          .where(
+            and(eq(tweets.dbUserId, auth.userId), eq(tweets.likedTweet, true)),
+          )
         return value ?? 0
       })(),
     ])
@@ -168,17 +134,17 @@ export const getMeta = async (context: HonoContext) => {
     return new Response(
       JSON.stringify({
         all,
-        collections: summariseCollections(rows),
+        collections,
         likedToots,
         likedTweets,
         public: publicItems,
         stars,
-        tags: tagCounts(rows),
+        tags,
         toots: tootsCount,
         top,
         trash,
         tweets: tweetsCount,
-        types: typeCounts(rows),
+        types,
       }),
       { headers: API_HEADERS, status: 200 },
     )
@@ -200,7 +166,11 @@ export const getTags = async (context: HonoContext) => {
     }
 
     return new Response(
-      JSON.stringify(tagCounts(await getActiveBookmarks(auth))),
+      JSON.stringify(
+        await getTagCounts(auth.requestContext.db, auth.userId, {
+          includeUntagged: true,
+        }),
+      ),
       {
         headers: API_HEADERS,
         status: 200,
@@ -238,37 +208,28 @@ export const renameTag = async (context: HonoContext) => {
       })
     }
 
-    const rows = await auth.requestContext.db
-      .select()
-      .from(bookmarks)
-      .where(
-        and(eq(bookmarks.user, auth.userId), eq(bookmarks.status, 'active')),
-      )
-
-    const affected = rows.filter((bookmark) =>
-      (bookmark.tags ?? []).includes(oldTag),
-    )
-
-    await Promise.all(
-      affected.map((bookmark) => {
-        const tags = Array.from(
-          new Set(
-            (bookmark.tags ?? []).map((tag) => (tag === oldTag ? newTag : tag)),
-          ),
-        )
-
-        return auth.requestContext.db
-          .update(bookmarks)
-          .set({ modifiedAt: new Date(), tags })
-          .where(
-            and(eq(bookmarks.id, bookmark.id), eq(bookmarks.user, auth.userId)),
-          )
-      }),
-    )
+    // Single UPDATE: replace the tag in-place, then dedupe (the new tag may
+    // already be present) while preserving each tag's first-occurrence order.
+    const result = await auth.requestContext.db.execute(sql`
+      UPDATE ${bookmarks}
+      SET tags = (
+        SELECT array_agg(u.tag ORDER BY u.ord)
+        FROM (
+          SELECT DISTINCT ON (t.tag) t.tag AS tag, t.ord AS ord
+          FROM unnest(array_replace(${bookmarks.tags}, ${oldTag}, ${newTag}))
+            WITH ORDINALITY AS t(tag, ord)
+          ORDER BY t.tag, t.ord
+        ) AS u
+      ),
+      modified_at = timezone('utc', now())
+      WHERE ${bookmarks.user} = ${auth.userId}
+        AND ${bookmarks.status} = 'active'
+        AND ${oldTag} = ANY(${bookmarks.tags})
+    `)
 
     return new Response(
       JSON.stringify({
-        count: affected.length,
+        count: result.rowCount ?? 0,
         error: null,
       }),
       { headers: API_HEADERS, status: 200 },
@@ -291,7 +252,7 @@ export const getCollectionsTags = async (context: HonoContext) => {
     }
 
     return new Response(
-      JSON.stringify(summariseCollections(await getActiveBookmarks(auth))),
+      JSON.stringify(await getCollections(auth.requestContext.db, auth.userId)),
       {
         headers: API_HEADERS,
         status: 200,
@@ -327,17 +288,27 @@ export const getCollectionBookmarks = async (context: HonoContext) => {
     )
     const limit = params.limit ?? DEFAULT_API_RESPONSE_LIMIT
     const offset = params.offset ?? 0
-    const rows = (await getActiveBookmarks(auth))
-      .filter((bookmark) =>
-        (bookmark.tags ?? []).some((tag) => tagBelongsToCollection(tag, name)),
-      )
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    const data = rows.slice(offset, offset + limit).map(bookmarkToRow)
+    const { db } = auth.requestContext
+    const where = and(
+      eq(bookmarks.user, auth.userId),
+      eq(bookmarks.status, 'active'),
+      collectionMatchCondition(name),
+    )
+    const [[{ value: total }], rows] = await Promise.all([
+      db.select({ value: count() }).from(bookmarks).where(where),
+      db
+        .select()
+        .from(bookmarks)
+        .where(where)
+        .orderBy(desc(bookmarks.createdAt))
+        .limit(limit)
+        .offset(offset),
+    ])
 
     return new Response(
       JSON.stringify({
-        count: rows.length,
-        data,
+        count: total ?? 0,
+        data: rows.map(bookmarkToRow),
         error: null,
       }),
       { headers: API_HEADERS, status: 200 },
