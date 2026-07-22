@@ -1,9 +1,27 @@
-.media-form {
-  max-width: 600px;
-}
+@layer components {
+  .media-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-m);
+    align-items: start;
+  }
 
-.media-form-columns {
-  display: grid;
-  grid-template-columns: 100px 2fr 1.5fr;
-  gap: var(--spacing-s);
+  .media-form-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+    min-width: 0;
+  }
+
+  .media-form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-s);
+  }
+
+  .media-form-footer {
+    padding-block: var(--space-s);
+    padding-bottom: max(var(--space-s), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--theme3);
+  }
 }

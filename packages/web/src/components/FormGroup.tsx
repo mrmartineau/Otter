@@ -73,7 +73,7 @@ export const FormGroup = ({
       ) : (
         children
       )}
-      {note ? <Text>{note}</Text> : null}
+      {note ? <Text className="text-sm mt-2">{note}</Text> : null}
       {error ? <Text>{error}</Text> : null}
     </div>
   )

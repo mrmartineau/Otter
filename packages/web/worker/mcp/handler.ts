@@ -1,6 +1,10 @@
 import type { Context } from 'hono'
-import { type RequestContext, requireRequestContext } from '../context'
-import { toolDefinitions, toolHandlers } from './tools'
+import {
+  hasScope,
+  type RequestContext,
+  requireRequestContext,
+} from '../context'
+import { toolDefinitions, toolHandlers, toolScopes } from './tools'
 import {
   INTERNAL_ERROR,
   INVALID_PARAMS,
@@ -203,6 +207,19 @@ async function dispatch(
         throw new JsonRpcException(
           METHOD_NOT_FOUND,
           `Unknown tool: ${toolName}`,
+        )
+      }
+      // Fail closed: a tool missing from the scope map is denied rather
+      // than silently public.
+      const requiredScope = toolScopes[toolName]
+      if (!requiredScope) {
+        return toolError(
+          `Tool "${toolName}" has no scope mapping and cannot be called.`,
+        )
+      }
+      if (!hasScope(ctx.requestContext, requiredScope)) {
+        return toolError(
+          `Insufficient scope: this tool requires the "${requiredScope}" scope.`,
         )
       }
       try {
