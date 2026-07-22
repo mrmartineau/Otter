@@ -1,5 +1,10 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, useSearch } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Outlet,
+  useMatchRoute,
+  useSearch,
+} from '@tanstack/react-router'
 import { Suspense } from 'react'
 import { BookmarkForm } from '@/components/BookmarkForm'
 import { Loader } from '@/components/Loader'
@@ -22,18 +27,33 @@ export const Route = createFileRoute('/_app/new/bookmark')({
     const response = { tags }
     return response
   },
-  loaderDeps: ({ search }) => ({ url: search.url, bookmarklet: search.bookmarklet }),
-  validateSearch: (search: { url?: string; bookmarklet?: string }): { url?: string; bookmarklet?: string } => {
+  loaderDeps: ({ search }) => ({
+    bookmarklet: search.bookmarklet,
+    url: search.url,
+  }),
+  validateSearch: (search: {
+    url?: string
+    bookmarklet?: string
+  }): { url?: string; bookmarklet?: string } => {
     return {
-      url: search.url,
       bookmarklet: search.bookmarklet,
+      url: search.url,
     }
   },
 })
 
 function RouteComponent() {
+  const matchRoute = useMatchRoute()
+  const isConfirmationRoute = Boolean(
+    matchRoute({ to: '/new/bookmark/confirmation' }),
+  )
   const searchParams = useSearch({ from: '/_app/new/bookmark' })
   const { data } = useSuspenseQuery(getMetaOptions())
+
+  if (isConfirmationRoute) {
+    return <Outlet />
+  }
+
   return (
     <Suspense fallback={<Loader />}>
       <BookmarkForm

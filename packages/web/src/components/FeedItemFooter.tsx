@@ -1,4 +1,10 @@
+import popOffSfx from '@mrmartineau/kit/sounds/pop-off.mp3'
+import popOnSfx from '@mrmartineau/kit/sounds/pop-on.mp3'
+import popUpOffSfx from '@mrmartineau/kit/sounds/pop-up-off.mp3'
+import popUpOnSfx from '@mrmartineau/kit/sounds/pop-up-on.mp3'
+import useSound from '@mrmartineau/use-sound'
 import {
+  ArticleIcon,
   CalendarIcon,
   CardsIcon,
   CopyIcon,
@@ -8,8 +14,10 @@ import {
   RssSimpleIcon,
   StarIcon,
 } from '@phosphor-icons/react'
+import { useQueryClient } from '@tanstack/react-query'
 import urlJoin from 'proper-url-join'
 import { Suspense, useMemo } from 'react'
+import { toast } from 'sonner'
 import title from 'title'
 import {
   Tooltip,
@@ -18,7 +26,7 @@ import {
   TooltipTrigger,
 } from '@/components/Tooltip'
 import { MINIMUM_CLICK_COUNT } from '@/constants'
-import { supabase } from '@/utils/supabase/client'
+import { updateBookmark } from '@/utils/fetching/bookmarks'
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import { getRelativeDate } from '../utils/dates'
 import { findMatchingCollections } from '../utils/findMatchingCollections'
@@ -57,7 +65,12 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
     allowDeletion = false,
     collections,
   } = props
+  const queryClient = useQueryClient()
   const handleClickRegister = useClickBookmark()
+  const [playPopOn] = useSound(popOnSfx, { volume: 0.3 })
+  const [playPopOff] = useSound(popOffSfx, { volume: 0.3 })
+  const [playPopUpOn] = useSound(popUpOnSfx, { volume: 0.3 })
+  const [playPopUpOff] = useSound(popUpOffSfx, { volume: 0.3 })
   const createdDate = getRelativeDate(created_at)
   const modifiedDate = getRelativeDate(modified_at)
   const dateTooltip =
@@ -70,13 +83,24 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
   ): Promise<void> => {
     const updateData =
       column === 'public' ? { public: !isPublic } : { star: !star }
-    await supabase
-      .from('bookmarks')
-      .update({
-        ...updateData,
-        modified_at: new Date().toISOString(),
-      })
-      .match({ id })
+    await updateBookmark(id, updateData)
+    await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+    const label =
+      column === 'public'
+        ? !isPublic
+          ? 'Made public'
+          : 'Made private'
+        : !star
+          ? 'Starred'
+          : 'Unstarred'
+    if (column === 'public') {
+      !isPublic ? playPopOn() : playPopOff()
+    } else {
+      !star ? playPopUpOn() : playPopUpOff()
+    }
+    toast.success(label, {
+      description: props.title || undefined,
+    })
   }
 
   const matchingCollections = useMemo(() => {
@@ -88,6 +112,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
       return
     }
     navigator.clipboard.writeText(url)
+    toast.success('URL copied to clipboard')
   }
 
   return (
@@ -270,6 +295,19 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                 </IconButton>
               </TooltipTrigger>
               <TooltipContent>Copy URL to clipboard</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link href={`/bookmark/${id}/read`}>
+                  <ArticleIcon
+                    aria-label="Read article"
+                    size={18}
+                    weight="duotone"
+                  />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>Read article</TooltipContent>
             </Tooltip>
           </Flex>
 

@@ -7,9 +7,19 @@
 ###
 
 # Get scrape
-GET {{base_url}}/scrape?url=https://zander.wtf/blog
+GET {{base_url}}/scrape?url=https://apple.com
+
+###
+
+# Get scrape
+GET {{base_url}}/scrape?url=https://zander.wtf/blog/ai-side-projects/
 
 ###
 
 # Short url
 GET {{base_url}}/scrape?url=https://t.co/wy9S5P0Cd2
+
+###
+
+# Check URL
+GET {{base_url}}/check-url?url_input=viteplus.dev

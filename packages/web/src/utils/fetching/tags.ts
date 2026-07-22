@@ -1,12 +1,18 @@
 import { queryOptions } from '@tanstack/react-query'
-import { supabase } from '../supabase/client'
+import type { MetaTag } from './meta'
 
 export const getTags = async () => {
-  const { data, error } = await supabase.from('tags_count').select('*')
-  if (error) {
-    throw error
+  const response = await fetch('/api/tags', { credentials: 'include' })
+  const body = (await response.json()) as {
+    error?: string
+    reason?: string
   }
-  return data
+
+  if (!response.ok) {
+    throw new Error(body.error || body.reason || 'Failed to fetch tags')
+  }
+
+  return body as MetaTag[]
 }
 
 export const getTagsOptions = () => {

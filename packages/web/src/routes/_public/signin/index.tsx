@@ -1,12 +1,17 @@
-import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+  useSearch,
+} from '@tanstack/react-router'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { Flex } from '@/components/Flex'
 import { FormGroup } from '@/components/FormGroup'
 import { Input } from '@/components/Input'
-import { ROUTE_HOME } from '@/constants'
+import { ALLOW_SIGNUP, ROUTE_HOME } from '@/constants'
 import { useToggle } from '@/hooks/useToggle'
-import { supabase } from '@/utils/supabase/client'
+import { authClient } from '@/utils/auth/client'
 
 type SigninSearch = {
   error?: string
@@ -41,7 +46,7 @@ function RouteComponent() {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await authClient.signIn.email({
       email,
       password,
     })
@@ -55,6 +60,16 @@ function RouteComponent() {
     }
 
     setIsLoading(false)
+
+    // OAuth flow: window.location.search has sig param injected by oauthProviderClient
+    if (new URLSearchParams(window.location.search).has('sig')) {
+      const result = await authClient.oauth2.continue({ postLogin: true })
+      if (result.data?.url) {
+        window.location.href = result.data.url
+        return
+      }
+    }
+
     if (redirectTo) {
       return navigate({ to: redirectTo })
     }
@@ -67,13 +82,13 @@ function RouteComponent() {
         src="/otter-logo.svg"
         width="90"
         height="90"
-        className="mx-auto mt-l"
+        className="mx-auto"
         alt="Otter logo"
       />
-      <h2 className="mt-s text-center">Sign in</h2>
+      <h2 className="text-center">Sign in</h2>
 
       <form onSubmit={handleSignIn}>
-        <Flex direction={'column'} gap="m">
+        <Flex direction={'column'} gap="xs">
           <FormGroup label="Email" name="email">
             <Input
               id="email"
@@ -90,20 +105,22 @@ function RouteComponent() {
               type="password"
               name="password"
               required
-              autoComplete="email"
+              autoComplete="current-password"
             />
           </FormGroup>
 
-          <Flex gap="m" justify="between">
-            {/* {ALLOW_SIGNUP ? (
-              <Button formAction={signUp} variant="secondary">
-                Sign Up
-              </Button>
-            ) : null} */}
-            <Button type="submit" disabled={isLoading}>
-              Sign In
-            </Button>
-          </Flex>
+          <Button type="submit" disabled={isLoading}>
+            Sign In
+          </Button>
+          <Link to="/forgot-password" className="self-center text-sm">
+            Forgot password?
+          </Link>
+
+          {ALLOW_SIGNUP ? (
+            <Link to="/register" className="self-center text-sm">
+              Don't have an account? Register
+            </Link>
+          ) : null}
 
           {error ? (
             <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">

@@ -12,9 +12,9 @@ export const comboboxStyles: StylesConfig<
   control: (provided, state) => ({
     ...provided,
     backgroundColor: 'var(--theme2)',
-    borderColor: state.isFocused ? 'var(--theme6)' : 'var(--theme6)',
+    borderColor: state.isFocused ? 'var(--theme6)' : 'var(--theme3)',
     borderRadius: 'var(--radii-l)',
-    borderWidth: '2px',
+    borderWidth: '1px',
     boxShadow: state.isFocused
       ? '0 0 0 2px var(--focus)'
       : '0 0 0 2px transparent',
@@ -23,7 +23,9 @@ export const comboboxStyles: StylesConfig<
   multiValue: (provided) => ({
     ...provided,
     alignItems: 'center',
+    backgroundColor: 'var(--theme4)',
     borderRadius: 'var(--radii-default)',
+    color: 'var(--theme8)',
     fontSize: 'var(--step--1)',
     padding: 'var(--space-3xs)',
   }),
@@ -31,8 +33,8 @@ export const comboboxStyles: StylesConfig<
   multiValueRemove: (provided) => ({
     ...provided,
     ':hover': {
-      backgroundColor: 'var(--theme8)',
-      color: 'var(--theme12)',
+      backgroundColor: 'var(--theme6)',
+      color: 'var(--theme10)',
     },
     borderRadius: 'var(--radii-full)',
     cursor: 'pointer',
@@ -58,7 +60,7 @@ export const comboboxStyles: StylesConfig<
   }),
 }
 
-export const comboboxTheme: Props['theme'] = (theme) => ({
+export const d: Props['theme'] = (theme) => ({
   ...theme,
   colors: {
     ...theme.colors,
@@ -68,7 +70,8 @@ export const comboboxTheme: Props['theme'] = (theme) => ({
     neutral20: 'var(--theme8)',
     neutral30: 'var(--theme9)',
     neutral40: 'var(--theme10)',
-    neutral50: 'var(--theme11)',
+    neutral50:
+      'var(--theme1s                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     )',
     neutral60: 'var(--theme12)',
     neutral70: 'var(--theme12)',
     neutral80: 'var(--theme12)',
@@ -85,7 +88,7 @@ export const Combobox = ({ value, options, ...rest }: Props) => (
     isMulti
     value={value}
     options={options}
-    theme={comboboxTheme}
+    theme={d}
     // @ts-ignore
     styles={comboboxStyles}
     {...rest}

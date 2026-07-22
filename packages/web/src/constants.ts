@@ -4,7 +4,7 @@ import type { RequestOrder } from './types/api'
 
 export const REPO_URL = 'https://github.com/mrmartineau/Otter'
 
-export const ALLOW_SIGNUP = false
+export const ALLOW_SIGNUP = import.meta.env.VITE_ALLOW_SIGNUP === 'true'
 
 export const TITLE_SEPARATOR = ' — '
 export const CONTENT = {
@@ -24,6 +24,8 @@ export const CONTENT = {
   flatFeed: 'Flat',
   groupByDay: 'By day',
   integrationsSettingsTitle: 'Integrations',
+  journalNav: 'Journal',
+  journalTitle: 'Journal',
 
   // used in the feed popover
   latestRssItems: 'Latest RSS feed items',
@@ -32,6 +34,7 @@ export const CONTENT = {
   newBookmarkTitle: 'New bookmark',
   newDescription: 'Add new item',
   newerBtn: 'Newer',
+  newMediaTitle: 'New media',
   newTitle: 'New item',
 
   // used in the feed pagination area
@@ -79,8 +82,11 @@ export const ROUTE_HOME = ROUTE_DASHBOARD
 export const ROUTE_FEED = '/feed'
 export const ROUTE_SIGNIN = '/signin'
 export const ROUTE_NEW_BOOKMARK = '/new/bookmark'
+export const ROUTE_NEW_MEDIA = '/new/media'
+export const ROUTE_NEW_BOOKMARK_CONFIRMATION = '/new/bookmark/confirmation'
 export const ROUTE_STARS = '/stars'
 export const ROUTE_PUBLIC = '/public'
+export const ROUTE_RECENT = '/recent'
 export const ROUTE_STATS = '/top'
 export const ROUTE_TRASH = '/trash'
 export const ROUTE_SETTINGS_ACCOUNT = '/settings/account'
@@ -89,6 +95,7 @@ export const ROUTE_TOOTS_LIKES = '/toots/likes'
 export const ROUTE_TWEETS_MINE = '/tweets'
 export const ROUTE_TWEETS_LIKES = '/tweets/likes'
 export const ROUTE_MEDIA = '/media'
+export const ROUTE_JOURNAL = '/journal'
 
 // API Routes
 export const API_AUTH = '/api/auth.json'
@@ -109,6 +116,7 @@ export const API_TWEETS_SEARCH = '/api/search/tweets'
 export const API_HEADERS = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Origin': '*',
+  'Cache-Control': 'no-store',
   'Content-Type': 'application/json',
 }
 

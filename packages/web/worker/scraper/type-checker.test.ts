@@ -1,5 +1,6 @@
-import { expect, describe, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { typeChecker } from './type-checker'
+
 describe('typeChecker', () => {
   test('video', () => {
     expect(typeChecker('zander.mp4')).toBe('video')

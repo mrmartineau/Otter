@@ -1,4 +1,5 @@
 import { decode } from 'html-entities'
+import { assertSafePublicUrl, safeFetch } from '../url-guard'
 import type { ScrapeResponse } from '.'
 import { type FollowShortUrlResponse, followShortUrl } from './follow-short-url'
 import { generateErrorJSONResponse } from './json-response'
@@ -40,6 +41,7 @@ class Scraper {
 
     this.url = url
     try {
+      assertSafePublicUrl(url)
       this.unshortenedInfo = await followShortUrl([url])
     } catch (error) {
       console.log(`🚀 ~ Scraper ~ fetch ~ error:`, error)
@@ -53,7 +55,7 @@ class Scraper {
     const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
 
     try {
-      this.response = await fetch(targetUrl, {
+      this.response = await safeFetch(targetUrl, {
         headers: {
           Accept:
             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
@@ -99,7 +101,7 @@ class Scraper {
         }
       }
 
-      for await (const item of optionsItem.selectors) {
+      for (const item of optionsItem.selectors) {
         const selector = item.selector
         let nextText = ''
 

@@ -1,5 +1,6 @@
-import { expect, describe, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { linkType } from './link-type'
+
 describe('linkType', () => {
   test('video', () => {
     expect(linkType('http://youtube.com')).toBe('video')

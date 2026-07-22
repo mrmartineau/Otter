@@ -1,9 +1,8 @@
-import type { Session } from '@supabase/supabase-js'
-import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../utils/supabase/client'
+import { createContext, useContext } from 'react'
+import { type AuthSession, authClient } from '../utils/auth/client'
 
 const SessionContext = createContext<{
-  session: Session | null
+  session: AuthSession | null
 }>({
   session: null,
 })
@@ -29,27 +28,7 @@ export const useAuthContext = () => {
 }
 
 export const useSession = () => {
-  const [session, setSession] = useState<Session | null>(null)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        setSession(null)
-        // router?.invalidate()
-      } else if (session) {
-        setSession(session)
-      }
-    })
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [])
+  const { data: session } = authClient.useSession()
 
   return session
 }

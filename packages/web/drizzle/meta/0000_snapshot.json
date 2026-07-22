@@ -1,0 +1,2076 @@
+{
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  },
+  "dialect": "postgresql",
+  "enums": {
+    "public.feeds_type": {
+      "name": "feeds_type",
+      "schema": "public",
+      "values": ["rss", "api"]
+    },
+    "public.media_rating": {
+      "name": "media_rating",
+      "schema": "public",
+      "values": [
+        "0",
+        "0.5",
+        "1",
+        "1.5",
+        "2",
+        "2.5",
+        "3",
+        "3.5",
+        "4",
+        "4.5",
+        "5"
+      ]
+    },
+    "public.media_status": {
+      "name": "media_status",
+      "schema": "public",
+      "values": ["now", "skipped", "done", "wishlist"]
+    },
+    "public.media_type": {
+      "name": "media_type",
+      "schema": "public",
+      "values": ["tv", "film", "game", "book", "podcast", "music", "other"]
+    },
+    "public.status": {
+      "name": "status",
+      "schema": "public",
+      "values": ["active", "inactive"]
+    },
+    "public.type": {
+      "name": "type",
+      "schema": "public",
+      "values": [
+        "link",
+        "video",
+        "audio",
+        "recipe",
+        "image",
+        "document",
+        "article",
+        "game",
+        "book",
+        "event",
+        "product",
+        "note",
+        "file",
+        "place"
+      ]
+    }
+  },
+  "id": "fae7df6d-6cf0-43c2-9869-6f3ce49b72be",
+  "policies": {},
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "roles": {},
+  "schemas": {},
+  "sequences": {},
+  "tables": {
+    "public.account": {
+      "checkConstraints": {},
+      "columns": {
+        "access_token": {
+          "name": "access_token",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "access_token_expires_at": {
+          "name": "access_token_expires_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "account_id": {
+          "name": "account_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "default": "gen_random_uuid()::text",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "id_token": {
+          "name": "id_token",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "password": {
+          "name": "password",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "refresh_token_expires_at": {
+          "name": "refresh_token_expires_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "scope": {
+          "name": "scope",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updated_at": {
+          "default": "now()",
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "account_user_id_user_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "account_user_id_user_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "account",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "account_user_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "user_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "account_user_id_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "account",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.bookmark_tags": {
+      "checkConstraints": {},
+      "columns": {
+        "bookmark_id": {
+          "name": "bookmark_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "tag_id": {
+          "name": "tag_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {
+        "bookmark_tags_pkey": {
+          "columns": ["bookmark_id", "tag_id"],
+          "name": "bookmark_tags_pkey"
+        }
+      },
+      "foreignKeys": {
+        "bookmark_tags_bookmark_id_bookmarks_id_fk": {
+          "columnsFrom": ["bookmark_id"],
+          "columnsTo": ["id"],
+          "name": "bookmark_tags_bookmark_id_bookmarks_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "bookmark_tags",
+          "tableTo": "bookmarks"
+        },
+        "bookmark_tags_tag_id_tags_id_fk": {
+          "columnsFrom": ["tag_id"],
+          "columnsTo": ["id"],
+          "name": "bookmark_tags_tag_id_tags_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "bookmark_tags",
+          "tableTo": "tags"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "bookmark_tags",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.bookmarks": {
+      "checkConstraints": {},
+      "columns": {
+        "bluesky_post_uri": {
+          "name": "bluesky_post_uri",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "click_count": {
+          "default": 0,
+          "name": "click_count",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "smallint"
+        },
+        "created_at": {
+          "default": "timezone('utc', now())",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "description": {
+          "name": "description",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "feed": {
+          "name": "feed",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "image": {
+          "name": "image",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "modified_at": {
+          "default": "timezone('utc', now())",
+          "name": "modified_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "note": {
+          "name": "note",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "public": {
+          "default": false,
+          "name": "public",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "star": {
+          "default": false,
+          "name": "star",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "status": {
+          "default": "'active'",
+          "name": "status",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "status",
+          "typeSchema": "public"
+        },
+        "tags": {
+          "name": "tags",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "title": {
+          "name": "title",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "tweet": {
+          "name": "tweet",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "json"
+        },
+        "type": {
+          "default": "'link'",
+          "name": "type",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "type",
+          "typeSchema": "public"
+        },
+        "url": {
+          "name": "url",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "user": {
+          "name": "user",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "bookmarks_user_user_id_fk": {
+          "columnsFrom": ["user"],
+          "columnsTo": ["id"],
+          "name": "bookmarks_user_user_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "bookmarks",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "bookmarks_status_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "status",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "bookmarks_status_idx",
+          "with": {}
+        },
+        "bookmarks_user_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "user",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "bookmarks_user_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "bookmarks",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.feeds": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "identity": {
+            "cache": "1",
+            "cycle": false,
+            "increment": "1",
+            "maxValue": "9223372036854775807",
+            "minValue": "1",
+            "name": "Feeds_id_seq",
+            "schema": "public",
+            "startWith": "1",
+            "type": "byDefault"
+          },
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "bigint"
+        },
+        "name": {
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "properties": {
+          "name": "properties",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "json"
+        },
+        "type": {
+          "name": "type",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "feeds_type",
+          "typeSchema": "public"
+        },
+        "url": {
+          "name": "url",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "feeds",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.jwks": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "default": "gen_random_uuid()::text",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "private_key": {
+          "name": "private_key",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "public_key": {
+          "name": "public_key",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "jwks",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.media": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "identity": {
+            "cache": "1",
+            "cycle": false,
+            "increment": "1",
+            "maxValue": "9223372036854775807",
+            "minValue": "1",
+            "name": "media_id_seq",
+            "schema": "public",
+            "startWith": "1",
+            "type": "byDefault"
+          },
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "bigint"
+        },
+        "image": {
+          "name": "image",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "media_id": {
+          "name": "media_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "modified_at": {
+          "name": "modified_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "name": {
+          "default": "''",
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "platform": {
+          "name": "platform",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "rating": {
+          "name": "rating",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "media_rating",
+          "typeSchema": "public"
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "numeric"
+        },
+        "status": {
+          "default": "'wishlist'",
+          "name": "status",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "media_status",
+          "typeSchema": "public"
+        },
+        "type": {
+          "name": "type",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "media_type",
+          "typeSchema": "public"
+        },
+        "user": {
+          "name": "user",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "media_user_user_id_fk": {
+          "columnsFrom": ["user"],
+          "columnsTo": ["id"],
+          "name": "media_user_user_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "media",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "media_user_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "user",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "media_user_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "media",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.oauth_access_token": {
+      "checkConstraints": {},
+      "columns": {
+        "client_id": {
+          "name": "client_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "default": "gen_random_uuid()::text",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "reference_id": {
+          "name": "reference_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "refresh_id": {
+          "name": "refresh_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "scopes": {
+          "name": "scopes",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "session_id": {
+          "name": "session_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "token": {
+          "name": "token",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "oauth_access_token_client_id_oauth_client_client_id_fk": {
+          "columnsFrom": ["client_id"],
+          "columnsTo": ["client_id"],
+          "name": "oauth_access_token_client_id_oauth_client_client_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "oauth_access_token",
+          "tableTo": "oauth_client"
+        },
+        "oauth_access_token_refresh_id_oauth_refresh_token_id_fk": {
+          "columnsFrom": ["refresh_id"],
+          "columnsTo": ["id"],
+          "name": "oauth_access_token_refresh_id_oauth_refresh_token_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "oauth_access_token",
+          "tableTo": "oauth_refresh_token"
+        },
+        "oauth_access_token_session_id_session_id_fk": {
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
+          "name": "oauth_access_token_session_id_session_id_fk",
+          "onDelete": "set null",
+          "onUpdate": "no action",
+          "tableFrom": "oauth_access_token",
+          "tableTo": "session"
+        },
+        "oauth_access_token_user_id_user_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "oauth_access_token_user_id_user_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "oauth_access_token",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "oauth_access_token_client_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "client_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "oauth_access_token_client_id_idx",
+          "with": {}
+        },
+        "oauth_access_token_session_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "session_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "oauth_access_token_session_id_idx",
+          "with": {}
+        },
+        "oauth_access_token_token_key": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "token",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": true,
+          "method": "btree",
+          "name": "oauth_access_token_token_key",
+          "with": {}
+        },
+        "oauth_access_token_user_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "user_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "oauth_access_token_user_id_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "oauth_access_token",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.oauth_client": {
+      "checkConstraints": {},
+      "columns": {
+        "client_id": {
+          "name": "client_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "client_secret": {
+          "name": "client_secret",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "contacts": {
+          "name": "contacts",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "disabled": {
+          "default": false,
+          "name": "disabled",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "enable_end_session": {
+          "name": "enable_end_session",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "grant_types": {
+          "name": "grant_types",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "icon": {
+          "name": "icon",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "default": "gen_random_uuid()::text",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "metadata": {
+          "name": "metadata",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "json"
+        },
+        "name": {
+          "name": "name",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "policy": {
+          "name": "policy",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "post_logout_redirect_uris": {
+          "name": "post_logout_redirect_uris",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "public": {
+          "name": "public",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "redirect_uris": {
+          "name": "redirect_uris",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "reference_id": {
+          "name": "reference_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "require_pkce": {
+          "name": "require_pkce",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "response_types": {
+          "name": "response_types",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "scopes": {
+          "name": "scopes",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "skip_consent": {
+          "name": "skip_consent",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "software_id": {
+          "name": "software_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "software_statement": {
+          "name": "software_statement",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "software_version": {
+          "name": "software_version",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "subject_type": {
+          "name": "subject_type",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "token_endpoint_auth_method": {
+          "name": "token_endpoint_auth_method",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "tos": {
+          "name": "tos",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "type": {
+          "name": "type",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updated_at": {
+          "default": "now()",
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "uri": {
+          "name": "uri",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "oauth_client_user_id_user_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "oauth_client_user_id_user_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "oauth_client",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "oauth_client_client_id_key": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "client_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": true,
+          "method": "btree",
+          "name": "oauth_client_client_id_key",
+          "with": {}
+        },
+        "oauth_client_user_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "user_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "oauth_client_user_id_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "oauth_client",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.oauth_consent": {
+      "checkConstraints": {},
+      "columns": {
+        "client_id": {
+          "name": "client_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "default": "gen_random_uuid()::text",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "reference_id": {
+          "name": "reference_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "scopes": {
+          "name": "scopes",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "oauth_consent_client_id_oauth_client_client_id_fk": {
+          "columnsFrom": ["client_id"],
+          "columnsTo": ["client_id"],
+          "name": "oauth_consent_client_id_oauth_client_client_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "oauth_consent",
+          "tableTo": "oauth_client"
+        },
+        "oauth_consent_user_id_user_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "oauth_consent_user_id_user_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "oauth_consent",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "oauth_consent_client_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "client_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "oauth_consent_client_id_idx",
+          "with": {}
+        },
+        "oauth_consent_user_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "user_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "oauth_consent_user_id_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "oauth_consent",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.oauth_refresh_token": {
+      "checkConstraints": {},
+      "columns": {
+        "auth_time": {
+          "name": "auth_time",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "client_id": {
+          "name": "client_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "default": "gen_random_uuid()::text",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "reference_id": {
+          "name": "reference_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "revoked": {
+          "name": "revoked",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "scopes": {
+          "name": "scopes",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "session_id": {
+          "name": "session_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "token": {
+          "name": "token",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "oauth_refresh_token_client_id_oauth_client_client_id_fk": {
+          "columnsFrom": ["client_id"],
+          "columnsTo": ["client_id"],
+          "name": "oauth_refresh_token_client_id_oauth_client_client_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "oauth_refresh_token",
+          "tableTo": "oauth_client"
+        },
+        "oauth_refresh_token_session_id_session_id_fk": {
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
+          "name": "oauth_refresh_token_session_id_session_id_fk",
+          "onDelete": "set null",
+          "onUpdate": "no action",
+          "tableFrom": "oauth_refresh_token",
+          "tableTo": "session"
+        },
+        "oauth_refresh_token_user_id_user_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "oauth_refresh_token_user_id_user_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "oauth_refresh_token",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "oauth_refresh_token_client_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "client_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "oauth_refresh_token_client_id_idx",
+          "with": {}
+        },
+        "oauth_refresh_token_session_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "session_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "oauth_refresh_token_session_id_idx",
+          "with": {}
+        },
+        "oauth_refresh_token_user_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "user_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "oauth_refresh_token_user_id_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "oauth_refresh_token",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.profiles": {
+      "checkConstraints": {
+        "username_length": {
+          "name": "username_length",
+          "value": "char_length(\"profiles\".\"username\") >= 3"
+        }
+      },
+      "columns": {
+        "api_key": {
+          "default": "gen_random_uuid()",
+          "name": "api_key",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "id": {
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "settings_collections_visible": {
+          "default": false,
+          "name": "settings_collections_visible",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "settings_group_by_date": {
+          "default": false,
+          "name": "settings_group_by_date",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "settings_pinned_tags": {
+          "default": "ARRAY[]::text[]",
+          "name": "settings_pinned_tags",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "settings_tags_visible": {
+          "default": false,
+          "name": "settings_tags_visible",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "settings_top_tags_count": {
+          "name": "settings_top_tags_count",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "numeric"
+        },
+        "settings_types_visible": {
+          "default": false,
+          "name": "settings_types_visible",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "username": {
+          "name": "username",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "profiles_id_user_id_fk": {
+          "columnsFrom": ["id"],
+          "columnsTo": ["id"],
+          "name": "profiles_id_user_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "profiles",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "profiles_api_key_key": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "api_key",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": true,
+          "method": "btree",
+          "name": "profiles_api_key_key",
+          "with": {}
+        },
+        "profiles_username_key": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "username",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": true,
+          "method": "btree",
+          "name": "profiles_username_key",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "profiles",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.session": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "default": "gen_random_uuid()::text",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "token": {
+          "name": "token",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updated_at": {
+          "default": "now()",
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "session_user_id_user_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "session_user_id_user_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "session",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "session_token_key": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "token",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": true,
+          "method": "btree",
+          "name": "session_token_key",
+          "with": {}
+        },
+        "session_user_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "user_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "session_user_id_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "session",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.tags": {
+      "checkConstraints": {},
+      "columns": {
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "tag": {
+          "name": "tag",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {
+        "tags_tag_key": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "tag",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": true,
+          "method": "btree",
+          "name": "tags_tag_key",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "tags",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.toots": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "db_user_id": {
+          "name": "db_user_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "hashtags": {
+          "name": "hashtags",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "liked_toot": {
+          "default": false,
+          "name": "liked_toot",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "media": {
+          "name": "media",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "json"
+        },
+        "reply": {
+          "name": "reply",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "json"
+        },
+        "text": {
+          "default": "''",
+          "name": "text",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "toot_id": {
+          "name": "toot_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "toot_url": {
+          "name": "toot_url",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "urls": {
+          "name": "urls",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "json"
+        },
+        "user_avatar": {
+          "name": "user_avatar",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "user_name": {
+          "name": "user_name",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "toots_db_user_id_user_id_fk": {
+          "columnsFrom": ["db_user_id"],
+          "columnsTo": ["id"],
+          "name": "toots_db_user_id_user_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "toots",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "toots_db_user_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "db_user_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "toots_db_user_id_idx",
+          "with": {}
+        },
+        "toots_toot_id_key": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "toot_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": true,
+          "method": "btree",
+          "name": "toots_toot_id_key",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "toots",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.tweets": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "db_user_id": {
+          "name": "db_user_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "uuid"
+        },
+        "hashtags": {
+          "name": "hashtags",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text[]"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "liked_tweet": {
+          "default": false,
+          "name": "liked_tweet",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "media": {
+          "name": "media",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "json"
+        },
+        "reply": {
+          "name": "reply",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "json"
+        },
+        "text": {
+          "default": "''",
+          "name": "text",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "tweet_id": {
+          "name": "tweet_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "tweet_url": {
+          "name": "tweet_url",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "urls": {
+          "name": "urls",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "json"
+        },
+        "user_avatar": {
+          "name": "user_avatar",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "user_name": {
+          "name": "user_name",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "tweets_db_user_id_user_id_fk": {
+          "columnsFrom": ["db_user_id"],
+          "columnsTo": ["id"],
+          "name": "tweets_db_user_id_user_id_fk",
+          "onDelete": "no action",
+          "onUpdate": "no action",
+          "tableFrom": "tweets",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {
+        "tweets_db_user_id_idx": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "db_user_id",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": false,
+          "method": "btree",
+          "name": "tweets_db_user_id_idx",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "tweets",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.user": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "email": {
+          "name": "email",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "email_verified": {
+          "default": false,
+          "name": "email_verified",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "id": {
+          "default": "gen_random_uuid()",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        },
+        "image": {
+          "name": "image",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "name": {
+          "name": "name",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updated_at": {
+          "default": "now()",
+          "name": "updated_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {
+        "user_email_key": {
+          "columns": [
+            {
+              "asc": true,
+              "expression": "email",
+              "isExpression": false,
+              "nulls": "last"
+            }
+          ],
+          "concurrently": false,
+          "isUnique": true,
+          "method": "btree",
+          "name": "user_email_key",
+          "with": {}
+        }
+      },
+      "isRLSEnabled": false,
+      "name": "user",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.user_integrations": {
+      "checkConstraints": {},
+      "columns": {
+        "bluesky_app_password": {
+          "name": "bluesky_app_password",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "bluesky_enabled": {
+          "default": false,
+          "name": "bluesky_enabled",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "boolean"
+        },
+        "bluesky_handle": {
+          "name": "bluesky_handle",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "bluesky_last_error": {
+          "name": "bluesky_last_error",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "bluesky_post_prefix": {
+          "name": "bluesky_post_prefix",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "bluesky_post_suffix": {
+          "name": "bluesky_post_suffix",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "user_id": {
+          "name": "user_id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "uuid"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {
+        "user_integrations_user_id_user_id_fk": {
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "name": "user_integrations_user_id_user_id_fk",
+          "onDelete": "cascade",
+          "onUpdate": "no action",
+          "tableFrom": "user_integrations",
+          "tableTo": "user"
+        }
+      },
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "user_integrations",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    },
+    "public.verification": {
+      "checkConstraints": {},
+      "columns": {
+        "created_at": {
+          "default": "now()",
+          "name": "created_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "id": {
+          "default": "gen_random_uuid()::text",
+          "name": "id",
+          "notNull": true,
+          "primaryKey": true,
+          "type": "text"
+        },
+        "identifier": {
+          "name": "identifier",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        },
+        "updated_at": {
+          "default": "now()",
+          "name": "updated_at",
+          "notNull": false,
+          "primaryKey": false,
+          "type": "timestamp with time zone"
+        },
+        "value": {
+          "name": "value",
+          "notNull": true,
+          "primaryKey": false,
+          "type": "text"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "foreignKeys": {},
+      "indexes": {},
+      "isRLSEnabled": false,
+      "name": "verification",
+      "policies": {},
+      "schema": "",
+      "uniqueConstraints": {}
+    }
+  },
+  "version": "7",
+  "views": {}
+}

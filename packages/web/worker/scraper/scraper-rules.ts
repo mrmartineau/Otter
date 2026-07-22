@@ -9,7 +9,6 @@ export const scraperRules: GetMetadataOptions[] = [
     multiple: false,
     name: 'title',
     selectors: [
-      { attribute: 'content', selector: 'meta[name="og:title"]' },
       { attribute: 'content', selector: 'meta[property="og:title"]' },
       { attribute: 'content', selector: 'meta[name=title]' },
       { attribute: 'content', selector: 'meta[name="twitter:title"]' },

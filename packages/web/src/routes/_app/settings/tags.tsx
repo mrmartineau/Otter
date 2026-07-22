@@ -3,7 +3,7 @@ import { useCallback } from 'react'
 import { Button } from '@/components/Button'
 import { FormGroup } from '@/components/FormGroup'
 import { Input } from '@/components/Input'
-import { supabase } from '@/utils/supabase/client'
+import type { MetaTag } from '@/utils/fetching/meta'
 
 export const Route = createFileRoute('/_app/settings/tags')({
   component: RouteComponent,
@@ -15,20 +15,24 @@ export const Route = createFileRoute('/_app/settings/tags')({
     ],
   }),
   loader: async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    const { data } = await supabase
-      .from('tags_count')
-      .select('*')
-      .order('tag', { ascending: true })
+    const response = await fetch('/api/tags', {
+      credentials: 'include',
+    })
 
-    return { tags: data, user }
+    if (!response.ok) {
+      return { tags: [] as MetaTag[] }
+    }
+
+    const tags = (await response.json()) as MetaTag[]
+
+    return {
+      tags: tags.toSorted((a, b) => (a.tag ?? '').localeCompare(b.tag ?? '')),
+    }
   },
 })
 
 function RouteComponent() {
-  const { tags, user } = Route.useLoaderData()
+  const { tags } = Route.useLoaderData()
   const navigate = useNavigate()
 
   const handleRenameTag = useCallback(
@@ -38,13 +42,14 @@ function RouteComponent() {
       const old_tag = formData.get('old_tag') as string
       const new_tag = formData.get('new_tag') as string
 
-      const { error } = await supabase.rpc('update_bookmark_tags', {
-        new_tag,
-        old_tag,
-        user_id: user?.id as string,
+      const response = await fetch('/api/tags/rename', {
+        body: JSON.stringify({ new_tag, old_tag }),
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
       })
 
-      if (error) {
+      if (!response.ok) {
         return navigate({
           search: {
             message: `Could not rename ${old_tag} to ${new_tag}`,
@@ -60,7 +65,7 @@ function RouteComponent() {
         to: '/settings/tags',
       })
     },
-    [user?.id, navigate],
+    [navigate],
   )
 
   return (

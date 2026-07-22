@@ -21,5 +21,10 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "verbatimModuleSyntax": true
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "vite.config.ts",
+    "drizzle.config.ts",
+    "db/**/*.ts",
+    "scripts/**/*.ts"
+  ]
 }

@@ -4,6 +4,7 @@ import {
   EyeIcon,
   GaugeIcon,
   ListBulletsIcon,
+  NotebookIcon,
   RocketLaunchIcon,
   StarIcon,
   TrashIcon,
@@ -20,6 +21,7 @@ import {
   ROUTE_DASHBOARD,
   ROUTE_FEED,
   ROUTE_HOME,
+  ROUTE_JOURNAL,
   ROUTE_MEDIA,
   ROUTE_PUBLIC,
   ROUTE_SETTINGS_ACCOUNT,
@@ -114,13 +116,14 @@ export const Sidebar = ({ version }: SidebarProps) => {
           </SidebarLink>
           <TypeList types={dbMeta?.types} />
           <AllTags tags={dbMeta?.tags} />
-          <CollectionList
-            collections={dbMeta?.collections}
-            tags={dbMeta?.tags}
-          />
+          <CollectionList collections={dbMeta?.collections} />
           <SidebarLink href={ROUTE_MEDIA} activePath="media">
             <ApertureIcon size={18} weight="duotone" />
             {CONTENT.mediaNav}
+          </SidebarLink>
+          <SidebarLink href={ROUTE_JOURNAL} activePath="journal">
+            <NotebookIcon size={18} weight="duotone" />
+            {CONTENT.journalNav}
           </SidebarLink>
         </Flex>
       </div>

@@ -9,9 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as PublicRouteRouteImport } from './routes/_public/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as PublicRecentRouteImport } from './routes/_public/recent'
 import { Route as AppTweetsRouteImport } from './routes/_app/tweets'
 import { Route as AppTrashRouteImport } from './routes/_app/trash'
 import { Route as AppTopRouteImport } from './routes/_app/top'
@@ -20,21 +24,45 @@ import { Route as AppStarsRouteImport } from './routes/_app/stars'
 import { Route as AppSearchRouteImport } from './routes/_app/search'
 import { Route as AppPublicRouteImport } from './routes/_app/public'
 import { Route as AppMediaRouteImport } from './routes/_app/media'
+import { Route as AppJournalRouteImport } from './routes/_app/journal'
 import { Route as AppFeedRouteImport } from './routes/_app/feed'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
 import { Route as PublicSigninIndexRouteImport } from './routes/_public/signin/index'
+import { Route as PublicResetPasswordIndexRouteImport } from './routes/_public/reset-password/index'
+import { Route as PublicRegisterIndexRouteImport } from './routes/_public/register/index'
+import { Route as PublicForgotPasswordIndexRouteImport } from './routes/_public/forgot-password/index'
+import { Route as PublicShareTokenRouteImport } from './routes/_public/share.$token'
 import { Route as AppTypeTypeRouteImport } from './routes/_app/type.$type'
 import { Route as AppTagTagRouteImport } from './routes/_app/tag.$tag'
 import { Route as AppSettingsTagsRouteImport } from './routes/_app/settings/tags'
 import { Route as AppSettingsIntegrationsRouteImport } from './routes/_app/settings/integrations'
+import { Route as AppSettingsDataRouteImport } from './routes/_app/settings/data'
 import { Route as AppSettingsAccountRouteImport } from './routes/_app/settings/account'
 import { Route as AppOauthConsentRouteImport } from './routes/_app/oauth/consent'
+import { Route as AppNewMediaRouteImport } from './routes/_app/new.media'
 import { Route as AppNewBookmarkRouteImport } from './routes/_app/new.bookmark'
 import { Route as AppCollectionCollectionRouteImport } from './routes/_app/collection.$collection'
 import { Route as AppBookmarkIdRouteImport } from './routes/_app/bookmark.$id'
+import { Route as AppNewBookmarkConfirmationRouteImport } from './routes/_app/new.bookmark.confirmation'
+import { Route as AppBookmarkIdReadRouteImport } from './routes/_app/bookmark.$id.read'
 import { Route as AppBookmarkIdEditRouteImport } from './routes/_app/bookmark.$id.edit'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChangelogRoute = ChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PublicRouteRoute = PublicRouteRouteImport.update({
   id: '/_public',
   getParentRoute: () => rootRouteImport,
@@ -46,6 +74,11 @@ const AppRouteRoute = AppRouteRouteImport.update({
 const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicRecentRoute = PublicRecentRouteImport.update({
+  id: '/recent',
+  path: '/recent',
   getParentRoute: () => PublicRouteRoute,
 } as any)
 const AppTweetsRoute = AppTweetsRouteImport.update({
@@ -88,6 +121,11 @@ const AppMediaRoute = AppMediaRouteImport.update({
   path: '/media',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppJournalRoute = AppJournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppFeedRoute = AppFeedRouteImport.update({
   id: '/feed',
   path: '/feed',
@@ -106,6 +144,28 @@ const AppSettingsRouteRoute = AppSettingsRouteRouteImport.update({
 const PublicSigninIndexRoute = PublicSigninIndexRouteImport.update({
   id: '/signin/',
   path: '/signin/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicResetPasswordIndexRoute =
+  PublicResetPasswordIndexRouteImport.update({
+    id: '/reset-password/',
+    path: '/reset-password/',
+    getParentRoute: () => PublicRouteRoute,
+  } as any)
+const PublicRegisterIndexRoute = PublicRegisterIndexRouteImport.update({
+  id: '/register/',
+  path: '/register/',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicForgotPasswordIndexRoute =
+  PublicForgotPasswordIndexRouteImport.update({
+    id: '/forgot-password/',
+    path: '/forgot-password/',
+    getParentRoute: () => PublicRouteRoute,
+  } as any)
+const PublicShareTokenRoute = PublicShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
   getParentRoute: () => PublicRouteRoute,
 } as any)
 const AppTypeTypeRoute = AppTypeTypeRouteImport.update({
@@ -128,6 +188,11 @@ const AppSettingsIntegrationsRoute = AppSettingsIntegrationsRouteImport.update({
   path: '/integrations',
   getParentRoute: () => AppSettingsRouteRoute,
 } as any)
+const AppSettingsDataRoute = AppSettingsDataRouteImport.update({
+  id: '/data',
+  path: '/data',
+  getParentRoute: () => AppSettingsRouteRoute,
+} as any)
 const AppSettingsAccountRoute = AppSettingsAccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -136,6 +201,11 @@ const AppSettingsAccountRoute = AppSettingsAccountRouteImport.update({
 const AppOauthConsentRoute = AppOauthConsentRouteImport.update({
   id: '/oauth/consent',
   path: '/oauth/consent',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppNewMediaRoute = AppNewMediaRouteImport.update({
+  id: '/new/media',
+  path: '/new/media',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppNewBookmarkRoute = AppNewBookmarkRouteImport.update({
@@ -153,6 +223,17 @@ const AppBookmarkIdRoute = AppBookmarkIdRouteImport.update({
   path: '/bookmark/$id',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppNewBookmarkConfirmationRoute =
+  AppNewBookmarkConfirmationRouteImport.update({
+    id: '/confirmation',
+    path: '/confirmation',
+    getParentRoute: () => AppNewBookmarkRoute,
+  } as any)
+const AppBookmarkIdReadRoute = AppBookmarkIdReadRouteImport.update({
+  id: '/read',
+  path: '/read',
+  getParentRoute: () => AppBookmarkIdRoute,
+} as any)
 const AppBookmarkIdEditRoute = AppBookmarkIdEditRouteImport.update({
   id: '/edit',
   path: '/edit',
@@ -161,9 +242,13 @@ const AppBookmarkIdEditRoute = AppBookmarkIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/changelog': typeof ChangelogRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRoute
+  '/journal': typeof AppJournalRoute
   '/media': typeof AppMediaRoute
   '/public': typeof AppPublicRoute
   '/search': typeof AppSearchRoute
@@ -172,23 +257,36 @@ export interface FileRoutesByFullPath {
   '/top': typeof AppTopRoute
   '/trash': typeof AppTrashRoute
   '/tweets': typeof AppTweetsRoute
+  '/recent': typeof PublicRecentRoute
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
-  '/new/bookmark': typeof AppNewBookmarkRoute
+  '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
+  '/new/media': typeof AppNewMediaRoute
   '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
+  '/settings/data': typeof AppSettingsDataRoute
   '/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
   '/type/$type': typeof AppTypeTypeRoute
+  '/share/$token': typeof PublicShareTokenRoute
+  '/forgot-password/': typeof PublicForgotPasswordIndexRoute
+  '/register/': typeof PublicRegisterIndexRoute
+  '/reset-password/': typeof PublicResetPasswordIndexRoute
   '/signin/': typeof PublicSigninIndexRoute
   '/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
+  '/bookmark/$id/read': typeof AppBookmarkIdReadRoute
+  '/new/bookmark/confirmation': typeof AppNewBookmarkConfirmationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
+  '/changelog': typeof ChangelogRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/feed': typeof AppFeedRoute
+  '/journal': typeof AppJournalRoute
   '/media': typeof AppMediaRoute
   '/public': typeof AppPublicRoute
   '/search': typeof AppSearchRoute
@@ -197,25 +295,38 @@ export interface FileRoutesByTo {
   '/top': typeof AppTopRoute
   '/trash': typeof AppTrashRoute
   '/tweets': typeof AppTweetsRoute
+  '/recent': typeof PublicRecentRoute
   '/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/collection/$collection': typeof AppCollectionCollectionRoute
-  '/new/bookmark': typeof AppNewBookmarkRoute
+  '/new/bookmark': typeof AppNewBookmarkRouteWithChildren
+  '/new/media': typeof AppNewMediaRoute
   '/oauth/consent': typeof AppOauthConsentRoute
   '/settings/account': typeof AppSettingsAccountRoute
+  '/settings/data': typeof AppSettingsDataRoute
   '/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/settings/tags': typeof AppSettingsTagsRoute
   '/tag/$tag': typeof AppTagTagRoute
   '/type/$type': typeof AppTypeTypeRoute
+  '/share/$token': typeof PublicShareTokenRoute
+  '/forgot-password': typeof PublicForgotPasswordIndexRoute
+  '/register': typeof PublicRegisterIndexRoute
+  '/reset-password': typeof PublicResetPasswordIndexRoute
   '/signin': typeof PublicSigninIndexRoute
   '/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
+  '/bookmark/$id/read': typeof AppBookmarkIdReadRoute
+  '/new/bookmark/confirmation': typeof AppNewBookmarkConfirmationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
   '/_public': typeof PublicRouteRouteWithChildren
+  '/changelog': typeof ChangelogRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/feed': typeof AppFeedRoute
+  '/_app/journal': typeof AppJournalRoute
   '/_app/media': typeof AppMediaRoute
   '/_app/public': typeof AppPublicRoute
   '/_app/search': typeof AppSearchRoute
@@ -224,26 +335,39 @@ export interface FileRoutesById {
   '/_app/top': typeof AppTopRoute
   '/_app/trash': typeof AppTrashRoute
   '/_app/tweets': typeof AppTweetsRoute
+  '/_public/recent': typeof PublicRecentRoute
   '/_public/': typeof PublicIndexRoute
   '/_app/bookmark/$id': typeof AppBookmarkIdRouteWithChildren
   '/_app/collection/$collection': typeof AppCollectionCollectionRoute
-  '/_app/new/bookmark': typeof AppNewBookmarkRoute
+  '/_app/new/bookmark': typeof AppNewBookmarkRouteWithChildren
+  '/_app/new/media': typeof AppNewMediaRoute
   '/_app/oauth/consent': typeof AppOauthConsentRoute
   '/_app/settings/account': typeof AppSettingsAccountRoute
+  '/_app/settings/data': typeof AppSettingsDataRoute
   '/_app/settings/integrations': typeof AppSettingsIntegrationsRoute
   '/_app/settings/tags': typeof AppSettingsTagsRoute
   '/_app/tag/$tag': typeof AppTagTagRoute
   '/_app/type/$type': typeof AppTypeTypeRoute
+  '/_public/share/$token': typeof PublicShareTokenRoute
+  '/_public/forgot-password/': typeof PublicForgotPasswordIndexRoute
+  '/_public/register/': typeof PublicRegisterIndexRoute
+  '/_public/reset-password/': typeof PublicResetPasswordIndexRoute
   '/_public/signin/': typeof PublicSigninIndexRoute
   '/_app/bookmark/$id/edit': typeof AppBookmarkIdEditRoute
+  '/_app/bookmark/$id/read': typeof AppBookmarkIdReadRoute
+  '/_app/new/bookmark/confirmation': typeof AppNewBookmarkConfirmationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/changelog'
+    | '/privacy'
+    | '/terms'
     | '/settings'
     | '/dashboard'
     | '/feed'
+    | '/journal'
     | '/media'
     | '/public'
     | '/search'
@@ -252,23 +376,36 @@ export interface FileRouteTypes {
     | '/top'
     | '/trash'
     | '/tweets'
+    | '/recent'
     | '/bookmark/$id'
     | '/collection/$collection'
     | '/new/bookmark'
+    | '/new/media'
     | '/oauth/consent'
     | '/settings/account'
+    | '/settings/data'
     | '/settings/integrations'
     | '/settings/tags'
     | '/tag/$tag'
     | '/type/$type'
+    | '/share/$token'
+    | '/forgot-password/'
+    | '/register/'
+    | '/reset-password/'
     | '/signin/'
     | '/bookmark/$id/edit'
+    | '/bookmark/$id/read'
+    | '/new/bookmark/confirmation'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/changelog'
+    | '/privacy'
+    | '/terms'
     | '/settings'
     | '/dashboard'
     | '/feed'
+    | '/journal'
     | '/media'
     | '/public'
     | '/search'
@@ -277,24 +414,37 @@ export interface FileRouteTypes {
     | '/top'
     | '/trash'
     | '/tweets'
+    | '/recent'
     | '/bookmark/$id'
     | '/collection/$collection'
     | '/new/bookmark'
+    | '/new/media'
     | '/oauth/consent'
     | '/settings/account'
+    | '/settings/data'
     | '/settings/integrations'
     | '/settings/tags'
     | '/tag/$tag'
     | '/type/$type'
+    | '/share/$token'
+    | '/forgot-password'
+    | '/register'
+    | '/reset-password'
     | '/signin'
     | '/bookmark/$id/edit'
+    | '/bookmark/$id/read'
+    | '/new/bookmark/confirmation'
   id:
     | '__root__'
     | '/_app'
     | '/_public'
+    | '/changelog'
+    | '/privacy'
+    | '/terms'
     | '/_app/settings'
     | '/_app/dashboard'
     | '/_app/feed'
+    | '/_app/journal'
     | '/_app/media'
     | '/_app/public'
     | '/_app/search'
@@ -303,27 +453,60 @@ export interface FileRouteTypes {
     | '/_app/top'
     | '/_app/trash'
     | '/_app/tweets'
+    | '/_public/recent'
     | '/_public/'
     | '/_app/bookmark/$id'
     | '/_app/collection/$collection'
     | '/_app/new/bookmark'
+    | '/_app/new/media'
     | '/_app/oauth/consent'
     | '/_app/settings/account'
+    | '/_app/settings/data'
     | '/_app/settings/integrations'
     | '/_app/settings/tags'
     | '/_app/tag/$tag'
     | '/_app/type/$type'
+    | '/_public/share/$token'
+    | '/_public/forgot-password/'
+    | '/_public/register/'
+    | '/_public/reset-password/'
     | '/_public/signin/'
     | '/_app/bookmark/$id/edit'
+    | '/_app/bookmark/$id/read'
+    | '/_app/new/bookmark/confirmation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   PublicRouteRoute: typeof PublicRouteRouteWithChildren
+  ChangelogRoute: typeof ChangelogRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/changelog': {
+      id: '/changelog'
+      path: '/changelog'
+      fullPath: '/changelog'
+      preLoaderRoute: typeof ChangelogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_public': {
       id: '/_public'
       path: ''
@@ -343,6 +526,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/recent': {
+      id: '/_public/recent'
+      path: '/recent'
+      fullPath: '/recent'
+      preLoaderRoute: typeof PublicRecentRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/_app/tweets': {
@@ -401,6 +591,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMediaRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/journal': {
+      id: '/_app/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof AppJournalRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/feed': {
       id: '/_app/feed'
       path: '/feed'
@@ -427,6 +624,34 @@ declare module '@tanstack/react-router' {
       path: '/signin'
       fullPath: '/signin/'
       preLoaderRoute: typeof PublicSigninIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/reset-password/': {
+      id: '/_public/reset-password/'
+      path: '/reset-password'
+      fullPath: '/reset-password/'
+      preLoaderRoute: typeof PublicResetPasswordIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/register/': {
+      id: '/_public/register/'
+      path: '/register'
+      fullPath: '/register/'
+      preLoaderRoute: typeof PublicRegisterIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/forgot-password/': {
+      id: '/_public/forgot-password/'
+      path: '/forgot-password'
+      fullPath: '/forgot-password/'
+      preLoaderRoute: typeof PublicForgotPasswordIndexRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/share/$token': {
+      id: '/_public/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof PublicShareTokenRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/_app/type/$type': {
@@ -457,6 +682,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsIntegrationsRouteImport
       parentRoute: typeof AppSettingsRouteRoute
     }
+    '/_app/settings/data': {
+      id: '/_app/settings/data'
+      path: '/data'
+      fullPath: '/settings/data'
+      preLoaderRoute: typeof AppSettingsDataRouteImport
+      parentRoute: typeof AppSettingsRouteRoute
+    }
     '/_app/settings/account': {
       id: '/_app/settings/account'
       path: '/account'
@@ -469,6 +701,13 @@ declare module '@tanstack/react-router' {
       path: '/oauth/consent'
       fullPath: '/oauth/consent'
       preLoaderRoute: typeof AppOauthConsentRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/new/media': {
+      id: '/_app/new/media'
+      path: '/new/media'
+      fullPath: '/new/media'
+      preLoaderRoute: typeof AppNewMediaRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/new/bookmark': {
@@ -492,6 +731,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookmarkIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/new/bookmark/confirmation': {
+      id: '/_app/new/bookmark/confirmation'
+      path: '/confirmation'
+      fullPath: '/new/bookmark/confirmation'
+      preLoaderRoute: typeof AppNewBookmarkConfirmationRouteImport
+      parentRoute: typeof AppNewBookmarkRoute
+    }
+    '/_app/bookmark/$id/read': {
+      id: '/_app/bookmark/$id/read'
+      path: '/read'
+      fullPath: '/bookmark/$id/read'
+      preLoaderRoute: typeof AppBookmarkIdReadRouteImport
+      parentRoute: typeof AppBookmarkIdRoute
+    }
     '/_app/bookmark/$id/edit': {
       id: '/_app/bookmark/$id/edit'
       path: '/edit'
@@ -504,12 +757,14 @@ declare module '@tanstack/react-router' {
 
 interface AppSettingsRouteRouteChildren {
   AppSettingsAccountRoute: typeof AppSettingsAccountRoute
+  AppSettingsDataRoute: typeof AppSettingsDataRoute
   AppSettingsIntegrationsRoute: typeof AppSettingsIntegrationsRoute
   AppSettingsTagsRoute: typeof AppSettingsTagsRoute
 }
 
 const AppSettingsRouteRouteChildren: AppSettingsRouteRouteChildren = {
   AppSettingsAccountRoute: AppSettingsAccountRoute,
+  AppSettingsDataRoute: AppSettingsDataRoute,
   AppSettingsIntegrationsRoute: AppSettingsIntegrationsRoute,
   AppSettingsTagsRoute: AppSettingsTagsRoute,
 }
@@ -519,20 +774,35 @@ const AppSettingsRouteRouteWithChildren =
 
 interface AppBookmarkIdRouteChildren {
   AppBookmarkIdEditRoute: typeof AppBookmarkIdEditRoute
+  AppBookmarkIdReadRoute: typeof AppBookmarkIdReadRoute
 }
 
 const AppBookmarkIdRouteChildren: AppBookmarkIdRouteChildren = {
   AppBookmarkIdEditRoute: AppBookmarkIdEditRoute,
+  AppBookmarkIdReadRoute: AppBookmarkIdReadRoute,
 }
 
 const AppBookmarkIdRouteWithChildren = AppBookmarkIdRoute._addFileChildren(
   AppBookmarkIdRouteChildren,
 )
 
+interface AppNewBookmarkRouteChildren {
+  AppNewBookmarkConfirmationRoute: typeof AppNewBookmarkConfirmationRoute
+}
+
+const AppNewBookmarkRouteChildren: AppNewBookmarkRouteChildren = {
+  AppNewBookmarkConfirmationRoute: AppNewBookmarkConfirmationRoute,
+}
+
+const AppNewBookmarkRouteWithChildren = AppNewBookmarkRoute._addFileChildren(
+  AppNewBookmarkRouteChildren,
+)
+
 interface AppRouteRouteChildren {
   AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
   AppFeedRoute: typeof AppFeedRoute
+  AppJournalRoute: typeof AppJournalRoute
   AppMediaRoute: typeof AppMediaRoute
   AppPublicRoute: typeof AppPublicRoute
   AppSearchRoute: typeof AppSearchRoute
@@ -543,7 +813,8 @@ interface AppRouteRouteChildren {
   AppTweetsRoute: typeof AppTweetsRoute
   AppBookmarkIdRoute: typeof AppBookmarkIdRouteWithChildren
   AppCollectionCollectionRoute: typeof AppCollectionCollectionRoute
-  AppNewBookmarkRoute: typeof AppNewBookmarkRoute
+  AppNewBookmarkRoute: typeof AppNewBookmarkRouteWithChildren
+  AppNewMediaRoute: typeof AppNewMediaRoute
   AppOauthConsentRoute: typeof AppOauthConsentRoute
   AppTagTagRoute: typeof AppTagTagRoute
   AppTypeTypeRoute: typeof AppTypeTypeRoute
@@ -553,6 +824,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,
   AppFeedRoute: AppFeedRoute,
+  AppJournalRoute: AppJournalRoute,
   AppMediaRoute: AppMediaRoute,
   AppPublicRoute: AppPublicRoute,
   AppSearchRoute: AppSearchRoute,
@@ -563,7 +835,8 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppTweetsRoute: AppTweetsRoute,
   AppBookmarkIdRoute: AppBookmarkIdRouteWithChildren,
   AppCollectionCollectionRoute: AppCollectionCollectionRoute,
-  AppNewBookmarkRoute: AppNewBookmarkRoute,
+  AppNewBookmarkRoute: AppNewBookmarkRouteWithChildren,
+  AppNewMediaRoute: AppNewMediaRoute,
   AppOauthConsentRoute: AppOauthConsentRoute,
   AppTagTagRoute: AppTagTagRoute,
   AppTypeTypeRoute: AppTypeTypeRoute,
@@ -574,12 +847,22 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 )
 
 interface PublicRouteRouteChildren {
+  PublicRecentRoute: typeof PublicRecentRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicShareTokenRoute: typeof PublicShareTokenRoute
+  PublicForgotPasswordIndexRoute: typeof PublicForgotPasswordIndexRoute
+  PublicRegisterIndexRoute: typeof PublicRegisterIndexRoute
+  PublicResetPasswordIndexRoute: typeof PublicResetPasswordIndexRoute
   PublicSigninIndexRoute: typeof PublicSigninIndexRoute
 }
 
 const PublicRouteRouteChildren: PublicRouteRouteChildren = {
+  PublicRecentRoute: PublicRecentRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicShareTokenRoute: PublicShareTokenRoute,
+  PublicForgotPasswordIndexRoute: PublicForgotPasswordIndexRoute,
+  PublicRegisterIndexRoute: PublicRegisterIndexRoute,
+  PublicResetPasswordIndexRoute: PublicResetPasswordIndexRoute,
   PublicSigninIndexRoute: PublicSigninIndexRoute,
 }
 
@@ -590,6 +873,9 @@ const PublicRouteRouteWithChildren = PublicRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   PublicRouteRoute: PublicRouteRouteWithChildren,
+  ChangelogRoute: ChangelogRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

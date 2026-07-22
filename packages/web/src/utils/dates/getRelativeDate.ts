@@ -18,8 +18,8 @@ export const getRelativeDateSource = (
   const ago = daysAgo(originalDate)
   const relative: string = relativeDate(originalDate)
   return {
-    formatted,
     ago,
+    formatted,
     relative,
   }
 }

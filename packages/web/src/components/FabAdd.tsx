@@ -1,3 +1,5 @@
+import switchOnSfx from '@mrmartineau/kit/sounds/switch-on.mp3'
+import useSound from '@mrmartineau/use-sound'
 import { PlusCircleIcon } from '@phosphor-icons/react'
 import { useLocation } from '@tanstack/react-router'
 import { cn } from '@/utils/classnames'
@@ -7,6 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './Tooltip'
 
 export const FabAdd = () => {
   const location = useLocation()
+  const [playSwitchOn] = useSound(switchOnSfx)
 
   const disableFab =
     location.pathname === `/new/bookmark` || location.pathname.includes('edit')
@@ -21,6 +24,8 @@ export const FabAdd = () => {
           onClick={(event) => {
             if (disableFab) {
               event.preventDefault()
+            } else {
+              playSwitchOn()
             }
           }}
           className={cn(disableFab && 'pointer-events-none opacity-30')}

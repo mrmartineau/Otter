@@ -36,7 +36,7 @@ export const handleScrape = async (request: HonoRequest) => {
   }
 
   if (url && !url.match(/^[a-zA-Z]+:\/\//)) {
-    url = 'https://' + url
+    url = `https://${url}`
   }
 
   try {
@@ -72,9 +72,14 @@ export const handleScrape = async (request: HonoRequest) => {
     // Add url type
     response.urlType = linkType(url, false)
 
-    // Parse JSON-LD
+    // Parse JSON-LD — if the script content is malformed, fall back to null
+    // rather than failing the entire scrape response
     if (response?.jsonld) {
-      response.jsonld = JSON.parse(response.jsonld as string)
+      try {
+        response.jsonld = JSON.parse(response.jsonld as string)
+      } catch {
+        response.jsonld = {} as JSONObject
+      }
     }
   } catch (error) {
     return generateErrorJSONResponse(error, url)

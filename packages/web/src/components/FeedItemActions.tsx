@@ -1,3 +1,6 @@
+import switchOffSfx from '@mrmartineau/kit/sounds/switch-off.mp3'
+import switchOnSfx from '@mrmartineau/kit/sounds/switch-on.mp3'
+import useSound from '@mrmartineau/use-sound'
 import {
   ArrowCounterClockwiseIcon,
   ArrowSquareOutIcon,
@@ -11,11 +14,12 @@ import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import urlJoin from 'proper-url-join'
 import { DropdownMenu } from 'radix-ui'
-import { Suspense } from 'react'
+import { Suspense, useRef } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/Button'
+import { deleteBookmark, updateBookmark } from '@/utils/fetching/bookmarks'
 import { getMetaOptions } from '@/utils/fetching/meta'
 import { filteredTags } from '@/utils/filteredTags'
-import { supabase } from '@/utils/supabase/client'
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import { useToggle } from '../hooks/useToggle'
 import type { BookmarkFeedItemProps } from './BookmarkFeedItem'
@@ -43,35 +47,29 @@ export const FeedItemActions = ({
   const [isToggled, , setToggleState] = useToggle()
   const navigate = useNavigate()
   const handleClickRegister = useClickBookmark()
+  const [playSwitchOn] = useSound(switchOnSfx, { volume: 0.3 })
+  const [playSwitchOff] = useSound(switchOffSfx, { volume: 0.3 })
+  const dropdownItemClicked = useRef(false)
   const { data: bookmarkTags } = useSuspenseQuery(getMetaOptions())
   const queryClient = useQueryClient()
 
   const handleArchiveBookmark = async () => {
     if (window.confirm('Do you really want to trash this bookmark?')) {
-      await supabase
-        .from('bookmarks')
-        .update({
-          modified_at: new Date().toISOString(),
-          status: 'inactive',
-        })
-        .match({ id })
+      await updateBookmark(id, { status: 'inactive' })
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+      toast.success('Moved to trash')
     }
   }
   const handleUnArchiveBookmark = async () => {
-    await supabase
-      .from('bookmarks')
-      .update({
-        modified_at: new Date().toISOString(),
-        status: 'active',
-      })
-      .match({ id })
+    await updateBookmark(id, { status: 'active' })
     await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+    toast.success('Restored from trash')
   }
   const handleDeleteBookmark = async () => {
     if (window.confirm('Do you really want to delete this bookmark forever?')) {
-      await supabase.from('bookmarks').delete().match({ id })
+      await deleteBookmark(id, { permanent: true })
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+      toast.success('Permanently deleted')
     }
   }
 
@@ -151,7 +149,17 @@ export const FeedItemActions = ({
     <div className="feed-item-actions">
       {allowDeletion === false ? (
         <>
-          <DropdownMenu.Root>
+          <DropdownMenu.Root
+            onOpenChange={(open) => {
+              if (open) {
+                playSwitchOn()
+              } else if (dropdownItemClicked.current) {
+                dropdownItemClicked.current = false
+              } else {
+                playSwitchOff()
+              }
+            }}
+          >
             <DropdownMenu.Trigger asChild>
               <Button variant="ghost" size="xs">
                 <ListPlusIcon weight="duotone" size="16" /> More
@@ -165,7 +173,11 @@ export const FeedItemActions = ({
               {url ? (
                 <DropdownMenu.Item
                   className="DropdownMenuItem"
-                  onClick={handleNavigateToBookmark}
+                  onClick={() => {
+                    dropdownItemClicked.current = true
+                    playSwitchOn()
+                    handleNavigateToBookmark()
+                  }}
                 >
                   Open in new tab
                   <div className="DropdownMenuItem-rightSlot">
@@ -176,7 +188,11 @@ export const FeedItemActions = ({
               {typeof navigator?.share === 'function' ? (
                 <DropdownMenu.Item
                   className="DropdownMenuItem"
-                  onClick={() => handleShare()}
+                  onClick={() => {
+                    dropdownItemClicked.current = true
+                    playSwitchOn()
+                    handleShare()
+                  }}
                 >
                   Share
                   <div className="DropdownMenuItem-rightSlot">
@@ -187,7 +203,11 @@ export const FeedItemActions = ({
                 <>
                   <DropdownMenu.Item
                     className="DropdownMenuItem"
-                    onClick={() => handleShare('mastodon')}
+                    onClick={() => {
+                      dropdownItemClicked.current = true
+                      playSwitchOn()
+                      handleShare('mastodon')
+                    }}
                   >
                     Share on Mastodon
                     <div className="DropdownMenuItem-rightSlot">
@@ -196,7 +216,11 @@ export const FeedItemActions = ({
                   </DropdownMenu.Item>
                   <DropdownMenu.Item
                     className="DropdownMenuItem"
-                    onClick={() => handleShare('twitter')}
+                    onClick={() => {
+                      dropdownItemClicked.current = true
+                      playSwitchOn()
+                      handleShare('twitter')
+                    }}
                   >
                     Share on Twitter
                     <div className="DropdownMenuItem-rightSlot">
@@ -208,7 +232,11 @@ export const FeedItemActions = ({
               {isInFeed && (
                 <DropdownMenu.Item
                   className="DropdownMenuItem"
-                  onClick={handleDeepLink}
+                  onClick={() => {
+                    dropdownItemClicked.current = true
+                    playSwitchOn()
+                    handleDeepLink()
+                  }}
                 >
                   Deep link
                   <div className="DropdownMenuItem-rightSlot">
@@ -219,7 +247,14 @@ export const FeedItemActions = ({
 
               <DropdownMenu.Item
                 className="DropdownMenuItem"
-                onClick={handleArchiveBookmark}
+                onClick={() => {
+                  dropdownItemClicked.current = true
+                  playSwitchOn()
+                  // Defer so the dropdown finishes closing before
+                  // window.confirm opens — a synchronous confirm fired into
+                  // Radix's menu teardown gets auto-dismissed (returns false).
+                  setTimeout(handleArchiveBookmark, 0)
+                }}
               >
                 Trash
                 <div className="DropdownMenuItem-rightSlot">
@@ -233,12 +268,14 @@ export const FeedItemActions = ({
           <Dialog
             open={isToggled}
             onOpenChange={(open) => {
+              if (!open) playSwitchOff()
               setToggleState(open)
             }}
           >
             <DialogTrigger
               asChild
               onClick={() => {
+                playSwitchOn()
                 setToggleState(true)
               }}
             >

@@ -4,6 +4,7 @@ import { Container } from '@/components/Container'
 import { Sidebar } from '@/components/Sidebar'
 import { TopBar } from '@/components/TopBar'
 import { UserProvider } from '@/components/UserProvider'
+import { usePasteUrl } from '@/hooks/usePasteUrl'
 import { getSession } from '@/utils/fetching/user'
 import pkg from '../../../package.json'
 import { ROUTE_SIGNIN } from '../../constants'
@@ -22,6 +23,8 @@ export const Route = createFileRoute('/_app')({
 })
 
 function RouteComponent() {
+  usePasteUrl()
+
   return (
     <UserProvider>
       <div className="otter-app-container">
@@ -31,7 +34,7 @@ function RouteComponent() {
           <div className="otter-sidebar-pane-overlay" />
           <main id="main" className="otter-content-pane">
             <div className="otter-content-pane-inner">
-              <Container className="h-full">
+              <Container className="min-h-dvh">
                 <Outlet />
               </Container>
             </div>

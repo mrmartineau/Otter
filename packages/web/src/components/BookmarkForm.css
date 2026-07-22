@@ -1,18 +1,46 @@
-.bookmark-form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-
-  label {
-    min-height: 20px;
+@layer components {
+  .bookmark-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    flex-shrink: 0;
   }
-}
 
-.bookmark-form-image {
-  border-radius: var(--radii-l);
-  border: 1px solid var(--border);
-  width: 100%;
-  max-width: 450px;
-  background-color: var(--theme3);
-  margin-bottom: var(--space-s);
+  .bookmark-form-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+
+  .bookmark-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-s);
+  }
+
+  .bookmark-form-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+
+    label {
+      min-height: 20px;
+    }
+  }
+
+  .bookmark-form-image {
+    border-radius: var(--radii-l) var(--radii-l) 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    width: 100%;
+    max-height: 450px;
+    background-color: var(--theme3);
+  }
+
+  .bookmark-form-footer {
+    margin-top: var(--space-m);
+    padding: var(--space-s);
+    padding-bottom: max(var(--space-s), env(safe-area-inset-bottom));
+    background-color: var(--theme1);
+    border-top: 1px solid var(--theme3);
+  }
 }

@@ -1,140 +1,64 @@
-import type {
-  OAuthAuthorizationDetails,
-  OAuthRedirect,
-} from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { Flex } from '@/components/Flex'
-import { supabase } from '@/utils/supabase/client'
-
-type ConsentSearch = {
-  authorization_id?: string
-}
+import { authClient } from '@/utils/auth/client'
 
 export const Route = createFileRoute('/_app/oauth/consent')({
   component: RouteComponent,
-  validateSearch: (search: Record<string, unknown>): ConsentSearch => ({
-    authorization_id: (search.authorization_id as string) || undefined,
-  }),
 })
 
+const SCOPE_LABELS: Record<string, string> = {
+  'bookmarks:read': 'Read your bookmarks',
+  'bookmarks:write': 'Create and modify bookmarks',
+  email: 'Access your email address',
+  offline_access: 'Stay signed in',
+  openid: 'Verify your identity',
+  'profile:read': 'Read your profile',
+}
+
 function RouteComponent() {
-  const { authorization_id } = Route.useSearch()
-  const [authDetails, setAuthDetails] = useState<
-    OAuthAuthorizationDetails | OAuthRedirect | null
-  >(null)
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const search = new URLSearchParams(window.location.search)
+  const scopes = (search.get('scope') ?? '').split(' ').filter(Boolean)
+  const clientId = search.get('client_id') ?? ''
 
-  useEffect(() => {
-    if (!authorization_id) {
-      setError('Missing authorization_id')
-      setIsLoading(false)
-      return
+  const handleConsent = async (accept: boolean) => {
+    setIsLoading(true)
+    const result = await authClient.oauth2.consent({ accept })
+    setIsLoading(false)
+    if (result.data?.url) {
+      window.location.href = result.data.url
     }
-
-    supabase.auth.oauth
-      .getAuthorizationDetails(authorization_id)
-      .then(({ data, error }) => {
-        if (error || !data) {
-          setError(error?.message || 'Invalid authorization request')
-        } else {
-          setAuthDetails(data)
-        }
-        setIsLoading(false)
-      })
-  }, [authorization_id])
-
-  const handleDecision = async (decision: 'approve' | 'deny') => {
-    if (!authorization_id) return
-    setIsSubmitting(true)
-
-    const method =
-      decision === 'approve'
-        ? supabase.auth.oauth.approveAuthorization
-        : supabase.auth.oauth.denyAuthorization
-
-    const { data, error } = await method(authorization_id)
-
-    if (error) {
-      setError(error.message)
-      setIsSubmitting(false)
-      return
-    }
-
-    window.location.href = data.redirect_url
-  }
-
-  if (isLoading) {
-    return (
-      <Container variant="auth">
-        <p className="mt-l text-center">Loading authorization details…</p>
-      </Container>
-    )
-  }
-
-  if (error) {
-    return (
-      <Container variant="auth">
-        <p className="mt-l text-center text-destructive">{error}</p>
-      </Container>
-    )
-  }
-
-  if (!authDetails) {
-    return null
-  }
-
-  if (!('client' in authDetails)) {
-    window.location.href = authDetails.redirect_url
-    return null
   }
 
   return (
     <Container variant="auth">
       <Flex direction="column" gap="m" className="mt-l">
-        <h2 className="text-center">Authorize {authDetails.client.name}</h2>
-        <p className="text-center">
-          This application wants to access your account.
-        </p>
-
-        <div className="rounded-lg bg-neutral-900 p-m">
-          <Flex direction="column" gap="xs">
-            <p>
-              <strong>Client:</strong> {authDetails.client.name}
-            </p>
-            <p>
-              <strong>Redirect URI:</strong> {authDetails.redirect_uri}
-            </p>
-            {authDetails.scope?.trim() && (
-              <div>
-                <strong>Requested permissions:</strong>
-                <ul className="mt-2xs list-inside list-disc">
-                  {authDetails.scope.split(' ').map((scopeItem) => (
-                    <li key={scopeItem}>{scopeItem}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </Flex>
-        </div>
-
+        <h2 className="text-center">Authorize access</h2>
+        {clientId ? (
+          <p className="text-center text-sm opacity-70">{clientId}</p>
+        ) : null}
+        <p>This application is requesting access to:</p>
+        <ul className="list-disc pl-m">
+          {scopes.map((scope) => (
+            <li key={scope}>{SCOPE_LABELS[scope] ?? scope}</li>
+          ))}
+        </ul>
         <Flex gap="m" justify="center">
           <Button
-            variant="secondary"
-            onClick={() => handleDecision('deny')}
-            disabled={isSubmitting}
+            onClick={() => handleConsent(true)}
+            disabled={isLoading}
           >
-            Deny
+            Authorize
           </Button>
           <Button
-            onClick={() => handleDecision('approve')}
-            disabled={isSubmitting}
+            variant="outline"
+            onClick={() => handleConsent(false)}
+            disabled={isLoading}
           >
-            Approve
+            Deny
           </Button>
         </Flex>
       </Flex>

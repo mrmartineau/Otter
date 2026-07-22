@@ -1,4 +1,3 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
 import {
   queryOptions,
   useMutation,
@@ -6,27 +5,29 @@ import {
 } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { UserProfile } from '@/types/db'
-import type { Database } from '@/types/supabase'
-import { supabase } from '../supabase/client'
+import { authClient } from '../auth/client'
 
 export const getSession = async () => {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  const { data: session } = await authClient.getSession()
   return session
 }
 
 export const getUserProfile = async () => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  const userProfile = await supabase
-    .from('profiles')
-    .select('*')
-    .match({ id: user?.id })
-    .single()
+  const response = await fetch('/api/me', {
+    credentials: 'include',
+  })
 
-  return userProfile
+  const userProfile = (await response.json()) as {
+    data?: UserProfile
+    error?: string
+    reason?: string
+  }
+
+  if (!response.ok) {
+    throw new Error(userProfile.error || userProfile.reason)
+  }
+
+  return userProfile as { data: UserProfile }
 }
 
 export const getUserProfileOptions = () => {
@@ -37,23 +38,6 @@ export const getUserProfileOptions = () => {
   })
 }
 
-export const getUserProfileByApiKey = async (
-  apiKey: string,
-  supabaseClient: SupabaseClient<Database> = supabase,
-) => {
-  const supabaseResponse = await supabaseClient
-    .from('profiles')
-    .select('*')
-    .match({ api_key: apiKey })
-    .single()
-
-  if (supabaseResponse.error) {
-    throw supabaseResponse.error
-  }
-
-  return supabaseResponse
-}
-
 interface UpdateUserParams {
   column: string
   value: string | number | boolean | string[] | null
@@ -61,10 +45,26 @@ interface UpdateUserParams {
 }
 
 const updateUser = async ({ column, value, id }: UpdateUserParams) => {
-  return await supabase
-    .from('profiles')
-    .update({ [column]: value, updated_at: new Date().toISOString() })
-    .match({ id })
+  const response = await fetch('/api/me', {
+    body: JSON.stringify({ column, id, value }),
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'PATCH',
+  })
+
+  const userProfile = (await response.json()) as {
+    data?: UserProfile
+    error?: string
+    reason?: string
+  }
+
+  if (!response.ok) {
+    throw new Error(userProfile.error || userProfile.reason)
+  }
+
+  return { data: userProfile.data as UserProfile, error: null }
 }
 
 export const updateUserMutation = () => {

@@ -1,3 +1,6 @@
+import switchOffSfx from '@mrmartineau/kit/sounds/switch-off.mp3'
+import switchOnSfx from '@mrmartineau/kit/sounds/switch-on.mp3'
+import useSound from '@mrmartineau/use-sound'
 import { CaretUpDownIcon } from '@phosphor-icons/react'
 import { Collapsible as CollapsiblePrimitive } from 'radix-ui'
 import { type ComponentProps, useCallback } from 'react'
@@ -17,14 +20,17 @@ export const Collapsible = ({
   ...props
 }: CollapsibleProps1) => {
   const { profile, handleUpdateUISettings } = useUser()
+  const [playSwitchOn] = useSound(switchOnSfx, { volume: 0.3 })
+  const [playSwitchOff] = useSound(switchOffSfx, { volume: 0.3 })
   const handleOpenChange = useCallback(
     (open: boolean) => {
+      open ? playSwitchOn() : playSwitchOff()
       handleUpdateUISettings({
         payload: open,
         type: `settings_${stateKey}_visible`,
       })
     },
-    [handleUpdateUISettings, stateKey],
+    [handleUpdateUISettings, stateKey, playSwitchOn, playSwitchOff],
   )
 
   return (
@@ -52,11 +58,7 @@ export const CollapsibleTrigger = ({
 }: ComponentProps<typeof CollapsiblePrimitive.Trigger>) => {
   return (
     <CollapsiblePrimitive.Trigger asChild {...rest}>
-      <Button
-        variant="collapsible"
-        size="s"
-        className="h-7 w-full justify-start !gap-2xs"
-      >
+      <Button variant="collapsible">
         <div className="rounded bg-theme3 p-1">
           <CaretUpDownIcon weight="duotone" size={14} />
         </div>

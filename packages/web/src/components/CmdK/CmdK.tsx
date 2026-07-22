@@ -1,3 +1,6 @@
+import closeSound from '@mrmartineau/kit/sounds/close_001.mp3'
+import openSound from '@mrmartineau/kit/sounds/open_001.mp3'
+import useSound from '@mrmartineau/use-sound'
 import {
   ArrowElbowDownLeftIcon,
   ArrowFatLinesUpIcon,
@@ -18,6 +21,7 @@ import { Command } from 'cmdk'
 import {
   createContext,
   type DispatchWithoutAction,
+  useCallback,
   useEffect,
   useState,
 } from 'react'
@@ -65,7 +69,8 @@ export const CmdK = () => {
   const [open, toggleOpen, setOpen] = useToggle(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [isHoldingAltKeyDown, setIsHoldingAltKeyDown] = useState(false)
-
+  const [playOpen] = useSound(openSound, { volume: 0.15 })
+  const [playClose] = useSound(closeSound, { volume: 0.15 })
   const { data, isLoading } = useQuery({
     enabled: !!searchTerm,
     queryFn: () => fetchSearch(searchTerm),
@@ -82,15 +87,26 @@ export const CmdK = () => {
   }
   const groupByDate = profile?.settings_group_by_date
 
+  const handleOpenCmdK = useCallback(() => {
+    setOpen(true)
+    playOpen()
+  }, [setOpen, playOpen])
+
+  const handleCloseCmdK = useCallback(() => {
+    setOpen(false)
+    playClose()
+    setSearchTerm('')
+  }, [setOpen, playClose])
+
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
       if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
-        toggleOpen()
+        handleOpenCmdK()
       }
     }
     document.addEventListener('keydown', down)
     return () => document.removeEventListener('keydown', down)
-  }, [toggleOpen])
+  }, [handleOpenCmdK])
 
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
@@ -120,7 +136,7 @@ export const CmdK = () => {
           <Button
             variant="cmdk"
             aria-label="Search Otter"
-            onClick={toggleOpen}
+            onClick={handleOpenCmdK}
             className="h-10"
           >
             <MagnifyingGlassIcon weight="duotone" size="25" />
@@ -135,10 +151,11 @@ export const CmdK = () => {
       <Command.Dialog
         open={open}
         onOpenChange={(open) => {
-          if (!open) {
-            setSearchTerm('')
+          if (open) {
+            handleOpenCmdK()
+          } else {
+            handleCloseCmdK()
           }
-          setOpen(open)
         }}
         label="Search"
         onKeyDown={(event) => {

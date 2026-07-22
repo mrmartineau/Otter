@@ -7,13 +7,16 @@ import { Button } from '@/components/Button'
 import { CONTENT, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { useFeedOptions } from '@/hooks/useFeedOptions'
 import { type FeedItemModel, useGroupByDate } from '@/hooks/useGroupByDate'
-import { usePagination } from '@/hooks/usePagination'
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll'
 import { getCollectionsTagsOptions } from '@/utils/fetching/collections'
+import type { ShareKind } from '@/utils/fetching/shares'
 import type { Bookmark, Toot, Tweet } from '../types/db'
 import { cn } from '../utils/classnames'
 import { BookmarkFeedItem } from './BookmarkFeedItem'
 import { Flex } from './Flex'
 import { headingVariants } from './Heading'
+import { Loader } from './Loader'
+import { ShareDialog } from './ShareDialog'
 import { SidebarLink } from './SidebarLink'
 import { TootFeedItem } from './TootFeedItem'
 import { TweetFeedItem } from './TweetFeedItem'
@@ -29,13 +32,16 @@ interface FeedProps {
   icon?: ReactNode
   items: FeedItemModel[]
   allowDeletion?: boolean
-  offset?: number
   count: number
   limit?: number
   allowGroupByDate?: boolean
   feedType?: 'tweets' | 'bookmarks' | 'toots'
   showFeedOptions?: boolean
   from?: FileRouteTypes['fullPaths']
+  hasNextPage?: boolean
+  isFetchingNextPage?: boolean
+  fetchNextPage?: () => void
+  shareConfig?: { kind: ShareKind; name: string }
 }
 
 export function isBookmark(item: FeedItemModel): item is Bookmark {
@@ -54,22 +60,24 @@ export const Feed = memo(
     icon,
     items,
     allowDeletion = false,
-    count,
-    limit = DEFAULT_API_RESPONSE_LIMIT,
-    offset = 0,
+    count: _count,
+    limit: _limit = DEFAULT_API_RESPONSE_LIMIT,
     allowGroupByDate = false,
     subNav,
     showFeedOptions = true,
-    from,
+    from: _from,
+    hasNextPage = false,
+    isFetchingNextPage = false,
+    fetchNextPage,
+    shareConfig,
   }: FeedProps) => {
     const { starQuery, publicQuery, setStarQuery, setPublicQuery } =
       useFeedOptions()
     const { groupByDate, groupedItems } = useGroupByDate(items)
-    const { handleUpdateOffset, hasOldItems, hasNewItems } = usePagination({
-      count,
-      from,
-      limit,
-      offset,
+    const { sentinelRef } = useInfiniteScroll({
+      fetchNextPage: fetchNextPage ?? (() => {}),
+      hasNextPage,
+      isFetchingNextPage,
     })
     const { data: collectionsTags } = useSuspenseQuery(
       getCollectionsTagsOptions(),
@@ -86,17 +94,6 @@ export const Feed = memo(
       }
     }
 
-    // // TODO: move this to usequery
-    // useEffect(() => {
-    //   const getCollections = async () => {
-    //     const collectionTagsResponse = await supabase
-    //       .from('collection_tags_view')
-    //       .select('*')
-    //     setCollections(collectionTagsResponse.data)
-    //   }
-    //   getCollections()
-    // }, [])
-
     return (
       <div className="feed">
         <Flex gap="xs" direction="column" justify="between">
@@ -110,29 +107,42 @@ export const Feed = memo(
               {icon}
               {title}
             </h3>
-            {showFeedOptions ? (
+            {showFeedOptions || shareConfig ? (
               <Flex gap="3xs">
-                <Button
-                  onClick={() => handleToggleState('star')}
-                  size="xs"
-                  variant="ghost"
-                  aria-pressed={starQuery}
-                >
-                  <StarIcon size={16} weight={starQuery ? 'fill' : 'duotone'} />{' '}
-                  Stars
-                </Button>
-                <Button
-                  onClick={() => handleToggleState('public')}
-                  size="xs"
-                  variant="ghost"
-                  aria-pressed={publicQuery}
-                >
-                  <EyeIcon
-                    size={16}
-                    weight={publicQuery ? 'fill' : 'duotone'}
-                  />{' '}
-                  Public
-                </Button>
+                {showFeedOptions ? (
+                  <>
+                    <Button
+                      onClick={() => handleToggleState('star')}
+                      size="xs"
+                      variant="ghost"
+                      aria-pressed={starQuery}
+                    >
+                      <StarIcon
+                        size={16}
+                        weight={starQuery ? 'fill' : 'duotone'}
+                      />{' '}
+                      Stars
+                    </Button>
+                    <Button
+                      onClick={() => handleToggleState('public')}
+                      size="xs"
+                      variant="ghost"
+                      aria-pressed={publicQuery}
+                    >
+                      <EyeIcon
+                        size={16}
+                        weight={publicQuery ? 'fill' : 'duotone'}
+                      />{' '}
+                      Public
+                    </Button>
+                  </>
+                ) : null}
+                {shareConfig ? (
+                  <ShareDialog
+                    kind={shareConfig.kind}
+                    name={shareConfig.name}
+                  />
+                ) : null}
               </Flex>
             ) : null}
           </Flex>
@@ -141,8 +151,10 @@ export const Feed = memo(
               {subNav.map(({ href, text, isActive, icon }) => {
                 return (
                   <SidebarLink href={href} isActive={isActive} key={href}>
-                    {icon}
-                    {text}
+                    <>
+                      {icon}
+                      {text}
+                    </>
                   </SidebarLink>
                 )
               })}
@@ -213,33 +225,10 @@ export const Feed = memo(
           </div>
         )}
 
-        {/* Next/previous navigation */}
-        {hasOldItems || hasNewItems ? (
-          <Flex align="center" justify="center" gap="s" className="mt-m">
-            {hasNewItems ? (
-              <Button
-                onClick={() =>
-                  handleUpdateOffset(Number(offset) - Number(limit))
-                }
-                disabled={!hasNewItems}
-                // disabledText={CONTENT.noNewerItems}
-              >
-                {CONTENT.newerBtn}
-              </Button>
-            ) : null}
-            {hasOldItems ? (
-              <Button
-                onClick={() =>
-                  handleUpdateOffset(Number(offset) + Number(limit))
-                }
-                disabled={!hasOldItems}
-                // disabledText={CONTENT.noOlderItems}
-              >
-                {CONTENT.olderBtn}
-              </Button>
-            ) : null}
-          </Flex>
-        ) : null}
+        {/* Infinite scroll sentinel */}
+        <div ref={sentinelRef} className="mt-m flex justify-center">
+          {isFetchingNextPage ? <Loader /> : null}
+        </div>
       </div>
     )
   },

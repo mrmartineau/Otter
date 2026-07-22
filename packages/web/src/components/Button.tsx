@@ -10,11 +10,12 @@ const buttonVariants = cva(['button-base', 'focus'], {
   },
   variants: {
     size: {
-      '2xs': 'px-3xs py-4xs text-step--2',
+      // @biome-ignore assist/source/useSortedKeys
+      '2xs': 'px-2xs py-3xs text-step--2 rounded-md',
       collapsible: 'h-6 w-6',
       l: 'px-m py-s',
-      m: 'px-m py-2xs text-step-0',
-      s: 'px-s py-2xs',
+      m: 'px-s py-2xs text-step--1',
+      s: 'px-s py-2xs text-step--1',
       xs: 'px-xs py-3xs text-step--2',
     },
     variant: {

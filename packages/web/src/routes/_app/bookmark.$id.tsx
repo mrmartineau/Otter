@@ -9,8 +9,7 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
   head: ({ loaderData }) => ({
     meta: [
       {
-        // @ts-expect-error How do I type loader data?
-        title: `Bookmark: ${loaderData?.title}`,
+        title: `Bookmark: ${(loaderData as { title?: string } | undefined)?.title ?? ''}`,
       },
     ],
   }),
@@ -22,6 +21,13 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
     )
     return bookmark.data
   },
+  validateSearch: (search: {
+    bookmarklet?: string
+  }): { bookmarklet?: string } => {
+    return {
+      bookmarklet: search.bookmarklet,
+    }
+  },
 })
 
 function RouteComponent() {
@@ -29,17 +35,16 @@ function RouteComponent() {
     getBookmarkOptions({ id: Route.useParams().id }),
   )
   const matchRoute = useMatchRoute()
-  const params = matchRoute({ to: '/bookmark/$id/edit' })
+  const isChildRoute =
+    matchRoute({ to: '/bookmark/$id/edit' }) ||
+    matchRoute({ to: '/bookmark/$id/read' })
 
-  // this feels weird, but it's a workaround to get the edit page to work
-  // the edit page is a child route, so it needs to be rendered here through the use of `Outlet`
   return (
     <>
-      {params ? (
+      {isChildRoute ? (
         <Outlet />
       ) : (
         <ErrorBoundary fallback={<div>Something went wrong</div>}>
-          {/* @ts-expect-error How do I get the proper types for this? */}
           <BookmarkFeedItem {...bookmark.data} preventMarkdownClamping />
         </ErrorBoundary>
       )}

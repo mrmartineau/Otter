@@ -1,4 +1,5 @@
 import type { Context } from 'hono'
+import { AI_MODEL } from './consts'
 
 export type AiGenerateResponse = {
   response: string
@@ -18,9 +19,14 @@ export const generateResponse = async ({
   prompt: string
   context: Context
 }) => {
-  const response = await context.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
-    prompt: `${systemPrompt}\n${prompt}`,
-  })
+  const messages = [
+    { content: systemPrompt, role: 'system' },
+    {
+      content: prompt,
+      role: 'user',
+    },
+  ]
+  const response = await context.env.AI.run(AI_MODEL, { messages })
 
   return context.json(response)
 }

@@ -4,7 +4,6 @@
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-
   /**
    * Bindings
    * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
@@ -15,22 +14,44 @@
     "binding": "AI"
   },
   "assets": {
-    "directory": "./public",
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    "directory": "./dist/client",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
   },
-  "compatibility_date": "2025-07-26",
+  "compatibility_date": "2026-03-12",
   "compatibility_flags": ["nodejs_compat"],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "fb72d6282a264b2e9f59a42e010bff2f"
+    }
+  ],
+  "keep_vars": true,
   "main": "worker/index.ts",
   "name": "otter-web",
   "observability": {
-    "enabled": true
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true
+    }
   },
-
   /**
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
    */
-  "placement": { "mode": "smart" },
+  "placement": {
+    "mode": "smart"
+  },
 
   /**
    * Cron Triggers
@@ -38,23 +59,47 @@
    */
   "triggers": {
     "crons": ["*/15 * * * *"]
-  }
+  },
+    
+  /**
+   * Rate limiting for the scrape/AI/RSS proxy endpoints
+   * https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
+   */
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 30,
+        "period": 60
+      }
+    }
+  ],
+  
+  /* Custom domain */
+  "routes": [
+    {
+      "custom_domain": true,
+      "pattern": "otter.zander.wtf",
+      "zone_name": "zander.wtf"
+    }
+  ],
   /**
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
    */
-  // "vars": { "MY_VARIABLE": "production_value" },
+  "vars": {
+    "BETTER_AUTH_URL": "https://otter.zander.wtf"
+  }
   /**
    * Note: Use secrets to store sensitive data.
    * https://developers.cloudflare.com/workers/configuration/secrets/
    */
-
   /**
    * Static Assets
    * https://developers.cloudflare.com/workers/static-assets/binding/
    */
   // "assets": { "directory": "./public/", "binding": "ASSETS" },
-
   /**
    * Service Bindings (communicate between multiple Workers)
    * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings

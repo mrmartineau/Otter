@@ -35,7 +35,16 @@ async function buildForBrowser(browser) {
   const browserManifest = JSON.parse(
     fs.readFileSync(browserManifestPath, 'utf8'),
   )
-  const finalManifest = { ...baseManifest, ...browserManifest }
+  const finalManifest = {
+    ...baseManifest,
+    ...browserManifest,
+    permissions: [
+      ...new Set([
+        ...(baseManifest.permissions ?? []),
+        ...(browserManifest.permissions ?? []),
+      ]),
+    ],
+  }
 
   // Run webpack build
   const webpackConfig = require('./webpack.config.js')

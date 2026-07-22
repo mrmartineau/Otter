@@ -16,7 +16,7 @@ export const PossibleMatchingItems = ({
   }
 
   return (
-    <div className="mt-2xs px-2xs text-step--2">
+    <div className="my-2xs px-2xs text-step--2">
       <b>Do you already have this item saved?</b>
       <ol className="list-inside list-decimal">
         {items?.slice(0, 3).map((item) => (

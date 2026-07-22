@@ -84,6 +84,44 @@ pnpm install
 pnpm web:dev
 ```
 
+## Releasing
+
+Otter uses [semantic-release](https://github.com/semantic-release/semantic-release) with the [`semantic-release-monorepo`](https://github.com/pmowrer/semantic-release-monorepo) plugin to version each package independently based on [Conventional Commits](https://www.conventionalcommits.org/). Packages are not published to npm — releases are GitHub releases only.
+
+### Commit message format
+
+| Prefix | Release type |
+| :----- | :----------- |
+| `fix:` | Patch (`1.0.x`) |
+| `feat:` | Minor (`1.x.0`) |
+| `feat!:` or `BREAKING CHANGE:` | Major (`x.0.0`) |
+
+### Per-package versioning
+
+Each releasable package has its own `release.config.mjs` that extends `semantic-release-monorepo`. The plugin filters commits to those that touch files inside the package's directory, so a commit changing only `packages/web` will only bump and release `@mrmartineau/otter-web`.
+
+Releasable packages:
+
+- `@mrmartineau/otter-web` — tags as `@mrmartineau/otter-web@vX.Y.Z`
+- `@mrmartineau/otter-chrome-extension` — tags as `@mrmartineau/otter-chrome-extension@vX.Y.Z`
+- `@mrmartineau/otter-web-extension` — tags as `@mrmartineau/otter-web-extension@vX.Y.Z`
+
+The `app` and `raycast-extension` packages are released through their own platforms (App Store / Raycast Store) and are not part of this workflow.
+
+### CI / automated releases
+
+Releases are triggered manually via the **"Release"** workflow in GitHub Actions (`.github/workflows/release.yml`). The workflow:
+
+1. Installs dependencies
+2. Runs `semantic-release` inside each releasable package via `pnpm --filter ... exec semantic-release`
+3. For each package with relevant new commits: bumps `package.json`, updates that package's `CHANGELOG.md`, commits the bump back to `main`, and creates a GitHub release with package-scoped tag and notes
+
+`GITHUB_TOKEN` is provided automatically by GitHub Actions — no additional secrets required.
+
+### Scoping commits
+
+To target a specific package, use a Conventional Commits scope, e.g. `feat(web): ...` or `fix(chrome-extension): ...`. The plugin uses changed file paths (not the scope) to decide which package releases, but scopes make the changelog clearer.
+
 ## Tech stack
 
 - **Frontend:** React 19, TanStack Router, React Query, Tailwind CSS v4

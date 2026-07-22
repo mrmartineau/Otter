@@ -44,4 +44,6 @@ export interface MetadataResponse {
   lang: isNullable<string>
   feeds: isNullable<string>
   urlType: BookmarkType
+  /** Markdown representation of the page's main content. Only present when ?markdown=true is passed. */
+  markdown?: isNullable<string>
 }

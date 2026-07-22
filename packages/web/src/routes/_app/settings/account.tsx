@@ -1,8 +1,7 @@
-import type { User } from '@supabase/supabase-js'
 import { createFileRoute } from '@tanstack/react-router'
 import { CodeBlock } from '@/components/CodeBlock'
 import { UpdateInfoForm } from '@/components/UpdateInfoForm'
-import { supabase } from '@/utils/supabase/client'
+import { getSession } from '@/utils/fetching/user'
 
 export const Route = createFileRoute('/_app/settings/account')({
   component: RouteComponent,
@@ -13,12 +12,9 @@ export const Route = createFileRoute('/_app/settings/account')({
       },
     ],
   }),
-  loader: async (): Promise<User | null> => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    return user
+  loader: async () => {
+    const session = await getSession()
+    return session?.user ?? null
   },
 })
 

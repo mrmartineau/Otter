@@ -3,18 +3,21 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
-import { supabase } from '@/utils/supabase/client'
+import { authClient } from '@/utils/auth/client'
 import { useToggle } from '../hooks/useToggle'
 import { getErrorMessage } from '../utils/get-error-message'
 import { FormGroup } from './FormGroup'
 
 export interface FormData {
+  currentPassword?: string
   email?: string
   password?: string
 }
 
 interface UpdateInfoProps {
-  user: any
+  user: {
+    email: string
+  } | null
 }
 
 export const UpdateInfoForm = ({ user }: UpdateInfoProps) => {
@@ -27,19 +30,39 @@ export const UpdateInfoForm = ({ user }: UpdateInfoProps) => {
     setValue,
   } = useForm<FormData>({
     defaultValues: {
-      email: user.email,
+      email: user?.email,
     },
   })
   const handleUpdateInfo = async (values: FormData) => {
     try {
-      const { error } = await supabase.auth.updateUser({
-        email: values.email,
-        password: values.password,
-      })
-      if (error) {
-        throw error
+      if (values.email && values.email !== user?.email) {
+        const { error } = await authClient.changeEmail({
+          newEmail: values.email,
+        })
+
+        if (error) {
+          throw error
+        }
       }
+
+      if (values.password) {
+        if (!values.currentPassword) {
+          throw new Error('Current password is required to change password')
+        }
+
+        const { error } = await authClient.changePassword({
+          currentPassword: values.currentPassword,
+          newPassword: values.password,
+          revokeOtherSessions: true,
+        })
+
+        if (error) {
+          throw error
+        }
+      }
+
       setFormSubmitting(false)
+      setValue('currentPassword', '')
       setValue('password', '')
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error)
@@ -82,7 +105,22 @@ export const UpdateInfoForm = ({ user }: UpdateInfoProps) => {
         </FormGroup>
 
         <FormGroup
-          label="Password"
+          label="Current password"
+          name="currentPassword"
+          error={errors.currentPassword?.message as string}
+        >
+          <Input
+            id="currentPassword"
+            type="password"
+            placeholder="Current password"
+            aria-invalid={errors.currentPassword?.message ? 'true' : 'false'}
+            {...register('currentPassword')}
+            autoComplete="current-password"
+          />
+        </FormGroup>
+
+        <FormGroup
+          label="New password"
           name="password"
           error={errors.password?.message as string}
         >

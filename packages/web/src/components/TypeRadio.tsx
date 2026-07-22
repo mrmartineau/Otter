@@ -2,7 +2,6 @@ import type { ComponentPropsWithRef } from 'react'
 import title from 'title'
 
 import type { BookmarkType } from '../types/db'
-import { IconControl } from './IconControl'
 import { TypeToIcon } from './TypeToIcon'
 
 export interface TypeRadioProps extends ComponentPropsWithRef<'input'> {
@@ -10,9 +9,20 @@ export interface TypeRadioProps extends ComponentPropsWithRef<'input'> {
 }
 
 export const TypeRadio = ({ value, ...props }: TypeRadioProps) => (
-  <IconControl type="radio" value={value} label={title(value)} {...props}>
-    <TypeToIcon type={value} className="text-theme8" />
-  </IconControl>
+  <label className="type-radio">
+    <input
+      className="type-radio-input"
+      type="radio"
+      value={value}
+      name={value}
+      {...props}
+    />
+
+    <div className="type-radio-label">
+      <TypeToIcon type={value} />
+      {title(value)}
+    </div>
+  </label>
 )
 
 TypeRadio.displayName = 'TypeRadio'
