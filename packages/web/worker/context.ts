@@ -16,7 +16,9 @@ export type RequestContext = {
   /**
    * Scopes granted to the caller. `null` means the caller is fully trusted
    * (session cookie or API key); an array means an OAuth access token whose
-   * grants must be checked before privileged operations.
+   * grants must be checked before privileged operations. Unauthenticated or
+   * invalid-token contexts get `[]` (no grants) — but always gate on
+   * `user`/`profile` too (`hasScope` does).
    */
   grantedScopes: string[] | null
 }
@@ -187,7 +189,7 @@ export const createRequestContext = async (
 
     return {
       db,
-      grantedScopes: oauth?.scopes ?? null,
+      grantedScopes: oauth?.scopes ?? [],
       profile: oauth?.profile ?? null,
       user: oauth
         ? {
@@ -198,12 +200,16 @@ export const createRequestContext = async (
     }
   }
 
-  return { db, grantedScopes: null, profile: null, user: null }
+  return { db, grantedScopes: [], profile: null, user: null }
 }
 
+// Never treat an unauthenticated context as trusted, even though its
+// grantedScopes default would otherwise allow it.
 export const hasScope = (requestContext: RequestContext, scope: string) =>
-  requestContext.grantedScopes === null ||
-  requestContext.grantedScopes.includes(scope)
+  requestContext.user !== null &&
+  requestContext.profile !== null &&
+  (requestContext.grantedScopes === null ||
+    requestContext.grantedScopes.includes(scope))
 
 export const requireRequestContext = async (
   context: Context<{ Bindings: WorkerEnv }>,

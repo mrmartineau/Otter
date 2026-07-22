@@ -209,8 +209,15 @@ async function dispatch(
           `Unknown tool: ${toolName}`,
         )
       }
+      // Fail closed: a tool missing from the scope map is denied rather
+      // than silently public.
       const requiredScope = toolScopes[toolName]
-      if (requiredScope && !hasScope(ctx.requestContext, requiredScope)) {
+      if (!requiredScope) {
+        return toolError(
+          `Tool "${toolName}" has no scope mapping and cannot be called.`,
+        )
+      }
+      if (!hasScope(ctx.requestContext, requiredScope)) {
         return toolError(
           `Insufficient scope: this tool requires the "${requiredScope}" scope.`,
         )
