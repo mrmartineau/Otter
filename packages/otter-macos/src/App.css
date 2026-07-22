@@ -1,0 +1,100 @@
+/* ZUI owns the reset + base layer + tokens. This is only the browser chrome
+   (tabs + toolbar) shown in the top strip webview; content lives in native
+   sibling webviews below, managed by Rust. */
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+.chrome {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* Tab strip */
+.tabstrip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  padding: var(--space-2xs) var(--space-2xs) var(--space-3xs);
+  border-bottom: var(--border-style) 1px var(--color-border);
+  -webkit-user-select: none;
+  user-select: none;
+  overflow-x: auto;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  max-width: 12rem;
+  min-width: 6rem;
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-md);
+  font-size: var(--step--1);
+  color: var(--color-text);
+  cursor: default;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background-color: oklch(from var(--color-text) l c h / 0.06);
+}
+
+.tab-active {
+  background-color: var(--color-background);
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-label {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.tab-close:hover {
+  opacity: 1;
+  background-color: oklch(from var(--color-text) l c h / 0.12);
+}
+
+/* Toolbar / address bar */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  padding: var(--space-3xs) var(--space-2xs) var(--space-2xs);
+}
+
+.addr-form {
+  flex: 1 1 auto;
+  margin-inline-start: var(--space-2xs);
+}
+
+.addr-input {
+  width: 100%;
+}
