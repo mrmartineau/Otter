@@ -116,10 +116,7 @@ export const Sidebar = ({ version }: SidebarProps) => {
           </SidebarLink>
           <TypeList types={dbMeta?.types} />
           <AllTags tags={dbMeta?.tags} />
-          <CollectionList
-            collections={dbMeta?.collections}
-            tags={dbMeta?.tags}
-          />
+          <CollectionList collections={dbMeta?.collections} />
           <SidebarLink href={ROUTE_MEDIA} activePath="media">
             <ApertureIcon size={18} weight="duotone" />
             {CONTENT.mediaNav}

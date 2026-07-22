@@ -1,6 +1,6 @@
 import { FolderIcon } from '@phosphor-icons/react'
 import { CONTENT } from '../constants'
-import type { CollectionType, MetaTag } from '../utils/fetching/meta'
+import type { CollectionType } from '../utils/fetching/meta'
 import {
   Collapsible,
   CollapsibleContent,
@@ -12,9 +12,8 @@ import { Text } from './Text'
 
 interface TypeListProps {
   collections?: CollectionType[]
-  tags?: MetaTag[]
 }
-export const CollectionList = ({ collections, tags }: TypeListProps) => (
+export const CollectionList = ({ collections }: TypeListProps) => (
   <Collapsible stateKey="collections">
     <CollapsibleTrigger>
       {CONTENT.collectionsNav}{' '}
@@ -29,19 +28,11 @@ export const CollectionList = ({ collections, tags }: TypeListProps) => (
                   return null
                 }
 
-                let count = bookmark_count || 0
-                // also count up tags that match the collection name
-                const matchingTags = tags?.filter((item) => {
-                  return item.tag?.toLowerCase() === collection.toLowerCase()
-                })
-                for (const tag of matchingTags!) {
-                  if (tag?.count) {
-                    count += tag.count
-                  }
-                }
+                // bookmark_count already includes bookmarks tagged with the
+                // bare collection name — don't add tag counts on top.
                 return {
                   collection,
-                  count,
+                  count: bookmark_count || 0,
                 }
               })
               .sort((a, b) => (b?.count ?? 0) - (a?.count ?? 0))
