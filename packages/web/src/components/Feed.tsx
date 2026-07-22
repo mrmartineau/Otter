@@ -1,4 +1,9 @@
-import { EyeIcon, StarIcon } from '@phosphor-icons/react'
+import {
+  ClockCounterClockwiseIcon,
+  EyeIcon,
+  StarIcon,
+  XIcon,
+} from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import type { FileRouteTypes } from '@tanstack/react-router'
 import { memo, type ReactNode } from 'react'
@@ -71,8 +76,14 @@ export const Feed = memo(
     fetchNextPage,
     shareConfig,
   }: FeedProps) => {
-    const { starQuery, publicQuery, setStarQuery, setPublicQuery } =
-      useFeedOptions()
+    const {
+      starQuery,
+      publicQuery,
+      windowQuery,
+      setStarQuery,
+      setPublicQuery,
+      setWindowQuery,
+    } = useFeedOptions()
     const { groupByDate, groupedItems } = useGroupByDate(items)
     const { sentinelRef } = useInfiniteScroll({
       fetchNextPage: fetchNextPage ?? (() => {}),
@@ -135,6 +146,31 @@ export const Feed = memo(
                       />{' '}
                       Public
                     </Button>
+                    <Button
+                      onClick={() => setWindowQuery((prev) => prev + 1)}
+                      size="xs"
+                      variant="ghost"
+                      aria-pressed={windowQuery > 0}
+                      title="Click again to go back another 7 days"
+                    >
+                      <ClockCounterClockwiseIcon
+                        size={16}
+                        weight={windowQuery > 0 ? 'fill' : 'duotone'}
+                      />{' '}
+                      {windowQuery > 1
+                        ? `${(windowQuery - 1) * 7 + 1}–${windowQuery * 7} days ago`
+                        : 'Last 7 days'}
+                    </Button>
+                    {windowQuery > 0 ? (
+                      <Button
+                        onClick={() => setWindowQuery(0)}
+                        size="xs"
+                        variant="ghost"
+                        aria-label="Clear date filter"
+                      >
+                        <XIcon size={16} />
+                      </Button>
+                    ) : null}
                   </>
                 ) : null}
                 {shareConfig ? (
