@@ -6,7 +6,9 @@ import {
   desc,
   eq,
   getTableColumns,
+  gte,
   ilike,
+  lt,
   or,
   sql,
 } from 'drizzle-orm'
@@ -66,6 +68,7 @@ export const getSearch = async (context: HonoContext) => {
       status,
       type,
       tag,
+      window: dateWindow,
     } = apiParameters(searchParams)
     const star = parseBoolean(searchParams.star)
     const hasSearchTerm = searchTerm.trim() !== ''
@@ -76,6 +79,18 @@ export const getSearch = async (context: HonoContext) => {
       type ? eq(bookmarks.type, type as BookmarkType) : undefined,
       star === undefined ? undefined : eq(bookmarks.star, star),
       tag ? arrayContains(bookmarks.tags, [tag]) : undefined,
+      dateWindow
+        ? gte(
+            bookmarks.createdAt,
+            sql`now() - ${dateWindow * 7} * interval '1 day'`,
+          )
+        : undefined,
+      dateWindow && dateWindow > 1
+        ? lt(
+            bookmarks.createdAt,
+            sql`now() - ${(dateWindow - 1) * 7} * interval '1 day'`,
+          )
+        : undefined,
       hasSearchTerm
         ? or(
             sql`${bookmarks.searchText} @@ ${tsQuery}`,

@@ -17,6 +17,8 @@ export interface BaseApiParameters {
 export interface ApiParametersQuery extends BaseApiParameters {
   star: boolean | undefined
   public: boolean | undefined
+  // 7-day date window: 1 = last 7 days, 2 = 8–14 days ago, etc.
+  window: number | undefined
 }
 export const apiParameters = (
   apiParams: Partial<ApiParametersQuery>,
@@ -30,6 +32,8 @@ export const apiParameters = (
   const type = apiParams?.type || undefined
   const tag = apiParams?.tag || undefined
   const top = apiParams?.top || undefined
+  const rawWindow = Math.floor(Number(apiParams?.window))
+  const dateWindow = rawWindow > 0 ? rawWindow : undefined
 
   return {
     limit,
@@ -41,5 +45,6 @@ export const apiParameters = (
     tag,
     top,
     type,
+    window: dateWindow,
   }
 }

@@ -7,6 +7,7 @@ import {
   eq,
   gte,
   isNull,
+  lt,
   or,
   sql,
 } from 'drizzle-orm'
@@ -66,6 +67,7 @@ export const getAllBookmarks = async (context: HonoContext) => {
       type,
       tag,
       top,
+      window: dateWindow,
     } = apiParameters(searchParams)
     const star = parseBoolean(searchParams.star)
     const publicItems = parseBoolean(searchParams.public)
@@ -81,6 +83,18 @@ export const getAllBookmarks = async (context: HonoContext) => {
         : undefined,
       tag === 'Untagged'
         ? or(isNull(bookmarks.tags), sql`cardinality(${bookmarks.tags}) = 0`)
+        : undefined,
+      dateWindow
+        ? gte(
+            bookmarks.createdAt,
+            sql`now() - ${dateWindow * 7} * interval '1 day'`,
+          )
+        : undefined,
+      dateWindow && dateWindow > 1
+        ? lt(
+            bookmarks.createdAt,
+            sql`now() - ${(dateWindow - 1) * 7} * interval '1 day'`,
+          )
         : undefined,
     ].filter(Boolean)
     const where = and(...conditions)
