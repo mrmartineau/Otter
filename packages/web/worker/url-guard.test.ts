@@ -100,6 +100,9 @@ describe('safeFetch', () => {
     const calls: string[] = []
     globalThis.fetch = (async (input: RequestInfo | URL) => {
       const url = String(input)
+      if (url.startsWith('https://cloudflare-dns.com/')) {
+        return new Response(JSON.stringify({ Answer: [] }), { status: 200 })
+      }
       calls.push(url)
       if (url === 'https://example.com/start') {
         return new Response(null, {
@@ -116,6 +119,36 @@ describe('safeFetch', () => {
       'https://example.com/start',
       'https://example.com/final',
     ])
+  })
+
+  it('rejects hostnames that resolve to private addresses', async () => {
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = String(input)
+      if (url.startsWith('https://cloudflare-dns.com/')) {
+        return new Response(
+          JSON.stringify({ Answer: [{ data: '10.0.0.5', type: 1 }] }),
+          { status: 200 },
+        )
+      }
+      return new Response('ok', { status: 200 })
+    }) as typeof fetch
+
+    await expect(safeFetch('https://rebind.example/')).rejects.toThrow(
+      'URL host resolves to a disallowed address',
+    )
+  })
+
+  it('fails open when DNS-over-HTTPS is unavailable', async () => {
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      const url = String(input)
+      if (url.startsWith('https://cloudflare-dns.com/')) {
+        return new Response('unavailable', { status: 503 })
+      }
+      return new Response('ok', { status: 200 })
+    }) as typeof fetch
+
+    const response = await safeFetch('https://doh-down.example/')
+    expect(await response.text()).toBe('ok')
   })
 
   it('rejects redirects to private addresses', async () => {
