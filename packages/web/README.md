@@ -82,18 +82,22 @@ This imports the legacy SQL dump into the new schema.
 
 ```bash
 pnpm dev              # Start dev server on port 5678
-pnpm build            # TypeScript check and Vite build
+pnpm build            # TypeScript build (tsc -b) and Vite build
 pnpm preview          # Build and preview with Vite
 pnpm deploy           # Build and deploy to Cloudflare Workers
-pnpm cf-typegen       # Generate Cloudflare Workers types
+pnpm cf-typegen       # Generate Cloudflare Workers types (run after changing wrangler.jsonc bindings)
 pnpm db:generate      # Generate Drizzle migrations from schema changes
 pnpm db:migrate       # Run Drizzle migrations
 pnpm db:import        # Import legacy SQL dump data
-pnpm db:import:legacy # Import legacy SQL dump data explicitly
 pnpm db:studio        # Open Drizzle Studio
 pnpm oauth:raycast    # Register/update the first-party Raycast OAuth client
-pnpm type-check       # Run TypeScript type checking
+pnpm test             # Run tests (vitest watch mode)
+pnpm vitest run       # Run tests once
 ```
+
+Type-check with `tsc -b` (the project-references build) — plain `tsc --noEmit` checks nothing here since the real config lives in `tsconfig.app.json` / `tsconfig.node.json`.
+
+Tests use Vitest with a `happy-dom` environment and are colocated as `*.test.ts` next to source.
 
 ## Env vars
 
@@ -318,19 +322,28 @@ curl -s -X POST "http://localhost:5678/api/mcp" \
 
 ## API Endpoints
 
-- `GET /api/` - health check
-- `POST /api/new` - create new item in Otter
-- `GET /api/new?url=https://example.com` - quick create bookmark from URL with metadata
-- `GET /api/bookmarks` - returns bookmarks
-- `GET /api/search?q=example` - search bookmarks
-- `GET /api/media` - returns media items grouped by type and status
-- `GET /api/media-search` - search media items
-- `POST /api/toot` - internal bookmark side-effect endpoint for Mastodon
-- `GET /api/scrape?url=https://example.com` - scrape a URL
-- `POST /api/ai/title` - rewrite a title with AI
-- `POST /api/ai/description` - rewrite a description with AI
-- `GET /api/rss?feed=https://example.com/rss` - convert an RSS feed to JSON
+All routes live under `/api` (see `worker/hono.ts`). Auth is via session cookie, OAuth bearer token, or `profiles.api_key` bearer token. Highlights:
+
+- `GET /api/` - health check (no DB connection)
+- `GET /api/me` / `PATCH /api/me` - current profile
+- `POST /api/new` - create new item(s); `GET /api/new?url=…` quick-creates a bookmark with scraped metadata
+- `GET|POST /api/bookmarks`, `GET|PATCH|DELETE /api/bookmarks/:id` - bookmark CRUD
+- `POST /api/bookmarks/:id/click` - register a click
+- `POST /api/bookmarks/import` / `GET /api/bookmarks/export` - bulk import/export
+- `GET /api/search?q=…` - search bookmarks (also `/api/search/tweets`, `/api/search/toots`)
+- `GET /api/recent`, `GET /api/dashboard`, `GET /api/meta` - feed/dashboard/metadata
+- `GET /api/tags`, `PATCH /api/tags/rename`, `GET /api/collections-tags`, `GET /api/collections/:collection`
+- `GET|POST /api/media`, `GET|PATCH|DELETE /api/media/:id`, `GET /api/media-search` - media tracker
+- `GET|POST /api/journals`, `…/journal-entries/:id` - journals
+- `GET|POST|DELETE /api/shares`, `GET /api/share/:token` - public shares
+- `GET /api/tweets`, `GET /api/toots` (+ `/:id`) - imported tweets/toots
+- `GET|PUT|PATCH /api/integrations/bluesky`, `POST /api/bluesky`, `POST /api/toot` - social posting/integration
+- `GET /api/scrape?url=…`, `GET /api/scrape-content?url=…` - scrape a URL (rate-limited, SSRF-guarded)
+- `POST /api/ai/title|description|summarise|classify` - Workers AI helpers (rate-limited)
+- `GET /api/rss?feed=…` - convert an RSS feed to JSON (rate-limited)
 - `POST /api/mcp` - MCP JSON-RPC endpoint (see [MCP server](#mcp-server))
+
+`/scrape*`, `/ai/*` and `/rss` sit behind per-user rate limiting (`RATE_LIMITER` binding) and an SSRF guard (`worker/url-guard.ts`).
 
 ## Mastodon integration
 

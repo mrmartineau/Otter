@@ -15,10 +15,9 @@ A universal browser extension for saving pages to [Otter](https://github.com/mrm
 ## Installation
 
 1. Clone this repository
-2. Navigate to this directory: `packages/web-extension`
-3. Install dependencies: `npm install`
-4. Build the extension: `npm run build`
-5. Load the extension in your browser:
+2. Install dependencies from the repo root: `pnpm install`
+3. Build the extension: `pnpm --filter=@mrmartineau/otter-web-extension run build` (or `pnpm run build` from `packages/web-extension`)
+4. Load the extension in your browser:
 
 ### Chrome
 
@@ -38,14 +37,16 @@ A universal browser extension for saving pages to [Otter](https://github.com/mrm
 
 ### Scripts
 
+Run from `packages/web-extension` (or via `pnpm --filter=@mrmartineau/otter-web-extension run <script>`):
+
 | Script | Description |
 | --- | --- |
-| `npm run build` | Build for both Chrome and Firefox |
-| `npm run build:chrome` | Build only for Chrome |
-| `npm run build:firefox` | Build only for Firefox |
-| `npm run dev:chrome` | Development build with watch for Chrome |
-| `npm run dev:firefox` | Development build with watch for Firefox |
-| `npm run format` | Format code with Prettier |
+| `pnpm run build` | Build for both Chrome and Firefox |
+| `pnpm run build:chrome` | Build only for Chrome (`TARGET=chrome`) |
+| `pnpm run build:firefox` | Build only for Firefox (`TARGET=firefox`) |
+| `pnpm run dev:chrome` | Development build with watch for Chrome |
+| `pnpm run dev:firefox` | Development build with watch for Firefox |
+| `pnpm run format` | Format code with Prettier |
 
 ### Project Structure
 
