@@ -1,6 +1,7 @@
 import './polyfill.js'
 import Defuddle from 'defuddle'
 import { parseHTML } from 'linkedom'
+import { safeFetch } from '../url-guard'
 import { createMarkdownContent } from './defuddle/markdown'
 import { MAX_SIZE, readResponseWithLimit } from './fetch'
 import { followShortUrl } from './follow-short-url'
@@ -12,12 +13,11 @@ export async function xtract(targetUrl: string): Promise<XtractResponse> {
   const { unshortened_url, urls } = await followShortUrl([targetUrl])
   const resolvedShortUrl = unshortened_url || targetUrl
 
-  const response = await fetch(resolvedShortUrl, {
+  const response = await safeFetch(resolvedShortUrl, {
     headers: {
       Accept: 'text/html,application/xhtml+xml',
       'User-Agent': 'Mozilla/5.0 (compatible; OtterBot/1.0)',
     },
-    redirect: 'follow',
   })
 
   if (!response.ok) {

@@ -1,3 +1,5 @@
+import { assertSafePublicUrl } from '../url-guard'
+
 const MAX_REDIRECTS = 20
 const HEAD_TIMEOUT_MS = 10_000
 
@@ -61,7 +63,11 @@ export const followShortUrl = async (
   const currentUrl = urls[urls.length - 1]
   const location = await requestRedirectLocation(currentUrl)
   if (location) {
-    const resolvedLocation = new URL(location, currentUrl).toString()
+    // Re-validate every hop so a public short URL cannot redirect the
+    // worker to an internal address (SSRF).
+    const resolvedLocation = assertSafePublicUrl(
+      new URL(location, currentUrl).toString(),
+    ).toString()
     urls.push(resolvedLocation)
     return followShortUrl(urls, redirectCount + 1)
   }

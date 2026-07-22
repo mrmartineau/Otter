@@ -45,7 +45,7 @@ const isPrivateIpv6 = (hostname: string): boolean => {
     address === '::1' ||
     address.startsWith('fc') ||
     address.startsWith('fd') || // unique local fc00::/7
-    address.startsWith('fe80') || // link-local
+    /^fe[89ab]/.test(address) || // link-local fe80::/10 (fe80–febf)
     address.startsWith('::ffff:') // IPv4-mapped — could smuggle private IPv4
   )
 }
@@ -80,4 +80,40 @@ export const assertSafePublicUrl = (input: string): URL => {
   }
 
   return url
+}
+
+const MAX_SAFE_REDIRECTS = 10
+
+/**
+ * fetch() that re-validates the URL on every redirect hop, so a public URL
+ * cannot bounce the worker to an internal address. Always fetches with
+ * `redirect: 'manual'`; a redirect response without a Location header is
+ * returned as-is.
+ */
+export const safeFetch = async (
+  input: string,
+  init?: RequestInit,
+): Promise<Response> => {
+  let currentUrl = assertSafePublicUrl(input).toString()
+
+  for (let redirects = 0; redirects <= MAX_SAFE_REDIRECTS; redirects++) {
+    const response = await fetch(currentUrl, { ...init, redirect: 'manual' })
+
+    if (response.status < 300 || response.status >= 400) {
+      return response
+    }
+
+    const location = response.headers.get('location')
+
+    if (!location) {
+      return response
+    }
+
+    await response.body?.cancel()
+    currentUrl = assertSafePublicUrl(
+      new URL(location, currentUrl).toString(),
+    ).toString()
+  }
+
+  throw new Error('Too many redirects')
 }
