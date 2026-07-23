@@ -52,6 +52,15 @@
   "placement": {
     "mode": "smart"
   },
+
+  /**
+   * Cron Triggers
+   * https://developers.cloudflare.com/workers/configuration/cron-triggers/
+   */
+  "triggers": {
+    "crons": ["*/15 * * * *"]
+  },
+    
   /**
    * Rate limiting for the scrape/AI/RSS proxy endpoints
    * https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
@@ -66,6 +75,7 @@
       }
     }
   ],
+  
   /* Custom domain */
   "routes": [
     {
