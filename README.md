@@ -6,7 +6,7 @@
         height="90"
       /><br/>Otter</h1>
 
-> Otter is a self-hosted bookmark manager and media tracker built with React, [Supabase](https://supabase.com), and [Cloudflare Workers](https://workers.cloudflare.com)
+> Otter is a self-hosted bookmark manager and media tracker built with React, [Hono](https://hono.dev), Postgres, and [Cloudflare Workers](https://workers.cloudflare.com)
 
   <p>
     <a
@@ -42,9 +42,13 @@
 - **Media tracking** — kanban-style board for tracking movies, TV shows, games, and more
 - **AI-powered** title and description rewriting via Cloudflare Workers AI
 - RSS feed parsing and URL scraping
-- Mastodon integration — backup your own toots and favourite toots
+- Mastodon integration — backup your own toots and favourite toots, plus auto-posting public bookmarks
+- Bluesky and Twitter/X import
+- **MCP server** — let MCP clients (Claude, Cursor, etc.) search and manage your bookmarks
+- REST API with API-key auth, plus an OAuth provider for first-party clients
 - Cross-browser web extension (Chrome & Firefox)
 - Raycast extension to search, view, and create bookmarks
+- Terminal UI (`otter-tui`)
 - Native macOS/iOS app
 - Bookmarklet
 
@@ -61,21 +65,22 @@ This is a pnpm monorepo containing the following packages:
 
 | Package | Description |
 | --- | --- |
-| [`packages/web`](packages/web) | Web app and Hono API on Cloudflare Workers |
-| [`packages/app`](packages/app) | Native macOS/iOS app |
+| [`packages/web`](packages/web) | Web app, Hono API, OAuth + MCP provider on Cloudflare Workers |
+| [`packages/app`](packages/app) | Native macOS/iOS app (Safari web extension + share sheet) |
 | [`packages/web-extension`](packages/web-extension) | Cross-browser extension (Chrome & Firefox) |
 | [`packages/raycast-extension`](packages/raycast-extension) | [Raycast](https://www.raycast.com/mrmartineau/otter) extension |
+| [`packages/tui`](packages/tui) | Terminal UI — browse, search, star and save bookmarks from the shell |
 | [`packages/chrome-extension`](packages/chrome-extension) | Legacy Chrome extension (superseded by `web-extension`) |
 
 ## Getting started
 
 ### Prerequisites
 
-- [pnpm](https://pnpm.io) v10+ — install with `corepack enable && corepack prepare pnpm@latest --activate`
-- [Supabase](https://supabase.com) account and the [Supabase CLI](https://supabase.com/docs/reference/cli/introduction)
-- [Cloudflare](https://cloudflare.com) account — used for hosting, Workers AI, and the API
+- [pnpm](https://pnpm.io) v11 (pinned via `packageManager`) — install with `corepack enable && corepack prepare pnpm@latest --activate`
+- A Postgres database, e.g. [Neon](https://neon.tech)
+- [Cloudflare](https://cloudflare.com) account — used for hosting, Workers AI, Hyperdrive, and the API
 
-For a full walkthrough — including Supabase database setup, Cloudflare configuration, and deployment — see the **[Setup Instructions](docs/setup-instructions.md)**.
+For a full walkthrough — including database setup, Cloudflare configuration, and deployment — see the **[Setup Instructions](docs/setup-instructions.md)**.
 
 ### Quick start
 
@@ -105,6 +110,7 @@ Releasable packages:
 - `@mrmartineau/otter-web` — tags as `@mrmartineau/otter-web@vX.Y.Z`
 - `@mrmartineau/otter-chrome-extension` — tags as `@mrmartineau/otter-chrome-extension@vX.Y.Z`
 - `@mrmartineau/otter-web-extension` — tags as `@mrmartineau/otter-web-extension@vX.Y.Z`
+- `@mrmartineau/otter-tui` — tags as `@mrmartineau/otter-tui@vX.Y.Z`
 
 The `app` and `raycast-extension` packages are released through their own platforms (App Store / Raycast Store) and are not part of this workflow.
 
@@ -124,11 +130,12 @@ To target a specific package, use a Conventional Commits scope, e.g. `feat(web):
 
 ## Tech stack
 
-- **Frontend:** React 19, TanStack Router, React Query, Tailwind CSS v4
+- **Frontend:** React 19, TanStack Router, TanStack Query, Tailwind CSS v4, Radix UI
 - **API:** [Hono](https://hono.dev) on Cloudflare Workers with AI bindings
-- **Database:** [Supabase](https://supabase.com) (Postgres)
+- **Database:** Postgres (e.g. [Neon](https://neon.tech)) via [Drizzle ORM](https://orm.drizzle.team) and Cloudflare Hyperdrive
+- **Auth:** [Better Auth](https://better-auth.com) with OAuth provider + JWT plugins
 - **Hosting:** [Cloudflare](https://cloudflare.com)
-- **Tooling:** pnpm workspaces, [Biome](https://biomejs.dev) (formatting & linting), Vite
+- **Tooling:** pnpm workspaces, [Biome](https://biomejs.dev) (formatting & linting), Vite, Vitest
 
 ## License
 
