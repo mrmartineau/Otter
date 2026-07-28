@@ -3,8 +3,7 @@ import { compare, hash } from 'bcryptjs'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { betterAuth } from 'better-auth/minimal'
 import { jwt } from 'better-auth/plugins'
-import type { Db } from '../db/client'
-import type { DbEnv } from '../db/client'
+import type { Db, DbEnv } from '../db/client'
 import {
   authAccounts,
   authJwks,
@@ -100,6 +99,11 @@ export const createAuth = (env: AuthEnv, db: Db) => {
     plugins: [
       jwt(),
       oauthProvider({
+        // Native clients (the iOS app) register themselves via RFC 7591 rather
+        // than shipping a per-instance client ID. A registered client still
+        // can't reach any data until a user signs in and consents.
+        allowDynamicClientRegistration: true,
+        allowUnauthenticatedClientRegistration: true,
         cachedTrustedClients: getTrustedOAuthClients(env),
         consentPage: '/oauth/consent',
         loginPage: '/signin',
