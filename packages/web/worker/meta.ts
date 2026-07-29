@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, sql } from 'drizzle-orm'
+import { and, count, desc, eq, gte, lt, sql } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { apiParameters } from '@/utils/fetching/apiParameters'
@@ -283,16 +283,36 @@ export const getCollectionBookmarks = async (context: HonoContext) => {
       })
     }
 
-    const params = apiParameters(
-      Object.fromEntries(new URL(context.req.url).searchParams),
+    const searchParams = Object.fromEntries(
+      new URL(context.req.url).searchParams,
     )
+    const params = apiParameters(searchParams)
     const limit = params.limit ?? DEFAULT_API_RESPONSE_LIMIT
     const offset = params.offset ?? 0
+    const dateWindow = params.window
+    const star = searchParams.star === 'true' ? true : undefined
+    const publicItems = searchParams.public === 'true' ? true : undefined
     const { db } = auth.requestContext
+    // Same star/public/date-window filters as /api/bookmarks, so a collection
+    // can be narrowed the same way as any other feed.
     const where = and(
       eq(bookmarks.user, auth.userId),
       eq(bookmarks.status, 'active'),
       collectionMatchCondition(name),
+      star === undefined ? undefined : eq(bookmarks.star, star),
+      publicItems === undefined ? undefined : eq(bookmarks.public, publicItems),
+      dateWindow
+        ? gte(
+            bookmarks.createdAt,
+            sql`now() - ${dateWindow * 7} * interval '1 day'`,
+          )
+        : undefined,
+      dateWindow && dateWindow > 1
+        ? lt(
+            bookmarks.createdAt,
+            sql`now() - ${(dateWindow - 1) * 7} * interval '1 day'`,
+          )
+        : undefined,
     )
     const [[{ value: total }], rows] = await Promise.all([
       db.select({ value: count() }).from(bookmarks).where(where),

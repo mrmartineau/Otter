@@ -13,7 +13,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Start listening for save-bookmark requests (app intents, otter:// URLs)
+        // before any scene — and therefore any SwiftUI view — exists.
+        _ = SaveRequestCenter.shared
+
+        // Must happen before the app finishes launching.
+        BackgroundRefresh.register()
         return true
     }
 

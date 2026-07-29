@@ -74,12 +74,8 @@
 		CE00120B2E9702DC00D4FB99 /* Exceptions for "Shared (App)" folder in "Otter (iOS)" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"/Localized: Resources/Main.html",
 				AppIntents.swift,
 				Assets.xcassets,
-				Resources/Script.js,
-				Resources/Style.css,
-				ViewController.swift,
 			);
 			target = CE0011BF2E9702DC00D4FB99 /* Otter (iOS) */;
 		};
@@ -146,10 +142,49 @@
 			);
 			target = CE0011E62E9702DC00D4FB99 /* Otter Extension (macOS) */;
 		};
+		CE0012302E9702DC00D4FB99 /* Exceptions for "macOS (App)" folder in "Otter (macOS)" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CE0011D12E9702DC00D4FB99 /* Otter (macOS) */;
+		};
 		CE0894582F487E12001E9F97 /* Exceptions for "Otter Share" folder in "Otter Share" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+			);
+			target = CE0894492F487E12001E9F97 /* Otter Share */;
+		};
+		CE0A00022F60000000000002 /* Exceptions for "Shared (Core)" folder in "Otter (iOS)" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Bookmark.swift,
+				BookmarkDraft.swift,
+				BookmarkFeedSource.swift,
+				BookmarkFormModel.swift,
+				BookmarkFormView.swift,
+				DiskCache.swift,
+				Keychain.swift,
+				OtterClient.swift,
+				OtterCredentials.swift,
+				OtterOAuth.swift,
+			);
+			target = CE0011BF2E9702DC00D4FB99 /* Otter (iOS) */;
+		};
+		CE0A00032F60000000000003 /* Exceptions for "Shared (Core)" folder in "Otter Share" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Bookmark.swift,
+				BookmarkDraft.swift,
+				BookmarkFeedSource.swift,
+				BookmarkFormModel.swift,
+				BookmarkFormView.swift,
+				DiskCache.swift,
+				Keychain.swift,
+				OtterClient.swift,
+				OtterCredentials.swift,
+				OtterOAuth.swift,
 			);
 			target = CE0894492F487E12001E9F97 /* Otter Share */;
 		};
@@ -194,13 +229,6 @@
 			path = "macOS (App)";
 			sourceTree = "<group>";
 		};
-		CE0012302E9702DC00D4FB99 /* Exceptions for "macOS (App)" folder in "Otter (macOS)" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = CE0011D12E9702DC00D4FB99 /* Otter (macOS) */;
-		};
 		CE0011E12E9702DC00D4FB99 /* iOS (Extension) */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -223,6 +251,15 @@
 				CE0894582F487E12001E9F97 /* Exceptions for "Otter Share" folder in "Otter Share" target */,
 			);
 			path = "Otter Share";
+			sourceTree = "<group>";
+		};
+		CE0A00012F60000000000001 /* Shared (Core) */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CE0A00022F60000000000002 /* Exceptions for "Shared (Core)" folder in "Otter (iOS)" target */,
+				CE0A00032F60000000000003 /* Exceptions for "Shared (Core)" folder in "Otter Share" target */,
+			);
+			path = "Shared (Core)";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -270,6 +307,7 @@
 			isa = PBXGroup;
 			children = (
 				CE0011A82E9702DB00D4FB99 /* Shared (App) */,
+				CE0A00012F60000000000001 /* Shared (Core) */,
 				CE0011B12E9702DC00D4FB99 /* Shared (Extension) */,
 				CE0011C22E9702DC00D4FB99 /* iOS (App) */,
 				CE0011D32E9702DC00D4FB99 /* macOS (App) */,
@@ -631,6 +669,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = Otter.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = C49QLB3U49;
@@ -640,9 +679,8 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -673,6 +711,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = Otter.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = C49QLB3U49;
@@ -682,9 +721,8 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1004,6 +1042,7 @@
 		CE0894552F487E12001E9F97 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = OtterShare.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = C49QLB3U49;
@@ -1024,6 +1063,7 @@
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
@@ -1034,6 +1074,7 @@
 		CE0894562F487E12001E9F97 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = OtterShare.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = C49QLB3U49;
@@ -1054,6 +1095,7 @@
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
