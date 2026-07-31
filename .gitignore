@@ -36,3 +36,9 @@ packages/*/build
 .cursor/
 
 .wrangler
+
+# Xcode — per-user editor state (open tabs, scroll positions, breakpoint UI).
+# Rewritten on almost every session and conflicts messily.
+xcuserdata/
+*.xcuserstate
+DerivedData/
