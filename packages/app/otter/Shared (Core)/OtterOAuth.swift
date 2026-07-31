@@ -16,6 +16,10 @@ nonisolated enum OtterError: LocalizedError {
     case signInCancelled
     case invalidResponse
     case server(String)
+    /// Otter answered, but with a 5xx — a cold Worker or a blip, worth retrying.
+    case serverUnavailable(String)
+    /// The refresh token was rejected outright — the grant is genuinely gone.
+    case invalidGrant
 
     var errorDescription: String? {
         switch self {
@@ -29,6 +33,10 @@ nonisolated enum OtterError: LocalizedError {
             return "Unexpected response from Otter."
         case let .server(message):
             return message
+        case let .serverUnavailable(message):
+            return message
+        case .invalidGrant:
+            return "Otter rejected the saved sign-in. Sign in again."
         }
     }
 }
@@ -249,13 +257,42 @@ nonisolated enum OtterOAuth {
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = Data(encoded.utf8)
 
-        let data = try await send(request)
+        let (data, urlResponse) = try await URLSession.shared.data(for: request)
+        let status = (urlResponse as? HTTPURLResponse)?.statusCode ?? 0
+
+        guard (200 ..< 300).contains(status) else {
+            let message = errorMessage(from: data)
+
+            // OAuth reports a spent or revoked grant as `invalid_grant`; anything
+            // else (network, 5xx, rate limit) is transient and must not be treated
+            // as a sign-out.
+            if isInvalidGrant(data: data, status: status) {
+                throw OtterError.invalidGrant
+            }
+
+            throw OtterError.server(message ?? "Otter returned \(status).")
+        }
 
         guard let response = try? JSONDecoder().decode(TokenResponse.self, from: data) else {
             throw OtterError.invalidResponse
         }
 
         return response
+    }
+
+    private static func isInvalidGrant(data: Data, status: Int) -> Bool {
+        struct Failure: Decodable {
+            let error: String?
+        }
+
+        let code = (try? JSONDecoder().decode(Failure.self, from: data))?.error
+
+        if let code {
+            return code == "invalid_grant" || code == "invalid_client" || code == "unauthorized_client"
+        }
+
+        // No machine-readable code: only a 400/401 is unambiguous enough.
+        return status == 400 || status == 401
     }
 
     // MARK: - Transport

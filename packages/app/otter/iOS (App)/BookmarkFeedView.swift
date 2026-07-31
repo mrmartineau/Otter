@@ -10,6 +10,7 @@ import SwiftUI
 struct BookmarkFeedView: View {
     @StateObject private var model: BookmarkFeedModel
     @State private var editing: Bookmark?
+    @State private var detail: Bookmark?
     @Environment(\.scenePhase) private var scenePhase
 
     /// Chips shown above the list — a collection's tags, mirroring the web sub-nav.
@@ -56,6 +57,9 @@ struct BookmarkFeedView: View {
                 BookmarkListRow(
                     bookmark: bookmark,
                     onEdit: { editing = bookmark },
+                    onShowDetail: { detail = bookmark },
+                    onToggleStar: { Task { await model.toggleStar(bookmark) } },
+                    onTogglePublic: { Task { await model.togglePublic(bookmark) } },
                     onTrash: { Task { await model.trash(bookmark) } }
                 )
             }
@@ -120,6 +124,17 @@ struct BookmarkFeedView: View {
                 }
             }
         }
+        .sheet(item: $detail) { bookmark in
+            BookmarkDetailView(bookmark: bookmark) {
+                detail = nil
+                // Let the detail sheet finish dismissing before the editor
+                // takes its place, otherwise the second one never appears.
+                Task {
+                    try? await Task.sleep(nanoseconds: 350_000_000)
+                    editing = bookmark
+                }
+            }
+        }
         .alert(
             "Couldn't update bookmark",
             isPresented: Binding(
@@ -139,6 +154,9 @@ struct BookmarkFeedView: View {
 struct BookmarkListRow: View {
     let bookmark: Bookmark
     let onEdit: () -> Void
+    let onShowDetail: () -> Void
+    let onToggleStar: () -> Void
+    let onTogglePublic: () -> Void
     let onTrash: () -> Void
 
     @Environment(\.openURL) private var openURL
@@ -150,6 +168,7 @@ struct BookmarkListRow: View {
             BookmarkRow(bookmark: bookmark)
         }
         .buttonStyle(.plain)
+        // Edit stays first, so it keeps the full-swipe gesture it already had.
         .swipeActions(edge: .trailing) {
             Button {
                 onEdit()
@@ -157,6 +176,26 @@ struct BookmarkListRow: View {
                 Label("Edit", systemImage: "pencil")
             }
             .tint(.blue)
+
+            Button {
+                onToggleStar()
+            } label: {
+                Label(
+                    bookmark.star ? "Unstar" : "Star",
+                    systemImage: bookmark.star ? "star.slash" : "star"
+                )
+            }
+            .tint(.yellow)
+
+            Button {
+                onTogglePublic()
+            } label: {
+                Label(
+                    bookmark.isPublic ? "Make private" : "Make public",
+                    systemImage: bookmark.isPublic ? "eye.slash" : "eye"
+                )
+            }
+            .tint(.indigo)
         }
         .swipeActions(edge: .leading) {
             // Not `role: .destructive` — this only moves the bookmark to the
@@ -168,6 +207,125 @@ struct BookmarkListRow: View {
             }
             .tint(.orange)
         }
+        // Long press for everything the row has no room for.
+        .contextMenu {
+            if let url = bookmark.linkURL {
+                Button {
+                    openURL(url)
+                } label: {
+                    Label("Open link", systemImage: "safari")
+                }
+
+                Button {
+                    UIPasteboard.general.string = url.absoluteString
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                } label: {
+                    Label("Copy link", systemImage: "doc.on.doc")
+                }
+            }
+
+            Divider()
+
+            Button {
+                onShowDetail()
+            } label: {
+                Label("Details", systemImage: "info.circle")
+            }
+
+            Button {
+                onEdit()
+            } label: {
+                Label("Edit", systemImage: "pencil")
+            }
+
+            Button {
+                onToggleStar()
+            } label: {
+                Label(
+                    bookmark.star ? "Unstar" : "Star",
+                    systemImage: bookmark.star ? "star.slash" : "star"
+                )
+            }
+
+            Button {
+                onTogglePublic()
+            } label: {
+                Label(
+                    bookmark.isPublic ? "Make private" : "Make public",
+                    systemImage: bookmark.isPublic ? "eye.slash" : "eye"
+                )
+            }
+
+            Divider()
+
+            // As with the swipe action, this only moves the bookmark to the trash.
+            Button {
+                onTrash()
+            } label: {
+                Label("Move to Trash", systemImage: "trash")
+            }
+        } preview: {
+            BookmarkPreview(bookmark: bookmark)
+        }
+    }
+}
+
+/// The hard-press preview: the row's content with room to breathe, so the
+/// description and tags are readable before you pick an action.
+private struct BookmarkPreview: View {
+    let bookmark: Bookmark
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if let imageURL = bookmark.imageURL {
+                RemoteImage(url: imageURL, maxSize: 320) { phase in
+                    switch phase {
+                    case let .success(image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(height: 140)
+                            .clipped()
+                    case .failure:
+                        EmptyView()
+                    case .loading:
+                        Rectangle()
+                            .fill(Color(.tertiarySystemFill))
+                            .frame(height: 140)
+                    }
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(bookmark.displayTitle)
+                    .font(.headline)
+                    .lineLimit(3)
+
+                if let description = bookmark.description, !description.isEmpty {
+                    Text(description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(4)
+                }
+
+                if let note = bookmark.note, !note.isEmpty {
+                    Text(note)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(3)
+                }
+
+                if let host = bookmark.host {
+                    Text(host)
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.bottom, 14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(width: 280)
     }
 }
 
@@ -177,6 +335,8 @@ struct BookmarkRow: View {
     let bookmark: Bookmark
 
     private static let gutterWidth: CGFloat = 14
+    private static let thumbnailSize: CGFloat = 52
+    private static let faviconSize: CGFloat = 14
 
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
@@ -212,10 +372,14 @@ struct BookmarkRow: View {
                         }
 
                         if let footnote {
-                            Text(footnote)
-                                .font(.caption)
-                                .foregroundStyle(.tertiary)
-                                .lineLimit(1)
+                            HStack(spacing: 4) {
+                                favicon
+
+                                Text(footnote)
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                                    .lineLimit(1)
+                            }
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -245,12 +409,46 @@ struct BookmarkRow: View {
         .accessibilityLabel(bookmark.star ? "Starred" : "")
     }
 
-    /// Host and tags on one quiet line.
+    /// The site's icon, sitting to the left of the host. The slot keeps its size
+    /// in every state, so a favicon arriving doesn't shove the line sideways.
+    @ViewBuilder
+    private var favicon: some View {
+        if let faviconURL = bookmark.faviconURL {
+            // Decoded well above the drawn size: the service hands back icons at
+            // assorted resolutions, and this leaves room for the larger ones.
+            RemoteImage(url: faviconURL, maxSize: Self.faviconSize * 2) { phase in
+                switch phase {
+                case let .success(image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: Self.faviconSize, height: Self.faviconSize)
+                        .clipShape(Circle())
+                case .failure:
+                    // No icon for this domain — a neutral mark keeps the row aligned.
+                    Image(systemName: "globe")
+                        .font(.system(size: Self.faviconSize - 2))
+                        .foregroundStyle(.tertiary)
+                        .frame(width: Self.faviconSize, height: Self.faviconSize)
+                case .loading:
+                    Circle()
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: Self.faviconSize, height: Self.faviconSize)
+                }
+            }
+        }
+    }
+
+    /// Host, type and tags on one quiet line.
     private var footnote: String? {
         var parts: [String] = []
 
         if let host = bookmark.host {
             parts.append(host)
+        }
+
+        if let type = bookmark.type, !type.isEmpty {
+            parts.append(BookmarkTypes.label(for: type))
         }
 
         if let tags = bookmark.tags, !tags.isEmpty {
@@ -263,13 +461,17 @@ struct BookmarkRow: View {
     @ViewBuilder
     private var thumbnail: some View {
         if let imageURL = bookmark.imageURL {
-            AsyncImage(url: imageURL) { phase in
+            // Decoded at `maxSize`, not at whatever the source happens to be —
+            // og:images run to several thousand pixels a side. The cap is well
+            // above 52 pt because `.fill` crops to the *shortest* edge, so a
+            // wide image still needs 52 pt of height to cover the square.
+            RemoteImage(url: imageURL, maxSize: Self.thumbnailSize * 2) { phase in
                 switch phase {
                 case let .success(image):
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(width: 52, height: 52)
+                        .frame(width: Self.thumbnailSize, height: Self.thumbnailSize)
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -278,10 +480,10 @@ struct BookmarkRow: View {
                 case .failure:
                     // A dead image URL shouldn't leave an empty grey box.
                     EmptyView()
-                default:
+                case .loading:
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .fill(Color(.tertiarySystemFill))
-                        .frame(width: 52, height: 52)
+                        .frame(width: Self.thumbnailSize, height: Self.thumbnailSize)
                 }
             }
         }

@@ -169,6 +169,7 @@
 				OtterClient.swift,
 				OtterCredentials.swift,
 				OtterOAuth.swift,
+				RemoteImage.swift,
 			);
 			target = CE0011BF2E9702DC00D4FB99 /* Otter (iOS) */;
 		};
@@ -185,6 +186,7 @@
 				OtterClient.swift,
 				OtterCredentials.swift,
 				OtterOAuth.swift,
+				RemoteImage.swift,
 			);
 			target = CE0894492F487E12001E9F97 /* Otter Share */;
 		};

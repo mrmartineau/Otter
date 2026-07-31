@@ -130,11 +130,55 @@ final class BookmarkFeedModel: ObservableObject {
         }
     }
 
+    /// Flips the star, showing the change straight away and rolling it back if
+    /// the request fails. `replace` then drops the row if the new value means it
+    /// no longer belongs here — unstarring inside the Stars feed, say.
+    func toggleStar(_ bookmark: Bookmark) async {
+        var updated = bookmark
+        updated.star.toggle()
+
+        await applyFlag(updated, revertingTo: bookmark) {
+            try await OtterClient.shared.setStar(id: bookmark.id, star: updated.star)
+        }
+    }
+
+    func togglePublic(_ bookmark: Bookmark) async {
+        var updated = bookmark
+        updated.isPublic.toggle()
+
+        await applyFlag(updated, revertingTo: bookmark) {
+            try await OtterClient.shared.setPublic(id: bookmark.id, isPublic: updated.isPublic)
+        }
+    }
+
+    private func applyFlag(
+        _ optimistic: Bookmark,
+        revertingTo original: Bookmark,
+        request: () async throws -> Bookmark
+    ) async {
+        guard let index = bookmarks.firstIndex(where: { $0.id == original.id }) else { return }
+
+        bookmarks[index] = optimistic
+
+        do {
+            replace(try await request())
+        } catch {
+            // Re-find rather than reuse `index`: the list may have moved while
+            // the request was in flight.
+            if let current = bookmarks.firstIndex(where: { $0.id == original.id }) {
+                bookmarks[current] = original
+            }
+
+            actionError = error.localizedDescription
+        }
+    }
+
     /// Whether an edited bookmark still belongs in this particular feed.
     private func matches(_ bookmark: Bookmark) -> Bool {
         guard bookmark.status != "inactive" else { return false }
 
         if filter.star, !bookmark.star { return false }
+        if filter.isPublic, !bookmark.isPublic { return false }
 
         switch source {
         case .all, .search, .top:
@@ -160,9 +204,19 @@ final class BookmarkFeedModel: ObservableObject {
                 limit: pageSize,
                 offset: bookmarks.count
             )
+            let countBefore = bookmarks.count
             let known = Set(bookmarks.map(\.id))
             bookmarks.append(contentsOf: page.data.filter { !known.contains($0.id) })
-            totalCount = page.count
+
+            if bookmarks.count == countBefore {
+                // The page was empty, or every row in it was one we already hold —
+                // which happens when the list shifts under us. Pin the total to
+                // what we have so `canLoadMore` goes false instead of leaving the
+                // spinner up to refetch the same page forever.
+                totalCount = bookmarks.count
+            } else {
+                totalCount = max(page.count, bookmarks.count)
+            }
         } catch {
             loadError = error.localizedDescription
         }

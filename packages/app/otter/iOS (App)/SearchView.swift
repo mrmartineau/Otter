@@ -103,6 +103,48 @@ final class SearchModel: ObservableObject {
         }
     }
 
+    /// Flips the star, showing the change straight away and rolling it back if
+    /// the request fails. Search has no filters, so the row always stays put.
+    func toggleStar(_ bookmark: Bookmark) async {
+        var updated = bookmark
+        updated.star.toggle()
+
+        await applyFlag(updated, revertingTo: bookmark) {
+            try await OtterClient.shared.setStar(id: bookmark.id, star: updated.star)
+        }
+    }
+
+    func togglePublic(_ bookmark: Bookmark) async {
+        var updated = bookmark
+        updated.isPublic.toggle()
+
+        await applyFlag(updated, revertingTo: bookmark) {
+            try await OtterClient.shared.setPublic(id: bookmark.id, isPublic: updated.isPublic)
+        }
+    }
+
+    private func applyFlag(
+        _ optimistic: Bookmark,
+        revertingTo original: Bookmark,
+        request: () async throws -> Bookmark
+    ) async {
+        guard let index = results.firstIndex(where: { $0.id == original.id }) else { return }
+
+        results[index] = optimistic
+
+        do {
+            replace(try await request())
+        } catch {
+            // Re-find rather than reuse `index`: the list may have moved while
+            // the request was in flight.
+            if let current = results.firstIndex(where: { $0.id == original.id }) {
+                results[current] = original
+            }
+
+            actionError = error.localizedDescription
+        }
+    }
+
     func trash(_ bookmark: Bookmark) async {
         guard let index = results.firstIndex(where: { $0.id == bookmark.id }) else { return }
 
@@ -133,9 +175,17 @@ final class SearchModel: ObservableObject {
 
             // Discard the page if the term moved on while it was in flight.
             if term == activeTerm {
+                let countBefore = results.count
                 let known = Set(results.map(\.id))
                 results.append(contentsOf: page.data.filter { !known.contains($0.id) })
-                totalCount = page.count
+
+                // Nothing new means the server has no more to give; pin the total
+                // so `canLoadMore` goes false rather than refetching forever.
+                if results.count == countBefore {
+                    totalCount = results.count
+                } else {
+                    totalCount = max(page.count, results.count)
+                }
             }
         } catch {
             searchError = error.localizedDescription
@@ -148,6 +198,7 @@ final class SearchModel: ObservableObject {
 struct SearchView: View {
     @StateObject private var model = SearchModel()
     @State private var editing: Bookmark?
+    @State private var detail: Bookmark?
 
     var body: some View {
         NavigationStack {
@@ -156,6 +207,9 @@ struct SearchView: View {
                     BookmarkListRow(
                         bookmark: bookmark,
                         onEdit: { editing = bookmark },
+                        onShowDetail: { detail = bookmark },
+                        onToggleStar: { Task { await model.toggleStar(bookmark) } },
+                        onTogglePublic: { Task { await model.togglePublic(bookmark) } },
                         onTrash: { Task { await model.trash(bookmark) } }
                     )
                 }
@@ -190,6 +244,17 @@ struct SearchView: View {
 
                     if let saved {
                         model.replace(saved)
+                    }
+                }
+            }
+            .sheet(item: $detail) { bookmark in
+                BookmarkDetailView(bookmark: bookmark) {
+                    detail = nil
+                    // Let the detail sheet finish dismissing before the editor
+                    // takes its place, otherwise the second one never appears.
+                    Task {
+                        try? await Task.sleep(nanoseconds: 350_000_000)
+                        editing = bookmark
                     }
                 }
             }

@@ -34,11 +34,20 @@ final class BookmarkFormModel: ObservableObject {
 
     // Progress
     @Published var isScraping = false
+    @Published var isLoadingTags = false
     @Published var isClassifying = false
     @Published var isRewritingTitle = false
     @Published var isRewritingDescription = false
     @Published var isSaving = false
     @Published var isSaved = false
+
+    // Errors are kept apart so one failing request can't wipe another's message,
+    // and so each can be retried from the section it belongs to.
+    /// Fetching metadata for the URL.
+    @Published var scrapeError: String?
+    /// Fetching the tag list that backs the suggestions.
+    @Published var tagsError: String?
+    /// Saving, and the AI actions.
     @Published var errorMessage: String?
 
     /// New bookmark, or an edit of an existing one.
@@ -168,13 +177,24 @@ final class BookmarkFormModel: ObservableObject {
         await tagLoad
     }
 
-    private func loadTags() async {
-        guard let loaded = try? await OtterClient.shared.tags() else { return }
+    /// The tag list behind the suggestions. This used to swallow its error, which
+    /// left the field looking as though the account simply had no tags.
+    func loadTags() async {
+        isLoadingTags = true
+        tagsError = nil
 
-        availableTags = loaded
-            .compactMap(\.tag)
-            .filter { $0 != "Untagged" && !$0.hasPrefix("like:") }
-            .sorted { $0.lowercased() < $1.lowercased() }
+        do {
+            let loaded = try await retrying { try await OtterClient.shared.tags() }
+
+            availableTags = loaded
+                .compactMap(\.tag)
+                .filter { $0 != "Untagged" && !$0.hasPrefix("like:") }
+                .sorted { $0.lowercased() < $1.lowercased() }
+        } catch {
+            tagsError = message(for: error)
+        }
+
+        isLoadingTags = false
     }
 
     // MARK: - Scraping
@@ -183,10 +203,12 @@ final class BookmarkFormModel: ObservableObject {
         guard let target = normalizedURL, !isScraping else { return }
 
         isScraping = true
-        errorMessage = nil
+        scrapeError = nil
 
         do {
-            let metadata = try await OtterClient.shared.scrape(url: target.absoluteString)
+            let metadata = try await retrying {
+                try await OtterClient.shared.scrape(url: target.absoluteString)
+            }
             lastScrapedURL = target.absoluteString
             scrapedTitle = metadata.title
             scrapedDescription = metadata.description
@@ -213,7 +235,7 @@ final class BookmarkFormModel: ObservableObject {
             }
         } catch {
             isScraping = false
-            handle(error)
+            scrapeError = message(for: error)
         }
     }
 
@@ -229,6 +251,7 @@ final class BookmarkFormModel: ObservableObject {
         guard !isClassifying, normalizedURL != nil || !title.isEmpty else { return }
 
         isClassifying = true
+        errorMessage = nil
 
         do {
             let result = try await OtterClient.shared.classify(
@@ -245,7 +268,7 @@ final class BookmarkFormModel: ObservableObject {
                 type = suggestedType
             }
         } catch {
-            handle(error)
+            errorMessage = message(for: error)
         }
 
         isClassifying = false
@@ -259,7 +282,7 @@ final class BookmarkFormModel: ObservableObject {
         do {
             title = try await OtterClient.shared.rewriteTitle(title)
         } catch {
-            handle(error)
+            errorMessage = message(for: error)
         }
 
         isRewritingTitle = false
@@ -276,7 +299,7 @@ final class BookmarkFormModel: ObservableObject {
                 title: title
             )
         } catch {
-            handle(error)
+            errorMessage = message(for: error)
         }
 
         isRewritingDescription = false
@@ -376,7 +399,7 @@ final class BookmarkFormModel: ObservableObject {
             return saved
         } catch {
             isSaving = false
-            handle(error)
+            errorMessage = message(for: error)
             return nil
         }
     }
@@ -390,6 +413,8 @@ final class BookmarkFormModel: ObservableObject {
         scrapedTitle = nil
         scrapedDescription = nil
         errorMessage = nil
+        scrapeError = nil
+        tagsError = nil
         hasAutoClassified = false
         lastScrapedURL = nil
 
@@ -420,12 +445,60 @@ final class BookmarkFormModel: ObservableObject {
         return mode.isEdit ? "" : nil
     }
 
-    private func handle(_ error: Error) {
-        if case OtterError.notSignedIn = error {
-            isSignedIn = false
-            return
+    /// The message to show for a failure, or `nil` when the sign-in went away —
+    /// the form swaps to its signed-out state instead of reporting an error.
+    private func message(for error: Error) -> String? {
+        if error is CancellationError {
+            return nil
         }
 
-        errorMessage = error.localizedDescription
+        switch error {
+        case OtterError.notSignedIn, OtterError.invalidGrant:
+            isSignedIn = false
+            return nil
+        default:
+            return error.localizedDescription
+        }
+    }
+
+    /// Retries a request through transient failures. The form fetches once when
+    /// it opens, so without this a single blip leaves it permanently missing its
+    /// metadata or its tag list with no way back.
+    private func retrying<T>(
+        attempts: Int = 3,
+        _ operation: () async throws -> T
+    ) async throws -> T {
+        var lastError: Error = OtterError.invalidResponse
+
+        for attempt in 0 ..< attempts {
+            try Task.checkCancellation()
+
+            do {
+                return try await operation()
+            } catch {
+                guard Self.isTransient(error) else { throw error }
+                lastError = error
+            }
+
+            // 400ms, then 800ms.
+            if attempt < attempts - 1 {
+                try await Task.sleep(nanoseconds: UInt64(400_000_000) << UInt64(attempt))
+            }
+        }
+
+        throw lastError
+    }
+
+    /// Whether trying the same request again could plausibly work. A 4xx, a bad
+    /// address or a dead grant are all settled answers — retrying just stalls.
+    private static func isTransient(_ error: Error) -> Bool {
+        if error is URLError { return true }
+
+        switch error {
+        case OtterError.serverUnavailable, OtterError.invalidResponse:
+            return true
+        default:
+            return false
+        }
     }
 }

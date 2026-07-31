@@ -15,7 +15,9 @@ nonisolated struct Bookmark: Identifiable, Hashable, Decodable {
     let note: String?
     let tags: [String]?
     let type: String?
-    let star: Bool
+    /// `var` so a swipe action can flip it optimistically before the PATCH lands.
+    var star: Bool
+    var isPublic: Bool
     let status: String
     let createdAt: Date?
 
@@ -29,6 +31,7 @@ nonisolated struct Bookmark: Identifiable, Hashable, Decodable {
         case tags
         case type
         case star
+        case isPublic = "public"
         case status
         case createdAt = "created_at"
     }
@@ -44,6 +47,7 @@ nonisolated struct Bookmark: Identifiable, Hashable, Decodable {
         tags = try container.decodeIfPresent([String].self, forKey: .tags)
         type = try container.decodeIfPresent(String.self, forKey: .type)
         star = try container.decodeIfPresent(Bool.self, forKey: .star) ?? false
+        isPublic = try container.decodeIfPresent(Bool.self, forKey: .isPublic) ?? false
         status = try container.decodeIfPresent(String.self, forKey: .status) ?? "active"
         createdAt = try container
             .decodeIfPresent(String.self, forKey: .createdAt)
@@ -73,15 +77,32 @@ nonisolated struct Bookmark: Identifiable, Hashable, Decodable {
         return URL(string: image)
     }
 
+    /// The site's favicon, via the same DuckDuckGo service the web app's
+    /// `<Favicon>` uses — keyed on the bare hostname, as `simpleUrl` produces.
+    var faviconURL: URL? {
+        guard let host else { return nil }
+        return URL(string: "https://icons.duckduckgo.com/ip3/\(host).ico")
+    }
+
     /// Otter serialises timestamps with fractional seconds, which
     /// `ISO8601DateFormatter` only handles when explicitly asked.
+    ///
+    /// Both formatters are shared: building one per bookmark meant two
+    /// allocations of a notoriously expensive object for every row decoded.
+    /// `ISO8601DateFormatter` is documented as thread-safe for parsing, and
+    /// neither is mutated after setup, hence `nonisolated(unsafe)`.
+    nonisolated(unsafe) private static let fractionalFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    nonisolated(unsafe) private static let plainFormatter = ISO8601DateFormatter()
+
     private static func parseTimestamp(_ value: String) -> Date? {
-        let withFraction = ISO8601DateFormatter()
-        withFraction.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = fractionalFormatter.date(from: value) { return date }
 
-        if let date = withFraction.date(from: value) { return date }
-
-        return ISO8601DateFormatter().date(from: value)
+        return plainFormatter.date(from: value)
     }
 }
 

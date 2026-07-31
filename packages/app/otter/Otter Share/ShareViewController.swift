@@ -38,7 +38,16 @@ class ShareViewController: UIViewController {
 
     private func present(url: String) {
         let hosting = UIHostingController(
-            rootView: BookmarkFormView(url: url) { [weak self] _ in
+            rootView: BookmarkFormView(
+                url: url,
+                onOpenApp: { [weak self] in
+                    // Extensions can't use UIApplication.open, so hand the URL to
+                    // the host via the extension context.
+                    guard let self, let appURL = URL(string: "otter://") else { return }
+                    self.extensionContext?.open(appURL)
+                    self.close()
+                }
+            ) { [weak self] _ in
                 self?.close()
             }
         )

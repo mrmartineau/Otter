@@ -14,14 +14,21 @@ import UIKit
 struct BookmarkFormView: View {
     /// The saved bookmark, or `nil` when the form was dismissed without saving.
     let onFinish: (Bookmark?) -> Void
+    /// Set by the share extension, which can't present a sign-in flow itself.
+    var onOpenApp: (() -> Void)?
 
     @StateObject private var model: BookmarkFormModel
     @FocusState private var isURLFocused: Bool
 
     /// New bookmark, optionally pre-filled with a URL from the share sheet.
-    init(url: String, onFinish: @escaping (Bookmark?) -> Void) {
+    init(
+        url: String,
+        onOpenApp: (() -> Void)? = nil,
+        onFinish: @escaping (Bookmark?) -> Void
+    ) {
         _model = StateObject(wrappedValue: BookmarkFormModel(url: url))
         self.onFinish = onFinish
+        self.onOpenApp = onOpenApp
         self.autofocusURL = url.isEmpty
     }
 
@@ -60,6 +67,18 @@ struct BookmarkFormView: View {
                     Section {
                         Text("Sign in to Otter to save bookmarks.")
                             .foregroundStyle(.secondary)
+
+                        if let onOpenApp {
+                            Button("Open Otter", action: onOpenApp)
+                        }
+                    }
+
+                    // A failed refresh explains itself here rather than leaving a
+                    // dead end with a disabled Save button.
+                    if let errorMessage = model.errorMessage {
+                        Section {
+                            Text(errorMessage).foregroundStyle(.red)
+                        }
                     }
                 }
             }
@@ -119,6 +138,15 @@ struct BookmarkFormView: View {
                 isEnabled: model.normalizedURL != nil
             ) {
                 Task { await model.scrape() }
+            }
+        } footer: {
+            if let scrapeError = model.scrapeError {
+                RetryNotice(
+                    message: "Couldn't fetch details for this link. \(scrapeError)",
+                    label: "Try again"
+                ) {
+                    Task { await model.scrape() }
+                }
             }
         }
     }
@@ -247,6 +275,15 @@ struct BookmarkFormView: View {
         } footer: {
             if model.isClassifying {
                 Text("Finding tags…")
+            } else if model.isLoadingTags {
+                Text("Loading your tags…")
+            } else if let tagsError = model.tagsError {
+                RetryNotice(
+                    message: "Couldn't load your existing tags, so suggestions are unavailable. \(tagsError)",
+                    label: "Retry"
+                ) {
+                    Task { await model.loadTags() }
+                }
             }
         }
     }
@@ -273,7 +310,9 @@ struct BookmarkFormView: View {
     private var imageSection: some View {
         if let preview = model.imagePreviewURL {
             Section("Image") {
-                AsyncImage(url: preview) { phase in
+                // Capped at roughly a full-width row rather than decoded at the
+                // source resolution, which for a hero image can be tens of MB.
+                RemoteImage(url: preview, maxSize: 420) { phase in
                     switch phase {
                     case let .success(image):
                         image
@@ -284,7 +323,7 @@ struct BookmarkFormView: View {
                     case .failure:
                         // A broken preview shouldn't leave an empty gap.
                         EmptyView()
-                    default:
+                    case .loading:
                         ProgressView().frame(maxWidth: .infinity)
                     }
                 }
@@ -382,6 +421,28 @@ private struct SectionHeader: View {
     }
 }
 
+/// An inline failure with a way to try again, for the parts of the form that
+/// fetch on their own. Sits in the section footer that owns the request, so it's
+/// obvious which piece is missing.
+private struct RetryNotice: View {
+    let message: String
+    let label: String
+    let action: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(message)
+                .foregroundStyle(.red)
+
+            Button(label, action: action)
+                .font(.footnote.weight(.semibold))
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.accentColor)
+        }
+        .padding(.top, 2)
+    }
+}
+
 private struct SuggestionRow: View {
     let text: String
     let onUse: () -> Void
@@ -425,7 +486,7 @@ private extension View {
 }
 
 /// Minimal flow layout — SwiftUI has no wrapping stack.
-private struct FlowLayout: Layout {
+struct FlowLayout: Layout {
     var spacing: CGFloat = 6
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {

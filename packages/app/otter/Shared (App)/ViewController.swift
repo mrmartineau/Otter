@@ -19,6 +19,26 @@ typealias PlatformViewController = NSViewController
 /// Bundle identifier for the Safari Web Extension
 let extensionBundleIdentifier = "zander.martineau.otter.Extension"
 
+/// `WKUserContentController` retains its script message handlers strongly, and
+/// the handler here is the view controller that owns the web view:
+/// controller → webView → configuration → userContentController → controller.
+/// That cycle keeps the controller and its whole web content process alive for
+/// the lifetime of the app. Registering this box instead breaks it.
+private final class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
+    private weak var target: WKScriptMessageHandler?
+
+    init(target: WKScriptMessageHandler) {
+        self.target = target
+    }
+
+    func userContentController(
+        _ userContentController: WKUserContentController,
+        didReceive message: WKScriptMessage
+    ) {
+        target?.userContentController(userContentController, didReceive: message)
+    }
+}
+
 /// Main view controller for the Otter Safari Extension app that manages the web-based UI
 /// and handles communication between the app and Safari extension system.
 class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMessageHandler {
@@ -38,13 +58,21 @@ class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMess
         self.webView.scrollView.isScrollEnabled = false
 #endif
 
-        // Add message handler to receive messages from JavaScript
-        self.webView.configuration.userContentController.add(self, name: "controller")
+        // Add message handler to receive messages from JavaScript. Registered
+        // through a weak box — see `WeakScriptMessageHandler`.
+        self.webView.configuration.userContentController.add(
+            WeakScriptMessageHandler(target: self),
+            name: "controller"
+        )
 
         // Load the main HTML file from the app bundle
         self.webView.loadFileURL(Bundle.main.url(forResource: "Main", withExtension: "html")!, allowingReadAccessTo: Bundle.main.resourceURL!)
 
         NotificationCenter.default.addObserver(self, selector: #selector(handleSaveBookmark(_:)), name: .saveBookmark, object: nil)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .saveBookmark, object: nil)
     }
 
     @objc private func handleSaveBookmark(_ notification: Notification) {

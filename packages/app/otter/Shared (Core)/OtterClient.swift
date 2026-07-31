@@ -14,16 +14,18 @@ actor OtterClient {
     static let shared = OtterClient()
 
     private var cached: OtterCredentials?
-    private var didLoad = false
     private var refreshTask: Task<OtterCredentials, Error>?
 
     // MARK: - Credentials
 
     func credentials() -> OtterCredentials? {
-        if !didLoad {
-            cached = OtterCredentialStore.load()
-            didLoad = true
+        if let cached {
+            return cached
         }
+
+        // Never latch a miss. iOS reuses share-extension processes, so one that
+        // started before sign-in would otherwise claim "not signed in" forever.
+        cached = OtterCredentialStore.load()
 
         return cached
     }
@@ -39,13 +41,11 @@ actor OtterClient {
         }
 
         cached = credentials
-        didLoad = true
         OtterCredentialStore.save(credentials)
     }
 
     func signOut() {
         cached = nil
-        didLoad = true
         OtterCredentialStore.clear()
         BookmarkCache.clear()
         MetadataCache.clear()
@@ -161,6 +161,36 @@ actor OtterClient {
             path: "api/bookmarks/\(id)",
             method: "PATCH",
             body: try JSONEncoder().encode(draft)
+        )
+
+        guard let wrapper = try? JSONDecoder().decode(Wrapper.self, from: data) else {
+            throw OtterError.invalidResponse
+        }
+
+        BookmarkCache.clear()
+
+        return wrapper.data
+    }
+
+    func setStar(id: String, star: Bool) async throws -> Bookmark {
+        try await patchFlag(id: id, body: ["star": star])
+    }
+
+    func setPublic(id: String, isPublic: Bool) async throws -> Bookmark {
+        try await patchFlag(id: id, body: ["public": isPublic])
+    }
+
+    /// A `PATCH` carrying one key. The API writes only the keys it receives, so a
+    /// toggle from a list row can't overwrite fields the edit form owns.
+    private func patchFlag(id: String, body: [String: Bool]) async throws -> Bookmark {
+        struct Wrapper: Decodable {
+            let data: Bookmark
+        }
+
+        let data = try await perform(
+            path: "api/bookmarks/\(id)",
+            method: "PATCH",
+            body: try JSONEncoder().encode(body)
         )
 
         guard let wrapper = try? JSONDecoder().decode(Wrapper.self, from: data) else {
@@ -325,9 +355,13 @@ actor OtterClient {
         }
 
         guard (200 ..< 300).contains(result.status) else {
-            throw OtterError.server(
-                OtterOAuth.errorMessage(from: result.data) ?? "Otter returned \(result.status)."
-            )
+            let message = OtterOAuth.errorMessage(from: result.data)
+                ?? "Otter returned \(result.status)."
+
+            // 5xx is worth another go; a 4xx is a considered "no".
+            throw result.status >= 500
+                ? OtterError.serverUnavailable(message)
+                : OtterError.server(message)
         }
 
         return result.data
@@ -399,11 +433,23 @@ actor OtterClient {
             store(updated)
 
             return updated
-        } catch {
-            // The grant is gone (revoked, expired or rotated away) — drop it so
-            // the UI falls back to the sign-in screen.
+        } catch OtterError.invalidGrant {
+            // The app and the share extension share one keychain item, and the
+            // server rotates refresh tokens: this process may simply be holding a
+            // copy that the other one already spent. Re-read before giving up.
+            if let stored = OtterCredentialStore.load(),
+               stored.refreshToken != credentials.refreshToken {
+                cached = stored
+                return stored
+            }
+
+            // Genuinely revoked or expired — drop it so the UI asks for sign-in.
             signOut()
             throw OtterError.notSignedIn
         }
+
+        // Any other failure (offline, 5xx, rate limited) is transient. Keep the
+        // credentials and let the caller surface the error, otherwise a flaky
+        // network would sign the user out of both the app and the extension.
     }
 }
