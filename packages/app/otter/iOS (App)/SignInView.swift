@@ -57,8 +57,37 @@ struct SignInView: View {
                     .multilineTextAlignment(.center)
             }
 
+            registerFooter
+
             Spacer()
         }
         .padding(24)
+    }
+
+    /// Otter is self-hosted, so there's no one sign-up address to point at — the
+    /// link follows whatever instance has been typed above.
+    @ViewBuilder
+    private var registerFooter: some View {
+        if let registerURL {
+            VStack(spacing: 4) {
+                Text("Don't have an account?")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                // Opens in the browser, which is also where the sign-in flow
+                // runs — so the session created here carries straight over.
+                Link("Create one on this instance", destination: registerURL)
+                    .font(.footnote.weight(.semibold))
+            }
+            .multilineTextAlignment(.center)
+        }
+    }
+
+    private var registerURL: URL? {
+        guard let instance = OtterOAuth.normalizeInstanceURL(model.instanceText) else {
+            return nil
+        }
+
+        return instance.appending(path: "register")
     }
 }

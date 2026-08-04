@@ -112,8 +112,18 @@ final class BookmarkFormModel: ObservableObject {
         return parsed
     }
 
+    /// Saving deliberately doesn't depend on the scrape succeeding. A link that
+    /// 404s, sits behind a login, or doesn't exist yet is still worth keeping —
+    /// only an unparseable address stops us.
     var canSave: Bool {
         isSignedIn && !isSaved && !isSaving && normalizedURL != nil
+    }
+
+    /// Something was typed, but it can't be read as a web address — the one case
+    /// where Save stays disabled, so the form owes the user an explanation.
+    var hasUnusableURL: Bool {
+        !url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && normalizedURL == nil
     }
 
     var titleSuggestion: String? {
@@ -187,9 +197,26 @@ final class BookmarkFormModel: ObservableObject {
             let loaded = try await retrying { try await OtterClient.shared.tags() }
 
             availableTags = loaded
-                .compactMap(\.tag)
-                .filter { $0 != "Untagged" && !$0.hasPrefix("like:") }
-                .sorted { $0.lowercased() < $1.lowercased() }
+                .compactMap { entry -> (tag: String, count: Int)? in
+                    guard let tag = entry.tag,
+                          tag != "Untagged",
+                          !tag.hasPrefix("like:")
+                    else {
+                        return nil
+                    }
+
+                    return (tag, entry.count ?? 0)
+                }
+                // Most-used first, so the eight suggestions offered before you
+                // type anything are the tags you actually reach for. Matches the
+                // API's own `ORDER BY count DESC, tag ASC`; sorted here rather
+                // than trusting that ordering to survive silently.
+                .sorted {
+                    $0.count == $1.count
+                        ? $0.tag.lowercased() < $1.tag.lowercased()
+                        : $0.count > $1.count
+                }
+                .map(\.tag)
         } catch {
             tagsError = message(for: error)
         }

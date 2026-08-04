@@ -1,9 +1,13 @@
 //
 //  BookmarkDetailView.swift
-//  iOS (App)
+//  Shared (Core)
 //
 //  Everything a feed row has to leave out — the note, the full tag list, the
-//  whole URL. Reached by long-pressing a row.
+//  whole URL. Reached by long-pressing a row, or by tapping one of the possible
+//  matches the bookmark form warns about.
+//
+//  Deliberately owns no `NavigationStack`, so it works both pushed onto an
+//  existing stack and presented in a sheet the caller wraps.
 //
 
 import SwiftUI
@@ -13,7 +17,6 @@ struct BookmarkDetailView: View {
     let bookmark: Bookmark
     let onEdit: () -> Void
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
     /// Flips the copy button to a confirmation for a moment, so a tap that
@@ -21,24 +24,19 @@ struct BookmarkDetailView: View {
     @State private var didCopy = false
 
     var body: some View {
-        NavigationStack {
-            List {
-                imageSection
-                linkSection
-                descriptionSection
-                noteSection
-                tagsSection
-                detailsSection
-            }
-            .navigationTitle(bookmark.displayTitle)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
-                }
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Edit", action: onEdit)
-                }
+        List {
+            imageSection
+            linkSection
+            descriptionSection
+            noteSection
+            tagsSection
+            detailsSection
+        }
+        .navigationTitle(bookmark.displayTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("Edit", action: onEdit)
             }
         }
     }

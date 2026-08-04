@@ -19,6 +19,8 @@ struct BookmarkFormView: View {
 
     @StateObject private var model: BookmarkFormModel
     @FocusState private var isURLFocused: Bool
+    /// An existing match being edited from its detail view.
+    @State private var editingMatch: Bookmark?
 
     /// New bookmark, optionally pre-filled with a URL from the share sheet.
     init(
@@ -108,6 +110,26 @@ struct BookmarkFormView: View {
                     model.checkForDuplicates()
                 }
             }
+            // Pushed, not presented: back returns here with the form intact.
+            .navigationDestination(for: Bookmark.self) { match in
+                BookmarkDetailView(bookmark: match) {
+                    editingMatch = match
+                }
+            }
+        }
+        .sheet(item: $editingMatch) { match in
+            // Editing an existing match — adding a tag to a link already saved,
+            // say. The edit form takes no duplicates section of its own, so this
+            // can't nest any further.
+            BookmarkFormView(bookmark: match) { saved in
+                editingMatch = nil
+
+                if saved != nil {
+                    // The match has changed; refresh so the detail view behind
+                    // this sheet isn't showing stale values.
+                    model.checkForDuplicates()
+                }
+            }
         }
     }
 
@@ -140,9 +162,14 @@ struct BookmarkFormView: View {
                 Task { await model.scrape() }
             }
         } footer: {
-            if let scrapeError = model.scrapeError {
+            if model.hasUnusableURL {
+                Text("Add a web address to save this bookmark.")
+                    .foregroundStyle(.secondary)
+            } else if let scrapeError = model.scrapeError {
+                // Explicitly not a blocker: a link that 404s, isn't published
+                // yet, or was invented on the spot is still worth saving.
                 RetryNotice(
-                    message: "Couldn't fetch details for this link. \(scrapeError)",
+                    message: "Couldn't fetch details for this link — you can still save it. \(scrapeError)",
                     label: "Try again"
                 ) {
                     Task { await model.scrape() }
@@ -157,16 +184,21 @@ struct BookmarkFormView: View {
     private var duplicatesSection: some View {
         if !model.matchingBookmarks.isEmpty {
             Section("Possible matching items") {
+                // Tappable: push the match's detail view, so you can check
+                // whether it's really the same link — and edit it from there,
+                // e.g. to add a tag — then come back to this form untouched.
                 ForEach(model.matchingBookmarks.prefix(5)) { bookmark in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(bookmark.displayTitle)
-                            .font(.footnote)
-                            .lineLimit(1)
-                        if let url = bookmark.url {
-                            Text(url)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                    NavigationLink(value: bookmark) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(bookmark.displayTitle)
+                                .font(.footnote)
                                 .lineLimit(1)
+                            if let url = bookmark.url {
+                                Text(url)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
                         }
                     }
                 }

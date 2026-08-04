@@ -11,6 +11,7 @@ struct BookmarkFeedView: View {
     @StateObject private var model: BookmarkFeedModel
     @State private var editing: Bookmark?
     @State private var detail: Bookmark?
+    @State private var reader: ArticleReaderRequest?
     @Environment(\.scenePhase) private var scenePhase
 
     /// Chips shown above the list — a collection's tags, mirroring the web sub-nav.
@@ -58,6 +59,9 @@ struct BookmarkFeedView: View {
                     bookmark: bookmark,
                     onEdit: { editing = bookmark },
                     onShowDetail: { detail = bookmark },
+                    onOpenReader: { mode in
+                        reader = ArticleReaderRequest(bookmark: bookmark, mode: mode)
+                    },
                     onToggleStar: { Task { await model.toggleStar(bookmark) } },
                     onTogglePublic: { Task { await model.togglePublic(bookmark) } },
                     onTrash: { Task { await model.trash(bookmark) } }
@@ -124,14 +128,24 @@ struct BookmarkFeedView: View {
                 }
             }
         }
+        .sheet(item: $reader) { request in
+            ArticleReaderView(bookmark: request.bookmark, mode: request.mode)
+        }
         .sheet(item: $detail) { bookmark in
-            BookmarkDetailView(bookmark: bookmark) {
-                detail = nil
-                // Let the detail sheet finish dismissing before the editor
-                // takes its place, otherwise the second one never appears.
-                Task {
-                    try? await Task.sleep(nanoseconds: 350_000_000)
-                    editing = bookmark
+            NavigationStack {
+                BookmarkDetailView(bookmark: bookmark) {
+                    detail = nil
+                    // Let the detail sheet finish dismissing before the editor
+                    // takes its place, otherwise the second one never appears.
+                    Task {
+                        try? await Task.sleep(nanoseconds: 350_000_000)
+                        editing = bookmark
+                    }
+                }
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Done") { detail = nil }
+                    }
                 }
             }
         }
@@ -155,6 +169,7 @@ struct BookmarkListRow: View {
     let bookmark: Bookmark
     let onEdit: () -> Void
     let onShowDetail: () -> Void
+    let onOpenReader: (ArticleReaderMode) -> Void
     let onToggleStar: () -> Void
     let onTogglePublic: () -> Void
     let onTrash: () -> Void
@@ -222,6 +237,20 @@ struct BookmarkListRow: View {
                 } label: {
                     Label("Copy link", systemImage: "doc.on.doc")
                 }
+            }
+
+            Divider()
+
+            Button {
+                onOpenReader(.read)
+            } label: {
+                Label("Read article", systemImage: "doc.richtext")
+            }
+
+            Button {
+                onOpenReader(.summary)
+            } label: {
+                Label("Summarise", systemImage: "sparkles")
             }
 
             Divider()

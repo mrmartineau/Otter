@@ -199,6 +199,7 @@ struct SearchView: View {
     @StateObject private var model = SearchModel()
     @State private var editing: Bookmark?
     @State private var detail: Bookmark?
+    @State private var reader: ArticleReaderRequest?
 
     var body: some View {
         NavigationStack {
@@ -208,6 +209,9 @@ struct SearchView: View {
                         bookmark: bookmark,
                         onEdit: { editing = bookmark },
                         onShowDetail: { detail = bookmark },
+                        onOpenReader: { mode in
+                            reader = ArticleReaderRequest(bookmark: bookmark, mode: mode)
+                        },
                         onToggleStar: { Task { await model.toggleStar(bookmark) } },
                         onTogglePublic: { Task { await model.togglePublic(bookmark) } },
                         onTrash: { Task { await model.trash(bookmark) } }
@@ -247,14 +251,24 @@ struct SearchView: View {
                     }
                 }
             }
+            .sheet(item: $reader) { request in
+                ArticleReaderView(bookmark: request.bookmark, mode: request.mode)
+            }
             .sheet(item: $detail) { bookmark in
-                BookmarkDetailView(bookmark: bookmark) {
-                    detail = nil
-                    // Let the detail sheet finish dismissing before the editor
-                    // takes its place, otherwise the second one never appears.
-                    Task {
-                        try? await Task.sleep(nanoseconds: 350_000_000)
-                        editing = bookmark
+                NavigationStack {
+                    BookmarkDetailView(bookmark: bookmark) {
+                        detail = nil
+                        // Let the detail sheet finish dismissing before the
+                        // editor takes its place, or the second never appears.
+                        Task {
+                            try? await Task.sleep(nanoseconds: 350_000_000)
+                            editing = bookmark
+                        }
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") { detail = nil }
+                        }
                     }
                 }
             }

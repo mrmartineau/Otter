@@ -160,6 +160,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Bookmark.swift,
+				BookmarkDetailView.swift,
 				BookmarkDraft.swift,
 				BookmarkFeedSource.swift,
 				BookmarkFormModel.swift,
@@ -177,6 +178,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Bookmark.swift,
+				BookmarkDetailView.swift,
 				BookmarkDraft.swift,
 				BookmarkFeedSource.swift,
 				BookmarkFormModel.swift,

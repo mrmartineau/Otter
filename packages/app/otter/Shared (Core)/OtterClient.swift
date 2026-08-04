@@ -254,6 +254,34 @@ actor OtterClient {
         return metadata
     }
 
+    /// The readable article behind a bookmark, for the in-app reader. Same
+    /// endpoint the web app's `/bookmark/:id/read` route uses.
+    func articleContent(url: String) async throws -> ArticleContent {
+        let data = try await perform(
+            path: "api/scrape-content",
+            query: [URLQueryItem(name: "url", value: url)]
+        )
+
+        // Checked before decoding the article: an error payload would otherwise
+        // decode cleanly into an empty ArticleContent.
+        if let failure = try? JSONDecoder().decode(ScrapeFailure.self, from: data),
+           let message = failure.error,
+           !message.isEmpty {
+            throw OtterError.server(message)
+        }
+
+        guard let article = try? JSONDecoder().decode(ArticleContent.self, from: data) else {
+            throw OtterError.invalidResponse
+        }
+
+        return article
+    }
+
+    /// `POST /api/ai/summarise` — takes the extracted article body, not the URL.
+    func summarise(_ content: String) async throws -> String {
+        try await generate(path: "api/ai/summarise", body: ["prompt": content])
+    }
+
     func rewriteTitle(_ title: String) async throws -> String {
         try await generate(path: "api/ai/title", body: ["prompt": title])
     }

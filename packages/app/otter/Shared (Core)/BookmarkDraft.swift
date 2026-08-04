@@ -68,6 +68,61 @@ nonisolated struct ScrapeMetadata: Decodable {
     }
 }
 
+/// `GET /api/scrape-content?url=…` — the readable article, extracted and
+/// converted to markdown by the Worker's `xtractr`.
+nonisolated struct ArticleContent: Decodable {
+    let title: String
+    let author: String
+    let domain: String
+    /// Markdown, not HTML.
+    let content: String
+    let wordCount: Int
+    let published: String
+    let image: String?
+
+    enum CodingKeys: String, CodingKey {
+        case title
+        case author
+        case domain
+        case content
+        case wordCount
+        case published
+        case image
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        title = try container.decodeIfPresent(String.self, forKey: .title) ?? ""
+        author = try container.decodeIfPresent(String.self, forKey: .author) ?? ""
+        domain = try container.decodeIfPresent(String.self, forKey: .domain) ?? ""
+        content = try container.decodeIfPresent(String.self, forKey: .content) ?? ""
+        wordCount = try container.decodeIfPresent(Int.self, forKey: .wordCount) ?? 0
+        published = try container.decodeIfPresent(String.self, forKey: .published) ?? ""
+        image = try container.decodeIfPresent(String.self, forKey: .image)
+    }
+
+    var hasContent: Bool {
+        !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    /// "1,234 words · example.com", the byline under the title.
+    var byline: String {
+        var parts: [String] = []
+
+        if !author.isEmpty { parts.append(author) }
+        if !domain.isEmpty { parts.append(domain) }
+        if wordCount > 0 { parts.append("\(wordCount) words") }
+
+        return parts.joined(separator: "  ·  ")
+    }
+}
+
+/// The scraper reports failures as HTTP 200 with an `error` key, so a 2xx alone
+/// doesn't mean it worked.
+nonisolated struct ScrapeFailure: Decodable {
+    let error: String?
+}
+
 /// `POST /api/ai/classify`
 nonisolated struct ClassifyResult: Decodable {
     struct Tag: Decodable {
