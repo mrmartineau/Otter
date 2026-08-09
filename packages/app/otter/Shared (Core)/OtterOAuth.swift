@@ -261,16 +261,20 @@ nonisolated enum OtterOAuth {
         let status = (urlResponse as? HTTPURLResponse)?.statusCode ?? 0
 
         guard (200 ..< 300).contains(status) else {
-            let message = errorMessage(from: data)
+            let message = errorMessage(from: data) ?? "Otter returned \(status)."
+            let contentType = (urlResponse as? HTTPURLResponse)?
+                .value(forHTTPHeaderField: "Content-Type")
 
             // OAuth reports a spent or revoked grant as `invalid_grant`; anything
             // else (network, 5xx, rate limit) is transient and must not be treated
             // as a sign-out.
-            if isInvalidGrant(data: data, status: status) {
+            if isInvalidGrant(data: data, status: status, contentType: contentType) {
                 throw OtterError.invalidGrant
             }
 
-            throw OtterError.server(message ?? "Otter returned \(status).")
+            throw status >= 500
+                ? OtterError.serverUnavailable(message)
+                : OtterError.server(message)
         }
 
         guard let response = try? JSONDecoder().decode(TokenResponse.self, from: data) else {
@@ -280,7 +284,11 @@ nonisolated enum OtterOAuth {
         return response
     }
 
-    private static func isInvalidGrant(data: Data, status: Int) -> Bool {
+    private static func isInvalidGrant(
+        data: Data,
+        status: Int,
+        contentType: String?
+    ) -> Bool {
         struct Failure: Decodable {
             let error: String?
         }
@@ -291,7 +299,15 @@ nonisolated enum OtterOAuth {
             return code == "invalid_grant" || code == "invalid_client" || code == "unauthorized_client"
         }
 
-        // No machine-readable code: only a 400/401 is unambiguous enough.
+        // No machine-readable code, so the status is all there is to go on — and
+        // it's only worth trusting when the answer actually came from the token
+        // endpoint. A captive portal, a proxy or an edge error page can return
+        // 401 with an HTML body, and signing out over one of those costs the
+        // user their whole sign-in for what is really a network blip.
+        guard contentType?.localizedCaseInsensitiveContains("json") == true else {
+            return false
+        }
+
         return status == 400 || status == 401
     }
 

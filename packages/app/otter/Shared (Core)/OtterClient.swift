@@ -34,6 +34,18 @@ actor OtterClient {
         credentials() != nil
     }
 
+    /// Picks up whatever is in the shared keychain now. The share extension
+    /// rotates the same grant from its own process, so this process's copy can
+    /// be a rotation behind by the time the app comes back to the foreground —
+    /// and using a rotated-away refresh token costs the whole grant.
+    func reloadCredentials() {
+        // A read that comes back empty is far more likely to be a locked
+        // keychain than a sign-out, so it never clears what we already have.
+        guard let stored = OtterCredentialStore.load() else { return }
+
+        cached = stored
+    }
+
     func store(_ credentials: OtterCredentials) {
         // A different instance means the cached page belongs to someone else.
         if cached?.instanceURL != credentials.instanceURL {
@@ -41,7 +53,12 @@ actor OtterClient {
         }
 
         cached = credentials
-        OtterCredentialStore.save(credentials)
+
+        if !OtterCredentialStore.save(credentials) {
+            // The rotated token now exists only in this process. Nothing can be
+            // done about it here, but it explains the sign-out that follows.
+            print("Otter: failed to persist credentials to the keychain.")
+        }
     }
 
     func signOut() {
@@ -358,7 +375,7 @@ actor OtterClient {
         guard var current = credentials() else { throw OtterError.notSignedIn }
 
         if current.isExpired {
-            current = try await refreshed(current)
+            current = try await refreshed(replacing: current)
         }
 
         var result = try await send(
@@ -372,7 +389,7 @@ actor OtterClient {
         // An access token can be rejected before our own expiry check notices —
         // refresh once and retry before giving up.
         if result.status == 401 {
-            current = try await refreshed(current)
+            current = try await refreshed(replacing: current)
             result = try await send(
                 credentials: current,
                 path: path,
@@ -428,13 +445,26 @@ actor OtterClient {
         return (data, (response as? HTTPURLResponse)?.statusCode ?? 0)
     }
 
-    /// Coalesces concurrent refreshes so a rotated refresh token isn't spent twice.
-    private func refreshed(_ credentials: OtterCredentials) async throws -> OtterCredentials {
+    /// Credentials that supersede `stale`, refreshing only when nothing newer
+    /// exists yet.
+    ///
+    /// Refresh tokens are single-use: spending one retires it, and offering a
+    /// retired one is treated as theft, so the instance revokes every token this
+    /// client holds. Two requests racing the same 401 — which is exactly what
+    /// the bookmark form does, loading tags and scraping at once — both arrive
+    /// here holding the same credentials, and the second must adopt the first's
+    /// result rather than spend the token again. The revocation is silent when
+    /// it happens: the sign-out only surfaces at the next expiry, hours later.
+    private func refreshed(replacing stale: OtterCredentials) async throws -> OtterCredentials {
+        if let fresher = superseding(stale) {
+            return fresher
+        }
+
         if let refreshTask {
             return try await refreshTask.value
         }
 
-        let task = Task { try await self.performRefresh(credentials) }
+        let task = Task { try await self.performRefresh(stale) }
         refreshTask = task
 
         defer { refreshTask = nil }
@@ -442,8 +472,52 @@ actor OtterClient {
         return try await task.value
     }
 
+    /// Usable credentials newer than `stale` — from this process, or written to
+    /// the shared keychain by the other one.
+    private func superseding(_ stale: OtterCredentials) -> OtterCredentials? {
+        if let cached, cached.accessToken != stale.accessToken, !cached.isExpired {
+            return cached
+        }
+
+        guard let stored = OtterCredentialStore.load(),
+              stored.accessToken != stale.accessToken,
+              !stored.isExpired
+        else {
+            return nil
+        }
+
+        cached = stored
+
+        return stored
+    }
+
     private func performRefresh(_ credentials: OtterCredentials) async throws -> OtterCredentials {
-        guard let refreshToken = credentials.refreshToken else {
+        guard credentials.refreshToken != nil else {
+            signOut()
+            throw OtterError.notSignedIn
+        }
+
+        // Whoever takes the lock rotates the grant; everyone else waits and
+        // picks up the result. Without it the app and the share extension can
+        // spend the same refresh token from their separate processes, and the
+        // loser's request is what revokes the grant.
+        let isLockHeld = await OtterRefreshLock.acquire()
+
+        defer {
+            if isLockHeld {
+                OtterRefreshLock.release()
+            }
+        }
+
+        // Re-read now the lock is held: whoever held it before almost certainly
+        // rotated, which leaves the token we were called with already retired.
+        if let fresher = superseding(credentials) {
+            return fresher
+        }
+
+        let current = OtterCredentialStore.load() ?? credentials
+
+        guard let refreshToken = current.refreshToken else {
             signOut()
             throw OtterError.notSignedIn
         }
@@ -451,22 +525,21 @@ actor OtterClient {
         do {
             let token = try await OtterOAuth.refresh(
                 refreshToken,
-                clientID: credentials.clientID,
-                instanceURL: credentials.instanceURL
+                clientID: current.clientID,
+                instanceURL: current.instanceURL
             )
-            var updated = credentials
+            var updated = current
             updated.accessToken = token.accessToken
-            updated.refreshToken = token.refreshToken ?? credentials.refreshToken
+            updated.refreshToken = token.refreshToken ?? current.refreshToken
             updated.expiresAt = token.expiresAt
             store(updated)
 
             return updated
         } catch OtterError.invalidGrant {
-            // The app and the share extension share one keychain item, and the
-            // server rotates refresh tokens: this process may simply be holding a
-            // copy that the other one already spent. Re-read before giving up.
+            // Last line of defence: another process may have rotated between the
+            // re-read above and this request landing.
             if let stored = OtterCredentialStore.load(),
-               stored.refreshToken != credentials.refreshToken {
+               stored.refreshToken != refreshToken {
                 cached = stored
                 return stored
             }

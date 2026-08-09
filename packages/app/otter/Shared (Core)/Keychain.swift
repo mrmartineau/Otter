@@ -44,21 +44,40 @@ nonisolated struct Keychain {
         return item as? Data
     }
 
-    func write(_ data: Data, account: String) {
-        let itemQuery = query(account: account)
+    /// Reports whether the value actually reached the keychain. Callers that
+    /// store a rotated OAuth token need to know: a write that silently failed
+    /// leaves the new token in memory only, and the next launch would present
+    /// the old one.
+    @discardableResult
+    func write(_ data: Data, account: String) -> Bool {
         // The share extension reads credentials while the device may be locked
         // in the background, so allow access after the first unlock.
         let attributes: [String: Any] = [
             kSecValueData as String: data,
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
         ]
-        let status = SecItemUpdate(itemQuery as CFDictionary, attributes as CFDictionary)
+        let status = SecItemUpdate(
+            query(account: account) as CFDictionary,
+            attributes as CFDictionary
+        )
 
         if status == errSecItemNotFound {
-            var insertQuery = itemQuery
-            insertQuery.merge(attributes) { current, _ in current }
-            _ = SecItemAdd(insertQuery as CFDictionary, nil)
+            return add(data, account: account) == errSecSuccess
         }
+
+        return status == errSecSuccess
+    }
+
+    /// Creates the item only if it isn't there already, answering
+    /// `errSecDuplicateItem` when it is. `SecItemAdd` is atomic across
+    /// processes, which is what lets the keychain stand in as a mutex the app
+    /// and its extensions can share.
+    func add(_ data: Data, account: String) -> OSStatus {
+        var insertQuery = query(account: account)
+        insertQuery[kSecValueData as String] = data
+        insertQuery[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
+
+        return SecItemAdd(insertQuery as CFDictionary, nil)
     }
 
     func delete(account: String) {
