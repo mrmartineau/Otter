@@ -23,7 +23,44 @@ export type AuthEnv = DbEnv & {
   BETTER_AUTH_TRUSTED_ORIGINS?: string
   BETTER_AUTH_DISABLE_SIGNUP?: string
   RAYCAST_OAUTH_CLIENT_ID?: string
+  OAUTH_ACCESS_TOKEN_TTL?: string
+  OAUTH_REFRESH_TOKEN_TTL?: string
 }
+
+const HOUR_IN_SECONDS = 60 * 60
+const DAY_IN_SECONDS = 24 * HOUR_IN_SECONDS
+
+/**
+ * Native clients — the iOS app and its share extension — have nowhere sensible
+ * to put a sign-in prompt, so the grant is meant to last until it's revoked.
+ *
+ * Refresh tokens rotate, and each rotation restarts the window, so a device
+ * used at least once a year never signs itself out. The access token is a
+ * signed JWT that nothing checks against the database, so its lifetime is also
+ * how long a leaked one keeps working: twelve hours trades a little of that for
+ * far fewer rotations, and every rotation is a chance for two clients sharing a
+ * grant to race. Both are overridable for instances that want the OAuth
+ * defaults (1 hour / 30 days) back.
+ */
+const DEFAULT_ACCESS_TOKEN_TTL = 12 * HOUR_IN_SECONDS
+const DEFAULT_REFRESH_TOKEN_TTL = 365 * DAY_IN_SECONDS
+
+const readSeconds = (raw: string | undefined, fallback: number) => {
+  const parsed = Number(raw)
+
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback
+}
+
+export const getTokenLifetimes = (env: AuthEnv) => ({
+  accessTokenExpiresIn: readSeconds(
+    env.OAUTH_ACCESS_TOKEN_TTL,
+    DEFAULT_ACCESS_TOKEN_TTL,
+  ),
+  refreshTokenExpiresIn: readSeconds(
+    env.OAUTH_REFRESH_TOKEN_TTL,
+    DEFAULT_REFRESH_TOKEN_TTL,
+  ),
+})
 
 const getTrustedOrigins = (env: AuthEnv) => {
   const origins = env.BETTER_AUTH_TRUSTED_ORIGINS?.split(',')
@@ -99,6 +136,7 @@ export const createAuth = (env: AuthEnv, db: Db) => {
     plugins: [
       jwt(),
       oauthProvider({
+        ...getTokenLifetimes(env),
         // Native clients (the iOS app) register themselves via RFC 7591 rather
         // than shipping a per-instance client ID. A registered client still
         // can't reach any data until a user signs in and consents.
