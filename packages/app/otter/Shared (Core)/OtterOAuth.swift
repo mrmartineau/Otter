@@ -256,6 +256,10 @@ nonisolated enum OtterOAuth {
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = Data(encoded.utf8)
+        // Well inside `OtterRefreshLock.staleAfter`, so a refresh still running
+        // can never have its lock broken out from under it. The default of 60s
+        // would leave that window wide open.
+        request.timeoutInterval = 20
 
         let (data, urlResponse) = try await URLSession.shared.data(for: request)
         let status = (urlResponse as? HTTPURLResponse)?.statusCode ?? 0

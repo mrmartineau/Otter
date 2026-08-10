@@ -79,58 +79,105 @@ nonisolated enum OtterRefreshLock {
 
     private static let pollInterval: UInt64 = 150_000_000
 
-    /// Waits for the lock, up to `timeout`. A `false` return means it never came
-    /// free; the caller refreshes anyway, because a client that can never
-    /// refresh is stranded for good, which is worse than the race this guards
-    /// against. Callers re-read the shared credentials either way.
-    static func acquire(timeout: TimeInterval = 20) async -> Bool {
+    enum Outcome {
+        /// Held, and tagged with the owner that must be handed back to `release`.
+        case acquired(owner: String)
+        /// Someone else is part-way through a rotation. Whatever they produce
+        /// lands in the keychain, so the caller should ask again rather than
+        /// spend a token that is about to be retired.
+        case busy
+        /// The keychain can't provide a lock at all. Refreshing unlocked risks a
+        /// race; never refreshing strands the client for good, so the caller
+        /// goes ahead.
+        case unavailable
+    }
+
+    /// A holder records who it is as well as when it started, so a lock can only
+    /// ever be released or broken by someone who has looked at whose it is.
+    private struct Holder {
+        let owner: String
+        let takenAt: Date
+
+        var encoded: Data {
+            Data("\(owner)|\(takenAt.timeIntervalSince1970)".utf8)
+        }
+
+        init(owner: String, takenAt: Date) {
+            self.owner = owner
+            self.takenAt = takenAt
+        }
+
+        init?(_ data: Data) {
+            guard let text = String(data: data, encoding: .utf8) else { return nil }
+
+            let parts = text.split(separator: "|", maxSplits: 1)
+
+            guard parts.count == 2, let seconds = TimeInterval(parts[1]) else { return nil }
+
+            owner = String(parts[0])
+            takenAt = Date(timeIntervalSince1970: seconds)
+        }
+    }
+
+    static func acquire(timeout: TimeInterval = 20) async -> Outcome {
         let deadline = Date(timeIntervalSinceNow: timeout)
 
         while true {
-            let status = claim()
+            let owner = OtterOAuth.randomURLSafeString(byteCount: 16)
+            let status = claim(owner: owner)
 
             if status == errSecSuccess {
-                return true
+                return .acquired(owner: owner)
             }
 
             // Refused for some reason other than the lock being taken — a
             // missing entitlement, say. There is nothing to wait for, and
             // waiting would block every refresh this install ever makes.
-            guard status == errSecDuplicateItem else { return false }
+            guard status == errSecDuplicateItem else { return .unavailable }
 
-            if let heldSince = heldSince(), Date().timeIntervalSince(heldSince) > staleAfter {
-                release()
+            if let holder = current(), isAbandoned(holder) {
+                // Abandoned by a process iOS killed mid-refresh. Break it — but
+                // only if it is still the same holder we just judged dead.
+                release(owner: holder.owner)
 
-                if claim() == errSecSuccess {
-                    return true
+                if claim(owner: owner) == errSecSuccess {
+                    return .acquired(owner: owner)
                 }
             }
 
-            guard Date() < deadline else { return false }
+            guard Date() < deadline else { return .busy }
 
             try? await Task.sleep(nanoseconds: pollInterval)
         }
     }
 
-    static func release() {
+    /// Releases the lock only if it is still ours. A refresh that outran
+    /// `staleAfter` has had its lock broken and reclaimed by someone else, and
+    /// deleting *their* lock on the way out would let a third process in while
+    /// they are mid-rotation — the very race this guards against.
+    static func release(owner: String) {
+        guard current()?.owner == owner else { return }
+
         keychain.delete(account: account)
     }
 
-    /// Stamped with the time it was taken, so a lock left behind by a killed
-    /// process can be recognised as abandoned.
-    private static func claim() -> OSStatus {
-        let stamp = String(Date().timeIntervalSince1970)
-        return keychain.add(Data(stamp.utf8), account: account)
+    /// A holder is written off once it has had far longer than a refresh needs,
+    /// or once its timestamp is in the future — which means the clock moved
+    /// backwards under it, and waiting on `staleAfter` would never elapse.
+    private static func isAbandoned(_ holder: Holder) -> Bool {
+        let age = Date().timeIntervalSince(holder.takenAt)
+
+        return age > staleAfter || age < 0
     }
 
-    private static func heldSince() -> Date? {
-        guard let data = keychain.read(account: account),
-              let text = String(data: data, encoding: .utf8),
-              let seconds = TimeInterval(text)
-        else {
-            return nil
-        }
+    private static func claim(owner: String) -> OSStatus {
+        let holder = Holder(owner: owner, takenAt: Date())
+        return keychain.add(holder.encoded, account: account)
+    }
 
-        return Date(timeIntervalSince1970: seconds)
+    private static func current() -> Holder? {
+        guard let data = keychain.read(account: account) else { return nil }
+
+        return Holder(data)
     }
 }

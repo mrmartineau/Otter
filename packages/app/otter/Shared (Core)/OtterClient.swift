@@ -43,6 +43,12 @@ actor OtterClient {
         // keychain than a sign-out, so it never clears what we already have.
         guard let stored = OtterCredentialStore.load() else { return }
 
+        // Only ever move forward. If the write after our last rotation failed —
+        // the case `store(_:)` reports — memory holds the only live token and
+        // the stored one is already retired, so reading it back would hand the
+        // instance a token it has revoked.
+        if let cached, !Self.isNewer(stored, than: cached) { return }
+
         cached = stored
     }
 
@@ -486,9 +492,26 @@ actor OtterClient {
             return nil
         }
 
+        // Never walk backwards onto a token this process rotated past but
+        // failed to persist.
+        if let cached, !Self.isNewer(stored, than: cached) { return nil }
+
         cached = stored
 
         return stored
+    }
+
+    /// Whether `candidate` is a later rotation than `known`. Every rotation
+    /// pushes the expiry outwards, so the expiry is what orders them; a set with
+    /// no expiry at all can't be ruled stale and is taken at face value.
+    private static func isNewer(
+        _ candidate: OtterCredentials,
+        than known: OtterCredentials
+    ) -> Bool {
+        guard let candidateExpiry = candidate.expiresAt else { return true }
+        guard let knownExpiry = known.expiresAt else { return false }
+
+        return candidateExpiry > knownExpiry
     }
 
     private func performRefresh(_ credentials: OtterCredentials) async throws -> OtterCredentials {
@@ -501,11 +524,31 @@ actor OtterClient {
         // picks up the result. Without it the app and the share extension can
         // spend the same refresh token from their separate processes, and the
         // loser's request is what revokes the grant.
-        let isLockHeld = await OtterRefreshLock.acquire()
+        let owner: String?
+
+        switch await OtterRefreshLock.acquire() {
+        case let .acquired(lockOwner):
+            owner = lockOwner
+        case .unavailable:
+            // No lock to be had. Racing beats never refreshing at all.
+            owner = nil
+        case .busy:
+            // Another process is still rotating. Its result will reach the
+            // keychain shortly, so the caller retries — refreshing now would
+            // spend a token that is about to be retired, and that is what costs
+            // the whole grant.
+            if let fresher = superseding(credentials) {
+                return fresher
+            }
+
+            throw OtterError.serverUnavailable(
+                "Otter is still refreshing this sign-in. Try again in a moment."
+            )
+        }
 
         defer {
-            if isLockHeld {
-                OtterRefreshLock.release()
+            if let owner {
+                OtterRefreshLock.release(owner: owner)
             }
         }
 
@@ -515,7 +558,9 @@ actor OtterClient {
             return fresher
         }
 
-        let current = OtterCredentialStore.load() ?? credentials
+        let current = OtterCredentialStore.load().map {
+            Self.isNewer($0, than: credentials) ? $0 : credentials
+        } ?? credentials
 
         guard let refreshToken = current.refreshToken else {
             signOut()
