@@ -501,13 +501,32 @@ actor OtterClient {
         return stored
     }
 
-    /// Whether `candidate` is a later rotation than `known`. Every rotation
-    /// pushes the expiry outwards, so the expiry is what orders them; a set with
-    /// no expiry at all can't be ruled stale and is taken at face value.
+    /// Whether `candidate` should replace `known`.
+    ///
+    /// A different instance or client isn't a later rotation of the same grant
+    /// at all — it's a different account, from a sign-in that happened
+    /// elsewhere. The shared keychain is what decides who we're signed in as, so
+    /// those always win outright and are never ranked by expiry.
+    ///
+    /// Same grant: the rotation counter orders them. Expiry is only the
+    /// fallback for credentials written before the counter existed, and it's a
+    /// fallback rather than the rule because it silently assumes the instance's
+    /// access-token TTL never changes — lower `OAUTH_ACCESS_TOKEN_TTL` between
+    /// two refreshes and the newer token carries the *earlier* expiry.
     private static func isNewer(
         _ candidate: OtterCredentials,
         than known: OtterCredentials
     ) -> Bool {
+        guard candidate.instanceURL == known.instanceURL,
+              candidate.clientID == known.clientID
+        else {
+            return true
+        }
+
+        if let candidateRotation = candidate.rotation, let knownRotation = known.rotation {
+            return candidateRotation > knownRotation
+        }
+
         guard let candidateExpiry = candidate.expiresAt else { return true }
         guard let knownExpiry = known.expiresAt else { return false }
 
@@ -524,14 +543,14 @@ actor OtterClient {
         // picks up the result. Without it the app and the share extension can
         // spend the same refresh token from their separate processes, and the
         // loser's request is what revokes the grant.
-        let owner: String?
+        let lease: OtterRefreshLock.Lease?
 
         switch await OtterRefreshLock.acquire() {
-        case let .acquired(lockOwner):
-            owner = lockOwner
+        case let .acquired(held):
+            lease = held
         case .unavailable:
             // No lock to be had. Racing beats never refreshing at all.
-            owner = nil
+            lease = nil
         case .busy:
             // Another process is still rotating. Its result will reach the
             // keychain shortly, so the caller retries — refreshing now would
@@ -547,8 +566,8 @@ actor OtterClient {
         }
 
         defer {
-            if let owner {
-                OtterRefreshLock.release(owner: owner)
+            if let lease {
+                OtterRefreshLock.release(lease)
             }
         }
 
@@ -577,6 +596,9 @@ actor OtterClient {
             updated.accessToken = token.accessToken
             updated.refreshToken = token.refreshToken ?? current.refreshToken
             updated.expiresAt = token.expiresAt
+            // Bumped under the lock, so the count stays monotonic across both
+            // processes and orders the copies without relying on the expiry.
+            updated.rotation = (current.rotation ?? 0) + 1
             store(updated)
 
             return updated

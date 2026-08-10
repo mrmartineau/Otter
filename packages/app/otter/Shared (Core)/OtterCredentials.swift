@@ -15,6 +15,16 @@ nonisolated struct OtterCredentials: Codable, Equatable {
     var refreshToken: String?
     var expiresAt: Date?
 
+    /// Counts rotations of this grant, so two copies can be ordered without
+    /// reading anything into their expiry dates. The expiry only ranks
+    /// rotations while the instance's `OAUTH_ACCESS_TOKEN_TTL` holds still, and
+    /// lowering it between two refreshes would otherwise make the newer token
+    /// look like the older one.
+    ///
+    /// Optional so credentials written before this existed still decode; a pair
+    /// that predates it falls back to comparing expiries.
+    var rotation: Int?
+
     /// Treat tokens as expired a minute early so in-flight requests don't race
     /// the expiry.
     var isExpired: Bool {
@@ -77,11 +87,18 @@ nonisolated enum OtterRefreshLock {
     /// one dead extension can't lock the app out permanently.
     private static let staleAfter: TimeInterval = 30
 
+    /// A lock is only released explicitly while we can still prove nobody was
+    /// entitled to break it — comfortably inside `staleAfter`, since the check
+    /// and the delete can't be made one atomic keychain operation. Past this
+    /// point the lease is simply left to expire, which costs a few seconds and
+    /// can't take someone else's lock down with it.
+    private static let releaseBefore: TimeInterval = 25
+
     private static let pollInterval: UInt64 = 150_000_000
 
     enum Outcome {
-        /// Held, and tagged with the owner that must be handed back to `release`.
-        case acquired(owner: String)
+        /// Held, along with the lease that must be handed back to `release`.
+        case acquired(lease: Lease)
         /// Someone else is part-way through a rotation. Whatever they produce
         /// lands in the keychain, so the caller should ask again rather than
         /// spend a token that is about to be retired.
@@ -92,11 +109,15 @@ nonisolated enum OtterRefreshLock {
         case unavailable
     }
 
-    /// A holder records who it is as well as when it started, so a lock can only
-    /// ever be released or broken by someone who has looked at whose it is.
-    private struct Holder {
+    /// Who holds the lock, and since when — so a lock can only be released or
+    /// broken by someone who has looked at whose it is and how old it is.
+    struct Lease {
         let owner: String
         let takenAt: Date
+
+        var age: TimeInterval {
+            Date().timeIntervalSince(takenAt)
+        }
 
         var encoded: Data {
             Data("\(owner)|\(takenAt.timeIntervalSince1970)".utf8)
@@ -123,11 +144,14 @@ nonisolated enum OtterRefreshLock {
         let deadline = Date(timeIntervalSinceNow: timeout)
 
         while true {
-            let owner = OtterOAuth.randomURLSafeString(byteCount: 16)
-            let status = claim(owner: owner)
+            let lease = Lease(
+                owner: OtterOAuth.randomURLSafeString(byteCount: 16),
+                takenAt: Date()
+            )
+            let status = keychain.add(lease.encoded, account: account)
 
             if status == errSecSuccess {
-                return .acquired(owner: owner)
+                return .acquired(lease: lease)
             }
 
             // Refused for some reason other than the lock being taken — a
@@ -135,13 +159,12 @@ nonisolated enum OtterRefreshLock {
             // waiting would block every refresh this install ever makes.
             guard status == errSecDuplicateItem else { return .unavailable }
 
-            if let holder = current(), isAbandoned(holder) {
-                // Abandoned by a process iOS killed mid-refresh. Break it — but
-                // only if it is still the same holder we just judged dead.
-                release(owner: holder.owner)
+            if let held = current(), isAbandoned(held) {
+                // Left behind by a process iOS killed mid-refresh.
+                breakLease(held)
 
-                if claim(owner: owner) == errSecSuccess {
-                    return .acquired(owner: owner)
+                if keychain.add(lease.encoded, account: account) == errSecSuccess {
+                    return .acquired(lease: lease)
                 }
             }
 
@@ -151,33 +174,46 @@ nonisolated enum OtterRefreshLock {
         }
     }
 
-    /// Releases the lock only if it is still ours. A refresh that outran
-    /// `staleAfter` has had its lock broken and reclaimed by someone else, and
-    /// deleting *their* lock on the way out would let a third process in while
-    /// they are mid-rotation — the very race this guards against.
-    static func release(owner: String) {
-        guard current()?.owner == owner else { return }
+    /// Releases the lock, but only while the lease demonstrably still belongs to
+    /// us.
+    ///
+    /// The owner check and the delete can't be a single keychain operation, so
+    /// the age check is what makes the pair safe rather than merely narrow:
+    /// inside `releaseBefore` no other process was entitled to break this lock,
+    /// so nothing can have claimed it between the two calls. Once past that,
+    /// the lease is left to expire on its own rather than risk deleting the
+    /// lock of whoever took over.
+    static func release(_ lease: Lease) {
+        guard lease.age < releaseBefore, current()?.owner == lease.owner else { return }
 
         keychain.delete(account: account)
     }
 
-    /// A holder is written off once it has had far longer than a refresh needs,
+    /// Clears a lease already judged abandoned, and only if it's still the one
+    /// we judged.
+    ///
+    /// This check-then-delete isn't atomic either, but the interleaving that
+    /// would matter needs a *third* party to claim the lock in between, and only
+    /// two processes ever share this grant: the app and the share extension.
+    /// Whichever of them is recovering here is the live one, and the lease it's
+    /// clearing belongs to the other — which is dead, by definition of
+    /// `isAbandoned`.
+    private static func breakLease(_ lease: Lease) {
+        guard current()?.owner == lease.owner else { return }
+
+        keychain.delete(account: account)
+    }
+
+    /// A lease is written off once it has had far longer than a refresh needs,
     /// or once its timestamp is in the future — which means the clock moved
     /// backwards under it, and waiting on `staleAfter` would never elapse.
-    private static func isAbandoned(_ holder: Holder) -> Bool {
-        let age = Date().timeIntervalSince(holder.takenAt)
-
-        return age > staleAfter || age < 0
+    private static func isAbandoned(_ lease: Lease) -> Bool {
+        lease.age > staleAfter || lease.age < 0
     }
 
-    private static func claim(owner: String) -> OSStatus {
-        let holder = Holder(owner: owner, takenAt: Date())
-        return keychain.add(holder.encoded, account: account)
-    }
-
-    private static func current() -> Holder? {
+    private static func current() -> Lease? {
         guard let data = keychain.read(account: account) else { return nil }
 
-        return Holder(data)
+        return Lease(data)
     }
 }

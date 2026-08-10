@@ -102,6 +102,22 @@ nonisolated enum OtterOAuth {
             .replacingOccurrences(of: "=", with: "")
     }
 
+    // MARK: - Transport configuration
+
+    /// Auth requests get their own session rather than `URLSession.shared`.
+    ///
+    /// `timeoutIntervalForRequest` is an *inactivity* timeout — a response that
+    /// trickles in resets it and can run indefinitely. `OtterRefreshLock` leases
+    /// a refresh for a fixed window, so the wall-clock ceiling
+    /// (`timeoutIntervalForResource`) is the one that has to stay inside it.
+    /// Ephemeral because token responses have no business touching a disk cache.
+    nonisolated(unsafe) private static let session: URLSession = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.timeoutIntervalForRequest = 15
+        configuration.timeoutIntervalForResource = 20
+        return URLSession(configuration: configuration)
+    }()
+
     // MARK: - Endpoints
 
     static func authURL(_ instanceURL: URL, _ path: String) -> URL {
@@ -256,12 +272,8 @@ nonisolated enum OtterOAuth {
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = Data(encoded.utf8)
-        // Well inside `OtterRefreshLock.staleAfter`, so a refresh still running
-        // can never have its lock broken out from under it. The default of 60s
-        // would leave that window wide open.
-        request.timeoutInterval = 20
 
-        let (data, urlResponse) = try await URLSession.shared.data(for: request)
+        let (data, urlResponse) = try await session.data(for: request)
         let status = (urlResponse as? HTTPURLResponse)?.statusCode ?? 0
 
         guard (200 ..< 300).contains(status) else {
@@ -318,7 +330,7 @@ nonisolated enum OtterOAuth {
     // MARK: - Transport
 
     private static func send(_ request: URLRequest) async throws -> Data {
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
 
         guard (200 ..< 300).contains(status) else {

@@ -52,7 +52,10 @@ final class SignInFlow: NSObject, ASWebAuthenticationPresentationContextProvidin
             clientID: clientID,
             accessToken: token.accessToken,
             refreshToken: token.refreshToken,
-            expiresAt: token.expiresAt
+            expiresAt: token.expiresAt,
+            // A fresh grant starts the rotation count, so ordering never has to
+            // fall back to reading the expiry.
+            rotation: 0
         )
     }
 
