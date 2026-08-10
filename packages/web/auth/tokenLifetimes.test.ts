@@ -29,7 +29,9 @@ describe('getTokenLifetimes', () => {
   })
 
   it('falls back rather than issuing a token that expires immediately', () => {
-    for (const raw of ['', '0', '-1', 'forever', 'NaN']) {
+    // '0.5' floors to zero — positive on the way in, an already-expired token
+    // on the way out.
+    for (const raw of ['', '0', '-1', '0.5', 'forever', 'NaN', 'Infinity']) {
       expect(
         getTokenLifetimes(
           env({ OAUTH_ACCESS_TOKEN_TTL: raw, OAUTH_REFRESH_TOKEN_TTL: raw }),

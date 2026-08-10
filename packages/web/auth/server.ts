@@ -45,10 +45,13 @@ const DAY_IN_SECONDS = 24 * HOUR_IN_SECONDS
 const DEFAULT_ACCESS_TOKEN_TTL = 12 * HOUR_IN_SECONDS
 const DEFAULT_REFRESH_TOKEN_TTL = 365 * DAY_IN_SECONDS
 
+// Truncated before the check, not after: a value under a second would otherwise
+// pass as positive and then floor to zero, issuing tokens that expire the
+// instant they are minted.
 const readSeconds = (raw: string | undefined, fallback: number) => {
-  const parsed = Number(raw)
+  const parsed = Math.floor(Number(raw))
 
-  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }
 
 export const getTokenLifetimes = (env: AuthEnv) => ({
