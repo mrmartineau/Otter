@@ -46,6 +46,13 @@ Notes:
 - `DATABASE_URL` should point at Neon.
 - `BETTER_AUTH_URL` must match the actual app origin for the environment.
 - Signups are disabled by default.
+- OAuth token lifetimes (used by the iOS app, the Raycast extension and MCP
+  clients) default to a 12 hour access token and a 1 year refresh token, so
+  native clients stay signed in rather than being bounced to a login screen.
+  Set `OAUTH_ACCESS_TOKEN_TTL` / `OAUTH_REFRESH_TOKEN_TTL` (in seconds) to
+  shorten them — `3600` and `2592000` restore the OAuth defaults. Access tokens
+  are JWTs that aren't checked against the database, so a shorter access token
+  TTL is the lever for how quickly a leaked one stops working.
 
 ## 4. Run database migrations
 

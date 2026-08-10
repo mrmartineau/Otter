@@ -34,6 +34,11 @@ PERSONAL_MASTODON_ACCESS_TOKEN=
 WEBHOOK_SECRET=replace-with-a-random-secret
 ```
 
+Optional: `OAUTH_ACCESS_TOKEN_TTL` and `OAUTH_REFRESH_TOKEN_TTL` (seconds)
+override how long OAuth tokens last for native clients like the iOS app. They
+default to 12 hours and 1 year respectively; `3600` and `2592000` restore the
+OAuth defaults.
+
 Generate secrets with:
 
 ```bash

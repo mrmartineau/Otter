@@ -102,6 +102,22 @@ nonisolated enum OtterOAuth {
             .replacingOccurrences(of: "=", with: "")
     }
 
+    // MARK: - Transport configuration
+
+    /// Auth requests get their own session rather than `URLSession.shared`.
+    ///
+    /// `timeoutIntervalForRequest` is an *inactivity* timeout — a response that
+    /// trickles in resets it and can run indefinitely. `OtterRefreshLock` leases
+    /// a refresh for a fixed window, so the wall-clock ceiling
+    /// (`timeoutIntervalForResource`) is the one that has to stay inside it.
+    /// Ephemeral because token responses have no business touching a disk cache.
+    nonisolated(unsafe) private static let session: URLSession = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.timeoutIntervalForRequest = 15
+        configuration.timeoutIntervalForResource = 20
+        return URLSession(configuration: configuration)
+    }()
+
     // MARK: - Endpoints
 
     static func authURL(_ instanceURL: URL, _ path: String) -> URL {
@@ -257,20 +273,24 @@ nonisolated enum OtterOAuth {
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = Data(encoded.utf8)
 
-        let (data, urlResponse) = try await URLSession.shared.data(for: request)
+        let (data, urlResponse) = try await session.data(for: request)
         let status = (urlResponse as? HTTPURLResponse)?.statusCode ?? 0
 
         guard (200 ..< 300).contains(status) else {
-            let message = errorMessage(from: data)
+            let message = errorMessage(from: data) ?? "Otter returned \(status)."
+            let contentType = (urlResponse as? HTTPURLResponse)?
+                .value(forHTTPHeaderField: "Content-Type")
 
             // OAuth reports a spent or revoked grant as `invalid_grant`; anything
             // else (network, 5xx, rate limit) is transient and must not be treated
             // as a sign-out.
-            if isInvalidGrant(data: data, status: status) {
+            if isInvalidGrant(data: data, status: status, contentType: contentType) {
                 throw OtterError.invalidGrant
             }
 
-            throw OtterError.server(message ?? "Otter returned \(status).")
+            throw status >= 500
+                ? OtterError.serverUnavailable(message)
+                : OtterError.server(message)
         }
 
         guard let response = try? JSONDecoder().decode(TokenResponse.self, from: data) else {
@@ -280,7 +300,11 @@ nonisolated enum OtterOAuth {
         return response
     }
 
-    private static func isInvalidGrant(data: Data, status: Int) -> Bool {
+    private static func isInvalidGrant(
+        data: Data,
+        status: Int,
+        contentType: String?
+    ) -> Bool {
         struct Failure: Decodable {
             let error: String?
         }
@@ -291,14 +315,22 @@ nonisolated enum OtterOAuth {
             return code == "invalid_grant" || code == "invalid_client" || code == "unauthorized_client"
         }
 
-        // No machine-readable code: only a 400/401 is unambiguous enough.
+        // No machine-readable code, so the status is all there is to go on — and
+        // it's only worth trusting when the answer actually came from the token
+        // endpoint. A captive portal, a proxy or an edge error page can return
+        // 401 with an HTML body, and signing out over one of those costs the
+        // user their whole sign-in for what is really a network blip.
+        guard contentType?.localizedCaseInsensitiveContains("json") == true else {
+            return false
+        }
+
         return status == 400 || status == 401
     }
 
     // MARK: - Transport
 
     private static func send(_ request: URLRequest) async throws -> Data {
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
 
         guard (200 ..< 300).contains(status) else {
