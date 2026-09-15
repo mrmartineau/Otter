@@ -99,7 +99,7 @@ nonisolated struct Bookmark: Identifiable, Hashable, Decodable {
 
     nonisolated(unsafe) private static let plainFormatter = ISO8601DateFormatter()
 
-    private static func parseTimestamp(_ value: String) -> Date? {
+    static func parseTimestamp(_ value: String) -> Date? {
         if let date = fractionalFormatter.date(from: value) { return date }
 
         return plainFormatter.date(from: value)

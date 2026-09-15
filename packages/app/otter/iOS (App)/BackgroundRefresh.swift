@@ -59,7 +59,14 @@ enum BackgroundRefresh {
     /// Refetches the first page of bookmarks and the metadata blob. Both calls
     /// write straight to the disk caches, so the next launch reads them.
     static func refreshCaches() async {
-        guard await OtterClient.shared.isSignedIn() else { return }
+        // Feeds need no account.
+        await FeedStore.shared.refreshAll()
+
+        guard !Task.isCancelled, await OtterClient.shared.isSignedIn() else { return }
+
+        await ReadingStore.shared.sync()
+
+        guard !Task.isCancelled else { return }
 
         _ = try? await OtterClient.shared.bookmarks(source: .all, limit: 25, offset: 0)
 

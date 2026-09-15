@@ -90,6 +90,16 @@ nonisolated struct ArticleContent: Decodable {
         case image
     }
 
+    init(title: String, author: String, domain: String, content: String, wordCount: Int, published: String, image: String?) {
+        self.title = title
+        self.author = author
+        self.domain = domain
+        self.content = content
+        self.wordCount = wordCount
+        self.published = published
+        self.image = image
+    }
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         title = try container.decodeIfPresent(String.self, forKey: .title) ?? ""

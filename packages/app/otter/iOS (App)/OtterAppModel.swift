@@ -15,6 +15,8 @@ final class OtterAppModel: ObservableObject {
 
     @Published var isRestoring = true
     @Published var isSignedIn = false
+    /// The sign-in sheet, shown the first time something needs an account.
+    @Published var isSignInPresented = false
 
     @Published var instanceText = OtterAppModel.defaultInstance
     @Published var isSigningIn = false
@@ -77,6 +79,7 @@ final class OtterAppModel: ObservableObject {
             isSigningIn = false
             feedReloadToken = UUID()
             isSignedIn = true
+            isSignInPresented = false
         } catch OtterError.signInCancelled {
             isSigningIn = false
         } catch {

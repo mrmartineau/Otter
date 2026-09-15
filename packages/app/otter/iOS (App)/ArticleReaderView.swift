@@ -36,10 +36,16 @@ final class ArticleReaderModel: ObservableObject {
     @Published private(set) var isSummarising = false
     @Published private(set) var summaryError: String?
 
-    private let url: String
+    private let loader: () async throws -> ArticleContent
 
+    /// Live scrape of a bookmark's URL.
     init(url: String) {
-        self.url = url
+        loader = { try await OtterClient.shared.articleContent(url: url) }
+    }
+
+    /// The stored article behind a reading item, cached for offline.
+    init(item: ReadingItem) {
+        loader = { try await ReadingStore.shared.loadContent(for: item).articleContent }
     }
 
     func load() async {
@@ -49,7 +55,7 @@ final class ArticleReaderModel: ObservableObject {
         loadError = nil
 
         do {
-            article = try await OtterClient.shared.articleContent(url: url)
+            article = try await loader()
         } catch {
             loadError = error.localizedDescription
         }
@@ -81,20 +87,41 @@ final class ArticleReaderModel: ObservableObject {
 }
 
 struct ArticleReaderView: View {
-    let bookmark: Bookmark
+    private let fallbackTitle: String
+    private let linkURL: URL?
+    /// Set when reading from the reading list: enables progress and the bottom bar.
+    private let readingItemID: String?
 
     @StateObject private var model: ArticleReaderModel
+    @ObservedObject private var store = ReadingStore.shared
     @State private var mode: ArticleReaderMode
+    /// A reference, not `@State`: scroll updates must not re-render the article.
+    @State private var tracker = ProgressTracker()
+    @AppStorage("reader.textSize") private var textSize = ReaderTextSize.medium
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
     init(bookmark: Bookmark, mode: ArticleReaderMode = .read) {
-        self.bookmark = bookmark
+        fallbackTitle = bookmark.displayTitle
+        linkURL = bookmark.linkURL
+        readingItemID = nil
         _model = StateObject(
             wrappedValue: ArticleReaderModel(url: bookmark.url ?? "")
         )
         _mode = State(initialValue: mode)
+    }
+
+    init(item: ReadingItem) {
+        fallbackTitle = item.displayTitle
+        linkURL = item.linkURL
+        readingItemID = item.id
+        _model = StateObject(wrappedValue: ArticleReaderModel(item: item))
+        _mode = State(initialValue: .read)
+    }
+
+    private var readingItem: ReadingItem? {
+        readingItemID.flatMap(store.item(id:))
     }
 
     var body: some View {
@@ -113,7 +140,7 @@ struct ArticleReaderView: View {
                             Task { await model.load() }
                         }
 
-                        if let url = bookmark.linkURL {
+                        if let url = linkURL {
                             Button("Open in browser") { openURL(url) }
                         }
                     }
@@ -127,7 +154,7 @@ struct ArticleReaderView: View {
                     } description: {
                         Text("Otter couldn't find article text on this page.")
                     } actions: {
-                        if let url = bookmark.linkURL {
+                        if let url = linkURL {
                             Button("Open in browser") { openURL(url) }
                         }
                     }
@@ -140,17 +167,62 @@ struct ArticleReaderView: View {
                     Button("Done") { dismiss() }
                 }
 
-                if let url = bookmark.linkURL {
-                    ToolbarItem(placement: .primaryAction) {
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        Picker("Text size", selection: $textSize) {
+                            ForEach(ReaderTextSize.allCases) { size in
+                                Text(size.label).tag(size)
+                            }
+                        }
+                        if let url = linkURL {
+                            Button {
+                                openURL(url)
+                            } label: {
+                                Label("Open in browser", systemImage: "safari")
+                            }
+                        }
+                    } label: {
+                        Label("Options", systemImage: "textformat.size")
+                    }
+                }
+
+                if let item = readingItem {
+                    ToolbarItemGroup(placement: .bottomBar) {
                         Button {
-                            openURL(url)
+                            item.isArchived ? store.unarchive(item) : store.archive(item)
+                            dismiss()
                         } label: {
-                            Label("Open in browser", systemImage: "safari")
+                            Label(
+                                item.isArchived ? "Unarchive" : "Archive",
+                                systemImage: item.isArchived ? "tray.and.arrow.up" : "archivebox"
+                            )
+                        }
+                        Spacer()
+                        Button {
+                            Task { await store.toggleStar(item) }
+                        } label: {
+                            Label("Star", systemImage: item.star ? "star.fill" : "star")
+                        }
+                        Spacer()
+                        if let url = linkURL {
+                            ShareLink(item: url) {
+                                Label("Share", systemImage: "square.and.arrow.up")
+                            }
+                            Spacer()
+                            Button {
+                                openURL(url)
+                            } label: {
+                                Label("Open original", systemImage: "safari")
+                            }
                         }
                     }
                 }
             }
             .task { await model.load() }
+            .onDisappear {
+                tracker.flush?.cancel()
+                if let item = readingItem { store.setProgress(item, progress: tracker.value) }
+            }
             // Covers both landing on Summary directly and switching to it later.
             .task(id: summaryTrigger) {
                 if mode == .summary {
@@ -167,7 +239,7 @@ struct ArticleReaderView: View {
             return extracted
         }
 
-        return bookmark.displayTitle
+        return fallbackTitle
     }
 
     /// Changes when the tab or the loaded article does, so the summary kicks off
@@ -188,15 +260,50 @@ struct ArticleReaderView: View {
 
             Divider()
 
-            ScrollView {
-                switch mode {
-                case .read:
-                    readBody(article)
-                case .summary:
-                    summaryBody
+            GeometryReader { viewport in
+                ScrollView {
+                    Group {
+                        switch mode {
+                        case .read:
+                            readBody(article)
+                        case .summary:
+                            summaryBody
+                        }
+                    }
+                    .background(
+                        GeometryReader { content in
+                            Color.clear.preference(
+                                key: ScrollProgressKey.self,
+                                value: Self.progress(
+                                    offset: -content.frame(in: .named("reader")).minY,
+                                    content: content.size.height,
+                                    viewport: viewport.size.height
+                                )
+                            )
+                        }
+                    )
+                }
+                .coordinateSpace(name: "reader")
+                .onPreferenceChange(ScrollProgressKey.self) { value in
+                    guard mode == .read, let item = readingItem, value > tracker.value else { return }
+                    tracker.value = value
+                    tracker.flush?.cancel()
+                    tracker.flush = Task { @MainActor in
+                        try? await Task.sleep(for: .seconds(1))
+                        guard !Task.isCancelled else { return }
+                        store.setProgress(item, progress: tracker.value)
+                    }
                 }
             }
         }
+        .dynamicTypeSize(textSize.dynamicTypeSize)
+    }
+
+    /// 0 at the top, 1 once the end of the article is on screen.
+    static func progress(offset: CGFloat, content: CGFloat, viewport: CGFloat) -> Double {
+        let scrollable = content - viewport
+        guard scrollable > 0 else { return content > 0 ? 1 : 0 }
+        return Double(min(1, max(0, offset / scrollable)))
     }
 
     private func readBody(_ article: ArticleContent) -> some View {
@@ -242,5 +349,43 @@ struct ArticleReaderView: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+@MainActor
+private final class ProgressTracker {
+    var value: Double = 0
+    var flush: Task<Void, Never>?
+}
+
+private struct ScrollProgressKey: PreferenceKey {
+    static let defaultValue: Double = 0
+    static func reduce(value: inout Double, nextValue: () -> Double) {
+        value = nextValue()
+    }
+}
+
+/// Reader text size, stored in `AppStorage` and shared with Settings.
+enum ReaderTextSize: String, CaseIterable, Identifiable {
+    case small, medium, large, extraLarge
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .small: return "Small"
+        case .medium: return "Medium"
+        case .large: return "Large"
+        case .extraLarge: return "Extra large"
+        }
+    }
+
+    var dynamicTypeSize: DynamicTypeSize {
+        switch self {
+        case .small: return .small
+        case .medium: return .large
+        case .large: return .xLarge
+        case .extraLarge: return .xxxLarge
+        }
     }
 }

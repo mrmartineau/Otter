@@ -372,7 +372,7 @@ actor OtterClient {
 
     // MARK: - Transport
 
-    private func perform(
+    func perform(
         path: String,
         method: String = "GET",
         query: [URLQueryItem] = [],
