@@ -37,6 +37,7 @@ final class ReadingStore: ObservableObject {
         }
     }
     private var progressFlush: Task<Void, Never>?
+    private var prefetch: Task<Void, Never>?
 
     private init() {
         pending = defaults.data(forKey: pendingKey)
@@ -95,6 +96,7 @@ final class ReadingStore: ObservableObject {
                 defaults.set(nextSince, forKey: sinceKey)
             }
             lastError = nil
+            prefetchContent()
         } catch OtterError.notSignedIn {
             reset()
         } catch {
@@ -136,6 +138,25 @@ final class ReadingStore: ObservableObject {
         let item = try await OtterClient.shared.saveForLater(url: url)
         upsert(item)
         return item
+    }
+
+    /// Downloads the newest unread articles that have no text cached yet, so
+    /// they open offline. Runs after every sync; one download at a time so it
+    /// never competes with the screen the user is looking at.
+    @discardableResult
+    func prefetchContent(limit: Int = 20) -> Task<Void, Never> {
+        if let prefetch, !prefetch.isCancelled { return prefetch }
+
+        let targets = unread.prefix(limit).filter { ($0.content ?? "").isEmpty && !$0.isFailed }
+        let task = Task {
+            for item in targets {
+                guard !Task.isCancelled else { return }
+                _ = try? await loadContent(for: item)
+            }
+            prefetch = nil
+        }
+        prefetch = task
+        return task
     }
 
     /// Fetches the stored article and caches it for offline reading.
@@ -230,6 +251,8 @@ final class ReadingStore: ObservableObject {
     }
 
     func reset() {
+        prefetch?.cancel()
+        prefetch = nil
         items = []
         pending = []
         cache.clear()

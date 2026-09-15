@@ -68,6 +68,12 @@ enum BackgroundRefresh {
 
         guard !Task.isCancelled else { return }
 
+        // The sync kicked this off; wait so the articles land before iOS
+        // suspends us again.
+        await ReadingStore.shared.prefetchContent().value
+
+        guard !Task.isCancelled else { return }
+
         _ = try? await OtterClient.shared.bookmarks(source: .all, limit: 25, offset: 0)
 
         guard !Task.isCancelled else { return }
