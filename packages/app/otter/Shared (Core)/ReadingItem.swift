@@ -22,9 +22,8 @@ nonisolated struct ReadingItem: Identifiable, Hashable, Codable {
     let wordCount: Int
     let readingTimeS: Int
     var star: Bool
+    /// When it was saved as a bookmark (ISO 8601).
     let createdAt: String
-    /// When the bookmark was saved (ISO 8601).
-    let savedAt: String
     let updatedAt: String
     let deletedAt: String?
     var content: String?
@@ -44,7 +43,6 @@ nonisolated struct ReadingItem: Identifiable, Hashable, Codable {
         case readingTimeS = "reading_time_s"
         case star
         case createdAt = "created_at"
-        case savedAt = "saved_at"
         case updatedAt = "updated_at"
         case deletedAt = "deleted_at"
         case content = "content_md"
@@ -66,7 +64,6 @@ nonisolated struct ReadingItem: Identifiable, Hashable, Codable {
         readingTimeS = try c.decodeIfPresent(Int.self, forKey: .readingTimeS) ?? 0
         star = try c.decodeIfPresent(Bool.self, forKey: .star) ?? false
         createdAt = try c.decodeIfPresent(String.self, forKey: .createdAt) ?? ""
-        savedAt = try c.decodeIfPresent(String.self, forKey: .savedAt) ?? createdAt
         updatedAt = try c.decodeIfPresent(String.self, forKey: .updatedAt) ?? ""
         deletedAt = try c.decodeIfPresent(String.self, forKey: .deletedAt)
         content = try c.decodeIfPresent(String.self, forKey: .content)
@@ -93,16 +90,16 @@ nonisolated struct ReadingItem: Identifiable, Hashable, Codable {
         return URL(string: image)
     }
 
-    var savedDate: Date? { Bookmark.parseTimestamp(savedAt) }
+    var savedDate: Date? { Bookmark.parseTimestamp(createdAt) }
 
-    /// "example.com · 6 min · 3 days ago" for the row subtitle.
+    /// "example.com · 6 min · 15 Sept 2026" for the row subtitle.
     var subtitle: String {
         var parts: [String] = []
         if let siteName, !siteName.isEmpty { parts.append(siteName) } else if let host { parts.append(host) }
         if readingTimeS > 0 { parts.append("\(max(1, readingTimeS / 60)) min") }
         if isFailed { parts.append("couldn't extract") }
         if let savedDate {
-            parts.append(savedDate.formatted(.relative(presentation: .named, unitsStyle: .abbreviated)))
+            parts.append(savedDate.formatted(date: .abbreviated, time: .omitted))
         }
         return parts.joined(separator: " · ")
     }

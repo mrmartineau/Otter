@@ -25,10 +25,11 @@ extension OtterClient {
 
     /// `GET /api/reader/items`. With `since`, returns every change after that
     /// instant, tombstones included.
-    func readingItems(state: String = "all", since: String? = nil, limit: Int = 200) async throws -> ReadingPage {
+    func readingItems(state: String = "all", since: String? = nil, limit: Int = 200, offset: Int = 0) async throws -> ReadingPage {
         var query = [
             URLQueryItem(name: "state", value: state),
             URLQueryItem(name: "limit", value: String(limit)),
+            URLQueryItem(name: "offset", value: String(offset)),
         ]
         if let since { query.append(URLQueryItem(name: "since", value: since)) }
 

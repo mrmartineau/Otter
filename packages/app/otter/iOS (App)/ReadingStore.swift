@@ -52,8 +52,10 @@ final class ReadingStore: ObservableObject {
         }
     }
 
+    /// Unread: newest bookmark first. Archive: most recently changed first,
+    /// which is the item archived last.
     var unread: [ReadingItem] { items.filter { !$0.isArchived } }
-    var archived: [ReadingItem] { items.filter(\.isArchived) }
+    var archived: [ReadingItem] { items.filter(\.isArchived).sorted { $0.updatedAt > $1.updatedAt } }
 
     func item(id: String) -> ReadingItem? {
         items.first { $0.id == id }
@@ -77,10 +79,20 @@ final class ReadingStore: ObservableObject {
 
         do {
             let since = defaults.string(forKey: sinceKey)
-            let page = try await OtterClient.shared.readingItems(since: since)
-            merge(page.data, replaceAll: since == nil)
-            if let next = page.nextSince {
-                defaults.set(next, forKey: sinceKey)
+            // Page through everything; the server caps a page at 200.
+            var changes: [ReadingItem] = []
+            var nextSince: String?
+            var offset = 0
+            while true {
+                let page = try await OtterClient.shared.readingItems(since: since, offset: offset)
+                changes += page.data
+                nextSince = nextSince ?? page.nextSince
+                if page.data.count < 200 { break }
+                offset += page.data.count
+            }
+            merge(changes, replaceAll: since == nil)
+            if let nextSince {
+                defaults.set(nextSince, forKey: sinceKey)
             }
             lastError = nil
         } catch OtterError.notSignedIn {
@@ -104,7 +116,7 @@ final class ReadingStore: ObservableObject {
             }
         }
 
-        items = byId.values.sorted { $0.savedAt > $1.savedAt }
+        items = byId.values.sorted { $0.createdAt > $1.createdAt }
         cache.store((try? JSONEncoder().encode(items)) ?? Data())
     }
 
@@ -113,7 +125,7 @@ final class ReadingStore: ObservableObject {
         merged.content = item.content ?? self.item(id: item.id)?.content
         items.removeAll { $0.id == item.id }
         items.append(merged)
-        items.sort { $0.savedAt > $1.savedAt }
+        items.sort { $0.createdAt > $1.createdAt }
         cache.store((try? JSONEncoder().encode(items)) ?? Data())
     }
 
