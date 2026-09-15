@@ -35,6 +35,13 @@
       "when": 1781092134629,
       "tag": "0004_closed_stone_men",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789464332036,
+      "tag": "0005_reader",
+      "breakpoints": true
     }
   ],
   "version": "7"

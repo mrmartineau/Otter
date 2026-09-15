@@ -62,6 +62,18 @@ import {
 } from './meta'
 import { dbMiddleware } from './middleware/db'
 import { getCurrentProfile, updateCurrentProfile } from './profile'
+import {
+  createHighlight,
+  createReadingItem,
+  deleteHighlight,
+  deleteReadingItem,
+  getReadingItem,
+  listHighlights,
+  listReadingItems,
+  reextractReadingItem,
+  updateHighlight,
+  updateReadingItem,
+} from './reader/reader'
 import { feedToJson } from './rss/rss-to-json'
 import { handleScrapeContent } from './scraper/scrape-content'
 import { getSearch } from './search/search'
@@ -214,6 +226,42 @@ api.delete('/bookmarks/:id', async (c) => {
 })
 api.post('/bookmarks/:id/click', async (c) => {
   return await incrementBookmarkClickCount(c)
+})
+// Otter Reader (read-it-later). Saving runs extraction, so it shares the
+// scrape rate limit.
+api.post('/reader/items', authedWithRateLimit('scrape'), async (c) => {
+  return await createReadingItem(c)
+})
+api.get('/reader/items', async (c) => {
+  return await listReadingItems(c)
+})
+api.get('/reader/items/:id', async (c) => {
+  return await getReadingItem(c)
+})
+api.patch('/reader/items/:id', async (c) => {
+  return await updateReadingItem(c)
+})
+api.delete('/reader/items/:id', async (c) => {
+  return await deleteReadingItem(c)
+})
+api.post(
+  '/reader/items/:id/reextract',
+  authedWithRateLimit('scrape'),
+  async (c) => {
+    return await reextractReadingItem(c)
+  },
+)
+api.get('/reader/highlights', async (c) => {
+  return await listHighlights(c)
+})
+api.post('/reader/highlights', async (c) => {
+  return await createHighlight(c)
+})
+api.patch('/reader/highlights/:id', async (c) => {
+  return await updateHighlight(c)
+})
+api.delete('/reader/highlights/:id', async (c) => {
+  return await deleteHighlight(c)
 })
 api.get('/check-url', async (c) => {
   return await checkBookmarkUrl(c)

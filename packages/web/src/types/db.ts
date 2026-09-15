@@ -247,3 +247,47 @@ export type JournalEntryUpdate = Partial<JournalEntryInsert>
 export interface JournalEntryFilters {
   journal?: number
 }
+
+export type ReadingState = 'pending' | 'ready' | 'failed' | 'archived'
+
+/** A row from `GET /api/reader/items`: the reading row joined with its bookmark. */
+export interface ReadingItem {
+  author: string | null
+  bookmark_id: string
+  content_hash: string | null
+  /** Only present on `GET /api/reader/items/:id`. */
+  content_md?: string | null
+  created_at: string
+  deleted_at: string | null
+  description: string | null
+  highlights?: Highlight[]
+  id: string
+  image: string | null
+  last_position: string | null
+  last_read_at: string | null
+  progress: number
+  published_at: string | null
+  reading_time_s: number
+  saved_at: string
+  site_name: string | null
+  star: boolean
+  state: ReadingState
+  tags: string[] | null
+  title: string | null
+  updated_at: string
+  url: string | null
+  word_count: number
+}
+
+export interface Highlight {
+  color: string | null
+  created_at: string
+  deleted_at: string | null
+  exact: string
+  id: string
+  note: string | null
+  prefix: string | null
+  reading_item_id: string
+  suffix: string | null
+  updated_at: string
+}

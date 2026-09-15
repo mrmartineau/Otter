@@ -6,11 +6,13 @@ import {
   customType,
   date,
   index,
+  integer,
   json,
   numeric,
   pgEnum,
   pgTable,
   primaryKey,
+  real,
   smallint,
   text,
   time,
@@ -615,3 +617,85 @@ export const userIntegrations = pgTable('user_integrations', {
     .primaryKey()
     .references(() => authUsers.id, { onDelete: 'cascade' }),
 })
+
+// --- Otter Reader (read-it-later) ---------------------------------------
+// A reading item is a bookmark (type = article) plus this row. Soft deletes
+// everywhere so the iOS app can sync tombstones with `?since=`.
+
+export const readingStateEnum = pgEnum('reading_state', [
+  'pending',
+  'ready',
+  'failed',
+  'archived',
+])
+
+export const readingItems = pgTable(
+  'reading_items',
+  {
+    author: text('author'),
+    bookmarkId: uuid('bookmark_id')
+      .notNull()
+      .references(() => bookmarks.id, { onDelete: 'cascade' }),
+    contentHash: text('content_hash'),
+    contentMd: text('content_md'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+    id: uuid('id').primaryKey().defaultRandom(),
+    lastPosition: text('last_position'),
+    lastReadAt: timestamp('last_read_at', { withTimezone: true }),
+    progress: real('progress').notNull().default(0),
+    publishedAt: text('published_at'),
+    readingTimeS: integer('reading_time_s').notNull().default(0),
+    siteName: text('site_name'),
+    state: readingStateEnum('state').notNull().default('pending'),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => authUsers.id, { onDelete: 'cascade' }),
+    wordCount: integer('word_count').notNull().default(0),
+  },
+  (table) => [
+    uniqueIndex('reading_items_bookmark_id_key').on(table.bookmarkId),
+    index('reading_items_user_updated_at_idx').on(
+      table.userId,
+      table.updatedAt.desc(),
+    ),
+  ],
+)
+
+export const highlights = pgTable(
+  'highlights',
+  {
+    color: text('color'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+    // W3C TextQuoteSelector: survives re-extraction.
+    exact: text('exact').notNull(),
+    id: uuid('id').primaryKey().defaultRandom(),
+    note: text('note'),
+    prefix: text('prefix'),
+    readingItemId: uuid('reading_item_id')
+      .notNull()
+      .references(() => readingItems.id, { onDelete: 'cascade' }),
+    suffix: text('suffix'),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => authUsers.id, { onDelete: 'cascade' }),
+  },
+  (table) => [
+    index('highlights_user_updated_at_idx').on(
+      table.userId,
+      table.updatedAt.desc(),
+    ),
+    index('highlights_reading_item_id_idx').on(table.readingItemId),
+  ],
+)
