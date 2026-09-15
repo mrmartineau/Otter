@@ -268,7 +268,6 @@ export interface ReadingItem {
   progress: number
   published_at: string | null
   reading_time_s: number
-  saved_at: string
   site_name: string | null
   star: boolean
   state: ReadingState

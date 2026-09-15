@@ -108,8 +108,6 @@ const itemToRow = (
   progress: item.progress,
   published_at: item.publishedAt,
   reading_time_s: item.readingTimeS,
-  // When the bookmark was saved, so backfilled articles keep their real date.
-  saved_at: bookmark.createdAt.toISOString(),
   site_name: item.siteName,
   star: bookmark.star,
   state: item.state,
@@ -208,7 +206,7 @@ const extractInto = async (
  */
 const ensureReadingRows = async (db: Db, userId: string) => {
   const missing = await db
-    .select({ id: bookmarks.id })
+    .select({ createdAt: bookmarks.createdAt, id: bookmarks.id })
     .from(bookmarks)
     .where(
       and(
@@ -228,7 +226,15 @@ const ensureReadingRows = async (db: Db, userId: string) => {
   if (missing.length) {
     await db
       .insert(readingItems)
-      .values(missing.map(({ id }) => ({ bookmarkId: id, userId })))
+      // created_at means "when it was saved as a bookmark", so copy the
+      // bookmark's date rather than stamping the sync time.
+      .values(
+        missing.map(({ createdAt, id }) => ({
+          bookmarkId: id,
+          createdAt,
+          userId,
+        })),
+      )
       .onConflictDoNothing()
   }
 }
@@ -367,6 +373,8 @@ export const listReadingItems = async (context: HonoContext) => {
       .where(and(...conditions))
       .orderBy(
         since ? desc(readingItems.updatedAt) : desc(readingItems.createdAt),
+        // Stable paging when dates tie.
+        desc(readingItems.id),
       )
       .limit(limit)
       .offset(offset)
