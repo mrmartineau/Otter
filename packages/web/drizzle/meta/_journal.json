@@ -49,6 +49,13 @@
       "when": 1789464332037,
       "tag": "0006_reader_dates",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789477158495,
+      "tag": "0007_reader_removed_at",
+      "breakpoints": true
     }
   ],
   "version": "7"

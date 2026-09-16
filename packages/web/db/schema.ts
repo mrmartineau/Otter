@@ -648,6 +648,9 @@ export const readingItems = pgTable(
     progress: real('progress').notNull().default(0),
     publishedAt: text('published_at'),
     readingTimeS: integer('reading_time_s').notNull().default(0),
+    // Set when the user removed it from the list, as opposed to a tombstone
+    // written because the bookmark stopped being an article.
+    removedAt: timestamp('removed_at', { withTimezone: true }),
     siteName: text('site_name'),
     state: readingStateEnum('state').notNull().default('pending'),
     updatedAt: timestamp('updated_at', { withTimezone: true })

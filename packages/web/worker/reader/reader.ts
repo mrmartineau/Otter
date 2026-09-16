@@ -1,4 +1,16 @@
-import { and, desc, eq, gt, inArray, isNull, notInArray } from 'drizzle-orm'
+import {
+  and,
+  desc,
+  eq,
+  gt,
+  inArray,
+  isNotNull,
+  isNull,
+  ne,
+  notInArray,
+  or,
+  sql,
+} from 'drizzle-orm'
 import type { Context } from 'hono'
 import { API_HEADERS } from '@/constants'
 import type { Highlight, ReadingItem, ReadingState } from '@/types/db'
@@ -198,13 +210,68 @@ const extractInto = async (
 }
 
 /**
- * Every active bookmark of type `article` belongs in the reading list, including
- * ones saved on the web before the reader existed. Rows are added lazily on each
- * list call so the app never has to know about a backfill.
+ * The reading list follows the bookmarks: every active bookmark of type
+ * `article` has a live row (backfilled here, so the web app's history counts),
+ * and a row whose bookmark stopped being an article, or was trashed, gets a
+ * tombstone so sync removes it. A bookmark that becomes an article again comes
+ * back unread — unless the user removed it from the list on purpose.
  *
- * ponytail: one extra indexed query per sync. Move to a trigger if it shows up.
+ * ponytail: three indexed queries per sync. Move to a trigger if it shows up.
  */
 const ensureReadingRows = async (db: Db, userId: string) => {
+  const now = new Date()
+  const notArticle = db
+    .select({ id: bookmarks.id })
+    .from(bookmarks)
+    .where(
+      and(
+        eq(bookmarks.user, userId),
+        or(
+          isNull(bookmarks.type),
+          ne(bookmarks.type, 'article'),
+          ne(bookmarks.status, 'active'),
+        ),
+      ),
+    )
+  const articleAgain = db
+    .select({ id: bookmarks.id })
+    .from(bookmarks)
+    .where(
+      and(
+        eq(bookmarks.user, userId),
+        eq(bookmarks.type, 'article'),
+        eq(bookmarks.status, 'active'),
+      ),
+    )
+
+  await db
+    .update(readingItems)
+    .set({ deletedAt: now, updatedAt: now })
+    .where(
+      and(
+        eq(readingItems.userId, userId),
+        isNull(readingItems.deletedAt),
+        inArray(readingItems.bookmarkId, notArticle),
+      ),
+    )
+
+  await db
+    .update(readingItems)
+    .set({
+      deletedAt: null,
+      progress: 0,
+      state: sql`case when ${readingItems.contentMd} is null then 'pending'::reading_state else 'ready'::reading_state end`,
+      updatedAt: now,
+    })
+    .where(
+      and(
+        eq(readingItems.userId, userId),
+        isNotNull(readingItems.deletedAt),
+        isNull(readingItems.removedAt),
+        inArray(readingItems.bookmarkId, articleAgain),
+      ),
+    )
+
   const missing = await db
     .select({ createdAt: bookmarks.createdAt, id: bookmarks.id })
     .from(bookmarks)
@@ -299,6 +366,7 @@ export const createReadingItem = async (context: HonoContext) => {
         .set({
           deletedAt: null,
           progress: 0,
+          removedAt: null,
           state: 'pending',
           updatedAt: new Date(),
         })
@@ -470,7 +538,7 @@ export const deleteReadingItem = async (context: HonoContext) => {
     const now = new Date()
     const [item] = await auth.db
       .update(readingItems)
-      .set({ deletedAt: now, updatedAt: now })
+      .set({ deletedAt: now, removedAt: now, updatedAt: now })
       .where(
         and(
           eq(readingItems.id, idParam(context)),

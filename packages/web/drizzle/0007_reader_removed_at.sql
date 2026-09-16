@@ -1,0 +1,1 @@
+ALTER TABLE "reading_items" ADD COLUMN "removed_at" timestamp with time zone;
