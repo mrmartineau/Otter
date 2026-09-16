@@ -7,7 +7,56 @@
 //  an account becomes necessary.
 //
 
+import Combine
 import SwiftUI
+
+/// Presents Otter's bookmark form for a reading item and refreshes the item
+/// afterwards. Shared by the list and the reader's bottom bar.
+@MainActor
+final class ReadingItemEditor: ObservableObject {
+    @Published var bookmark: Bookmark?
+    @Published var error: String?
+    private var item: ReadingItem?
+
+    func edit(_ item: ReadingItem) {
+        self.item = item
+        Task {
+            do {
+                bookmark = try await OtterClient.shared.bookmark(id: item.bookmarkId)
+            } catch {
+                self.error = error.localizedDescription
+            }
+        }
+    }
+
+    func finished(saved: Bookmark?) {
+        bookmark = nil
+        guard saved != nil, let item else { return }
+        Task {
+            // The title may have changed; and if the type is no longer
+            // "article", the sync brings back the tombstone that removes it.
+            await ReadingStore.shared.refresh(item)
+            await ReadingStore.shared.sync()
+        }
+    }
+}
+
+extension View {
+    /// The edit sheet and its error alert, driven by a `ReadingItemEditor`.
+    func readingItemEditor(_ editor: ReadingItemEditor) -> some View {
+        sheet(item: Binding(get: { editor.bookmark }, set: { if $0 == nil { editor.bookmark = nil } })) { bookmark in
+            BookmarkFormView(bookmark: bookmark) { saved in editor.finished(saved: saved) }
+        }
+        .alert("Couldn't open the bookmark", isPresented: Binding(
+            get: { editor.error != nil },
+            set: { if !$0 { editor.error = nil } }
+        )) {
+            Button("OK") {}
+        } message: {
+            Text(editor.error ?? "")
+        }
+    }
+}
 
 struct ReadingListView: View {
     @ObservedObject var model: OtterAppModel
@@ -15,6 +64,7 @@ struct ReadingListView: View {
 
     @State private var showArchived = false
     @State private var query = ""
+    @StateObject private var editor = ReadingItemEditor()
     @State private var reader: ReadingItem?
     @State private var isAdding = false
     @State private var newURL = ""
@@ -45,22 +95,21 @@ struct ReadingListView: View {
                             .buttonStyle(.borderedProminent)
                     }
                 } else {
-                    VStack(spacing: 0) {
-                        Picker("Show", selection: $showArchived) {
-                            Text("Unread").tag(false)
-                            Text("Archive").tag(true)
-                        }
-                        .pickerStyle(.segmented)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-
-                        list
-                    }
-                    .searchable(text: $query, prompt: "Search saved articles")
+                    list
+                        .searchable(text: $query, prompt: "Search saved articles")
                 }
             }
-            .navigationTitle("Read later")
+            .navigationTitle(showArchived ? "Archive" : "Read later")
             .toolbar {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    // Text buttons, like Read / Summary in the reader.
+                    ForEach([false, true], id: \.self) { archived in
+                        Button(archived ? "Archive" : "Unread") { showArchived = archived }
+                            .fontWeight(showArchived == archived ? .semibold : .regular)
+                            .foregroundStyle(showArchived == archived ? Color.accentColor : Color.secondary)
+                    }
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         isAdding = true
@@ -77,6 +126,7 @@ struct ReadingListView: View {
             .sheet(item: $reader) { item in
                 ArticleReaderView(item: item)
             }
+            .readingItemEditor(editor)
             .alert("Save article", isPresented: $isAdding) {
                 TextField("https://example.com/article", text: $newURL)
                     .textInputAutocapitalization(.never)
@@ -108,6 +158,13 @@ struct ReadingListView: View {
                     .contentShape(Rectangle())
                     .onTapGesture { reader = item }
                     .swipeActions(edge: .trailing) {
+                        Button {
+                            editor.edit(item)
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        .tint(.blue)
+
                         Button {
                             showArchived ? store.unarchive(item) : store.archive(item)
                         } label: {

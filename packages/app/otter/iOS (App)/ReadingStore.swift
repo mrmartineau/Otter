@@ -169,6 +169,14 @@ final class ReadingStore: ObservableObject {
         return full
     }
 
+    /// Re-reads one item, e.g. after its bookmark was edited. Editing a
+    /// bookmark doesn't touch the reading row, so `since` sync won't see it.
+    func refresh(_ item: ReadingItem) async {
+        if let fresh = try? await OtterClient.shared.readingItem(id: item.id) {
+            upsert(fresh)
+        }
+    }
+
     func reextract(_ item: ReadingItem) async throws {
         let full = try await OtterClient.shared.reextractReadingItem(id: item.id)
         upsert(full)

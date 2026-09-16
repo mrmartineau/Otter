@@ -14,38 +14,64 @@ struct FeedSubscriptionsView: View {
     @State private var newURL = ""
     @State private var isImporting = false
     @State private var message: String?
+    @State private var confirmRemoveAll = false
 
     var body: some View {
         List {
             Section {
                 ForEach(FeedStore.builtIn, id: \.id) { source in
-                    Label(source.title, systemImage: "newspaper")
+                    Toggle(isOn: Binding(
+                        get: { store.isEnabled(source) },
+                        set: { store.setEnabled($0, source: source) }
+                    )) {
+                        Label(source.title, systemImage: "newspaper")
+                    }
                 }
             } header: {
                 Text("Built in")
+            } footer: {
+                Text("Switch off the ones you don't read. They disappear from the Feeds tab.")
             }
 
-            Section {
-                ForEach(store.subscriptions) { subscription in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(subscription.title)
-                        Text(subscription.url).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+            // One section per folder, loose feeds first.
+            ForEach([nil] + store.folders.map(Optional.some), id: \.self) { folder in
+                let feeds = store.subscriptions(in: folder)
+                if !feeds.isEmpty || folder == nil {
+                    Section {
+                        ForEach(feeds) { subscription in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(subscription.title)
+                                Text(subscription.url).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                            }
+                        }
+                        .onDelete { offsets in
+                            for index in offsets { store.unsubscribe(feeds[index]) }
+                        }
+
+                        if folder == nil {
+                            Button {
+                                isAdding = true
+                            } label: {
+                                Label("Add feed", systemImage: "plus")
+                            }
+                        }
+                    } header: {
+                        Text(folder ?? "Subscriptions")
+                    } footer: {
+                        if folder == nil, store.subscriptions.isEmpty {
+                            Text("RSS, Atom and JSON Feed. Import an OPML file to bring feeds over from another reader; its folders are kept.")
+                        }
                     }
                 }
-                .onDelete { offsets in
-                    for index in offsets { store.unsubscribe(store.subscriptions[index]) }
-                }
+            }
 
-                Button {
-                    isAdding = true
-                } label: {
-                    Label("Add feed", systemImage: "plus")
-                }
-            } header: {
-                Text("Subscriptions")
-            } footer: {
-                if store.subscriptions.isEmpty {
-                    Text("RSS, Atom and JSON Feed. Import an OPML file to bring feeds over from another reader.")
+            if !store.subscriptions.isEmpty {
+                Section {
+                    Button("Remove all subscriptions", role: .destructive) {
+                        confirmRemoveAll = true
+                    }
+                } footer: {
+                    Text("Hacker News, Lobsters and Techmeme stay. Starred stories stay.")
                 }
             }
 
@@ -65,6 +91,13 @@ struct FeedSubscriptionsView: View {
             }
         }
         .navigationTitle("Feeds")
+        .confirmationDialog(
+            "Remove all \(store.subscriptions.count) subscriptions?",
+            isPresented: $confirmRemoveAll,
+            titleVisibility: .visible
+        ) {
+            Button("Remove all", role: .destructive) { store.unsubscribeAll() }
+        }
         .alert("Add feed", isPresented: $isAdding) {
             TextField("https://example.com/feed.xml", text: $newURL)
                 .textInputAutocapitalization(.never)

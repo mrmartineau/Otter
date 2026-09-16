@@ -16,30 +16,66 @@ struct FeedsView: View {
     /// "starred" is a virtual source: everything starred across feeds.
     @AppStorage("feeds.selected") private var selected = "hn"
     @State private var commentsItem: FeedItem?
+    @State private var readerItem: FeedItem?
+    /// Feed stories are usually articles; the reader shows "Open in browser"
+    /// when a page turns out not to be one.
+    @AppStorage("feeds.openInReader") private var openInReader = true
     @State private var isAddingFeed = false
     @State private var newFeedURL = ""
     @State private var message: String?
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
+    /// What the list shows. Sources by id, plus virtual views: "starred",
+    /// "all" (every subscription merged) and "folder:<name>".
+    private var current: String {
+        if selected == "starred" || selected == "all" { return selected }
+        if selected.hasPrefix("folder:"), store.folders.contains(String(selected.dropFirst(7))) { return selected }
+        if store.sources.contains(where: { $0.id == selected }) { return selected }
+        return store.sources.first?.id ?? "starred"
+    }
+
+    private var currentFolder: String? {
+        current.hasPrefix("folder:") ? String(current.dropFirst(7)) : nil
+    }
+
+    /// Merged views mix feeds, so rows say which feed a story came from.
+    private var isMerged: Bool {
+        current == "all" || current == "starred" || currentFolder != nil
+    }
+
     private var items: [FeedItem] {
-        selected == "starred" ? store.starred : store.items(for: selected)
+        switch current {
+        case "starred": return store.starred
+        case "all": return store.mergedItems(all: true)
+        default:
+            if let currentFolder { return store.mergedItems(folder: currentFolder) }
+            return store.items(for: current)
+        }
     }
 
     private var selectedSource: (any FeedSource)? {
-        store.sources.first { $0.id == selected }
+        store.sources.first { $0.id == current }
+    }
+
+    private var currentTitle: String {
+        switch current {
+        case "starred": return "Starred"
+        case "all": return "All feeds"
+        default: return currentFolder ?? selectedSource?.title ?? "Feeds"
+        }
     }
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                sourceStrip
-                Divider()
-                list
-            }
-            .navigationTitle(selected == "starred" ? "Starred" : selectedSource?.title ?? "Feeds")
+            list
+            .navigationTitle(currentTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    sourceMenu
+                }
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button {
@@ -47,9 +83,9 @@ struct FeedsView: View {
                         } label: {
                             Label("Add feed…", systemImage: "plus")
                         }
-                        if selected != "starred" {
+                        if selectedSource != nil {
                             Button {
-                                store.markAllRead(sourceID: selected)
+                                store.markAllRead(sourceID: current)
                             } label: {
                                 Label("Mark all as read", systemImage: "checkmark.circle")
                             }
@@ -66,6 +102,11 @@ struct FeedsView: View {
             }
             .navigationDestination(item: $commentsItem) { item in
                 CommentsView(item: item)
+            }
+            .sheet(item: $readerItem) { item in
+                if let url = item.linkURL {
+                    ArticleReaderView(url: url, title: item.title)
+                }
             }
             .task { await store.refreshIfStale() }
             .onChange(of: scenePhase) { _, phase in
@@ -97,33 +138,53 @@ struct FeedsView: View {
         }
     }
 
-    private var sourceStrip: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6) {
-                ForEach(store.sources, id: \.id) { source in
-                    chip(id: source.id, title: source.title)
+    /// The feed tree: built-ins, then folders as submenus, then loose feeds.
+    private var sourceMenu: some View {
+        Menu {
+            Section {
+                ForEach(FeedStore.builtIn.filter(store.isEnabled), id: \.id) { source in
+                    pick(source.id, source.title, systemImage: "newspaper")
                 }
-                chip(id: "starred", title: "★ Starred")
+                pick("starred", "Starred", systemImage: "star")
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+
+            if !store.subscriptions.isEmpty {
+                Section {
+                    pick("all", "All feeds", systemImage: "tray.full")
+
+                    ForEach(store.folders, id: \.self) { folder in
+                        Menu {
+                            pick("folder:\(folder)", "All in \(folder)", systemImage: "tray.full")
+                            Divider()
+                            ForEach(store.subscriptions(in: folder)) { subscription in
+                                pick(subscription.id, subscription.title, systemImage: "dot.radiowaves.up.forward")
+                            }
+                        } label: {
+                            Label(folder, systemImage: "folder")
+                        }
+                    }
+
+                    ForEach(store.subscriptions(in: nil)) { subscription in
+                        pick(subscription.id, subscription.title, systemImage: "dot.radiowaves.up.forward")
+                    }
+                }
+            }
+        } label: {
+            Label(currentTitle, systemImage: "line.3.horizontal")
         }
+        .accessibilityLabel("Choose feed")
     }
 
-    private func chip(id: String, title: String) -> some View {
+    private func pick(_ id: String, _ title: String, systemImage: String) -> some View {
         Button {
             selected = id
         } label: {
-            Text(title)
-                .font(.subheadline.weight(selected == id ? .semibold : .regular))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(
-                    selected == id ? Color.accentColor.opacity(0.18) : Color.secondary.opacity(0.12),
-                    in: Capsule()
-                )
+            if current == id {
+                Label(title, systemImage: "checkmark")
+            } else {
+                Label(title, systemImage: systemImage)
+            }
         }
-        .buttonStyle(.plain)
     }
 
     private var list: some View {
@@ -133,6 +194,7 @@ struct FeedsView: View {
                     item: item,
                     isRead: store.isRead(item),
                     isStarred: store.isStarred(item),
+                    sourceTitle: isMerged ? store.title(forSource: item.sourceID) : nil,
                     onComments: { commentsItem = item }
                 )
                     .contentShape(Rectangle())
@@ -165,7 +227,12 @@ struct FeedsView: View {
                     }
                     .contextMenu {
                         if let url = item.linkURL {
-                            Button { open(item) } label: { Label("Open link", systemImage: "safari") }
+                            Button {
+                                store.markRead(item)
+                                openURL(url)
+                            } label: {
+                                Label("Open in browser", systemImage: "safari")
+                            }
                             Button {
                                 UIPasteboard.general.string = url.absoluteString
                             } label: {
@@ -183,15 +250,15 @@ struct FeedsView: View {
         .listStyle(.plain)
         .overlay {
             if items.isEmpty {
-                if store.refreshing.contains(selected) {
+                if store.refreshing.contains(current) {
                     ProgressView()
-                } else if let error = store.errorsBySource[selected] {
+                } else if let error = store.errorsBySource[current], selectedSource != nil {
                     ContentUnavailableView("Couldn't load", systemImage: "exclamationmark.triangle", description: Text(error))
                 } else {
                     ContentUnavailableView(
-                        selected == "starred" ? "Nothing starred" : "Nothing here yet",
-                        systemImage: selected == "starred" ? "star" : "newspaper",
-                        description: Text(selected == "starred" ? "Swipe a story to star it." : "Pull to refresh.")
+                        current == "starred" ? "Nothing starred" : "Nothing here yet",
+                        systemImage: current == "starred" ? "star" : "newspaper",
+                        description: Text(current == "starred" ? "Swipe a story to star it." : "Pull to refresh.")
                     )
                 }
             }
@@ -201,9 +268,19 @@ struct FeedsView: View {
         }
     }
 
+    /// Discussion-only posts (Ask HN, Lobsters text posts) open their thread.
+    /// Anything else opens in the reader when signed in, else the browser.
     private func open(_ item: FeedItem) {
         store.markRead(item)
-        if let url = item.linkURL { openURL(url) }
+        guard let url = item.linkURL else { return }
+
+        if item.commentsRef != nil, item.url == item.commentsURL {
+            commentsItem = item
+        } else if openInReader, model.isSignedIn, ["http", "https"].contains(url.scheme ?? "") {
+            readerItem = item
+        } else {
+            openURL(url)
+        }
     }
 
     /// The signup moment. Feeds never needed an account; saving does.
@@ -229,6 +306,8 @@ struct FeedRow: View {
     let item: FeedItem
     let isRead: Bool
     let isStarred: Bool
+    /// Shown in merged views, where stories come from several feeds.
+    var sourceTitle: String?
     let onComments: () -> Void
 
     var body: some View {
@@ -250,7 +329,7 @@ struct FeedRow: View {
                     if isStarred {
                         Image(systemName: "star.fill").foregroundStyle(.yellow)
                     }
-                    Text(item.meta)
+                    Text([sourceTitle, item.meta].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · "))
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)

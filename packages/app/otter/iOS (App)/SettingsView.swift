@@ -8,6 +8,8 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var model: OtterAppModel
     @AppStorage("reader.textSize") private var textSize = ReaderTextSize.medium
+    @AppStorage("reader.font") private var fontDesign = ReaderFont.system
+    @AppStorage("feeds.openInReader") private var openInReader = true
 
     var body: some View {
         NavigationStack {
@@ -26,14 +28,30 @@ struct SettingsView: View {
                     }
                 }
 
-                Section("Reading") {
+                Section {
+                    Picker("Font", selection: $fontDesign) {
+                        ForEach(ReaderFont.allCases) { Text($0.label).tag($0) }
+                    }
                     Picker("Text size", selection: $textSize) {
                         ForEach(ReaderTextSize.allCases) { Text($0.label).tag($0) }
                     }
+                    // A live sample, so you can see the choice without opening an article.
+                    Text("The quick brown fox jumps over the lazy dog.")
+                        .font(.body)
+                        .fontDesign(fontDesign.design)
+                        .dynamicTypeSize(textSize.dynamicTypeSize)
+                        .foregroundStyle(.secondary)
+                } header: {
+                    Text("Reading")
                 }
 
-                Section("Feeds") {
+                Section {
                     NavigationLink("Subscriptions") { FeedSubscriptionsView() }
+                    Toggle("Open stories in the reader", isOn: $openInReader)
+                } header: {
+                    Text("Feeds")
+                } footer: {
+                    Text("Needs an Otter account, which extracts the article. Off, stories open in the browser.")
                 }
 
                 Section("About") {

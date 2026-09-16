@@ -52,6 +52,8 @@ nonisolated struct FeedSubscription: Identifiable, Hashable, Codable {
     let id: String
     var url: String
     var title: String
+    /// OPML folder, e.g. "Design". Nested folders join with " / ".
+    var folder: String?
 }
 
 nonisolated enum HTMLText {

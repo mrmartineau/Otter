@@ -15,8 +15,13 @@ import SwiftUI
 struct MarkdownContentView: View {
     let markdown: String
 
+    // Scale with the reader's text size, so larger type keeps the same rhythm.
+    @ScaledMetric(relativeTo: .body) private var lineSpacing: CGFloat = 6
+    @ScaledMetric(relativeTo: .body) private var blockSpacing: CGFloat = 20
+    @ScaledMetric(relativeTo: .title2) private var headingLineSpacing: CGFloat = 3
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: blockSpacing) {
             ForEach(Array(MarkdownBlock.parse(markdown).enumerated()), id: \.offset) { _, block in
                 view(for: block)
             }
@@ -30,11 +35,13 @@ struct MarkdownContentView: View {
         case let .heading(level, text):
             Self.inline(text)
                 .font(Self.headingFont(for: level))
+                .lineSpacing(headingLineSpacing)
                 .padding(.top, 6)
 
         case let .paragraph(text):
             Self.inline(text)
                 .font(.body)
+                .lineSpacing(lineSpacing)
 
         case let .bullet(text):
             HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -42,6 +49,7 @@ struct MarkdownContentView: View {
                 Self.inline(text)
             }
             .font(.body)
+            .lineSpacing(lineSpacing)
 
         case let .numbered(index, text):
             HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -50,6 +58,7 @@ struct MarkdownContentView: View {
                 Self.inline(text)
             }
             .font(.body)
+            .lineSpacing(lineSpacing)
 
         case let .quote(text):
             HStack(alignment: .top, spacing: 10) {
@@ -58,6 +67,7 @@ struct MarkdownContentView: View {
                     .frame(width: 3)
                 Self.inline(text)
                     .font(.body)
+                    .lineSpacing(lineSpacing)
                     .foregroundStyle(.secondary)
             }
             .fixedSize(horizontal: false, vertical: true)
@@ -67,6 +77,7 @@ struct MarkdownContentView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 Text(text)
                     .font(.footnote.monospaced())
+                    .lineSpacing(lineSpacing)
                     .padding(10)
             }
             .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
@@ -195,9 +206,13 @@ enum MarkdownBlock {
                 continue
             }
 
-            if let image = imageBlock(line) {
+            // Images come inline, mid-sentence or wrapped in a link. Lift each
+            // one out as its own block and keep the surrounding text.
+            if let (before, image, after) = splitImage(line) {
+                if !before.isEmpty { paragraph.append(before) }
                 flushParagraph()
                 blocks.append(image)
+                if !after.isEmpty { paragraph.append(after) }
                 continue
             }
 
@@ -244,25 +259,26 @@ enum MarkdownBlock {
         return (String(digits), String(rest.dropFirst(2)))
     }
 
-    /// A line that is nothing but `![alt](url)`.
-    private static func imageBlock(_ line: String) -> MarkdownBlock? {
-        guard line.hasPrefix("!["), line.hasSuffix(")"),
-              let closeBracket = line.firstIndex(of: "]")
+    /// `[![alt](src)](href)` or `![alt](src "title")`, anywhere in the line.
+    nonisolated(unsafe) private static let imagePattern = try! NSRegularExpression(
+        pattern: #"(?:\[)?!\[([^\]]*)\]\(\s*(\S+?)(?:\s+"[^"]*")?\s*\)(?:\]\([^)]*\))?"#
+    )
+
+    /// Splits the first image out of a line: text before, the image, text after.
+    private static func splitImage(_ line: String) -> (String, MarkdownBlock, String)? {
+        let range = NSRange(line.startIndex..., in: line)
+        guard let match = imagePattern.firstMatch(in: line, range: range),
+              let whole = Range(match.range, in: line),
+              let altRange = Range(match.range(at: 1), in: line),
+              let srcRange = Range(match.range(at: 2), in: line),
+              let url = URL(string: String(line[srcRange])),
+              url.scheme?.hasPrefix("http") == true
         else {
             return nil
         }
 
-        let afterBracket = line.index(after: closeBracket)
-
-        guard afterBracket < line.endIndex, line[afterBracket] == "(" else { return nil }
-
-        let alt = String(line[line.index(line.startIndex, offsetBy: 2) ..< closeBracket])
-        let target = line[line.index(after: afterBracket) ..< line.index(before: line.endIndex)]
-        // Markdown allows a title after the URL: ![alt](src "title")
-        let source = target.components(separatedBy: " ").first ?? String(target)
-
-        guard let url = URL(string: source) else { return nil }
-
-        return .image(url: url, alt: alt)
+        let before = line[..<whole.lowerBound].trimmingCharacters(in: .whitespaces)
+        let after = line[whole.upperBound...].trimmingCharacters(in: .whitespaces)
+        return (before, .image(url: url, alt: String(line[altRange])), after)
     }
 }

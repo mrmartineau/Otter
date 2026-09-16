@@ -41,6 +41,19 @@ extension OtterClient {
         return page
     }
 
+    /// `GET /api/bookmarks/:id` — the bookmark behind a reading item, for the
+    /// edit form.
+    func bookmark(id: String) async throws -> Bookmark {
+        struct Wrapper: Decodable {
+            let data: Bookmark
+        }
+        let data = try await perform(path: "api/bookmarks/\(id)")
+        guard let wrapper = try? JSONDecoder().decode(Wrapper.self, from: data) else {
+            throw OtterError.invalidResponse
+        }
+        return wrapper.data
+    }
+
     /// `GET /api/reader/items/:id` — includes the stored markdown.
     func readingItem(id: String) async throws -> ReadingItem {
         try decodeItem(try await perform(path: "api/reader/items/\(id)"))

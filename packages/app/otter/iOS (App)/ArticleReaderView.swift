@@ -91,13 +91,19 @@ struct ArticleReaderView: View {
     private let linkURL: URL?
     /// Set when reading from the reading list: enables progress and the bottom bar.
     private let readingItemID: String?
+    /// Set when reading a feed story live: enables the Read later button.
+    private var feedURL: URL?
+    @State private var savedForLater = false
+    @State private var saveError: String?
 
     @StateObject private var model: ArticleReaderModel
     @ObservedObject private var store = ReadingStore.shared
     @State private var mode: ArticleReaderMode
     /// A reference, not `@State`: scroll updates must not re-render the article.
     @State private var tracker = ProgressTracker()
+    @StateObject private var editor = ReadingItemEditor()
     @AppStorage("reader.textSize") private var textSize = ReaderTextSize.medium
+    @AppStorage("reader.font") private var fontDesign = ReaderFont.system
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -110,6 +116,17 @@ struct ArticleReaderView: View {
             wrappedValue: ArticleReaderModel(url: bookmark.url ?? "")
         )
         _mode = State(initialValue: mode)
+    }
+
+    /// A live article at a URL, e.g. a feed story. The bottom bar offers
+    /// Read later instead of the reading-list actions.
+    init(url: URL, title: String) {
+        fallbackTitle = title
+        linkURL = url
+        readingItemID = nil
+        feedURL = url
+        _model = StateObject(wrappedValue: ArticleReaderModel(url: url.absoluteString))
+        _mode = State(initialValue: .read)
     }
 
     init(item: ReadingItem) {
@@ -160,15 +177,27 @@ struct ArticleReaderView: View {
                     }
                 }
             }
-            .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") { dismiss() }
                 }
 
-                ToolbarItem(placement: .primaryAction) {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    // Two buttons rather than a segmented picker: a picker in
+                    // the bar draws its own box inside the bar's, which looks off.
+                    ForEach([ArticleReaderMode.read, .summary], id: \.self) { tab in
+                        Button(tab == .read ? "Read" : "Summary") { mode = tab }
+                            .fontWeight(mode == tab ? .semibold : .regular)
+                            .foregroundStyle(mode == tab ? Color.accentColor : Color.secondary)
+                    }
+
                     Menu {
+                        Picker("Font", selection: $fontDesign) {
+                            ForEach(ReaderFont.allCases) { font in
+                                Text(font.label).tag(font)
+                            }
+                        }
                         Picker("Text size", selection: $textSize) {
                             ForEach(ReaderTextSize.allCases) { size in
                                 Text(size.label).tag(size)
@@ -183,6 +212,34 @@ struct ArticleReaderView: View {
                         }
                     } label: {
                         Label("Options", systemImage: "textformat.size")
+                    }
+                }
+
+                if let feedURL {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Button {
+                            Task {
+                                do {
+                                    try await store.save(url: feedURL.absoluteString)
+                                    savedForLater = true
+                                } catch {
+                                    saveError = error.localizedDescription
+                                }
+                            }
+                        } label: {
+                            Label(savedForLater ? "Saved" : "Read later", systemImage: savedForLater ? "checkmark" : "book")
+                        }
+                        .disabled(savedForLater)
+                        Spacer()
+                        ShareLink(item: feedURL) {
+                            Label("Share", systemImage: "square.and.arrow.up")
+                        }
+                        Spacer()
+                        Button {
+                            openURL(feedURL)
+                        } label: {
+                            Label("Open original", systemImage: "safari")
+                        }
                     }
                 }
 
@@ -204,6 +261,12 @@ struct ArticleReaderView: View {
                             Label("Star", systemImage: item.star ? "star.fill" : "star")
                         }
                         Spacer()
+                        Button {
+                            editor.edit(item)
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        Spacer()
                         if let url = linkURL {
                             ShareLink(item: url) {
                                 Label("Share", systemImage: "square.and.arrow.up")
@@ -219,6 +282,15 @@ struct ArticleReaderView: View {
                 }
             }
             .task { await model.load() }
+            .readingItemEditor(editor)
+            .alert("Couldn't save", isPresented: Binding(
+                get: { saveError != nil },
+                set: { if !$0 { saveError = nil } }
+            )) {
+                Button("OK") {}
+            } message: {
+                Text(saveError ?? "")
+            }
             .onDisappear {
                 tracker.flush?.cancel()
                 if let item = readingItem { store.setProgress(item, progress: tracker.value) }
@@ -250,19 +322,11 @@ struct ArticleReaderView: View {
 
     private func content(for article: ArticleContent) -> some View {
         VStack(spacing: 0) {
-            Picker("View", selection: $mode) {
-                Text("Read").tag(ArticleReaderMode.read)
-                Text("Summary").tag(ArticleReaderMode.summary)
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-
-            Divider()
-
             GeometryReader { viewport in
                 ScrollView {
-                    Group {
+                    VStack(alignment: .leading, spacing: 16) {
+                        header(for: article)
+
                         switch mode {
                         case .read:
                             readBody(article)
@@ -297,6 +361,7 @@ struct ArticleReaderView: View {
             }
         }
         .dynamicTypeSize(textSize.dynamicTypeSize)
+        .fontDesign(fontDesign.design)
     }
 
     /// 0 at the top, 1 once the end of the article is on screen.
@@ -306,19 +371,28 @@ struct ArticleReaderView: View {
         return Double(min(1, max(0, offset / scrollable)))
     }
 
-    private func readBody(_ article: ArticleContent) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
+    /// The full title, never truncated, then author, site and word count.
+    private func header(for article: ArticleContent) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.title2.weight(.bold))
+                .textSelection(.enabled)
+
             if !article.byline.isEmpty {
                 Text(article.byline)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-
-            MarkdownContentView(markdown: article.content)
         }
-        .textSelection(.enabled)
-        .padding(16)
+        .padding([.horizontal, .top], 16)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func readBody(_ article: ArticleContent) -> some View {
+        MarkdownContentView(markdown: article.content)
+            .textSelection(.enabled)
+            .padding([.horizontal, .bottom], 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
@@ -347,7 +421,7 @@ struct ArticleReaderView: View {
                     .textSelection(.enabled)
             }
         }
-        .padding(16)
+        .padding([.horizontal, .bottom], 16)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -386,6 +460,32 @@ enum ReaderTextSize: String, CaseIterable, Identifiable {
         case .medium: return .large
         case .large: return .xLarge
         case .extraLarge: return .xxxLarge
+        }
+    }
+}
+
+/// Reader typeface: the system designs, so nothing is bundled and Dynamic
+/// Type keeps working.
+enum ReaderFont: String, CaseIterable, Identifiable {
+    case system, serif, rounded, monospaced
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .system: return "San Francisco"
+        case .serif: return "New York (serif)"
+        case .rounded: return "Rounded"
+        case .monospaced: return "Monospaced"
+        }
+    }
+
+    var design: Font.Design {
+        switch self {
+        case .system: return .default
+        case .serif: return .serif
+        case .rounded: return .rounded
+        case .monospaced: return .monospaced
         }
     }
 }
