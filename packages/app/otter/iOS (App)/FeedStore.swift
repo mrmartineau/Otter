@@ -15,7 +15,7 @@ import Foundation
 final class FeedStore: ObservableObject {
     static let shared = FeedStore()
 
-    static let builtIn: [any FeedSource] = [HackerNewsSource(), LobstersSource(), RSSSource.techmeme]
+    static let builtIn: [any FeedSource] = [HackerNewsSource(), LobstersSource(), RSSSource.techmeme, RSSSource.pinboard]
 
     @Published private(set) var itemsBySource: [String: [FeedItem]] = [:]
     @Published private(set) var errorsBySource: [String: String] = [:]

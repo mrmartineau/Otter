@@ -71,7 +71,7 @@ struct FeedSubscriptionsView: View {
                         confirmRemoveAll = true
                     }
                 } footer: {
-                    Text("Hacker News, Lobsters and Techmeme stay. Starred stories stay.")
+                    Text("Hacker News, Lobsters, Techmeme and Pinboard stay. Starred stories stay.")
                 }
             }
 

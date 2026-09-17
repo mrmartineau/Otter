@@ -128,6 +128,7 @@ nonisolated struct RSSSource: FeedSource {
     let url: URL
 
     static let techmeme = RSSSource(id: "techmeme", title: "Techmeme", url: URL(string: "https://www.techmeme.com/feed.xml")!)
+    static let pinboard = RSSSource(id: "pinboard", title: "Pinboard popular", url: URL(string: "https://feeds.pinboard.in/rss/popular/")!)
 
     func fetch() async throws -> [FeedItem] {
         try await RSSSource.load(url, sourceID: id).items
