@@ -5,12 +5,12 @@ import { API_HEADERS } from '@/constants'
 import type { Bookmark, BookmarkStatus, BookmarkType } from '@/types/db'
 import { errorResponse } from '@/utils/fetching/errorResponse'
 import type { MetaTag } from '@/utils/fetching/meta'
-import { getScrapeData } from '@/utils/fetching/scrape'
 import { getErrorMessage } from '@/utils/get-error-message'
 import { matchTags } from '@/utils/matchTags'
 import { bookmarks } from '../../db/schema'
 import { type RequestContext, requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
+import { scrapeMetadata } from '../scraper/index'
 import { bookmarkToRow } from './mapper'
 import { scheduleBookmarkSideEffects } from './sideEffects'
 
@@ -96,7 +96,7 @@ export const postNewBookmark = async (context: HonoContext) => {
     const dbTags = await getTagMetadata(auth.requestContext)
     const mapper = async ({ scrape, url, ...rest }: NewBookmark) => {
       if (url && scrape) {
-        const metadata = await getScrapeData(url)
+        const metadata = await scrapeMetadata(url)
         const tags = rest.tags || []
 
         return toBookmarkInsert(
@@ -173,7 +173,7 @@ export const getNewBookmark = async (context: HonoContext) => {
     }
 
     const dbTags = await getTagMetadata(auth.requestContext)
-    const metadata = await getScrapeData(url)
+    const metadata = await scrapeMetadata(url)
     const data = await auth.requestContext.db
       .insert(bookmarks)
       .values([
