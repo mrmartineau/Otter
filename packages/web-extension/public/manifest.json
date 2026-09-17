@@ -1,11 +1,14 @@
 {
-  "action": {},
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Save to Otter"
+  },
   "background": {
     "service_worker": "background.js"
   },
   "commands": {
     "_execute_action": {
-      "description": "Save to Otter",
+      "description": "Open the Otter menu",
       "suggested_key": {
         "default": "Ctrl+Shift+D",
         "mac": "Command+Shift+D"
@@ -17,6 +20,9 @@
         "default": "Ctrl+Shift+S",
         "mac": "Command+Shift+S"
       }
+    },
+    "read-later": {
+      "description": "Read later in Otter"
     }
   },
   "content_scripts": [
@@ -26,7 +32,8 @@
       "run_at": "document_idle"
     }
   ],
-  "description": "A Chrome Extension for Otter bookmarks",
+  "description": "A universal browser extension for Otter bookmarks",
+  "host_permissions": ["<all_urls>"],
   "icons": {
     "16": "icons/icon_16.png",
     "32": "icons/icon_32.png",
@@ -37,14 +44,13 @@
   "name": "Otter",
   "options_page": "options.html",
   "permissions": [
-    "commands",
-    "storage",
     "activeTab",
+    "contextMenus",
     "scripting",
-    "tabs",
-    "webNavigation",
+    "storage",
     "system.display",
-    "contextMenus"
+    "tabs",
+    "webNavigation"
   ],
-  "version": "0.2.0"
+  "version": "0.3.0"
 }

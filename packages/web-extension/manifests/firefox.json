@@ -1,5 +1,8 @@
 {
-  "action": {},
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Save to Otter"
+  },
   "background": {
     "scripts": ["background.js"]
   },

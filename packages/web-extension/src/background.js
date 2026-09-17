@@ -95,34 +95,104 @@ const openBookmarkletPage = async (url) => {
   }
 }
 
-const onContextClick = async (info, tab) => {
-  try {
-    if (info.linkUrl) {
-      openBookmarkletPage(info.linkUrl)
-    } else {
-      openBookmarkletPage(tab.url)
-    }
-  } catch (err) {
-    console.log(`🚀 ~ onContextClick ~ save ~ onCommand.addListener ~ err`, err)
-  }
-}
-
 // Some Chromium-based browsers (e.g. Phi Browser) don't expose the MV3
 // `action` API and only provide the legacy `browserAction` API
 const actionAPI = browserAPI.action ?? browserAPI.browserAction
 
-actionAPI.onClicked.addListener(async (tab) => {
+/**
+ * Direct API saves, using the Otter session already in this browser. The
+ * user is signed in to the web app; host permissions let the cookie travel.
+ */
+const apiSave = async (kind, url) => {
+  const { otterInstanceUrl } = await getStorageItems()
+  const endpoint =
+    kind === 'read-later'
+      ? urlJoin(otterInstanceUrl, 'api', 'reader', 'items')
+      : urlJoin(otterInstanceUrl, 'api', 'new')
+  // /api/new scrapes title, description, image and type (article, video…)
+  // and matches existing tags. /api/reader/items extracts the article.
+  const body = kind === 'read-later' ? { url } : [{ scrape: true, url }]
+
+  const response = await fetch(endpoint, {
+    body: JSON.stringify(body),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
+  })
+
+  if (response.status === 401) {
+    throw new Error('Sign in to Otter in this browser first.')
+  }
+  if (!response.ok) {
+    let reason = `Otter returned ${response.status}.`
+    try {
+      const payload = await response.json()
+      reason = payload.error ?? payload.reason ?? reason
+    } catch {}
+    throw new Error(reason)
+  }
+}
+
+const flashBadge = (text) => {
+  actionAPI.setBadgeText({ text })
+  setTimeout(() => actionAPI.setBadgeText({ text: '' }), 2000)
+}
+
+/**
+ * One entry point for the popup, the context menu and the shortcuts.
+ * `bookmark` opens the full form; the other two save straight away.
+ */
+const save = async (kind, url) => {
   if ((await isOptionsSetup()) === false) {
-    console.info('options not setup')
     browserAPI.tabs.create({ url: browserAPI.runtime.getURL('options.html') })
-    return
+    return { error: 'Set your Otter address first.', ok: false }
   }
 
-  openBookmarkletPage(tab.url)
+  if (kind === 'bookmark') {
+    openBookmarkletPage(url)
+    return { ok: true }
+  }
+
+  try {
+    await apiSave(kind, url)
+    flashBadge('✓')
+    return { ok: true }
+  } catch (error) {
+    flashBadge('!')
+    return { error: error.message, ok: false }
+  }
+}
+
+browserAPI.runtime.onMessage.addListener((message) => {
+  if (['quick-save', 'read-later', 'bookmark'].includes(message?.type)) {
+    return save(message.type, message.url)
+  }
 })
 
+// Fallback for browsers that ignore `default_popup`.
+actionAPI.onClicked?.addListener(async (tab) => {
+  save('bookmark', tab.url)
+})
+
+browserAPI.commands?.onCommand.addListener(async (command, tab) => {
+  const active =
+    tab ??
+    (await browserAPI.tabs.query({ active: true, currentWindow: true }))[0]
+  if (!active?.url) return
+
+  if (command === 'quick-save') save('quick-save', active.url)
+  if (command === 'read-later') save('read-later', active.url)
+})
+
+const contextKinds = {
+  'otter-context-quick-save': 'quick-save',
+  'otter-context-read-later': 'read-later',
+  'otter-context-save': 'bookmark',
+}
+
 browserAPI.contextMenus?.onClicked.addListener((info, tab) => {
-  onContextClick(info, tab)
+  const kind = contextKinds[info.menuItemId]
+  if (kind) save(kind, info.linkUrl || tab.url)
 })
 
 /**
@@ -161,16 +231,20 @@ browserAPI.webNavigation?.onCompleted.addListener(async (details) => {
 })
 
 /**
- * Context menus
+ * Context menus: the same three actions as the popup, on pages and links.
  */
-// chrome.contextMenus.create({
-//   title: '🦦 Quick save to Otter',
-//   contexts: ['page', 'link'],
-//   id: 'otter-context-quick-save',
-// });
-
+browserAPI.contextMenus?.create({
+  contexts: ['page', 'link'],
+  id: 'otter-context-quick-save',
+  title: 'Quick save to Otter',
+})
+browserAPI.contextMenus?.create({
+  contexts: ['page', 'link'],
+  id: 'otter-context-read-later',
+  title: 'Read later in Otter',
+})
 browserAPI.contextMenus?.create({
   contexts: ['page', 'link'],
   id: 'otter-context-save',
-  title: 'Save to Otter',
+  title: 'Save to Otter with details…',
 })

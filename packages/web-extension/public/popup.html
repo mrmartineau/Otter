@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+    <title>Save to Otter</title>
+  </head>
+  <body>
+    <main class="app">
+      <p class="url" id="url"></p>
+      <button id="quick-save" class="primary">
+        <strong>Quick save</strong>
+        <span>Bookmark with details fetched for you</span>
+      </button>
+      <button id="read-later">
+        <strong>Read later</strong>
+        <span>Save as an article for the reader</span>
+      </button>
+      <button id="bookmark">
+        <strong>Bookmark with details…</strong>
+        <span>Open the full form</span>
+      </button>
+      <p class="status" id="status" hidden></p>
+      <p class="setup" id="setup" hidden>
+        Set your Otter address first. <a href="#" id="options">Open options</a>
+      </p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

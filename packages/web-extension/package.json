@@ -25,5 +25,5 @@
     "dev:firefox": "TARGET=firefox webpack --mode=development --watch --config config/webpack.config.js",
     "format": "prettier --write --ignore-unknown \"{config,public,src}/**/*.{html,css,js,ts,json}\""
   },
-  "version": "0.1.0"
+  "version": "0.3.0"
 }

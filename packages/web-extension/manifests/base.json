@@ -1,7 +1,7 @@
 {
   "commands": {
     "_execute_action": {
-      "description": "Save to Otter",
+      "description": "Open the Otter menu",
       "suggested_key": {
         "default": "Ctrl+Shift+D",
         "mac": "Command+Shift+D"
@@ -13,6 +13,9 @@
         "default": "Ctrl+Shift+S",
         "mac": "Command+Shift+S"
       }
+    },
+    "read-later": {
+      "description": "Read later in Otter"
     }
   },
   "content_scripts": [
@@ -23,6 +26,7 @@
     }
   ],
   "description": "A universal browser extension for Otter bookmarks",
+  "host_permissions": ["<all_urls>"],
   "icons": {
     "16": "icons/icon_16.png",
     "32": "icons/icon_32.png",
@@ -40,5 +44,5 @@
     "webNavigation",
     "contextMenus"
   ],
-  "version": "0.2.0"
+  "version": "0.3.0"
 }

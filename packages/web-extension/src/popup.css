@@ -1,4 +1,3 @@
-/* normalize css starts here */
 *,
 *::before,
 *::after {
@@ -6,92 +5,100 @@
   padding: 0;
   box-sizing: border-box;
 }
-/* normalize css ends here */
 
 html {
   font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    Segoe UI,
-    Helvetica,
-    Arial,
-    sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   color: #222;
+  font-size: 14px;
 }
 
 body {
-  width: 350px;
-  height: 300px;
+  width: 300px;
 }
 
 .app {
-  height: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
-  text-align: center;
-  padding: 20px;
+  gap: 8px;
+  padding: 12px;
 }
 
-.title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.subtitle {
+.url {
   font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 2px 4px;
 }
 
-code {
-  font-size: 12px;
-  font-family: inherit;
-  background-color: rgba(254, 237, 185, 0.3);
-  padding: 2px 4px;
-  border-radius: 2px;
-}
-
-.counter-label {
-  font-size: 12px;
-  margin-bottom: 5px;
-}
-
-.counter {
-  font-size: 36px;
-  font-weight: 700;
-}
-
-.button-container {
-  margin-top: 15px;
-}
-
-.button {
-  border: 0;
-  display: inline-block;
-  padding: 10px 20px;
-  margin-right: 4px;
-  margin-left: 4px;
-  background-color: bisque;
-  font-size: 16px;
+button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f7f7f7;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
-  border-radius: 4px;
-  text-decoration: none;
-  transition: transform 0.2s ease;
-  user-select: none;
 }
 
-.button:focus {
-  outline: none;
+button:hover {
+  background: #eee;
 }
 
-.button:hover {
-  transform: scale(1.1);
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
-.divider {
-  margin: 30px auto 25px;
-  width: 50px;
-  border: 0.5px dashed #000;
-  opacity: 0.1;
+button.primary {
+  background: #1d63d8;
+  border-color: #1d63d8;
+  color: #fff;
+}
+
+button.primary:hover {
+  background: #174fae;
+}
+
+button span {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.status,
+.setup {
+  font-size: 12px;
+  padding: 4px 2px 0;
+  color: #444;
+}
+
+.status.error {
+  color: #b3261e;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color: #eee;
+    background: #1e1e1e;
+  }
+  .url,
+  .status,
+  .setup {
+    color: #aaa;
+  }
+  button {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+  }
+  button:hover {
+    background: #333;
+  }
 }
