@@ -11,6 +11,7 @@ import { bookmarks } from '../../db/schema'
 import { type RequestContext, requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 import { scrapeMetadata } from '../scraper/index'
+import { linkType } from '../scraper/link-type'
 import { bookmarkToRow } from './mapper'
 import { scheduleBookmarkSideEffects } from './sideEffects'
 
@@ -80,6 +81,58 @@ const getRequestContext = async (context: HonoContext) => {
 }
 
 /**
+ * Builds the bookmark fields for a URL, scraping the page for details.
+ *
+ * A scrape can fail for reasons that have nothing to do with the user: plenty
+ * of sites sit behind a bot wall and answer a server-side fetch with 403, and
+ * others time out. Losing the whole save in that case costs the user the part
+ * they actually asked for, so the bookmark is still written with whatever the
+ * caller supplied plus a type guessed from the URL.
+ */
+export const scrapedBookmark = async (
+  url: string,
+  rest: Partial<Bookmark>,
+  dbTags: MetaTag[],
+): Promise<Partial<Bookmark>> => {
+  const tags = rest.tags ?? []
+
+  try {
+    const metadata = await scrapeMetadata(url)
+
+    return {
+      ...rest,
+      description: metadata.description ?? rest.description,
+      feed: metadata.feeds,
+      image: metadata.image ?? rest.image,
+      tags: [...matchTags(metadata, dbTags), ...tags],
+      title: metadata.title ?? rest.title,
+      type: metadata.urlType,
+      url: metadata.cleaned_url || metadata.url,
+    }
+  } catch (error) {
+    console.warn(`Scrape failed for ${url}: ${getErrorMessage(error)}`)
+
+    return {
+      ...rest,
+      tags: [
+        // Only the fields matchTags reads, with nulls dropped to match its type.
+        ...matchTags(
+          {
+            description: rest.description ?? undefined,
+            note: rest.note ?? undefined,
+            title: rest.title ?? undefined,
+          },
+          dbTags,
+        ),
+        ...tags,
+      ],
+      type: rest.type ?? linkType(url, false),
+      url,
+    }
+  }
+}
+
+/**
  * POST /api/new
  * Adds new bookmarks using API-key or session auth.
  */
@@ -96,20 +149,8 @@ export const postNewBookmark = async (context: HonoContext) => {
     const dbTags = await getTagMetadata(auth.requestContext)
     const mapper = async ({ scrape, url, ...rest }: NewBookmark) => {
       if (url && scrape) {
-        const metadata = await scrapeMetadata(url)
-        const tags = rest.tags || []
-
         return toBookmarkInsert(
-          {
-            ...rest,
-            description: metadata.description,
-            feed: metadata.feeds,
-            image: metadata.image,
-            tags: [...matchTags(metadata, dbTags), ...tags],
-            title: metadata.title,
-            type: metadata.urlType,
-            url: metadata.cleaned_url || metadata.url,
-          },
+          await scrapedBookmark(url, rest, dbTags),
           auth.userId,
         )
       }
@@ -173,22 +214,10 @@ export const getNewBookmark = async (context: HonoContext) => {
     }
 
     const dbTags = await getTagMetadata(auth.requestContext)
-    const metadata = await scrapeMetadata(url)
     const data = await auth.requestContext.db
       .insert(bookmarks)
       .values([
-        toBookmarkInsert(
-          {
-            description: metadata.description,
-            feed: metadata.feeds,
-            image: metadata.image,
-            tags: matchTags(metadata, dbTags),
-            title: metadata.title,
-            type: metadata.urlType,
-            url: metadata.cleaned_url || metadata.url,
-          },
-          auth.userId,
-        ),
+        toBookmarkInsert(await scrapedBookmark(url, {}, dbTags), auth.userId),
       ])
       .returning()
     const rows = data.map(bookmarkToRow)
