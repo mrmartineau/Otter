@@ -103,7 +103,7 @@ const actionAPI = browserAPI.action ?? browserAPI.browserAction
  * Direct API saves, using the Otter session already in this browser. The
  * user is signed in to the web app; host permissions let the cookie travel.
  */
-const apiSave = async (kind, url) => {
+const apiSave = async (kind, url, title) => {
   const { otterInstanceUrl } = await getStorageItems()
   const endpoint =
     kind === 'read-later'
@@ -111,7 +111,7 @@ const apiSave = async (kind, url) => {
       : urlJoin(otterInstanceUrl, 'api', 'new')
   // /api/new scrapes title, description, image and type (article, video…)
   // and matches existing tags. /api/reader/items extracts the article.
-  const body = kind === 'read-later' ? { url } : [{ scrape: true, url }]
+  const body = kind === 'read-later' ? { url } : [{ scrape: true, title, url }]
 
   const response = await fetch(endpoint, {
     body: JSON.stringify(body),
@@ -142,7 +142,7 @@ const flashBadge = (text) => {
  * One entry point for the popup, the context menu and the shortcuts.
  * `bookmark` opens the full form; the other two save straight away.
  */
-const save = async (kind, url) => {
+const save = async (kind, url, title) => {
   if ((await isOptionsSetup()) === false) {
     browserAPI.tabs.create({ url: browserAPI.runtime.getURL('options.html') })
     return { error: 'Set your Otter address first.', ok: false }
@@ -154,7 +154,7 @@ const save = async (kind, url) => {
   }
 
   try {
-    await apiSave(kind, url)
+    await apiSave(kind, url, title)
     flashBadge('✓')
     return { ok: true }
   } catch (error) {
@@ -165,7 +165,7 @@ const save = async (kind, url) => {
 
 browserAPI.runtime.onMessage.addListener((message) => {
   if (['quick-save', 'read-later', 'bookmark'].includes(message?.type)) {
-    return save(message.type, message.url)
+    return save(message.type, message.url, message.title)
   }
 })
 
@@ -180,8 +180,8 @@ browserAPI.commands?.onCommand.addListener(async (command, tab) => {
     (await browserAPI.tabs.query({ active: true, currentWindow: true }))[0]
   if (!active?.url) return
 
-  if (command === 'quick-save') save('quick-save', active.url)
-  if (command === 'read-later') save('read-later', active.url)
+  if (command === 'quick-save') save('quick-save', active.url, active.title)
+  if (command === 'read-later') save('read-later', active.url, active.title)
 })
 
 const contextKinds = {
@@ -192,7 +192,15 @@ const contextKinds = {
 
 browserAPI.contextMenus?.onClicked.addListener((info, tab) => {
   const kind = contextKinds[info.menuItemId]
-  if (kind) save(kind, info.linkUrl || tab.url)
+  if (!kind) return
+
+  // On a link, the tab's title belongs to the page the link sits on, not to
+  // the link's target, so it only helps as a fallback for the page itself.
+  if (info.linkUrl) {
+    save(kind, info.linkUrl)
+  } else {
+    save(kind, tab.url, tab.title)
+  }
 })
 
 /**
@@ -232,19 +240,60 @@ browserAPI.webNavigation?.onCompleted.addListener(async (details) => {
 
 /**
  * Context menus: the same three actions as the popup, on pages and links.
+ *
+ * An MV3 service worker is torn down when idle and re-runs this file every
+ * time it wakes, so creating the menus at the top level throws "Cannot create
+ * item with duplicate id" on the second wake. Register them on install and on
+ * browser start instead, clearing first so the call is safe to repeat.
  */
-browserAPI.contextMenus?.create({
-  contexts: ['page', 'link'],
-  id: 'otter-context-quick-save',
-  title: 'Quick save to Otter',
-})
-browserAPI.contextMenus?.create({
-  contexts: ['page', 'link'],
-  id: 'otter-context-read-later',
-  title: 'Read later in Otter',
-})
-browserAPI.contextMenus?.create({
-  contexts: ['page', 'link'],
-  id: 'otter-context-save',
-  title: 'Save to Otter with details…',
-})
+const contextMenuItems = [
+  { id: 'otter-context-quick-save', title: 'Quick save to Otter' },
+  { id: 'otter-context-read-later', title: 'Read later in Otter' },
+  { id: 'otter-context-save', title: 'Save to Otter with details…' },
+]
+
+/**
+ * `contextMenus.create` is one of the few APIs the polyfill leaves on Chrome's
+ * callback style: it returns the id synchronously and reports failure through
+ * `runtime.lastError`. Passing a callback that reads that value marks the error
+ * as handled — without it a duplicate id logs "Unchecked runtime.lastError".
+ */
+const createMenuItem = (item) =>
+  browserAPI.contextMenus.create(
+    { contexts: ['page', 'link'], ...item },
+    () => {
+      const error = browserAPI.runtime.lastError
+
+      if (error) {
+        console.warn(`Context menu ${item.id}: ${error.message}`)
+      }
+    },
+  )
+
+// Rebuilds are serialised: onInstalled and onStartup can both fire when the
+// browser starts just after an update, and two interleaved rebuilds would
+// clear each other's menus and then collide on the same ids.
+let contextMenuRebuild = Promise.resolve()
+
+const createContextMenus = () => {
+  if (!browserAPI.contextMenus) {
+    return contextMenuRebuild
+  }
+
+  contextMenuRebuild = contextMenuRebuild
+    .then(async () => {
+      await browserAPI.contextMenus.removeAll()
+
+      for (const item of contextMenuItems) {
+        createMenuItem(item)
+      }
+    })
+    .catch((error) => {
+      console.warn('Could not create context menus:', error)
+    })
+
+  return contextMenuRebuild
+}
+
+browserAPI.runtime.onInstalled.addListener(createContextMenus)
+browserAPI.runtime.onStartup?.addListener(createContextMenus)

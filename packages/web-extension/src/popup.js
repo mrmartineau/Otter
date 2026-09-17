@@ -29,7 +29,13 @@ const run = async (type) => {
   for (const button of buttons) button.disabled = true
   setStatus(type === 'bookmark' ? '' : 'Saving…')
 
-  const result = await browserAPI.runtime.sendMessage({ type, url: tab.url })
+  // The tab title is a fallback: sites behind a bot wall refuse the server's
+  // fetch, and a bookmark with the real title beats a bare URL.
+  const result = await browserAPI.runtime.sendMessage({
+    title: tab.title,
+    type,
+    url: tab.url,
+  })
 
   if (result?.ok) {
     setStatus(type === 'read-later' ? 'Saved to Read later.' : 'Saved.')
