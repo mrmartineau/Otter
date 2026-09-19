@@ -28,6 +28,8 @@ final class FeedStore: ObservableObject {
     /// Starred items outlive their feed, so they are kept whole.
     @Published private(set) var starred: [FeedItem] = []
     @Published private(set) var lastRefresh: Date?
+    /// When each source last came back with items, so a screen can say so.
+    @Published private(set) var lastRefreshBySource: [String: Date] = [:]
 
     private let cache = DiskCache(fileName: "feeds.json")
     private let defaults = UserDefaults.standard
@@ -36,6 +38,8 @@ final class FeedStore: ObservableObject {
         var items: [String: [FeedItem]]
         var starred: [FeedItem]
         var lastRefresh: Date?
+        /// Optional so snapshots written before this existed still decode.
+        var lastRefreshBySource: [String: Date]?
     }
 
     private init() {
@@ -48,6 +52,7 @@ final class FeedStore: ObservableObject {
             itemsBySource = snapshot.items
             starred = snapshot.starred
             lastRefresh = snapshot.lastRefresh
+            lastRefreshBySource = snapshot.lastRefreshBySource ?? [:]
         }
     }
 
@@ -84,6 +89,12 @@ final class FeedStore: ObservableObject {
     func isRead(_ item: FeedItem) -> Bool { readIDs.contains(item.id) }
     func isStarred(_ item: FeedItem) -> Bool { starredIDs.contains(item.id) }
 
+    /// The oldest successful sync across these sources — the honest answer for
+    /// a merged view. Sources that have never synced are skipped.
+    func lastRefresh(forSources ids: [String]) -> Date? {
+        ids.compactMap { lastRefreshBySource[$0] }.min()
+    }
+
     var isStale: Bool {
         guard let lastRefresh else { return true }
         return Date().timeIntervalSince(lastRefresh) > 10 * 60
@@ -113,6 +124,7 @@ final class FeedStore: ObservableObject {
             let items = try await source.fetch()
             itemsBySource[source.id] = items
             errorsBySource[source.id] = nil
+            lastRefreshBySource[source.id] = Date()
         } catch {
             errorsBySource[source.id] = error.localizedDescription
         }
@@ -173,6 +185,7 @@ final class FeedStore: ObservableObject {
         let subscription = FeedSubscription(id: id, url: url.absoluteString, title: title ?? parsed.title ?? url.host ?? text, folder: folder)
         subscriptions.append(subscription)
         itemsBySource[id] = parsed.items
+        lastRefreshBySource[id] = Date()
         saveSubscriptions()
         persist()
         return subscription
@@ -219,7 +232,12 @@ final class FeedStore: ObservableObject {
     }
 
     private func persist() {
-        let snapshot = Snapshot(items: itemsBySource, starred: starred, lastRefresh: lastRefresh)
+        let snapshot = Snapshot(
+            items: itemsBySource,
+            starred: starred,
+            lastRefresh: lastRefresh,
+            lastRefreshBySource: lastRefreshBySource
+        )
         cache.store((try? JSONEncoder().encode(snapshot)) ?? Data())
     }
 }

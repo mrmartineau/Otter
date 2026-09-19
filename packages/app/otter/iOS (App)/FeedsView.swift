@@ -54,6 +54,28 @@ struct FeedsView: View {
         }
     }
 
+    /// The sources the current view draws from — what "syncing" refers to.
+    private var currentSourceIDs: [String] {
+        switch current {
+        case "starred": return []
+        case "all": return store.subscriptions.map(\.id)
+        default:
+            if let currentFolder { return store.subscriptions(in: currentFolder).map(\.id) }
+            return [current]
+        }
+    }
+
+    /// The line under the feed name: a fetch in flight, else when one last landed.
+    /// `Text(_:format: .relative)` keeps itself up to date, so no timer is needed.
+    @ViewBuilder
+    private var syncStatus: some View {
+        if currentSourceIDs.contains(where: store.refreshing.contains) {
+            Text("Syncing\u{2026}")
+        } else if let date = store.lastRefresh(forSources: currentSourceIDs) {
+            Text("Updated ") + Text(date, format: .relative(presentation: .numeric, unitsStyle: .abbreviated))
+        }
+    }
+
     private var selectedSource: (any FeedSource)? {
         store.sources.first { $0.id == current }
     }
@@ -74,6 +96,20 @@ struct FeedsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     sourceMenu
+                }
+
+                ToolbarItem(placement: .principal) {
+                    VStack(spacing: 0) {
+                        Text(currentTitle)
+                            .font(.headline)
+                            .lineLimit(1)
+
+                        syncStatus
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                    .accessibilityElement(children: .combine)
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
