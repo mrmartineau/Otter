@@ -178,7 +178,12 @@ struct BookmarkListRow: View {
 
     var body: some View {
         Button {
-            if let url = bookmark.linkURL { openURL(url) }
+            if let url = bookmark.linkURL {
+                openURL(url)
+            } else {
+                // A note has nothing to open, so the row's content *is* the details.
+                onShowDetail()
+            }
         } label: {
             BookmarkRow(bookmark: bookmark)
         }

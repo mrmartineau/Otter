@@ -18,6 +18,11 @@ nonisolated enum FeedHTTP {
         let config = URLSessionConfiguration.default
         config.httpAdditionalHeaders = ["User-Agent": "OtterReader/1.0 (+https://github.com/mrmartineau/otter)"]
         config.timeoutIntervalForRequest = 20
+        // Feeds ship long `Cache-Control` lifetimes, so the default protocol
+        // cache keeps handing back the copy it already has — pull to refresh
+        // included. Always go to the network; the parsed items are the cache.
+        config.requestCachePolicy = .reloadIgnoringLocalCacheData
+        config.urlCache = nil
         return URLSession(configuration: config)
     }()
 
