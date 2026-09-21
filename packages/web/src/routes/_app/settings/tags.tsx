@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useCallback } from 'react'
 import { Button } from '@/components/Button'
 import { FormGroup } from '@/components/FormGroup'
@@ -34,6 +34,18 @@ export const Route = createFileRoute('/_app/settings/tags')({
 function RouteComponent() {
   const { tags } = Route.useLoaderData()
   const navigate = useNavigate()
+  const router = useRouter()
+
+  // The loader only re-runs when the URL changes, and the URL here is the same
+  // page with a different message, which is the same URL when two attempts
+  // produce the same text. Invalidating refetches the list either way.
+  const refresh = useCallback(
+    (message: string) => {
+      router.invalidate()
+      navigate({ search: { message }, to: '/settings/tags' })
+    },
+    [navigate, router],
+  )
 
   const handleRenameTag = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
@@ -49,23 +61,43 @@ function RouteComponent() {
         method: 'PATCH',
       })
 
-      if (!response.ok) {
-        return navigate({
-          search: {
-            message: `Could not rename ${old_tag} to ${new_tag}`,
-          },
-          to: '/settings/tags',
-        })
+      refresh(
+        response.ok
+          ? `Renamed ${old_tag} to ${new_tag}`
+          : `Could not rename ${old_tag} to ${new_tag}`,
+      )
+    },
+    [refresh],
+  )
+
+  /**
+   * Deleting drops the tag from every bookmark carrying it and cannot be
+   * undone, so the count goes in the prompt — "shop" is 183 bookmarks, and
+   * the name alone does not say that.
+   */
+  const handleDeleteTag = useCallback(
+    async (tag: string, count: number | null) => {
+      const used = count ?? 0
+      const confirmed = window.confirm(
+        `Delete "${tag}"?\n\nIt will be removed from ${used} bookmark${
+          used === 1 ? '' : 's'
+        }. The bookmarks themselves are kept. This cannot be undone.`,
+      )
+
+      if (!confirmed) {
+        return
       }
 
-      navigate({
-        search: {
-          message: `Renamed ${old_tag} to ${new_tag}`,
-        },
-        to: '/settings/tags',
+      const response = await fetch('/api/tags', {
+        body: JSON.stringify({ tag }),
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        method: 'DELETE',
       })
+
+      refresh(response.ok ? `Deleted ${tag}` : `Could not delete ${tag}`)
     },
-    [navigate],
+    [refresh],
   )
 
   return (
@@ -73,7 +105,7 @@ function RouteComponent() {
       <h2>All tags</h2>
       <ul className="flex flex-col gap-xs max-w-[400px] w-full">
         {tags?.length
-          ? tags.map(({ tag }) => {
+          ? tags.map(({ count, tag }) => {
               if (!tag) {
                 return null
               }
@@ -91,6 +123,14 @@ function RouteComponent() {
                         />
                         <Button type="submit" variant="outline" size="xs">
                           Rename
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="xs"
+                          onClick={() => handleDeleteTag(tag, count)}
+                        >
+                          Delete
                         </Button>
                       </div>
                     </FormGroup>
