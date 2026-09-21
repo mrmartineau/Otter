@@ -8,9 +8,8 @@ import {
   or,
   sql,
 } from 'drizzle-orm'
-import { TidyURL } from 'tidy-url'
+import type { Context } from 'hono'
 import type { BookmarkStatus, BookmarkType } from '@/types/db'
-import { matchTagsSource } from '@/utils/matchTags'
 import { bookmarks } from '../../db/schema'
 import {
   getCollections,
@@ -18,10 +17,8 @@ import {
   getTypeCounts as getTypeCountsAggregate,
 } from '../bookmarks/aggregates'
 import { bookmarkToRow } from '../bookmarks/mapper'
+import { scrapedBookmark } from '../bookmarks/new'
 import type { RequestContext } from '../context'
-import { linkType } from '../scraper/link-type'
-import Scraper from '../scraper/scraper'
-import { scraperRules } from '../scraper/scraper-rules'
 import {
   type CallToolResult,
   type McpToolDefinition,
@@ -56,7 +53,9 @@ const typeEnumSchema = {
   type: 'string',
 } as const
 
-interface ToolContext {
+export interface ToolContext {
+  /** Needed for the `AI` binding behind the scrape-time rewriters. */
+  honoContext: Context
   requestContext: RequestContext
   userId: string
 }
@@ -415,58 +414,33 @@ const createBookmark: McpTool = {
   handler: async (args, ctx) => {
     const url = args.url as string
     const shouldScrape = args.scrape !== false
-    let scrapedData: Record<string, unknown> = {}
-    let autoTags: string[] = []
-
-    if (shouldScrape) {
-      try {
-        const scraper = new Scraper()
-        await scraper.fetch(url)
-        const metadata = await scraper.getMetadata(scraperRules)
-        const unshortenedUrl = scraper.response.url
-        const cleanedUrl = TidyURL.clean(unshortenedUrl || url)
-
-        scrapedData = {
-          description: metadata.description || null,
-          feed: metadata.feeds || null,
-          image: metadata.image || null,
-          title: metadata.title || null,
-          type: linkType(url, false),
-          url: cleanedUrl.url || unshortenedUrl || url,
-        }
-
-        const tags = await getTagCounts(ctx)
-        autoTags = matchTagsSource(
-          {
-            description: (metadata.description as string) || undefined,
-            title: (metadata.title as string) || undefined,
-          },
-          tags,
-        )
-      } catch {
-        scrapedData = { url }
-      }
-    }
-
     const userTags = (args.tags as string[]) || []
-    const mergedTags = [...new Set([...autoTags, ...userTags])]
+
+    // Rewriting the title and description, classifying the tags and type, and
+    // the fallbacks for when either fails all live in scrapedBookmark, so this
+    // tool and quick save cannot drift apart.
+    const scraped: Partial<Bookmark> = shouldScrape
+      ? await scrapedBookmark(url, {}, await getTagCounts(ctx), ctx.honoContext)
+      : {}
+
+    const mergedTags = [...new Set([...(scraped.tags ?? []), ...userTags])]
     const [bookmark] = await ctx.requestContext.db
       .insert(bookmarks)
       .values({
         description:
-          (args.description as string) ??
-          (scrapedData.description as string | null),
-        feed: scrapedData.feed as string | null,
-        image: scrapedData.image as string | null,
+          (args.description as string) ?? scraped.description ?? null,
+        feed: (scraped.feed as string | null) ?? null,
+        image: scraped.image ?? null,
         note: (args.note as string) || null,
         public: (args.public as boolean) || false,
         star: (args.star as boolean) || false,
         tags: mergedTags.length ? mergedTags : null,
-        title: (args.title as string) ?? (scrapedData.title as string | null),
+        title: (args.title as string) ?? scraped.title ?? null,
         type:
           (args.type as BookmarkType) ??
-          (scrapedData.type as BookmarkType | null),
-        url: (scrapedData.url as string) || url,
+          (scraped.type as BookmarkType | null) ??
+          null,
+        url: scraped.url || url,
         user: ctx.userId,
       })
       .returning()

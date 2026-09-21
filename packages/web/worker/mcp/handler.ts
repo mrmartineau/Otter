@@ -1,10 +1,11 @@
 import type { Context } from 'hono'
+import { hasScope, requireRequestContext } from '../context'
 import {
-  hasScope,
-  type RequestContext,
-  requireRequestContext,
-} from '../context'
-import { toolDefinitions, toolHandlers, toolScopes } from './tools'
+  type ToolContext,
+  toolDefinitions,
+  toolHandlers,
+  toolScopes,
+} from './tools'
 import {
   INTERNAL_ERROR,
   INVALID_PARAMS,
@@ -102,6 +103,7 @@ export const handleMcpPost = async (c: Context) => {
     const responses: JsonRpcResponse[] = []
     for (const msg of body) {
       const result = await processMessage(msg as JsonRpcRequest, {
+        honoContext: c,
         requestContext: authResult,
         userId,
       })
@@ -121,6 +123,7 @@ export const handleMcpPost = async (c: Context) => {
 
   // Handle single request
   const result = await processMessage(body as JsonRpcRequest, {
+    honoContext: c,
     requestContext: authResult,
     userId,
   })
@@ -135,7 +138,7 @@ export const handleMcpPost = async (c: Context) => {
 
 async function processMessage(
   msg: JsonRpcRequest,
-  ctx: { requestContext: RequestContext; userId: string },
+  ctx: ToolContext,
 ): Promise<JsonRpcResponse | null> {
   // Validate basic structure
   if (!msg || typeof msg !== 'object' || msg.jsonrpc !== '2.0' || !msg.method) {
@@ -174,7 +177,7 @@ async function processMessage(
 async function dispatch(
   method: string,
   params: Record<string, unknown> | undefined,
-  ctx: { requestContext: RequestContext; userId: string },
+  ctx: ToolContext,
 ): Promise<unknown> {
   switch (method) {
     case 'initialize':
@@ -225,10 +228,7 @@ async function dispatch(
       try {
         return await handler(
           (params?.arguments as Record<string, unknown>) || {},
-          {
-            requestContext: ctx.requestContext,
-            userId: ctx.userId,
-          },
+          ctx,
         )
       } catch (err) {
         // Tool execution errors are returned as isError results, not JSON-RPC errors
