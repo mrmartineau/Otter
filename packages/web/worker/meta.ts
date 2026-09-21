@@ -214,6 +214,12 @@ export const renameTag = async (context: HonoContext) => {
 
     // Single UPDATE: replace the tag in-place, then dedupe (the new tag may
     // already be present) while preserving each tag's first-occurrence order.
+    //
+    // Trashed bookmarks are renamed too. They are not deleted, and restoring
+    // one should bring back a bookmark carrying the current vocabulary, not
+    // the one in use whenever it was binned. Filtering on `status = 'active'`
+    // here left four tags stranded in the trash after a round of merges,
+    // invisible because `getTagCounts` hides them as well.
     const result = await auth.requestContext.db.execute(sql`
       UPDATE ${bookmarks}
       SET tags = (
@@ -227,7 +233,6 @@ export const renameTag = async (context: HonoContext) => {
       ),
       modified_at = timezone('utc', now())
       WHERE ${bookmarks.user} = ${auth.userId}
-        AND ${bookmarks.status} = 'active'
         AND ${oldTag} = ANY(${bookmarks.tags})
     `)
 
