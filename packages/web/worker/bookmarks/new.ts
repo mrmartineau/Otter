@@ -8,6 +8,7 @@ import type { MetaTag } from '@/utils/fetching/meta'
 import { getErrorMessage } from '@/utils/get-error-message'
 import { matchTags } from '@/utils/matchTags'
 import { bookmarks } from '../../db/schema'
+import { classifyBookmark } from '../ai/classify'
 import { type RequestContext, requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 import { scrapeMetadata } from '../scraper/index'
@@ -18,6 +19,9 @@ import { scheduleBookmarkSideEffects } from './sideEffects'
 type HonoContext = Context<{ Bindings: WorkerEnv }>
 type BookmarkInsert = typeof bookmarks.$inferInsert
 type NewBookmark = Partial<Bookmark> & { scrape?: boolean }
+
+/** Cap for the fallback tagger; the classifier caps itself. */
+const MAX_AUTO_TAGS = 5
 
 const getTagMetadata = async (requestContext: RequestContext) => {
   const rows = await requestContext.db
@@ -81,6 +85,61 @@ const getRequestContext = async (context: HonoContext) => {
 }
 
 /**
+ * Tags and types a page with the classifier.
+ *
+ * The AI is the tagger now. `matchTags` is only the fallback for when the AI
+ * call fails, because a bookmark with a few thin tags beats a save that errors.
+ */
+const autoClassify = async (
+  context: HonoContext,
+  fields: {
+    title?: string | null
+    description?: string | null
+    note?: string | null
+    url: string
+    type?: BookmarkType | null
+  },
+  dbTags: MetaTag[],
+) => {
+  // `like:` tags mirror favourites on other services, so they are never ours to
+  // suggest. The classifier wants the rest most-used first.
+  const existingTags = dbTags
+    .filter(
+      (item) =>
+        item.tag && item.tag !== 'Untagged' && !item.tag.startsWith('like:'),
+    )
+    .sort((a, b) => (b.count ?? 0) - (a.count ?? 0))
+    .map((item) => item.tag as string)
+
+  try {
+    const result = await classifyBookmark({
+      context,
+      currentType: fields.type ?? 'link',
+      description: fields.description ?? '',
+      existingTags,
+      title: fields.title ?? '',
+      url: fields.url,
+    })
+
+    return { tags: result.tags.map((tag) => tag.name), type: result.type }
+  } catch (error) {
+    console.warn(`Classify failed for ${fields.url}: ${getErrorMessage(error)}`)
+
+    return {
+      tags: matchTags(
+        {
+          description: fields.description ?? undefined,
+          note: fields.note ?? undefined,
+          title: fields.title ?? undefined,
+        },
+        dbTags,
+      ).slice(0, MAX_AUTO_TAGS),
+      type: fields.type ?? undefined,
+    }
+  }
+}
+
+/**
  * Builds the bookmark fields for a URL, scraping the page for details.
  *
  * A scrape can fail for reasons that have nothing to do with the user: plenty
@@ -93,40 +152,48 @@ export const scrapedBookmark = async (
   url: string,
   rest: Partial<Bookmark>,
   dbTags: MetaTag[],
+  context: HonoContext,
 ): Promise<Partial<Bookmark>> => {
   const tags = rest.tags ?? []
 
   try {
     const metadata = await scrapeMetadata(url)
+    const auto = await autoClassify(
+      context,
+      {
+        description: metadata.description ?? rest.description,
+        note: rest.note,
+        title: metadata.title ?? rest.title,
+        type: metadata.urlType,
+        url: metadata.cleaned_url || metadata.url || url,
+      },
+      dbTags,
+    )
 
     return {
       ...rest,
       description: metadata.description ?? rest.description,
       feed: metadata.feeds,
       image: metadata.image ?? rest.image,
-      tags: [...matchTags(metadata, dbTags), ...tags],
+      tags: [...new Set([...auto.tags, ...tags])],
       title: metadata.title ?? rest.title,
-      type: metadata.urlType,
+      type: auto.type ?? metadata.urlType,
       url: metadata.cleaned_url || metadata.url,
     }
   } catch (error) {
     console.warn(`Scrape failed for ${url}: ${getErrorMessage(error)}`)
 
+    const fallbackType = (rest.type as BookmarkType) ?? linkType(url, false)
+    const auto = await autoClassify(
+      context,
+      { ...rest, type: fallbackType, url },
+      dbTags,
+    )
+
     return {
       ...rest,
-      tags: [
-        // Only the fields matchTags reads, with nulls dropped to match its type.
-        ...matchTags(
-          {
-            description: rest.description ?? undefined,
-            note: rest.note ?? undefined,
-            title: rest.title ?? undefined,
-          },
-          dbTags,
-        ),
-        ...tags,
-      ],
-      type: rest.type ?? linkType(url, false),
+      tags: [...new Set([...auto.tags, ...tags])],
+      type: auto.type ?? fallbackType,
       url,
     }
   }
@@ -150,7 +217,7 @@ export const postNewBookmark = async (context: HonoContext) => {
     const mapper = async ({ scrape, url, ...rest }: NewBookmark) => {
       if (url && scrape) {
         return toBookmarkInsert(
-          await scrapedBookmark(url, rest, dbTags),
+          await scrapedBookmark(url, rest, dbTags, context),
           auth.userId,
         )
       }
@@ -217,7 +284,10 @@ export const getNewBookmark = async (context: HonoContext) => {
     const data = await auth.requestContext.db
       .insert(bookmarks)
       .values([
-        toBookmarkInsert(await scrapedBookmark(url, {}, dbTags), auth.userId),
+        toBookmarkInsert(
+          await scrapedBookmark(url, {}, dbTags, context),
+          auth.userId,
+        ),
       ])
       .returning()
     const rows = data.map(bookmarkToRow)

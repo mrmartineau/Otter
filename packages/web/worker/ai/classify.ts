@@ -1,10 +1,11 @@
 import type { Context } from 'hono'
 import type { BookmarkType } from '@/types/db'
-import { AI_MODEL } from './consts'
+import { matchTagNames } from '@/utils/matchTags'
+import { AI_CLASSIFY_MODEL } from './consts'
 
 export type AiClassifyResponse = {
   tags: { name: string; isNew: boolean }[]
-  type: string
+  type: BookmarkType
 }
 
 const BOOKMARK_TYPES = [
@@ -24,42 +25,68 @@ const BOOKMARK_TYPES = [
   'place',
 ] as const satisfies readonly BookmarkType[]
 
+const BOOKMARK_TYPE_SET = new Set<string>(BOOKMARK_TYPES)
+
+const isBookmarkType = (value: unknown): value is BookmarkType =>
+  typeof value === 'string' && BOOKMARK_TYPE_SET.has(value)
+
+const MAX_TAGS = 5
+
+/** How many of the most-used tags ride along with the word matches. */
+const POPULAR_TAG_COUNT = 40
+
+/**
+ * The model sees a shortlist, not the whole vocabulary. Handing it ~950 tag
+ * names made it answer with popular unrelated ones — a mountain bike wheel
+ * video came back tagged "golf" and "gaming". With ~50 candidates it picks
+ * from what is in front of it.
+ *
+ * `existingTags` arrives most-used first, which is the order `/api/tags`
+ * returns, so the tail of the shortlist is the user's habitual tags.
+ */
+const buildShortlist = (existingTags: string[], text: string) => [
+  ...new Set([
+    ...matchTagNames(text, existingTags),
+    ...existingTags.slice(0, POPULAR_TAG_COUNT),
+  ]),
+]
+
 const classifySystemPrompt = (
-  existingTags: string[],
+  candidates: string[],
   currentType: string,
-) => `You are a bookmark classifier. Given a URL, title, and description for a web page, you must:
+) => `You tag saved web pages. You are given a URL, a title and a description.
 
-1. Select the most relevant tags, between 1 and 5. Only include tags that are a strong match — not every bookmark needs 5 tags.
-2. Determine whether the content type should stay as "${currentType}" or change to another type from this fixed list: ${BOOKMARK_TYPES.join(', ')}.
+Pick between 1 and 5 tags from this list. Pick only tags that clearly fit the page — most pages need two or three:
+${candidates.join(', ')}
 
-IMPORTANT — Tag selection process:
-- You MUST first search the existing tags list exhaustively before considering any new tag. Reusing an existing tag is strongly preferred.
-- Treat close lexical variants as matches: plural/singular, derivations, morphology, and nearby forms (e.g. "orchestration", "orchestrate", and "orchestrators" should map to existing "ai:orchestrator" when relevant).
-- Many tags use prefixes with colons (e.g. "ai:orchestrator", "dev:tools", "css:animation"). Check ALL existing tags including prefixed tags and compare by meaning, not exact surface form.
-- If an existing tag is even reasonably relevant, choose it instead of inventing a new one.
-- Bookmark types are not tags. Never output a tag whose name is any bookmark type from this list: ${BOOKMARK_TYPES.join(', ')}.
-- In particular, do not suggest generic type tags like "link", "product", "article", "video", "book", or similar.
-- Only invent a new tag as a last resort when no existing tag is semantically appropriate. New tags should be lowercase, concise (1-2 words), and use kebab-case for multi-word tags.
+If, and only if, no tag in the list fits, put one new tag in "newTags". Write it lowercase, one or two words, kebab-case for two words.
 
-Existing tags:
-${existingTags.join(', ')}
-
-Respond ONLY with valid JSON in this exact format, no other text:
-{"tags": [{"name": "tag-name", "isNew": false}], "type": "link"}
+Also pick the content type. The type guessed from the URL is "${currentType}". Keep it unless the page is clearly something else.
 
 Rules:
-- Maximum 5 tags
-- "isNew" must be false for tags from the existing list, true for invented tags
-- Prefer existing tags over new tags in all borderline cases
-- Normalize mentally before matching (singular/plural, tense, and word family) and pick the closest existing tag
-- Never use any bookmark type as a tag name
-- The "type" must be one of: ${BOOKMARK_TYPES.join(', ')}
-- Start from the current type "${currentType}" as the default assumption
-- Only change the type if there is strong evidence from the URL/title/description that "${currentType}" is wrong
-- If unsure, keep the current type "${currentType}"
-- Consider the URL domain and path structure as hints for type (e.g. youtube.com = video, medium.com = article)
-- GitHub repository URLs (e.g. github.com/owner/repo) are always type "link", not "document" or "article"
-- NEVER suggest tags starting with "like:" — those are reserved for external service favorites`
+- Never answer with a tag that is close to one in the list. Use the list one.
+- Never use a content type as a tag.
+- An empty "tags" is better than a tag that does not fit.`
+
+/**
+ * A JSON schema makes the shortlist the only spellings the model can answer
+ * with, so it cannot invent a near-duplicate of a tag the user already has.
+ */
+const responseSchema = (candidates: string[]) => ({
+  properties: {
+    newTags: { items: { type: 'string' }, maxItems: 1, type: 'array' },
+    tags: {
+      items: candidates.length
+        ? { enum: candidates, type: 'string' }
+        : { type: 'string' },
+      maxItems: MAX_TAGS,
+      type: 'array',
+    },
+    type: { enum: [...BOOKMARK_TYPES], type: 'string' },
+  },
+  required: ['tags', 'type'],
+  type: 'object',
+})
 
 export const classifyBookmark = async ({
   context,
@@ -76,57 +103,60 @@ export const classifyBookmark = async ({
   existingTags: string[]
   currentType: string
 }): Promise<AiClassifyResponse> => {
-  const prompt = `URL: ${url}\nTitle: ${title}\nDescription: ${description}`
-  const normalizedCurrentType = BOOKMARK_TYPES.includes(
-    currentType as (typeof BOOKMARK_TYPES)[number],
-  )
+  const normalizedCurrentType = isBookmarkType(currentType)
     ? currentType
     : 'link'
+  const candidates = buildShortlist(existingTags, `${title} ${description}`)
 
   const messages = [
     {
-      content: classifySystemPrompt(existingTags, normalizedCurrentType),
+      content: classifySystemPrompt(candidates, normalizedCurrentType),
       role: 'system',
     },
     {
-      content: prompt,
+      content: `URL: ${url}\nTitle: ${title}\nDescription: ${description}`,
       role: 'user',
     },
   ]
 
-  const { response } = (await context.env.AI.run(AI_MODEL, {
+  const { response } = (await context.env.AI.run(AI_CLASSIFY_MODEL, {
     messages,
+    response_format: {
+      json_schema: responseSchema(candidates),
+      type: 'json_schema',
+    },
   })) as {
-    response: {
-      tags: { name: string; isNew?: boolean }[]
-      type: string
+    response?: { tags?: string[]; newTags?: string[]; type?: string }
+  }
+
+  // Match case-insensitively but answer with the spelling already in the
+  // database, or picking "cli" when the user has "CLI" saves a second tag.
+  const canonical = new Map(existingTags.map((tag) => [tag.toLowerCase(), tag]))
+  const seen = new Set<string>()
+  const tags: AiClassifyResponse['tags'] = []
+
+  for (const raw of [...(response?.tags ?? []), ...(response?.newTags ?? [])]) {
+    const name = typeof raw === 'string' ? raw.trim() : ''
+    const key = name.toLowerCase()
+
+    if (
+      !name ||
+      seen.has(key) ||
+      key.startsWith('like:') ||
+      BOOKMARK_TYPE_SET.has(key)
+    ) {
+      continue
+    }
+
+    seen.add(key)
+    tags.push({ isNew: !canonical.has(key), name: canonical.get(key) ?? name })
+
+    if (tags.length === MAX_TAGS) {
+      break
     }
   }
 
-  const existingTagSet = new Set(existingTags.map((t) => t.toLowerCase()))
-  const bookmarkTypeSet = new Set(
-    BOOKMARK_TYPES.map((t) => t.toLowerCase()),
-  )
-
-  const tags = Array.isArray(response?.tags)
-    ? response.tags
-        .slice(0, 5)
-        .filter(
-          (t) =>
-            t &&
-            typeof t.name === 'string' &&
-            !t.name.startsWith('like:') &&
-            !bookmarkTypeSet.has(t.name.toLowerCase()),
-        )
-        .map((t) => ({
-          isNew: !existingTagSet.has(t.name.toLowerCase()),
-          name: t.name,
-        }))
-    : []
-
-  const type = BOOKMARK_TYPES.includes(
-    response?.type as (typeof BOOKMARK_TYPES)[number],
-  )
+  const type = isBookmarkType(response?.type)
     ? response.type
     : normalizedCurrentType
 
