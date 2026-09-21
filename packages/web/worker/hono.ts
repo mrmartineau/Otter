@@ -8,6 +8,7 @@ import { generateResponse } from './ai/generateResponse'
 import { MAX_CONTENT_LENGTH, summariseSystemPrompt } from './ai/summarise'
 import { titleSystemPrompt } from './ai/title'
 import { sendBlueskyPost } from './bluesky/sendBlueskyPost'
+import { getTagCounts } from './bookmarks/aggregates'
 import { getAllBookmarks } from './bookmarks/getAllBookmarks'
 import { getRecentPublicBookmarks } from './bookmarks/getRecentPublicBookmarks'
 import { exportBookmarks, importBookmarks } from './bookmarks/importExport'
@@ -158,13 +159,27 @@ api.post('/ai/summarise', authedWithRateLimit('ai'), async (context) => {
   })
 })
 api.post('/ai/classify', authedWithRateLimit('ai'), async (context) => {
-  const { title, description, url, tags, currentType } =
-    await context.req.json()
+  const { title, description, url, currentType } = await context.req.json()
+  const requestContext = await requireRequestContext(context)
+
+  if (requestContext instanceof Response) {
+    return requestContext
+  }
+
+  // Read the vocabulary here rather than trusting the `tags` the caller sends.
+  // Suppressing near-duplicates needs the use counts, and every client had to
+  // send the whole list in the right order to get a good answer — 10KB of body
+  // and a contract nothing enforced. Callers may still send `tags`; it is
+  // ignored.
+  const existingTags = await getTagCounts(
+    context.var.db,
+    requestContext.user?.id ?? '',
+  )
   const result = await classifyBookmark({
     context,
     currentType: currentType ?? 'link',
     description: description ?? '',
-    existingTags: tags ?? [],
+    existingTags,
     title: title ?? '',
     url: url ?? '',
   })

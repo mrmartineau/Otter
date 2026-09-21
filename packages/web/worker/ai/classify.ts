@@ -1,5 +1,6 @@
 import type { Context } from 'hono'
 import type { BookmarkType } from '@/types/db'
+import type { MetaTag } from '@/utils/fetching/meta'
 import { matchTagNames } from '@/utils/matchTags'
 import { AI_CLASSIFY_MODEL } from './consts'
 
@@ -36,18 +37,86 @@ const MAX_TAGS = 5
 const POPULAR_TAG_COUNT = 40
 
 /**
+ * How many times more often the broader tag has to be used before it silences
+ * the narrower one. Tuned against the real vocabulary: "app:mac" (349 uses)
+ * silences "mac" (23) and "app" (21), while "components:shadcn" (51) leaves
+ * "components" (40) alone, because those two really are different ideas.
+ */
+const MIN_DOMINANCE = 5
+
+const tagParts = (name: string) =>
+  new Set(
+    name
+      .toLowerCase()
+      .split(/[^a-z0-9+#]+/)
+      .filter(Boolean),
+  )
+
+const isNarrowerThan = (a: Set<string>, b: Set<string>) =>
+  a.size < b.size && [...a].every((part) => b.has(part))
+
+/**
+ * Collapses the near-duplicates a hand-grown vocabulary picks up, so the model
+ * is never shown two names for one idea and cannot pick the rarer one.
+ *
+ * Two rules, both settled by use count:
+ * - Same words however they are spelled or separated — "CSS" and "css",
+ *   "app:mac" and "mac:app".
+ * - A tag whose words are a subset of a far more used tag — "mac" and "app"
+ *   standing next to "app:mac".
+ *
+ * `like:` tags mirror favourites on other services, so they are never ours to
+ * suggest.
+ */
+const usableTags = (tags: MetaTag[]) => {
+  const ranked = tags
+    .filter(
+      (item) =>
+        item.tag && item.tag !== 'Untagged' && !item.tag.startsWith('like:'),
+    )
+    .map((item) => ({
+      count: item.count ?? 0,
+      name: item.tag as string,
+      parts: tagParts(item.tag as string),
+    }))
+    .sort((a, b) => b.count - a.count)
+
+  // Most-used first, so the first spelling of each idea is the one that stays.
+  const bySignature = new Map<string, (typeof ranked)[number]>()
+
+  for (const tag of ranked) {
+    const signature = [...tag.parts].sort().join(' ')
+
+    if (!bySignature.has(signature)) {
+      bySignature.set(signature, tag)
+    }
+  }
+
+  const unique = [...bySignature.values()]
+
+  return unique
+    .filter(
+      (tag) =>
+        !unique.some(
+          (other) =>
+            other !== tag &&
+            other.count >= MIN_DOMINANCE * Math.max(tag.count, 1) &&
+            isNarrowerThan(tag.parts, other.parts),
+        ),
+    )
+    .map((tag) => tag.name)
+}
+
+/**
  * The model sees a shortlist, not the whole vocabulary. Handing it ~950 tag
  * names made it answer with popular unrelated ones — a mountain bike wheel
  * video came back tagged "golf" and "gaming". With ~50 candidates it picks
  * from what is in front of it.
- *
- * `existingTags` arrives most-used first, which is the order `/api/tags`
- * returns, so the tail of the shortlist is the user's habitual tags.
  */
-const buildShortlist = (existingTags: string[], text: string) => [
+const buildShortlist = (tagNames: string[], text: string) => [
   ...new Set([
-    ...matchTagNames(text, existingTags),
-    ...existingTags.slice(0, POPULAR_TAG_COUNT),
+    ...matchTagNames(text, tagNames),
+    ...tagNames.slice(0, POPULAR_TAG_COUNT),
   ]),
 ]
 
@@ -100,13 +169,14 @@ export const classifyBookmark = async ({
   title: string
   description: string
   url: string
-  existingTags: string[]
+  existingTags: MetaTag[]
   currentType: string
 }): Promise<AiClassifyResponse> => {
   const normalizedCurrentType = isBookmarkType(currentType)
     ? currentType
     : 'link'
-  const candidates = buildShortlist(existingTags, `${title} ${description}`)
+  const tagNames = usableTags(existingTags)
+  const candidates = buildShortlist(tagNames, `${title} ${description}`)
 
   const messages = [
     {
@@ -135,7 +205,7 @@ export const classifyBookmark = async ({
   // `existingTags` lists first.
   const canonical = new Map<string, string>()
 
-  for (const tag of existingTags) {
+  for (const tag of tagNames) {
     const key = tag.toLowerCase()
 
     if (!canonical.has(key)) {

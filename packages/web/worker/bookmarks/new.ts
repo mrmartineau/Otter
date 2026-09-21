@@ -104,22 +104,12 @@ const autoClassify = async (
   },
   dbTags: MetaTag[],
 ) => {
-  // `like:` tags mirror favourites on other services, so they are never ours to
-  // suggest. The classifier wants the rest most-used first.
-  const existingTags = dbTags
-    .filter(
-      (item) =>
-        item.tag && item.tag !== 'Untagged' && !item.tag.startsWith('like:'),
-    )
-    .sort((a, b) => (b.count ?? 0) - (a.count ?? 0))
-    .map((item) => item.tag as string)
-
   try {
     const result = await classifyBookmark({
       context,
       currentType: fields.type ?? 'link',
       description: fields.description ?? '',
-      existingTags,
+      existingTags: dbTags,
       title: fields.title ?? '',
       url: fields.url,
     })

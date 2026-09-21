@@ -5,12 +5,24 @@ import { classifyBookmark } from './classify'
 const aiRun = vi.fn()
 const context = { env: { AI: { run: aiRun } } } as unknown as Context
 
-// Most-used first, the order `/api/tags` returns.
+// Counts, not order, decide which spelling of an idea survives.
 const existingTags = [
-  ...Array.from({ length: 60 }, (_, index) => `popular-${index}`),
-  'CLI',
-  'ghostty',
-  'cli',
+  { count: 349, tag: 'app:mac' },
+  { count: 23, tag: 'mac' },
+  { count: 21, tag: 'app' },
+  { count: 2, tag: 'mac:app' },
+  { count: 51, tag: 'components:shadcn' },
+  { count: 40, tag: 'components' },
+  { count: 141, tag: 'CSS' },
+  { count: 24, tag: 'css' },
+  { count: 46, tag: 'CLI' },
+  { count: 1, tag: 'ghostty' },
+  { count: 12, tag: 'like:youtube' },
+  { count: 99, tag: 'Untagged' },
+  ...Array.from({ length: 60 }, (_, index) => ({
+    count: 60 - index,
+    tag: `popular-${index}`,
+  })),
 ]
 
 const classify = (tags: string[], type = 'link') => {
@@ -31,14 +43,49 @@ beforeEach(() => {
 })
 
 describe('classifyBookmark', () => {
+  const shortlist = () =>
+    aiRun.mock.calls[0][1].response_format.json_schema.properties.tags.items
+      .enum as string[]
+
   it('shows the model a shortlist, not the whole vocabulary', async () => {
     await classify([])
 
-    const prompt = aiRun.mock.calls[0][1].messages[0].content as string
+    expect(shortlist()).toContain('CLI')
+    expect(shortlist()).toContain('popular-0')
+    expect(shortlist()).not.toContain('popular-40')
+  })
 
-    // Word matches ride at the front, then the 40 most-used tags.
-    expect(prompt).toContain('CLI, ghostty, cli, popular-0')
-    expect(prompt).not.toContain('popular-40')
+  it('offers app:mac and never the pieces it is made of', async () => {
+    await classify([])
+
+    // 349 uses against 23, 21 and 2, so these are three spellings of one idea.
+    expect(shortlist()).toContain('app:mac')
+    expect(shortlist()).not.toContain('mac')
+    expect(shortlist()).not.toContain('app')
+    expect(shortlist()).not.toContain('mac:app')
+  })
+
+  it('keeps a broad tag that is genuinely its own idea', async () => {
+    await classify([])
+
+    // components (40) against components:shadcn (51) is nowhere near 5x, so
+    // both survive — not every component library is shadcn.
+    expect(shortlist()).toContain('components')
+    expect(shortlist()).toContain('components:shadcn')
+  })
+
+  it('offers one spelling of a tag, the most-used one', async () => {
+    await classify([])
+
+    expect(shortlist()).toContain('CSS')
+    expect(shortlist()).not.toContain('css')
+  })
+
+  it('never offers like: tags or Untagged', async () => {
+    await classify([])
+
+    expect(shortlist()).not.toContain('like:youtube')
+    expect(shortlist()).not.toContain('Untagged')
   })
 
   it('limits the answer to the shortlist', async () => {
@@ -46,7 +93,6 @@ describe('classifyBookmark', () => {
 
     const schema = aiRun.mock.calls[0][1].response_format.json_schema
 
-    expect(schema.properties.tags.items.enum).toContain('CLI')
     expect(schema.properties.tags.maxItems).toBe(5)
   })
 
@@ -58,10 +104,10 @@ describe('classifyBookmark', () => {
   })
 
   it('keeps the most-used spelling when the user has both', async () => {
-    // "CLI" is used more than "cli", so it is the one that comes back.
-    const result = await classify(['cli', 'CLI'])
+    // "CSS" is used more than "css", so it is the one that comes back.
+    const result = await classify(['css', 'CSS'])
 
-    expect(result.tags).toEqual([{ isNew: false, name: 'CLI' }])
+    expect(result.tags).toEqual([{ isNew: false, name: 'CSS' }])
   })
 
   it('drops bookmark types, like: tags and repeats', async () => {
