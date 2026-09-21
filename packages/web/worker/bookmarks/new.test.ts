@@ -12,10 +12,46 @@ const dbTags = [{ count: 3, tag: 'design' }]
 
 const context = { env: { AI: { run: aiRun } } } as unknown as Context
 
+/** The system prompt each AI call was given, in call order. */
+const systemPrompts = () =>
+  aiRun.mock.calls.map((call) => call[1].messages[0].content as string)
+
+const promptFor = (kind: 'title' | 'description') =>
+  systemPrompts().find((content) =>
+    content.startsWith(`You are a web page ${kind} rewriter`),
+  )
+
+/** Routes each call by its system prompt, the way the real models differ. */
+const stubAi = ({
+  title = 'Rewritten title',
+  description = 'Rewritten description',
+  tags = ['design'],
+  type = 'article',
+}: {
+  title?: string
+  description?: string
+  tags?: string[]
+  type?: string
+} = {}) => {
+  aiRun.mockImplementation(async (_model, options) => {
+    const systemPrompt = options.messages[0].content as string
+
+    if (systemPrompt.startsWith('You are a web page title rewriter')) {
+      return { response: title }
+    }
+
+    if (systemPrompt.startsWith('You are a web page description rewriter')) {
+      return { response: description }
+    }
+
+    return { response: { tags, type } }
+  })
+}
+
 beforeEach(() => {
   scrapeMetadata.mockReset()
   aiRun.mockReset()
-  aiRun.mockResolvedValue({ response: { tags: ['design'], type: 'article' } })
+  stubAi()
 })
 
 describe('scrapedBookmark', () => {
@@ -38,12 +74,90 @@ describe('scrapedBookmark', () => {
     )
 
     expect(result).toMatchObject({
-      description: 'Scraped description',
-      title: 'Scraped title about design',
       type: 'article',
       url: 'https://example.com/post',
     })
     expect(result.tags).toContain('design')
+  })
+
+  it('rewrites the scraped title and description', async () => {
+    scrapeMetadata.mockResolvedValue({
+      description: 'Get up and running. - ollama/ollama',
+      title: 'GitHub - ollama/ollama: Get up and running.',
+      url: 'https://github.com/ollama/ollama',
+      urlType: 'link',
+    })
+    stubAi({
+      description: 'Get up and running.',
+      title: 'ollama/ollama – Get up and running on GitHub.',
+    })
+
+    const result = await scrapedBookmark(
+      'https://github.com/ollama/ollama',
+      {},
+      dbTags,
+      context,
+    )
+
+    expect(result.title).toBe('ollama/ollama – Get up and running on GitHub.')
+    expect(result.description).toBe('Get up and running.')
+  })
+
+  it('hands the rewritten title to the description rewriter', async () => {
+    scrapeMetadata.mockResolvedValue({
+      description: 'Scraped description',
+      title: 'Messy | Title',
+      url: 'https://example.com/',
+      urlType: 'link',
+    })
+    stubAi({ title: 'Clean title' })
+
+    await scrapedBookmark('https://example.com/', {}, dbTags, context)
+
+    // The description prompt embeds the title so it can avoid repeating it.
+    // It has to be the rewritten one, which means it ran second.
+    expect(promptFor('description')).toContain('Clean title')
+    expect(promptFor('description')).not.toContain('Messy | Title')
+  })
+
+  it('classifies on the scraped wording, not the rewritten wording', async () => {
+    scrapeMetadata.mockResolvedValue({
+      description: 'Scraped description',
+      title: 'GitHub - owner/repo: a thing',
+      url: 'https://github.com/owner/repo',
+      urlType: 'link',
+    })
+    stubAi({ title: 'owner/repo – a thing' })
+
+    await scrapedBookmark('https://github.com/owner/repo', {}, dbTags, context)
+
+    const classifyPrompt = systemPrompts().find((content) =>
+      content.startsWith('You tag saved web pages'),
+    )
+
+    expect(classifyPrompt).toBeDefined()
+    // The classifier is one of three calls, and it never sees "owner/repo –".
+    expect(aiRun).toHaveBeenCalledTimes(3)
+  })
+
+  it('keeps the scraped wording when a rewrite fails', async () => {
+    scrapeMetadata.mockResolvedValue({
+      description: 'Scraped description',
+      title: 'Scraped title',
+      url: 'https://example.com/',
+      urlType: 'link',
+    })
+    aiRun.mockRejectedValue(new Error('AI unavailable'))
+
+    const result = await scrapedBookmark(
+      'https://example.com/',
+      {},
+      dbTags,
+      context,
+    )
+
+    expect(result.title).toBe('Scraped title')
+    expect(result.description).toBe('Scraped description')
   })
 
   it('takes the type the classifier picks over the one guessed from the url', async () => {
@@ -53,7 +167,7 @@ describe('scrapedBookmark', () => {
       url: 'https://example.com/miso-ramen',
       urlType: 'link',
     })
-    aiRun.mockResolvedValue({ response: { tags: [], type: 'recipe' } })
+    stubAi({ tags: [], type: 'recipe' })
 
     const result = await scrapedBookmark(
       'https://example.com/miso-ramen',
@@ -90,7 +204,7 @@ describe('scrapedBookmark', () => {
     scrapeMetadata.mockRejectedValue(
       new Error('Status 403 requesting https://cititec.com/'),
     )
-    aiRun.mockResolvedValue({ response: { tags: [], type: 'link' } })
+    stubAi({ tags: [], title: 'Cititec', type: 'link' })
 
     const result = await scrapedBookmark(
       'https://cititec.com/',

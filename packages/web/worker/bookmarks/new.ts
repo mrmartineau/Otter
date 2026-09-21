@@ -9,6 +9,9 @@ import { getErrorMessage } from '@/utils/get-error-message'
 import { matchTags } from '@/utils/matchTags'
 import { bookmarks } from '../../db/schema'
 import { classifyBookmark } from '../ai/classify'
+import { descriptionSystemPrompt } from '../ai/description'
+import { generateText } from '../ai/generateResponse'
+import { titleSystemPrompt } from '../ai/title'
 import { type RequestContext, requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 import { scrapeMetadata } from '../scraper/index'
@@ -140,6 +143,47 @@ const autoClassify = async (
 }
 
 /**
+ * Runs the scraped wording through the same two rewriters as the sparkle
+ * buttons in the bookmark form.
+ *
+ * The order matters and the two cannot be merged into one call: the
+ * description prompt is handed the title so it can avoid repeating it, so it
+ * needs the rewritten title, not the scraped one.
+ */
+const rewriteFields = async (
+  context: HonoContext,
+  title?: string | null,
+  description?: string | null,
+) => {
+  try {
+    const nextTitle = title
+      ? await generateText({
+          context,
+          prompt: title,
+          systemPrompt: titleSystemPrompt,
+        })
+      : ''
+    const finalTitle = nextTitle || title
+    const nextDescription = description
+      ? await generateText({
+          context,
+          prompt: description,
+          systemPrompt: descriptionSystemPrompt(finalTitle ?? undefined),
+        })
+      : ''
+
+    return {
+      description: nextDescription || description,
+      title: finalTitle,
+    }
+  } catch (error) {
+    console.warn(`Rewrite failed: ${getErrorMessage(error)}`)
+
+    return { description, title }
+  }
+}
+
+/**
  * Builds the bookmark fields for a URL, scraping the page for details.
  *
  * A scrape can fail for reasons that have nothing to do with the user: plenty
@@ -155,47 +199,55 @@ export const scrapedBookmark = async (
   context: HonoContext,
 ): Promise<Partial<Bookmark>> => {
   const tags = rest.tags ?? []
+  let base: Partial<Bookmark>
 
   try {
     const metadata = await scrapeMetadata(url)
-    const auto = await autoClassify(
-      context,
-      {
-        description: metadata.description ?? rest.description,
-        note: rest.note,
-        title: metadata.title ?? rest.title,
-        type: metadata.urlType,
-        url: metadata.cleaned_url || metadata.url || url,
-      },
-      dbTags,
-    )
 
-    return {
+    base = {
       ...rest,
       description: metadata.description ?? rest.description,
       feed: metadata.feeds,
       image: metadata.image ?? rest.image,
-      tags: [...new Set([...auto.tags, ...tags])],
       title: metadata.title ?? rest.title,
-      type: auto.type ?? metadata.urlType,
-      url: metadata.cleaned_url || metadata.url,
+      type: metadata.urlType,
+      url: metadata.cleaned_url || metadata.url || url,
     }
   } catch (error) {
     console.warn(`Scrape failed for ${url}: ${getErrorMessage(error)}`)
 
-    const fallbackType = (rest.type as BookmarkType) ?? linkType(url, false)
-    const auto = await autoClassify(
-      context,
-      { ...rest, type: fallbackType, url },
-      dbTags,
-    )
-
-    return {
+    base = {
       ...rest,
-      tags: [...new Set([...auto.tags, ...tags])],
-      type: auto.type ?? fallbackType,
+      type: (rest.type as BookmarkType) ?? linkType(url, false),
       url,
     }
+  }
+
+  // The classifier reads the scraped wording, not the rewritten wording. The
+  // site name that the title rewriter moves or drops is often the strongest
+  // hint about what the page is. Neither call needs the other's answer, so
+  // they run together rather than one after the other.
+  const [rewritten, auto] = await Promise.all([
+    rewriteFields(context, base.title, base.description),
+    autoClassify(
+      context,
+      {
+        description: base.description,
+        note: base.note,
+        title: base.title,
+        type: base.type as BookmarkType | null,
+        url: base.url ?? url,
+      },
+      dbTags,
+    ),
+  ])
+
+  return {
+    ...base,
+    description: rewritten.description,
+    tags: [...new Set([...auto.tags, ...tags])],
+    title: rewritten.title,
+    type: auto.type ?? (base.type as BookmarkType | undefined),
   }
 }
 
