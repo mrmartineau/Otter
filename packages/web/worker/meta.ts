@@ -197,7 +197,11 @@ export const renameTag = async (context: HonoContext) => {
       new_tag?: string
       old_tag?: string
     }
-    const oldTag = body.old_tag?.trim()
+    // `old_tag` has to match what is stored, character for character. Trimming
+    // it made a tag saved with a stray space (" components") impossible to
+    // rename, because the lookup went hunting for the trimmed spelling.
+    // `new_tag` is trimmed because a new tag should never be born with one.
+    const oldTag = body.old_tag
     const newTag = body.new_tag?.trim()
 
     if (!oldTag || !newTag) {
