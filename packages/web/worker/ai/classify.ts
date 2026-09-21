@@ -61,7 +61,7 @@ ${candidates.join(', ')}
 
 If, and only if, no tag in the list fits, put one new tag in "newTags". Write it lowercase, one or two words, kebab-case for two words.
 
-Also pick the content type. The type guessed from the URL is "${currentType}". Keep it unless the page is clearly something else.
+Also pick the content type. "${currentType}" is only a guess from the shape of the URL, so change it whenever the title or description says otherwise. A recipe page is "recipe", a thing for sale is "product", a blog post is "article", a repository is "link".
 
 Rules:
 - Never answer with a tag that is close to one in the list. Use the list one.
@@ -131,7 +131,17 @@ export const classifyBookmark = async ({
 
   // Match case-insensitively but answer with the spelling already in the
   // database, or picking "cli" when the user has "CLI" saves a second tag.
-  const canonical = new Map(existingTags.map((tag) => [tag.toLowerCase(), tag]))
+  // Where both spellings exist, the most-used one wins, which is the one
+  // `existingTags` lists first.
+  const canonical = new Map<string, string>()
+
+  for (const tag of existingTags) {
+    const key = tag.toLowerCase()
+
+    if (!canonical.has(key)) {
+      canonical.set(key, tag)
+    }
+  }
   const seen = new Set<string>()
   const tags: AiClassifyResponse['tags'] = []
 

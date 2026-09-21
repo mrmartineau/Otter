@@ -10,6 +10,7 @@ const existingTags = [
   ...Array.from({ length: 60 }, (_, index) => `popular-${index}`),
   'CLI',
   'ghostty',
+  'cli',
 ]
 
 const classify = (tags: string[], type = 'link') => {
@@ -36,7 +37,7 @@ describe('classifyBookmark', () => {
     const prompt = aiRun.mock.calls[0][1].messages[0].content as string
 
     // Word matches ride at the front, then the 40 most-used tags.
-    expect(prompt).toContain('CLI, ghostty, popular-0')
+    expect(prompt).toContain('CLI, ghostty, cli, popular-0')
     expect(prompt).not.toContain('popular-40')
   })
 
@@ -52,6 +53,13 @@ describe('classifyBookmark', () => {
   it('answers with the spelling already in the database', async () => {
     // The model says "cli"; saving that would sit beside the user's "CLI".
     const result = await classify(['cli'])
+
+    expect(result.tags).toEqual([{ isNew: false, name: 'CLI' }])
+  })
+
+  it('keeps the most-used spelling when the user has both', async () => {
+    // "CLI" is used more than "cli", so it is the one that comes back.
+    const result = await classify(['cli', 'CLI'])
 
     expect(result.tags).toEqual([{ isNew: false, name: 'CLI' }])
   })
