@@ -202,6 +202,10 @@ struct SearchView: View {
     @State private var reader: ArticleReaderRequest?
 
     var body: some View {
+        themedBody.otterTheme()
+    }
+
+    private var themedBody: some View {
         NavigationStack {
             List {
                 ForEach(model.results) { bookmark in
@@ -216,6 +220,7 @@ struct SearchView: View {
                         onTogglePublic: { Task { await model.togglePublic(bookmark) } },
                         onTrash: { Task { await model.trash(bookmark) } }
                     )
+                    .listRowBackground(Color.clear)
                 }
 
                 if model.canLoadMore {
@@ -225,9 +230,11 @@ struct SearchView: View {
                         Spacer()
                     }
                     .task { await model.loadMore() }
+                    .listRowBackground(Color.clear)
                 }
             }
             .listStyle(.plain)
+            .otterTheme()
             .overlay { status }
             .navigationTitle("Search")
             .toolbar { OtterToolbarItems() }

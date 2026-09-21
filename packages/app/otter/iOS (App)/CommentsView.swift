@@ -156,15 +156,18 @@ struct CommentsView: View {
                     Text(item.meta).font(.caption).foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 4)
+                .listRowBackground(Color.clear)
             }
 
             ForEach(rows, id: \.comment.id) { row in
                 CommentRow(comment: row.comment, depth: row.depth, isCollapsed: model.collapsed.contains(row.comment.id))
                     .contentShape(Rectangle())
+                    .listRowBackground(Color.clear)
                     .onTapGesture { withAnimation(.snappy) { model.toggle(row.comment) } }
             }
         }
         .listStyle(.plain)
+        .otterTheme()
         .overlay {
             if model.isLoading {
                 ProgressView()

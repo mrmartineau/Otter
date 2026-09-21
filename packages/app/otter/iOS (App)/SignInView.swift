@@ -9,6 +9,10 @@ struct SignInView: View {
     @ObservedObject var model: OtterAppModel
 
     var body: some View {
+        themedBody.otterTheme()
+    }
+
+    private var themedBody: some View {
         VStack(spacing: 24) {
             Spacer()
 

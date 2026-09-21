@@ -52,6 +52,10 @@ struct BookmarkFormView: View {
     }
 
     var body: some View {
+        themedBody.otterTheme()
+    }
+
+    private var themedBody: some View {
         NavigationStack {
             Form {
                 if model.isSignedIn {
@@ -84,6 +88,7 @@ struct BookmarkFormView: View {
                     }
                 }
             }
+            .otterTheme()
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

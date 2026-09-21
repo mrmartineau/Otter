@@ -171,6 +171,7 @@
 				"OtterClient+Reader.swift",
 				OtterCredentials.swift,
 				OtterOAuth.swift,
+				OtterTheme.swift,
 				ReadingItem.swift,
 				RemoteImage.swift,
 			);
@@ -191,6 +192,7 @@
 				"OtterClient+Reader.swift",
 				OtterCredentials.swift,
 				OtterOAuth.swift,
+				OtterTheme.swift,
 				ReadingItem.swift,
 				RemoteImage.swift,
 			);

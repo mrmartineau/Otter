@@ -72,7 +72,7 @@ struct FeedsView: View {
         if currentSourceIDs.contains(where: store.refreshing.contains) {
             Text("Syncing\u{2026}")
         } else if let date = store.lastRefresh(forSources: currentSourceIDs) {
-            Text("Updated ") + Text(date, format: .relative(presentation: .numeric, unitsStyle: .abbreviated))
+            Text("Updated ") + Text(date, format: .relative(presentation: .named, unitsStyle: .abbreviated))
         }
     }
 
@@ -233,6 +233,7 @@ struct FeedsView: View {
                     sourceTitle: isMerged ? store.title(forSource: item.sourceID) : nil,
                     onComments: { commentsItem = item }
                 )
+                    .listRowBackground(Color.clear)
                     .contentShape(Rectangle())
                     .onTapGesture { open(item) }
                     .swipeActions(edge: .trailing) {
@@ -284,6 +285,7 @@ struct FeedsView: View {
             }
         }
         .listStyle(.plain)
+        .otterTheme()
         .overlay {
             if items.isEmpty {
                 if store.refreshing.contains(current) {

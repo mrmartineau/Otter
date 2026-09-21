@@ -32,9 +32,11 @@ struct TagsView: View {
                             .monospacedDigit()
                     }
                 }
+                .listRowBackground(Color.clear)
             }
         }
         .listStyle(.plain)
+        .otterTheme()
         .searchable(text: $query, prompt: "Filter tags")
         .overlay {
             if store.isLoading, store.tags.isEmpty {

@@ -22,6 +22,7 @@ struct LibraryView: View {
                 Button("Sign in") { model.isSignInPresented = true }
                     .buttonStyle(.borderedProminent)
             }
+            .otterTheme()
         }
     }
 }

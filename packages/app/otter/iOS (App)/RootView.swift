@@ -17,6 +17,10 @@ struct RootView: View {
     @AppStorage("tab") private var tab = "read"
 
     var body: some View {
+        themedBody.otterTheme()
+    }
+
+    private var themedBody: some View {
         Group {
             if model.isRestoring {
                 LaunchLoadingView()

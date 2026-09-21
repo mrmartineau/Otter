@@ -99,6 +99,7 @@ struct ReadingListView: View {
                         .searchable(text: $query, prompt: "Search saved articles")
                 }
             }
+            .otterTheme()
             .navigationTitle(showArchived ? "Archive" : "Read later")
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
@@ -155,6 +156,7 @@ struct ReadingListView: View {
         List {
             ForEach(visible) { item in
                 ReadingRow(item: item)
+                    .listRowBackground(Color.clear)
                     .contentShape(Rectangle())
                     .onTapGesture { reader = item }
                     .swipeActions(edge: .trailing) {

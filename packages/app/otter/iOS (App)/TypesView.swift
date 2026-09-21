@@ -26,9 +26,11 @@ struct TypesView: View {
                             .monospacedDigit()
                     }
                 }
+                .listRowBackground(Color.clear)
             }
         }
         .listStyle(.plain)
+        .otterTheme()
         .overlay {
             if store.isLoading, store.types.isEmpty {
                 ProgressView()

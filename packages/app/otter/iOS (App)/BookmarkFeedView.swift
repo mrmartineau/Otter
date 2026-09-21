@@ -51,6 +51,7 @@ struct BookmarkFeedView: View {
                         }
                         .padding(.vertical, 2)
                     }
+                    .listRowBackground(Color.clear)
                 }
             }
 
@@ -66,6 +67,7 @@ struct BookmarkFeedView: View {
                     onTogglePublic: { Task { await model.togglePublic(bookmark) } },
                     onTrash: { Task { await model.trash(bookmark) } }
                 )
+                .listRowBackground(Color.clear)
             }
 
             if model.canLoadMore {
@@ -75,9 +77,11 @@ struct BookmarkFeedView: View {
                     Spacer()
                 }
                 .task { await model.loadMore() }
+                .listRowBackground(Color.clear)
             }
         }
         .listStyle(.plain)
+        .otterTheme()
         .overlay {
             if model.isLoading, model.bookmarks.isEmpty {
                 ProgressView()

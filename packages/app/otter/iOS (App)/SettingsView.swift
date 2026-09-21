@@ -10,6 +10,7 @@ struct SettingsView: View {
     @AppStorage("reader.textSize") private var textSize = ReaderTextSize.medium
     @AppStorage("reader.font") private var fontDesign = ReaderFont.system
     @AppStorage("feeds.openInReader") private var openInReader = true
+    @AppStorage(DarkTheme.storageKey) private var darkTheme = DarkTheme.soft
 
     var body: some View {
         NavigationStack {
@@ -26,6 +27,17 @@ struct SettingsView: View {
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
+                }
+
+                Section {
+                    Picker("Dark mode", selection: $darkTheme) {
+                        ForEach(DarkTheme.allCases) { Text($0.label).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Appearance")
+                } footer: {
+                    Text(darkTheme.detail)
                 }
 
                 Section {
@@ -62,6 +74,7 @@ struct SettingsView: View {
                     Link("Otter on GitHub", destination: URL(string: "https://github.com/mrmartineau/otter")!)
                 }
             }
+            .otterTheme()
             .navigationTitle("Settings")
         }
     }

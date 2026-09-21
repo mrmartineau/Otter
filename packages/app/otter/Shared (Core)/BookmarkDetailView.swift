@@ -24,6 +24,10 @@ struct BookmarkDetailView: View {
     @State private var didCopy = false
 
     var body: some View {
+        themedBody.otterTheme()
+    }
+
+    private var themedBody: some View {
         List {
             imageSection
             linkSection

@@ -142,6 +142,10 @@ struct ArticleReaderView: View {
     }
 
     var body: some View {
+        themedBody.otterTheme()
+    }
+
+    private var themedBody: some View {
         NavigationStack {
             Group {
                 if model.isLoading, model.article == nil {
@@ -177,6 +181,7 @@ struct ArticleReaderView: View {
                     }
                 }
             }
+            .otterTheme()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
