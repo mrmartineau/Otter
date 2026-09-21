@@ -71,6 +71,10 @@ struct FeedsView: View {
     private var syncStatus: some View {
         if currentSourceIDs.contains(where: store.refreshing.contains) {
             Text("Syncing\u{2026}")
+        } else if currentSourceIDs.contains(where: { store.errorsBySource[$0] != nil }) {
+            // Old stories are still on screen, so say why they are old.
+            Text("Couldn't refresh")
+                .foregroundStyle(.orange)
         } else if let date = store.lastRefresh(forSources: currentSourceIDs) {
             Text("Updated ") + Text(date, format: .relative(presentation: .named, unitsStyle: .abbreviated))
         }

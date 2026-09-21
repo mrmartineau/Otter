@@ -27,8 +27,8 @@ final class FeedStore: ObservableObject {
     @Published private(set) var starredIDs: Set<String> = []
     /// Starred items outlive their feed, so they are kept whole.
     @Published private(set) var starred: [FeedItem] = []
-    @Published private(set) var lastRefresh: Date?
-    /// When each source last came back with items, so a screen can say so.
+    /// When each source last came back with items — staleness and the
+    /// "Updated …" line both read this, so a failed fetch counts as neither.
     @Published private(set) var lastRefreshBySource: [String: Date] = [:]
 
     private let cache = DiskCache(fileName: "feeds.json")
@@ -37,7 +37,6 @@ final class FeedStore: ObservableObject {
     private struct Snapshot: Codable {
         var items: [String: [FeedItem]]
         var starred: [FeedItem]
-        var lastRefresh: Date?
         /// Optional so snapshots written before this existed still decode.
         var lastRefreshBySource: [String: Date]?
     }
@@ -51,7 +50,6 @@ final class FeedStore: ObservableObject {
         if let snapshot = cache.load(Snapshot.self) {
             itemsBySource = snapshot.items
             starred = snapshot.starred
-            lastRefresh = snapshot.lastRefresh
             lastRefreshBySource = snapshot.lastRefreshBySource ?? [:]
         }
     }
@@ -95,25 +93,30 @@ final class FeedStore: ObservableObject {
         ids.compactMap { lastRefreshBySource[$0] }.min()
     }
 
-    var isStale: Bool {
-        guard let lastRefresh else { return true }
-        return Date().timeIntervalSince(lastRefresh) > 10 * 60
+    /// A source nobody has heard from in ten minutes, or ever.
+    func isStale(_ source: any FeedSource) -> Bool {
+        guard let last = lastRefreshBySource[source.id] else { return true }
+        return Date().timeIntervalSince(last) > 10 * 60
     }
 
     // MARK: - Refresh
 
+    /// Fetches only the sources that are actually stale, so one broken feed
+    /// retrying does not drag every healthy one along with it.
     func refreshIfStale() async {
-        if isStale { await refreshAll() }
+        await refresh(sources.filter(isStale))
     }
 
     func refreshAll() async {
+        await refresh(sources)
+    }
+
+    private func refresh(_ sources: [any FeedSource]) async {
         await withTaskGroup(of: Void.self) { group in
             for source in sources {
                 group.addTask { await self.refresh(source) }
             }
         }
-        lastRefresh = Date()
-        persist()
     }
 
     func refresh(_ source: any FeedSource) async {
@@ -125,10 +128,13 @@ final class FeedStore: ObservableObject {
             itemsBySource[source.id] = items
             errorsBySource[source.id] = nil
             lastRefreshBySource[source.id] = Date()
+            persist()
         } catch {
+            // Leaving the tab cancels the fetch. That is not a failure, and
+            // reporting it would paper over the last real error.
+            guard !Task.isCancelled else { return }
             errorsBySource[source.id] = error.localizedDescription
         }
-        persist()
     }
 
     // MARK: - State
@@ -235,7 +241,6 @@ final class FeedStore: ObservableObject {
         let snapshot = Snapshot(
             items: itemsBySource,
             starred: starred,
-            lastRefresh: lastRefresh,
             lastRefreshBySource: lastRefreshBySource
         )
         cache.store((try? JSONEncoder().encode(snapshot)) ?? Data())

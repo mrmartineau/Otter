@@ -16,7 +16,12 @@ nonisolated protocol FeedSource: Sendable {
 nonisolated enum FeedHTTP {
     static let session: URLSession = {
         let config = URLSessionConfiguration.default
-        config.httpAdditionalHeaders = ["User-Agent": "OtterReader/1.0 (+https://github.com/mrmartineau/otter)"]
+        config.httpAdditionalHeaders = [
+            "User-Agent": "OtterReader/1.0 (+https://github.com/mrmartineau/otter)",
+            // `reloadIgnoringLocalCacheData` only skips *this* device's cache.
+            // Feeds sit behind CDNs, so ask those to revalidate too.
+            "Cache-Control": "no-cache",
+        ]
         config.timeoutIntervalForRequest = 20
         // Feeds ship long `Cache-Control` lifetimes, so the default protocol
         // cache keeps handing back the copy it already has — pull to refresh
