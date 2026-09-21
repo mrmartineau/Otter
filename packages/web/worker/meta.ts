@@ -185,6 +185,73 @@ export const getTags = async (context: HonoContext) => {
   }
 }
 
+/**
+ * DELETE /api/tags
+ *
+ * Drops a tag from every one of the caller's bookmarks. The tag name comes in
+ * the body rather than the path because a tag may hold any character, and a
+ * path that cannot express every value is a tag nobody can reach.
+ *
+ * Renaming was the only way to retire a tag before this, which meant folding
+ * it into a tag you did not want on those bookmarks.
+ */
+export const deleteTag = async (context: HonoContext) => {
+  try {
+    // Removing a tag edits bookmarks, so this needs the write scope rather
+    // than the profile:read the read-only meta routes share.
+    const requestContext = await requireRequestContext(context, [
+      'bookmarks:write',
+    ])
+
+    if (requestContext instanceof Response) {
+      return requestContext
+    }
+
+    const userId = requestContext.user?.id
+
+    if (!userId) {
+      return errorResponse({ reason: 'Not authorised', status: 401 })
+    }
+
+    const body = (await context.req.json()) as { tag?: string }
+    // Matched character for character, so a tag stored with a stray space is
+    // reachable. See the note in renameTag.
+    const tag = body.tag
+
+    if (!tag) {
+      return errorResponse({
+        error: 'Missing tag name',
+        reason: 'tag is required',
+        status: 400,
+      })
+    }
+
+    // Trashed bookmarks included, for the same reason renameTag covers them.
+    // A bookmark restored from the trash should not resurrect a retired tag.
+    const result = await requestContext.db.execute(sql`
+      UPDATE ${bookmarks}
+      SET tags = nullif(array_remove(${bookmarks.tags}, ${tag}), '{}'::text[]),
+          modified_at = timezone('utc', now())
+      WHERE ${bookmarks.user} = ${userId}
+        AND ${tag} = ANY(${bookmarks.tags})
+    `)
+
+    return new Response(
+      JSON.stringify({
+        count: result.rowCount ?? 0,
+        error: null,
+      }),
+      { headers: API_HEADERS, status: 200 },
+    )
+  } catch (error) {
+    return errorResponse({
+      error: getErrorMessage(error),
+      reason: 'Problem deleting tag',
+      status: 400,
+    })
+  }
+}
+
 export const renameTag = async (context: HonoContext) => {
   try {
     const auth = await getAuthed(context)

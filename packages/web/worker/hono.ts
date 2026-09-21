@@ -55,6 +55,7 @@ import {
 } from './media/media'
 import { getMediaSearch } from './media/mediaSearch'
 import {
+  deleteTag,
   getCollectionBookmarks,
   getCollectionsTags,
   getMeta,
@@ -361,6 +362,9 @@ api.get('/tags', async (c) => {
 })
 api.patch('/tags/rename', async (c) => {
   return await renameTag(c)
+})
+api.delete('/tags', async (c) => {
+  return await deleteTag(c)
 })
 api.get('/collections-tags', async (c) => {
   return await getCollectionsTags(c)
