@@ -2,8 +2,9 @@
 //  ShareRootView.swift
 //  Otter Share
 //
-//  Two actions: Read later (one tap, runs extraction) and Bookmark (the full
-//  form). Both talk to the API directly with the shared keychain token.
+//  Three actions: Quick save (one tap, the server scrapes and classifies),
+//  Read later (one tap, runs extraction) and Bookmark (the full form). All
+//  three talk to the API directly with the shared keychain token.
 //
 //  ponytail: no offline queue — the extension has no App Group container. A
 //  failed save shows the error; add the queue when an App Group exists.
@@ -12,12 +13,16 @@
 import SwiftUI
 
 struct ShareRootView: View {
+    /// Which one-tap button is spinning, so only that button shows progress.
+    private enum Action { case quickSave, readLater }
+
     let url: String
     let onOpenApp: () -> Void
     let onFinish: () -> Void
 
     @State private var showForm = false
     @State private var isSaving = false
+    @State private var savingAction: Action?
     @State private var isSignedIn = true
     @State private var error: String?
 
@@ -46,15 +51,28 @@ struct ShareRootView: View {
                             .buttonStyle(.borderedProminent)
                     } else {
                         Button {
-                            Task { await readLater() }
+                            Task { await save(.quickSave) }
                         } label: {
-                            if isSaving {
+                            if savingAction == .quickSave {
+                                ProgressView().frame(maxWidth: .infinity)
+                            } else {
+                                Label("Quick save", systemImage: "bolt").frame(maxWidth: .infinity)
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                        .disabled(isSaving)
+
+                        Button {
+                            Task { await save(.readLater) }
+                        } label: {
+                            if savingAction == .readLater {
                                 ProgressView().frame(maxWidth: .infinity)
                             } else {
                                 Label("Read later", systemImage: "book").frame(maxWidth: .infinity)
                             }
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.bordered)
                         .controlSize(.large)
                         .disabled(isSaving)
 
@@ -90,15 +108,22 @@ struct ShareRootView: View {
         }
     }
 
-    private func readLater() async {
+    private func save(_ action: Action) async {
         isSaving = true
+        savingAction = action
         error = nil
         do {
-            _ = try await OtterClient.shared.saveForLater(url: url)
+            switch action {
+            case .quickSave:
+                _ = try await OtterClient.shared.quickSave(url: url)
+            case .readLater:
+                _ = try await OtterClient.shared.saveForLater(url: url)
+            }
             onFinish()
         } catch {
             self.error = error.localizedDescription
         }
         isSaving = false
+        savingAction = nil
     }
 }

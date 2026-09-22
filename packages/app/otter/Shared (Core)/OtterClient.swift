@@ -174,6 +174,35 @@ actor OtterClient {
         return wrapper.data
     }
 
+    /// `POST /api/new` — the one-tap save. The server scrapes the page, rewrites
+    /// the title and description, and picks the tags and type, so there is
+    /// nothing to fill in. The same endpoint the browser extension's quick save
+    /// posts to, so both surfaces produce the same bookmark.
+    func quickSave(url: String, title: String? = nil) async throws -> Bookmark {
+        struct Payload: Encodable {
+            let scrape: Bool
+            let title: String?
+            let url: String
+        }
+
+        // The route takes a batch and answers with a bare array, not the
+        // `{ data: … }` wrapper the rest of the bookmark endpoints use.
+        let data = try await perform(
+            path: "api/new",
+            method: "POST",
+            body: try JSONEncoder().encode([Payload(scrape: true, title: title, url: url)])
+        )
+
+        guard let bookmark = (try? JSONDecoder().decode([Bookmark].self, from: data))?.first else {
+            throw OtterError.invalidResponse
+        }
+
+        // The new bookmark belongs at the top of the cached page.
+        BookmarkCache.clear()
+
+        return bookmark
+    }
+
     /// `PATCH /api/bookmarks/:id` — only the keys present in the body are written.
     func updateBookmark(id: String, draft: BookmarkDraft) async throws -> Bookmark {
         struct Wrapper: Decodable {
