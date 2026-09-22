@@ -1,8 +1,18 @@
+import {
+  MagnifyingGlassIcon,
+  PencilIcon,
+  TrashIcon,
+} from '@phosphor-icons/react'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
-import { useCallback } from 'react'
-import { Button } from '@/components/Button'
-import { FormGroup } from '@/components/FormGroup'
+import { useCallback, useMemo, useState } from 'react'
+import { IconButton } from '@/components/IconButton'
 import { Input } from '@/components/Input'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/Tooltip'
 import type { MetaTag } from '@/utils/fetching/meta'
 
 export const Route = createFileRoute('/_app/settings/tags')({
@@ -35,6 +45,15 @@ function RouteComponent() {
   const { tags } = Route.useLoaderData()
   const navigate = useNavigate()
   const router = useRouter()
+  const [filter, setFilter] = useState('')
+
+  const visibleTags = useMemo(() => {
+    const needle = filter.trim().toLowerCase()
+
+    return tags.filter(
+      ({ tag }) => tag && (!needle || tag.toLowerCase().includes(needle)),
+    )
+  }, [filter, tags])
 
   // The loader only re-runs when the URL changes, and the URL here is the same
   // page with a different message, which is the same URL when two attempts
@@ -101,45 +120,90 @@ function RouteComponent() {
   )
 
   return (
-    <div className="flow">
-      <h2>All tags</h2>
-      <ul className="flex flex-col gap-xs max-w-[400px] w-full">
-        {tags?.length
-          ? tags.map(({ count, tag }) => {
-              if (!tag) {
-                return null
-              }
+    <TooltipProvider>
+      <div className="flow">
+        <h2>All tags</h2>
 
-              return (
-                <li key={tag}>
-                  <form onSubmit={handleRenameTag}>
-                    <input type="hidden" name="old_tag" value={tag} />
-                    <FormGroup label="Tag" name={`new_tag-${tag}`}>
-                      <div className="flex items-baseline gap-xs">
-                        <Input
-                          id={`new_tag-${tag}`}
-                          name="new_tag"
-                          defaultValue={tag}
-                        />
-                        <Button type="submit" variant="outline" size="xs">
-                          Rename
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="xs"
-                          onClick={() => handleDeleteTag(tag, count)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </FormGroup>
-                  </form>
-                </li>
-              )
-            })
-          : null}
-      </ul>
-    </div>
+        <div className="max-w-[420px] w-full flow">
+          <div className="relative">
+            <MagnifyingGlassIcon
+              size={16}
+              weight="duotone"
+              className="absolute left-xs top-1/2 -translate-y-1/2 text-theme10 pointer-events-none"
+            />
+            <Input
+              type="search"
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+              placeholder="Filter tags"
+              aria-label="Filter tags"
+              autoComplete="off"
+              className="pl-l"
+            />
+          </div>
+          <p className="text-step--2 text-theme10">
+            {visibleTags.length === tags.length
+              ? `${tags.length} tags`
+              : `${visibleTags.length} of ${tags.length} tags`}
+          </p>
+        </div>
+
+        <ul className="flex flex-col gap-3xs max-w-[420px] w-full">
+          {visibleTags.map(({ count, tag }) => {
+            if (!tag) {
+              return null
+            }
+
+            return (
+              <li key={tag}>
+                <form
+                  onSubmit={handleRenameTag}
+                  className="flex items-center gap-2xs"
+                >
+                  <input type="hidden" name="old_tag" value={tag} />
+                  <Input
+                    name="new_tag"
+                    defaultValue={tag}
+                    aria-label={`Rename ${tag}`}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  <span
+                    className="text-step--2 text-theme10 tabular-nums min-w-[3ch] text-right"
+                    title={`Used on ${count ?? 0} bookmarks`}
+                  >
+                    {count ?? 0}
+                  </span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <IconButton type="submit" size="m">
+                        <PencilIcon size={16} weight="duotone" />
+                      </IconButton>
+                    </TooltipTrigger>
+                    <TooltipContent>Save this name</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <IconButton
+                        type="button"
+                        size="m"
+                        onClick={() => handleDeleteTag(tag, count)}
+                      >
+                        <TrashIcon size={16} weight="duotone" />
+                      </IconButton>
+                    </TooltipTrigger>
+                    <TooltipContent>Delete this tag</TooltipContent>
+                  </Tooltip>
+                </form>
+              </li>
+            )
+          })}
+        </ul>
+
+        {visibleTags.length === 0 ? (
+          <p className="text-theme10">No tags match “{filter}”.</p>
+        ) : null}
+      </div>
+    </TooltipProvider>
   )
 }
