@@ -6,6 +6,11 @@
 //  Read later (one tap, runs extraction) and Bookmark (the full form). All
 //  three talk to the API directly with the shared keychain token.
 //
+//  The buttons are Liquid Glass. This target is iOS 26.2 and up, so the glass
+//  styles need no availability gating. They share a GlassEffectContainer
+//  because glass cannot sample other glass: without it, three stacked glass
+//  buttons each sample their own region and read inconsistently.
+//
 //  ponytail: no offline queue — the extension has no App Group container. A
 //  failed save shows the error; add the queue when an App Group exists.
 //
@@ -48,42 +53,47 @@ struct ShareRootView: View {
                         Text("Sign in to Otter to save this page.")
                             .foregroundStyle(.secondary)
                         Button("Open Otter", action: onOpenApp)
-                            .buttonStyle(.borderedProminent)
+                            .buttonStyle(.glassProminent)
+                            .controlSize(.large)
                     } else {
-                        Button {
-                            Task { await save(.quickSave) }
-                        } label: {
-                            if savingAction == .quickSave {
-                                ProgressView().frame(maxWidth: .infinity)
-                            } else {
-                                Label("Quick save", systemImage: "bolt").frame(maxWidth: .infinity)
+                        GlassEffectContainer(spacing: 12) {
+                            VStack(spacing: 12) {
+                                Button {
+                                    Task { await save(.quickSave) }
+                                } label: {
+                                    if savingAction == .quickSave {
+                                        ProgressView().frame(maxWidth: .infinity)
+                                    } else {
+                                        Label("Quick save", systemImage: "bolt").frame(maxWidth: .infinity)
+                                    }
+                                }
+                                .buttonStyle(.glassProminent)
+                                .controlSize(.large)
+                                .disabled(isSaving)
+
+                                Button {
+                                    Task { await save(.readLater) }
+                                } label: {
+                                    if savingAction == .readLater {
+                                        ProgressView().frame(maxWidth: .infinity)
+                                    } else {
+                                        Label("Read later", systemImage: "book").frame(maxWidth: .infinity)
+                                    }
+                                }
+                                .buttonStyle(.glass)
+                                .controlSize(.large)
+                                .disabled(isSaving)
+
+                                Button {
+                                    showForm = true
+                                } label: {
+                                    Label("Bookmark with details…", systemImage: "bookmark").frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.glass)
+                                .controlSize(.large)
+                                .disabled(isSaving)
                             }
                         }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.large)
-                        .disabled(isSaving)
-
-                        Button {
-                            Task { await save(.readLater) }
-                        } label: {
-                            if savingAction == .readLater {
-                                ProgressView().frame(maxWidth: .infinity)
-                            } else {
-                                Label("Read later", systemImage: "book").frame(maxWidth: .infinity)
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.large)
-                        .disabled(isSaving)
-
-                        Button {
-                            showForm = true
-                        } label: {
-                            Label("Bookmark with details…", systemImage: "bookmark").frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
-                        .controlSize(.large)
-                        .disabled(isSaving)
                     }
 
                     if let error {
