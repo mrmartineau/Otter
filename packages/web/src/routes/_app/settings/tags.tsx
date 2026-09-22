@@ -1,6 +1,8 @@
 import {
+  ChartBarIcon,
   MagnifyingGlassIcon,
   PencilIcon,
+  TextAaIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
@@ -46,14 +48,25 @@ function RouteComponent() {
   const navigate = useNavigate()
   const router = useRouter()
   const [filter, setFilter] = useState('')
+  const [sort, setSort] = useState<'alpha' | 'count'>('alpha')
 
   const visibleTags = useMemo(() => {
     const needle = filter.trim().toLowerCase()
-
-    return tags.filter(
+    const matching = tags.filter(
       ({ tag }) => tag && (!needle || tag.toLowerCase().includes(needle)),
     )
-  }, [filter, tags])
+
+    // The loader hands these over already sorted by name, so only the other
+    // order costs a sort. Ties fall back to the name, the way /api/tags orders
+    // its own rows.
+    return sort === 'alpha'
+      ? matching
+      : matching.toSorted(
+          (a, b) =>
+            (b.count ?? 0) - (a.count ?? 0) ||
+            (a.tag ?? '').localeCompare(b.tag ?? ''),
+        )
+  }, [filter, sort, tags])
 
   // The loader only re-runs when the URL changes, and the URL here is the same
   // page with a different message, which is the same URL when two attempts
@@ -141,14 +154,44 @@ function RouteComponent() {
               className="pl-l"
             />
           </div>
-          <p className="text-step--2 text-theme10">
-            {visibleTags.length === tags.length
-              ? `${tags.length} tags`
-              : `${visibleTags.length} of ${tags.length} tags`}
-          </p>
+          <div className="flex items-center justify-between gap-xs">
+            <p className="text-step--2 text-theme10">
+              {visibleTags.length === tags.length
+                ? `${tags.length} tags`
+                : `${visibleTags.length} of ${tags.length} tags`}
+            </p>
+            <div className="flex items-center gap-3xs">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <IconButton
+                    type="button"
+                    size="m"
+                    aria-pressed={sort === 'alpha'}
+                    onClick={() => setSort('alpha')}
+                  >
+                    <TextAaIcon weight="duotone" />
+                  </IconButton>
+                </TooltipTrigger>
+                <TooltipContent>Sort A to Z</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <IconButton
+                    type="button"
+                    size="m"
+                    aria-pressed={sort === 'count'}
+                    onClick={() => setSort('count')}
+                  >
+                    <ChartBarIcon weight="duotone" />
+                  </IconButton>
+                </TooltipTrigger>
+                <TooltipContent>Sort by most bookmarks</TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
         </div>
 
-        <ul className="flex flex-col gap-3xs max-w-[420px] w-full">
+        <ul className="flex flex-col gap-2xs max-w-[420px] w-full">
           {visibleTags.map(({ count, tag }) => {
             if (!tag) {
               return null
@@ -177,7 +220,7 @@ function RouteComponent() {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <IconButton type="submit" size="m">
-                        <PencilIcon size={16} weight="duotone" />
+                        <PencilIcon weight="duotone" />
                       </IconButton>
                     </TooltipTrigger>
                     <TooltipContent>Save this name</TooltipContent>
@@ -189,7 +232,7 @@ function RouteComponent() {
                         size="m"
                         onClick={() => handleDeleteTag(tag, count)}
                       >
-                        <TrashIcon size={16} weight="duotone" />
+                        <TrashIcon weight="duotone" />
                       </IconButton>
                     </TooltipTrigger>
                     <TooltipContent>Delete this tag</TooltipContent>
