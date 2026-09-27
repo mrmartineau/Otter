@@ -1,6 +1,7 @@
 import './polyfill.js'
 import Defuddle from 'defuddle'
 import { parseHTML } from 'linkedom'
+import { scraperRules } from '../scraper/scraper-rules'
 import { safeFetch } from '../url-guard'
 import { createMarkdownContent } from './defuddle/markdown'
 import { MAX_SIZE, readResponseWithLimit } from './fetch'
@@ -59,6 +60,8 @@ export async function xtract(targetUrl: string): Promise<XtractResponse> {
   }
 
   const finalUrl = response.url || resolvedShortUrl
+  // Read before Defuddle runs, as it rewrites the document.
+  const fallbackImage = findImage(document, finalUrl)
   const defuddle = new Defuddle(document, {
     markdown: true,
     url: finalUrl,
@@ -82,7 +85,7 @@ export async function xtract(targetUrl: string): Promise<XtractResponse> {
     description: result.description || '',
     domain: result.domain || new URL(finalUrl).hostname,
     favicon: result.favicon,
-    image: result.image,
+    image: result.image || fallbackImage,
     pageType: computedPageType,
     published: result.published || '',
     redirectUrls: urls,
@@ -94,6 +97,28 @@ export async function xtract(targetUrl: string): Promise<XtractResponse> {
     urlType: computedPageType,
     wordCount: result.wordCount || 0,
   }
+}
+
+/**
+ * Defuddle only reads `property="og:image"` and `name="twitter:image"`. Plenty
+ * of sites write `name="og:image"` and the like, so fall back to the bookmark
+ * scraper's wider list.
+ */
+const imageSelectors =
+  scraperRules.find((rule) => rule.name === 'image')?.selectors ?? []
+
+export function findImage(document: Document, baseUrl: string): string {
+  for (const { attribute, selector } of imageSelectors) {
+    const element = document.querySelector(selector)
+    const value = attribute
+      ? element?.getAttribute(attribute)?.trim()
+      : element?.textContent?.trim()
+    if (!value) continue
+    try {
+      return new URL(value, baseUrl).href
+    } catch {}
+  }
+  return ''
 }
 
 export type { LinkType } from './link-types'
