@@ -60,14 +60,14 @@ struct MarkdownContentView: View {
             .font(.body)
             .lineSpacing(lineSpacing)
 
-        case let .quote(text):
+        case let .quote(markdown):
             HStack(alignment: .top, spacing: 10) {
                 Rectangle()
                     .fill(Color.secondary.opacity(0.4))
                     .frame(width: 3)
-                Self.inline(text)
-                    .font(.body)
-                    .lineSpacing(lineSpacing)
+                // A quote holds whole blocks — code, lists, images — so it
+                // renders with this same view. `AnyView` breaks the recursive type.
+                AnyView(MarkdownContentView(markdown: markdown))
                     .foregroundStyle(.secondary)
             }
             .fixedSize(horizontal: false, vertical: true)
@@ -141,6 +141,7 @@ enum MarkdownBlock {
     case paragraph(String)
     case bullet(String)
     case numbered(index: String, text: String)
+    /// The quote's own markdown, `>` markers removed.
     case quote(String)
     case code(String)
     case rule
@@ -150,6 +151,7 @@ enum MarkdownBlock {
         var blocks: [MarkdownBlock] = []
         var paragraph: [String] = []
         var fenced: [String]?
+        var quote: [String]?
 
         func flushParagraph() {
             let text = paragraph.joined(separator: " ")
@@ -162,8 +164,24 @@ enum MarkdownBlock {
             paragraph = []
         }
 
+        func flushQuote() {
+            if let open = quote { blocks.append(.quote(open.joined(separator: "\n"))) }
+            quote = nil
+        }
+
         for rawLine in markdown.components(separatedBy: .newlines) {
             let line = rawLine.trimmingCharacters(in: .whitespaces)
+
+            // Consecutive `>` lines are one quote, parsed again as markdown, so
+            // a code block or list inside it keeps its shape.
+            if fenced == nil, line.hasPrefix(">") {
+                flushParagraph()
+                var inner = line.dropFirst()
+                if inner.hasPrefix(" ") { inner = inner.dropFirst() }
+                quote = (quote ?? []) + [String(inner)]
+                continue
+            }
+            flushQuote()
 
             if line.hasPrefix("```") {
                 if let open = fenced {
@@ -216,12 +234,6 @@ enum MarkdownBlock {
                 continue
             }
 
-            if line.hasPrefix(">") {
-                flushParagraph()
-                blocks.append(.quote(line.dropFirst().trimmingCharacters(in: .whitespaces)))
-                continue
-            }
-
             if let marker = ["- ", "* ", "+ "].first(where: { line.hasPrefix($0) }) {
                 flushParagraph()
                 blocks.append(.bullet(String(line.dropFirst(marker.count))))
@@ -236,6 +248,8 @@ enum MarkdownBlock {
 
             paragraph.append(line)
         }
+
+        flushQuote()
 
         // An unterminated fence still shouldn't swallow the rest of the article.
         if let fenced {
