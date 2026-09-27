@@ -30,9 +30,10 @@ struct FeedsView: View {
     /// "all" (every subscription merged) and "folder:<name>".
     private var current: String {
         if selected == "starred" || selected == "all" { return selected }
-        if selected.hasPrefix("folder:"), store.folders.contains(String(selected.dropFirst(7))) { return selected }
-        if store.sources.contains(where: { $0.id == selected }) { return selected }
-        return store.sources.first?.id ?? "starred"
+        let menu = store.menu
+        if selected.hasPrefix("folder:"), menu.folders.contains(where: { $0.name == selected.dropFirst(7) }) { return selected }
+        if menu.titles[selected] != nil { return selected }
+        return menu.builtIn.first?.id ?? store.subscriptions.first?.id ?? "starred"
     }
 
     private var currentFolder: String? {
@@ -99,7 +100,8 @@ struct FeedsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    sourceMenu
+                    FeedSourceMenu(menu: store.menu, current: current, title: currentTitle) { selected = $0 }
+                        .equatable()
                 }
 
                 ToolbarItem(placement: .principal) {
@@ -143,7 +145,7 @@ struct FeedsView: View {
             .navigationDestination(item: $commentsItem) { item in
                 CommentsView(item: item)
             }
-            .sheet(item: $readerItem) { item in
+            .navigationDestination(item: $readerItem) { item in
                 if let url = item.linkURL {
                     ArticleReaderView(url: url, title: item.title)
                 }
@@ -174,55 +176,6 @@ struct FeedsView: View {
                 Button("OK") {}
             } message: {
                 Text(message ?? "")
-            }
-        }
-    }
-
-    /// The feed tree: built-ins, then folders as submenus, then loose feeds.
-    private var sourceMenu: some View {
-        Menu {
-            Section {
-                ForEach(FeedStore.builtIn.filter(store.isEnabled), id: \.id) { source in
-                    pick(source.id, source.title, systemImage: "newspaper")
-                }
-                pick("starred", "Starred", systemImage: "star")
-            }
-
-            if !store.subscriptions.isEmpty {
-                Section {
-                    pick("all", "All feeds", systemImage: "tray.full")
-
-                    ForEach(store.folders, id: \.self) { folder in
-                        Menu {
-                            pick("folder:\(folder)", "All in \(folder)", systemImage: "tray.full")
-                            Divider()
-                            ForEach(store.subscriptions(in: folder)) { subscription in
-                                pick(subscription.id, subscription.title, systemImage: "dot.radiowaves.up.forward")
-                            }
-                        } label: {
-                            Label(folder, systemImage: "folder")
-                        }
-                    }
-
-                    ForEach(store.subscriptions(in: nil)) { subscription in
-                        pick(subscription.id, subscription.title, systemImage: "dot.radiowaves.up.forward")
-                    }
-                }
-            }
-        } label: {
-            Label(currentTitle, systemImage: "line.3.horizontal")
-        }
-        .accessibilityLabel("Choose feed")
-    }
-
-    private func pick(_ id: String, _ title: String, systemImage: String) -> some View {
-        Button {
-            selected = id
-        } label: {
-            if current == id {
-                Label(title, systemImage: "checkmark")
-            } else {
-                Label(title, systemImage: systemImage)
             }
         }
     }
@@ -340,6 +293,59 @@ struct FeedsView: View {
             } catch {
                 message = error.localizedDescription
             }
+        }
+    }
+}
+
+/// The feed tree: built-ins, then folders as submenus, then loose feeds.
+///
+/// Equatable on its inputs, so the menu is left alone while feeds refresh and
+/// only redraws when the feed list or the selection changes.
+private struct FeedSourceMenu: View, Equatable {
+    let menu: FeedMenu
+    let current: String
+    let title: String
+    let onPick: (String) -> Void
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.menu == rhs.menu && lhs.current == rhs.current && lhs.title == rhs.title
+    }
+
+    var body: some View {
+        Menu {
+            Section {
+                ForEach(menu.builtIn) { pick($0.id, $0.title, systemImage: "newspaper") }
+                pick("starred", "Starred", systemImage: "star")
+            }
+
+            if menu.hasSubscriptions {
+                Section {
+                    pick("all", "All feeds", systemImage: "tray.full")
+
+                    ForEach(menu.folders) { folder in
+                        Menu {
+                            pick("folder:\(folder.name)", "All in \(folder.name)", systemImage: "tray.full")
+                            Divider()
+                            ForEach(folder.feeds) { pick($0.id, $0.title, systemImage: "dot.radiowaves.up.forward") }
+                        } label: {
+                            Label(folder.name, systemImage: "folder")
+                        }
+                    }
+
+                    ForEach(menu.loose) { pick($0.id, $0.title, systemImage: "dot.radiowaves.up.forward") }
+                }
+            }
+        } label: {
+            Label(title, systemImage: "line.3.horizontal")
+        }
+        .accessibilityLabel("Choose feed")
+    }
+
+    private func pick(_ id: String, _ title: String, systemImage: String) -> some View {
+        Button {
+            onPick(id)
+        } label: {
+            Label(title, systemImage: current == id ? "checkmark" : systemImage)
         }
     }
 }

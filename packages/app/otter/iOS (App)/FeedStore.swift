@@ -20,9 +20,17 @@ final class FeedStore: ObservableObject {
     @Published private(set) var itemsBySource: [String: [FeedItem]] = [:]
     @Published private(set) var errorsBySource: [String: String] = [:]
     @Published private(set) var refreshing: Set<String> = []
-    @Published private(set) var subscriptions: [FeedSubscription] = []
+    @Published private(set) var subscriptions: [FeedSubscription] = [] {
+        didSet { rebuildMenu() }
+    }
     /// Built-in sources switched off in Settings.
-    @Published private(set) var disabledBuiltIn: Set<String> = []
+    @Published private(set) var disabledBuiltIn: Set<String> = [] {
+        didSet { rebuildMenu() }
+    }
+    /// The feed picker, built once per change to the feed list, not on every
+    /// render. Refreshes publish many times a second; rebuilding the menu on
+    /// each of those left it stuck half open.
+    @Published private(set) var menu = FeedMenu()
     @Published private(set) var readIDs: Set<String> = []
     @Published private(set) var starredIDs: Set<String> = []
     /// Starred items outlive their feed, so they are kept whole.
@@ -52,6 +60,18 @@ final class FeedStore: ObservableObject {
             starred = snapshot.starred
             lastRefreshBySource = snapshot.lastRefreshBySource ?? [:]
         }
+        rebuildMenu()
+    }
+
+    private func rebuildMenu() {
+        let entry = { (s: FeedSubscription) in FeedMenu.Entry(id: s.id, title: s.title) }
+        let next = FeedMenu(
+            builtIn: Self.builtIn.filter(isEnabled).map { FeedMenu.Entry(id: $0.id, title: $0.title) },
+            folders: folders.map { FeedMenu.Folder(name: $0, feeds: subscriptions(in: $0).map(entry)) },
+            loose: subscriptions(in: nil).map(entry),
+            hasSubscriptions: !subscriptions.isEmpty
+        )
+        if next != menu { menu = next }
     }
 
     var sources: [any FeedSource] {
@@ -81,7 +101,7 @@ final class FeedStore: ObservableObject {
     }
 
     func title(forSource id: String) -> String? {
-        sources.first { $0.id == id }?.title
+        menu.titles[id]
     }
 
     func isRead(_ item: FeedItem) -> Bool { readIDs.contains(item.id) }
@@ -112,14 +132,18 @@ final class FeedStore: ObservableObject {
     }
 
     private func refresh(_ sources: [any FeedSource]) async {
+        guard !sources.isEmpty else { return }
         await withTaskGroup(of: Void.self) { group in
             for source in sources {
-                group.addTask { await self.refresh(source) }
+                group.addTask { await self.refresh(source, persisting: false) }
             }
         }
+        // Once for the batch: each write encodes every feed's items on the main
+        // actor, and fifty of those in a row stall the UI.
+        persist()
     }
 
-    func refresh(_ source: any FeedSource) async {
+    func refresh(_ source: any FeedSource, persisting: Bool = true) async {
         refreshing.insert(source.id)
         defer { refreshing.remove(source.id) }
 
@@ -128,7 +152,7 @@ final class FeedStore: ObservableObject {
             itemsBySource[source.id] = items
             errorsBySource[source.id] = nil
             lastRefreshBySource[source.id] = Date()
-            persist()
+            if persisting { persist() }
         } catch {
             // Leaving the tab cancels the fetch. That is not a failure, and
             // reporting it would paper over the last real error.
@@ -313,5 +337,36 @@ nonisolated enum OPML {
             guard name == "outline", let folder = isFolder.popLast() else { return }
             if folder { folders.removeLast() }
         }
+    }
+}
+
+/// What the feed picker shows. Plain values, so SwiftUI can tell when it has
+/// not changed and skip redrawing the menu.
+struct FeedMenu: Equatable {
+    struct Entry: Equatable, Identifiable {
+        let id: String
+        let title: String
+    }
+
+    struct Folder: Equatable, Identifiable {
+        let name: String
+        let feeds: [Entry]
+        var id: String { name }
+    }
+
+    var builtIn: [Entry] = []
+    var folders: [Folder] = []
+    var loose: [Entry] = []
+    var hasSubscriptions = false
+
+    /// Source titles by id, for the "which feed" line in merged views.
+    private(set) var titles: [String: String] = [:]
+
+    init(builtIn: [Entry] = [], folders: [Folder] = [], loose: [Entry] = [], hasSubscriptions: Bool = false) {
+        self.builtIn = builtIn
+        self.folders = folders
+        self.loose = loose
+        self.hasSubscriptions = hasSubscriptions
+        titles = Dictionary((builtIn + loose + folders.flatMap(\.feeds)).map { ($0.id, $0.title) }, uniquingKeysWith: { a, _ in a })
     }
 }
