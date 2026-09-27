@@ -145,8 +145,10 @@ struct ArticleReaderView: View {
         themedBody.otterTheme()
     }
 
+    /// Pushed onto the caller's `NavigationStack`, so it gets the back button
+    /// and the swipe from the left edge to go back.
     private var themedBody: some View {
-        NavigationStack {
+        Group {
             Group {
                 if model.isLoading, model.article == nil {
                     ProgressView("Fetching article…")
@@ -184,10 +186,6 @@ struct ArticleReaderView: View {
             .otterTheme()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
-                }
-
                 ToolbarItemGroup(placement: .primaryAction) {
                     // Two buttons rather than a segmented picker: a picker in
                     // the bar draws its own box inside the bar's, which looks off.
@@ -272,20 +270,23 @@ struct ArticleReaderView: View {
                             Label("Edit", systemImage: "pencil")
                         }
                         Spacer()
+                        Button {
+                            Task { await store.togglePublic(item) }
+                        } label: {
+                            Label(item.isPublic ? "Make private" : "Make public", systemImage: item.isPublic ? "eye.fill" : "eye")
+                        }
+                        // The original opens from the title, so no browser button here.
                         if let url = linkURL {
+                            Spacer()
                             ShareLink(item: url) {
                                 Label("Share", systemImage: "square.and.arrow.up")
-                            }
-                            Spacer()
-                            Button {
-                                openURL(url)
-                            } label: {
-                                Label("Open original", systemImage: "safari")
                             }
                         }
                     }
                 }
             }
+            // Full screen for reading, and room for the bottom bar.
+            .toolbar(.hidden, for: .tabBar)
             .task { await model.load() }
             .readingItemEditor(editor)
             .alert("Couldn't save", isPresented: Binding(
@@ -379,9 +380,22 @@ struct ArticleReaderView: View {
     /// The full title, never truncated, then author, site and word count.
     private func header(for article: ArticleContent) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title)
+            // Tapping the title opens the original in the browser.
+            if let url = linkURL {
+                Button {
+                    openURL(url)
+                } label: {
+                    Text(title) + Text(" \(Image(systemName: "arrow.up.right"))").foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
                 .font(.title2.weight(.bold))
-                .textSelection(.enabled)
+                .multilineTextAlignment(.leading)
+                .accessibilityHint("Opens the original in the browser")
+            } else {
+                Text(title)
+                    .font(.title2.weight(.bold))
+                    .textSelection(.enabled)
+            }
 
             if !article.byline.isEmpty {
                 Text(article.byline)

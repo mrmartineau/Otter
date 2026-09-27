@@ -229,6 +229,18 @@ final class ReadingStore: ObservableObject {
         }
     }
 
+    func togglePublic(_ item: ReadingItem) async {
+        var updated = item
+        updated.isPublic.toggle()
+        upsert(updated)
+        do {
+            _ = try await OtterClient.shared.setPublic(id: item.bookmarkId, isPublic: updated.isPublic)
+        } catch {
+            upsert(item)
+            lastError = error.localizedDescription
+        }
+    }
+
     private func enqueue(_ mutation: PendingMutation) {
         pending.append(mutation)
         Task { await flush() }

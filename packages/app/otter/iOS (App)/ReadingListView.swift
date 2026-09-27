@@ -124,7 +124,7 @@ struct ReadingListView: View {
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await store.sync() } }
             }
-            .sheet(item: $reader) { item in
+            .navigationDestination(item: $reader) { item in
                 ArticleReaderView(item: item)
             }
             .readingItemEditor(editor)

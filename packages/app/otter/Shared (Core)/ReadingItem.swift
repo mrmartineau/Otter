@@ -22,6 +22,8 @@ nonisolated struct ReadingItem: Identifiable, Hashable, Codable {
     let wordCount: Int
     let readingTimeS: Int
     var star: Bool
+    /// The bookmark's public flag — shown on the profile page and the site.
+    var isPublic: Bool
     /// When it was saved as a bookmark (ISO 8601).
     let createdAt: String
     let updatedAt: String
@@ -42,6 +44,7 @@ nonisolated struct ReadingItem: Identifiable, Hashable, Codable {
         case wordCount = "word_count"
         case readingTimeS = "reading_time_s"
         case star
+        case isPublic = "public"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case deletedAt = "deleted_at"
@@ -63,6 +66,7 @@ nonisolated struct ReadingItem: Identifiable, Hashable, Codable {
         wordCount = try c.decodeIfPresent(Int.self, forKey: .wordCount) ?? 0
         readingTimeS = try c.decodeIfPresent(Int.self, forKey: .readingTimeS) ?? 0
         star = try c.decodeIfPresent(Bool.self, forKey: .star) ?? false
+        isPublic = try c.decodeIfPresent(Bool.self, forKey: .isPublic) ?? false
         createdAt = try c.decodeIfPresent(String.self, forKey: .createdAt) ?? ""
         updatedAt = try c.decodeIfPresent(String.self, forKey: .updatedAt) ?? ""
         deletedAt = try c.decodeIfPresent(String.self, forKey: .deletedAt)

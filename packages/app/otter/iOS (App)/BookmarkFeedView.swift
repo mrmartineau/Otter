@@ -132,7 +132,7 @@ struct BookmarkFeedView: View {
                 }
             }
         }
-        .sheet(item: $reader) { request in
+        .navigationDestination(item: $reader) { request in
             ArticleReaderView(bookmark: request.bookmark, mode: request.mode)
         }
         .sheet(item: $detail) { bookmark in
