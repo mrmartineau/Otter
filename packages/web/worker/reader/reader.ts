@@ -118,6 +118,7 @@ const itemToRow = (
   last_position: item.lastPosition,
   last_read_at: item.lastReadAt?.toISOString() ?? null,
   progress: item.progress,
+  public: bookmark.public,
   published_at: item.publishedAt,
   reading_time_s: item.readingTimeS,
   site_name: item.siteName,

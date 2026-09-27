@@ -266,6 +266,7 @@ export interface ReadingItem {
   last_position: string | null
   last_read_at: string | null
   progress: number
+  public: boolean
   published_at: string | null
   reading_time_s: number
   site_name: string | null
