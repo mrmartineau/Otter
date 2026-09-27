@@ -385,6 +385,8 @@ struct FeedRow: View {
 
             Spacer(minLength: 0)
 
+            FeedThumbnail(page: item.linkURL)
+
             if item.commentsRef != nil {
                 // Comments open natively; the row itself opens the link.
                 Button(action: onComments) {

@@ -373,7 +373,6 @@ struct BookmarkRow: View {
     let bookmark: Bookmark
 
     private static let gutterWidth: CGFloat = 14
-    private static let thumbnailSize: CGFloat = 52
     private static let faviconSize: CGFloat = 14
 
     var body: some View {
@@ -496,20 +495,31 @@ struct BookmarkRow: View {
         return parts.isEmpty ? nil : parts.joined(separator: "  ·  ")
     }
 
-    @ViewBuilder
     private var thumbnail: some View {
-        if let imageURL = bookmark.imageURL {
+        RowThumbnail(url: bookmark.imageURL)
+    }
+}
+
+/// The square image at the end of a list row, shared by bookmarks, Read later
+/// and feeds. Draws nothing without an image, or when the image won't load.
+struct RowThumbnail: View {
+    let url: URL?
+
+    static let size: CGFloat = 52
+
+    var body: some View {
+        if let url {
             // Decoded at `maxSize`, not at whatever the source happens to be —
             // og:images run to several thousand pixels a side. The cap is well
             // above 52 pt because `.fill` crops to the *shortest* edge, so a
             // wide image still needs 52 pt of height to cover the square.
-            RemoteImage(url: imageURL, maxSize: Self.thumbnailSize * 2) { phase in
+            RemoteImage(url: url, maxSize: Self.size * 2) { phase in
                 switch phase {
                 case let .success(image):
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(width: Self.thumbnailSize, height: Self.thumbnailSize)
+                        .frame(width: Self.size, height: Self.size)
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                         .overlay(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -521,7 +531,7 @@ struct BookmarkRow: View {
                 case .loading:
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .fill(Color(.tertiarySystemFill))
-                        .frame(width: Self.thumbnailSize, height: Self.thumbnailSize)
+                        .frame(width: Self.size, height: Self.size)
                 }
             }
         }

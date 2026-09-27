@@ -257,6 +257,11 @@ struct ReadingRow: View {
                     if item.star {
                         Image(systemName: "star.fill")
                             .foregroundStyle(.yellow)
+                            .accessibilityLabel("Starred")
+                    }
+                    if item.isPublic {
+                        Image(systemName: "eye.fill")
+                            .accessibilityLabel("Public")
                     }
                     Text(item.subtitle)
                 }
@@ -272,17 +277,7 @@ struct ReadingRow: View {
 
             Spacer(minLength: 0)
 
-            if let imageURL = item.imageURL {
-                RemoteImage(url: imageURL, maxSize: 120) { phase in
-                    if case let .success(image) = phase {
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 60, height: 60)
-                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                    }
-                }
-            }
+            RowThumbnail(url: item.imageURL)
         }
         .padding(.vertical, 4)
     }
