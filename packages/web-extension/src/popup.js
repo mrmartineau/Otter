@@ -43,7 +43,10 @@ const run = async (type) => {
 
   // The tab title is a fallback: sites behind a bot wall refuse the server's
   // fetch, and a bookmark with the real title beats a bare URL.
+  // The popup already ran the check and showed any match before the buttons
+  // unlocked, so a click here is a deliberate save.
   const result = await browserAPI.runtime.sendMessage({
+    force: true,
     title: tab.title,
     type,
     url: tab.url,
@@ -76,9 +79,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('setup').hidden = false
     for (const button of buttons) button.disabled = true
   } else if (tab?.url?.startsWith('http')) {
-    browserAPI.runtime
+    // Lock the buttons until the check ends, so a quick click can't save a
+    // duplicate before "Already saved" appears.
+    for (const button of buttons) button.disabled = true
+    setStatus('Checking if this page is saved…')
+    const [link] = await browserAPI.runtime
       .sendMessage({ type: 'check-url', url: tab.url })
-      .then(([link] = []) => link && showLink('existing', link))
+      .catch(() => [])
+    setStatus('')
+    for (const button of buttons) button.disabled = false
+    if (link) {
+      showLink('existing', link)
+      document.querySelector('#quick-save strong').textContent = 'Save again'
+    }
   }
 
   document.getElementById('options').addEventListener('click', (event) => {

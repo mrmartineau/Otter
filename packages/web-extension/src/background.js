@@ -147,7 +147,8 @@ const checkUrl = async (url) => {
     urlJoin(otterInstanceUrl, 'api', 'check-url', {
       query: { url_input: `${host}${pathname.replace(/\/$/, '')}` },
     }),
-    { credentials: 'include' },
+    // A slow server must not leave the popup stuck on "Checking…".
+    { credentials: 'include', signal: AbortSignal.timeout(5000) },
   )
   if (!response.ok) return []
   const { data } = await response.json()
@@ -161,9 +162,11 @@ const flashBadge = (text) => {
 
 /**
  * One entry point for the popup, the context menu and the shortcuts.
- * `bookmark` opens the full form; the other two save straight away.
+ * `bookmark` opens the full form; the other two save straight away. A quick
+ * save stops if the URL is already saved, unless `force` is set: the popup
+ * sets it after it has shown the match and the user still asked to save.
  */
-const save = async (kind, url, title) => {
+const save = async (kind, url, title, force = false) => {
   if ((await isOptionsSetup()) === false) {
     browserAPI.tabs.create({ url: browserAPI.runtime.getURL('options.html') })
     return { error: 'Set your Otter address first.', ok: false }
@@ -172,6 +175,16 @@ const save = async (kind, url, title) => {
   if (kind === 'bookmark') {
     openBookmarkletPage(url)
     return { ok: true }
+  }
+
+  if (kind === 'quick-save' && !force) {
+    const [existing] = await checkUrl(url).catch(() => [])
+    if (existing) {
+      flashBadge('=')
+      // Show the popup so the match is visible; Chrome < 127 has no openPopup.
+      actionAPI.openPopup?.().catch(() => {})
+      return { existing, ok: false }
+    }
   }
 
   try {
@@ -195,7 +208,7 @@ browserAPI.runtime.onMessage.addListener((message) => {
     return checkUrl(message.url).catch(() => [])
   }
   if (['quick-save', 'read-later', 'bookmark'].includes(message?.type)) {
-    return save(message.type, message.url, message.title)
+    return save(message.type, message.url, message.title, message.force)
   }
 })
 
