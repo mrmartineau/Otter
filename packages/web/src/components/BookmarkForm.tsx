@@ -286,8 +286,12 @@ export const BookmarkForm = ({
   const checkMatchingItems = useCallback(
     async (link: string): Promise<void> => {
       try {
-        const url = new URL(link)
-        const { data } = await checkBookmarkUrl(url.hostname)
+        // Host + path, so other pages on the same site don't match. The web
+        // extension popup matches the same way.
+        const { host, pathname } = new URL(link)
+        const { data } = await checkBookmarkUrl(
+          `${host}${pathname.replace(/\/$/, '')}`,
+        )
         setPossibleMatchingItems(data as Bookmark[])
       } catch {
         setPossibleMatchingItems(null)
