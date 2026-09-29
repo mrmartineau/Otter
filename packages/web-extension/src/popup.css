@@ -13,6 +13,12 @@ html {
   font-size: 14px;
 }
 
+html,
+body {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 body {
   width: 300px;
 }
@@ -80,6 +86,19 @@ button span {
   color: #444;
 }
 
+.notice {
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #eef3fc;
+  color: #1d3f7a;
+}
+
+.notice a {
+  color: inherit;
+  font-weight: 600;
+}
+
 .status.error {
   color: #b3261e;
 }
@@ -93,6 +112,10 @@ button span {
   .status,
   .setup {
     color: #aaa;
+  }
+  .notice {
+    background: #1f2a3d;
+    color: #b9cdf3;
   }
   button {
     background: #2a2a2a;

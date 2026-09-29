@@ -131,6 +131,27 @@ const apiSave = async (kind, url, title) => {
     } catch {}
     throw new Error(reason)
   }
+
+  return response.json()
+}
+
+/**
+ * Bookmarks already saved for this URL. Matches host + path, so a different
+ * query string still counts; the bookmark form matches on host alone, which
+ * is too loose for a yes/no hint here.
+ */
+const checkUrl = async (url) => {
+  const { otterInstanceUrl } = await getStorageItems()
+  const { host, pathname } = new URL(url)
+  const response = await fetch(
+    urlJoin(otterInstanceUrl, 'api', 'check-url', {
+      query: { url_input: `${host}${pathname.replace(/\/$/, '')}` },
+    }),
+    { credentials: 'include' },
+  )
+  if (!response.ok) return []
+  const { data } = await response.json()
+  return (data ?? []).map(({ id }) => urlJoin(otterInstanceUrl, 'bookmark', id))
 }
 
 const flashBadge = (text) => {
@@ -154,9 +175,15 @@ const save = async (kind, url, title) => {
   }
 
   try {
-    await apiSave(kind, url, title)
+    const saved = await apiSave(kind, url, title)
     flashBadge('✓')
-    return { ok: true }
+    const { otterInstanceUrl } = await getStorageItems()
+    // /api/new returns the inserted rows; the reader endpoint has no web page.
+    const id = kind === 'quick-save' ? saved?.[0]?.id : undefined
+    return {
+      link: id ? urlJoin(otterInstanceUrl, 'bookmark', id) : undefined,
+      ok: true,
+    }
   } catch (error) {
     flashBadge('!')
     return { error: error.message, ok: false }
@@ -164,6 +191,9 @@ const save = async (kind, url, title) => {
 }
 
 browserAPI.runtime.onMessage.addListener((message) => {
+  if (message?.type === 'check-url') {
+    return checkUrl(message.url).catch(() => [])
+  }
   if (['quick-save', 'read-later', 'bookmark'].includes(message?.type)) {
     return save(message.type, message.url, message.title)
   }

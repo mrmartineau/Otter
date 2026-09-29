@@ -14,6 +14,18 @@ const setStatus = (text, isError = false) => {
   status.classList.toggle('error', isError)
 }
 
+// Popup links open in a new tab; a plain href would load inside the popup.
+const showLink = (id, href) => {
+  const link = document.getElementById(`${id}-link`)
+  link.href = href
+  link.onclick = (event) => {
+    event.preventDefault()
+    browserAPI.tabs.create({ url: href })
+    window.close()
+  }
+  document.getElementById(id).hidden = false
+}
+
 const currentTab = async () => {
   const [tab] = await browserAPI.tabs.query({
     active: true,
@@ -37,7 +49,14 @@ const run = async (type) => {
     url: tab.url,
   })
 
-  if (result?.ok) {
+  if (result?.ok && result.link) {
+    // Stay open so the new bookmark's link can be clicked.
+    setStatus('')
+    document.getElementById('existing').hidden = true
+    document.getElementById('read-later').hidden = true
+    document.getElementById('bookmark').hidden = true
+    showLink('saved', result.link)
+  } else if (result?.ok) {
     setStatus(type === 'read-later' ? 'Saved to Read later.' : 'Saved.')
     setTimeout(() => window.close(), 900)
   } else if (type === 'bookmark') {
@@ -56,6 +75,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!otterInstanceUrl) {
     document.getElementById('setup').hidden = false
     for (const button of buttons) button.disabled = true
+  } else if (tab?.url?.startsWith('http')) {
+    browserAPI.runtime
+      .sendMessage({ type: 'check-url', url: tab.url })
+      .then(([link] = []) => link && showLink('existing', link))
   }
 
   document.getElementById('options').addEventListener('click', (event) => {

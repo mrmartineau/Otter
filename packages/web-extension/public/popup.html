@@ -8,10 +8,16 @@
   <body>
     <main class="app">
       <p class="url" id="url"></p>
+      <p class="notice" id="existing" hidden>
+        Already saved. <a href="#" id="existing-link">View in Otter</a>
+      </p>
       <button id="quick-save" class="primary">
         <strong>Quick save</strong>
         <span>Bookmark with details fetched for you</span>
       </button>
+      <p class="notice" id="saved" hidden>
+        Saved. <a href="#" id="saved-link">View in Otter</a>
+      </p>
       <button id="read-later">
         <strong>Read later</strong>
         <span>Save as an article for the reader</span>
