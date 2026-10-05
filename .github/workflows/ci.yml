@@ -48,6 +48,15 @@ jobs:
         run: pnpm db:migrate
         env:
           DATABASE_URL: ${{ steps.neon.outputs.db_url }}
+      # The branch copies production's JWKS, whose private keys are encrypted
+      # with production's BETTER_AUTH_SECRET. The preview has its own secret,
+      # so drop them and let better-auth generate a fresh key on first use
+      # (otherwise every signed-in get-session 500s).
+      - name: Drop production JWKS from Neon branch
+        if: steps.neon.outcome == 'success'
+        run: psql "$DATABASE_URL" -c 'delete from jwks'
+        env:
+          DATABASE_URL: ${{ steps.neon.outputs.db_url }}
       - name: Prepare preview
         id: preview
         if: steps.neon.outcome == 'success'
