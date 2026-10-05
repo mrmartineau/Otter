@@ -334,11 +334,11 @@ final class BookmarkFormModel: ObservableObject {
 
     // MARK: - Duplicates
 
-    /// Debounced lookup of bookmarks that already point at this host.
+    /// Debounced lookup of bookmarks that already point at this page.
     func checkForDuplicates() {
         duplicateCheckTask?.cancel()
 
-        guard let host = normalizedURL?.host else {
+        guard let url = normalizedURL else {
             matchingBookmarks = []
             return
         }
@@ -348,7 +348,7 @@ final class BookmarkFormModel: ObservableObject {
 
             guard !Task.isCancelled else { return }
 
-            let found = try? await OtterClient.shared.matchingBookmarks(query: host)
+            let found = try? await OtterClient.shared.matchingBookmarks(for: url)
 
             guard !Task.isCancelled else { return }
 

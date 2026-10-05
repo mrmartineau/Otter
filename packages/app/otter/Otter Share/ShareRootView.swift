@@ -11,6 +11,10 @@
 //  because glass cannot sample other glass: without it, three stacked glass
 //  buttons each sample their own region and read inconsistently.
 //
+//  Before any button works, the sheet asks the API whether this page is
+//  already saved, so a duplicate needs a deliberate "Save again". A quick
+//  save keeps the sheet open with a link to the new bookmark.
+//
 //  ponytail: no offline queue — the extension has no App Group container. A
 //  failed save shows the error; add the queue when an App Group exists.
 //
@@ -30,6 +34,10 @@ struct ShareRootView: View {
     @State private var savingAction: Action?
     @State private var isSignedIn = true
     @State private var error: String?
+    @State private var isChecking = true
+    @State private var existing: Bookmark?
+    @State private var saved: Bookmark?
+    @State private var editing: Bookmark?
 
     var body: some View {
         if showForm {
@@ -55,45 +63,59 @@ struct ShareRootView: View {
                         Button("Open Otter", action: onOpenApp)
                             .buttonStyle(.glassProminent)
                             .controlSize(.large)
+                    } else if let saved {
+                        bookmarkLink(saved, title: "Saved. View in Otter", systemImage: "checkmark.circle.fill")
+                        Button(action: onFinish) {
+                            Text("Done").frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.glassProminent)
+                        .controlSize(.large)
                     } else {
+                        if isChecking {
+                            HStack(spacing: 8) {
+                                ProgressView().controlSize(.small)
+                                Text("Checking if this page is saved…")
+                            }
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                        } else if let existing {
+                            bookmarkLink(existing, title: "Already saved. View in Otter", systemImage: "bookmark.fill")
+                        }
+
                         GlassEffectContainer(spacing: 12) {
                             VStack(spacing: 12) {
                                 Button {
                                     Task { await save(.quickSave) }
                                 } label: {
-                                    if savingAction == .quickSave {
-                                        ProgressView().frame(maxWidth: .infinity)
-                                    } else {
-                                        Label("Quick save", systemImage: "bolt").frame(maxWidth: .infinity)
-                                    }
+                                    buttonLabel(
+                                        existing == nil ? "Quick save" : "Save again",
+                                        systemImage: "bolt",
+                                        isSpinning: savingAction == .quickSave
+                                    )
                                 }
                                 .buttonStyle(.glassProminent)
                                 .controlSize(.large)
-                                .disabled(isSaving)
 
                                 Button {
                                     Task { await save(.readLater) }
                                 } label: {
-                                    if savingAction == .readLater {
-                                        ProgressView().frame(maxWidth: .infinity)
-                                    } else {
-                                        Label("Read later", systemImage: "book").frame(maxWidth: .infinity)
-                                    }
+                                    buttonLabel("Read later", systemImage: "book", isSpinning: savingAction == .readLater)
                                 }
                                 .buttonStyle(.glass)
                                 .controlSize(.large)
-                                .disabled(isSaving)
 
                                 Button {
                                     showForm = true
                                 } label: {
-                                    Label("Bookmark with details…", systemImage: "bookmark").frame(maxWidth: .infinity)
+                                    buttonLabel("Bookmark with details…", systemImage: "bookmark", isSpinning: false)
                                 }
                                 .buttonStyle(.glass)
                                 .controlSize(.large)
-                                .disabled(isSaving)
                             }
                         }
+                        // Locked while checking, so a fast tap can't save a
+                        // duplicate before "Already saved" shows.
+                        .disabled(isSaving || isChecking)
                     }
 
                     if let error {
@@ -113,9 +135,48 @@ struct ShareRootView: View {
                         Button("Cancel", action: onFinish)
                     }
                 }
-                .task { isSignedIn = await OtterClient.shared.isSignedIn() }
+                .task { await check() }
+                // Pushed, not presented: back returns to the buttons.
+                .navigationDestination(for: Bookmark.self) { bookmark in
+                    BookmarkDetailView(bookmark: bookmark) { editing = bookmark }
+                }
+                .sheet(item: $editing) { bookmark in
+                    BookmarkFormView(bookmark: bookmark) { updated in
+                        editing = nil
+                        guard let updated else { return }
+                        if saved?.id == updated.id { saved = updated }
+                        if existing?.id == updated.id { existing = updated }
+                    }
+                }
             }
         }
+    }
+
+    /// The label stays in place under the spinner, so the button keeps its
+    /// size: a bare ProgressView is taller than a large button's text.
+    private func buttonLabel(_ title: String, systemImage: String, isSpinning: Bool) -> some View {
+        Label(title, systemImage: systemImage)
+            .opacity(isSpinning ? 0 : 1)
+            .overlay {
+                if isSpinning { ProgressView().controlSize(.small) }
+            }
+            .frame(maxWidth: .infinity)
+    }
+
+    private func bookmarkLink(_ bookmark: Bookmark, title: String, systemImage: String) -> some View {
+        NavigationLink(value: bookmark) {
+            Label(title, systemImage: systemImage)
+                .font(.footnote.weight(.semibold))
+        }
+    }
+
+    private func check() async {
+        isSignedIn = await OtterClient.shared.isSignedIn()
+        // A failed check unlocks the buttons: the save itself reports errors.
+        if isSignedIn, let pageURL = URL(string: url) {
+            existing = (try? await OtterClient.shared.matchingBookmarks(for: pageURL))?.first
+        }
+        isChecking = false
     }
 
     private func save(_ action: Action) async {
@@ -125,11 +186,12 @@ struct ShareRootView: View {
         do {
             switch action {
             case .quickSave:
-                _ = try await OtterClient.shared.quickSave(url: url)
+                // Stay open so the new bookmark can be checked.
+                saved = try await OtterClient.shared.quickSave(url: url)
             case .readLater:
                 _ = try await OtterClient.shared.saveForLater(url: url)
+                onFinish()
             }
-            onFinish()
         } catch {
             self.error = error.localizedDescription
         }

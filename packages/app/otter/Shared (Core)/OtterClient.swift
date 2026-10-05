@@ -261,15 +261,22 @@ actor OtterClient {
         BookmarkCache.clear()
     }
 
-    /// Bookmarks whose URL contains `query` — used to warn about duplicates.
-    func matchingBookmarks(query: String) async throws -> [Bookmark] {
+    /// Bookmarks already saved for `url` — used to warn about duplicates.
+    /// Matches host + path, so a different query string still counts but
+    /// other pages on the same site don't. The web app and browser extension
+    /// match the same way.
+    func matchingBookmarks(for url: URL) async throws -> [Bookmark] {
         struct Wrapper: Decodable {
             let data: [Bookmark]
         }
 
+        guard let host = url.host else { return [] }
+        var path = url.path(percentEncoded: true)
+        if path.hasSuffix("/") { path.removeLast() }
+
         let data = try await perform(
             path: "api/check-url",
-            query: [URLQueryItem(name: "url_input", value: query)]
+            query: [URLQueryItem(name: "url_input", value: host + path)]
         )
 
         guard let wrapper = try? JSONDecoder().decode(Wrapper.self, from: data) else {
