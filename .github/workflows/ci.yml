@@ -39,7 +39,7 @@ jobs:
         if: github.event.pull_request.head.repo.full_name == github.repository
         uses: neondatabase/create-branch-action@v6
         with:
-          project_id: ${{ vars.NEON_PROJECT_ID }}
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
           api_key: ${{ secrets.NEON_API_KEY }}
           branch_name: preview/pr-${{ github.event.number }}
       - name: Run migrations on Neon branch
