@@ -11,6 +11,9 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
@@ -21,4 +24,70 @@ jobs:
       - name: Install safe-chain
         run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
       - run: pnpm install --frozen-lockfile
+      # Built as the `preview` env (otter-web-preview Worker, no Hyperdrive).
+      # Same code as production, so this still checks the build.
       - run: pnpm run web:build
+        env:
+          CLOUDFLARE_ENV: preview
+
+      # Preview deploy: a Neon branch of production per PR (reused on new
+      # commits, deleted by preview-cleanup.yml), PR migrations applied to it,
+      # then a non-live Worker version with a stable pr-<n> alias.
+      # Fork PRs have no secrets, so they only build.
+      - name: Create Neon branch
+        id: neon
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: neondatabase/create-branch-action@v6
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+          branch_name: preview/pr-${{ github.event.number }}
+      - name: Run migrations on Neon branch
+        if: steps.neon.outcome == 'success'
+        working-directory: packages/web
+        run: pnpm db:migrate
+        env:
+          DATABASE_URL: ${{ steps.neon.outputs.db_url }}
+      # The branch copies production's JWKS, whose private keys are encrypted
+      # with production's BETTER_AUTH_SECRET. The preview has its own secret,
+      # so drop them and let better-auth generate a fresh key on first use
+      # (otherwise every signed-in get-session 500s).
+      - name: Drop production JWKS from Neon branch
+        if: steps.neon.outcome == 'success'
+        run: psql "$DATABASE_URL" -c 'delete from jwks'
+        env:
+          DATABASE_URL: ${{ steps.neon.outputs.db_url }}
+      - name: Prepare preview
+        id: preview
+        if: steps.neon.outcome == 'success'
+        run: |
+          sub=$(curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/subdomain" | jq -r .result.subdomain)
+          echo "url=https://pr-${{ github.event.number }}-otter-web-preview.$sub.workers.dev" >> "$GITHUB_OUTPUT"
+          printf 'DATABASE_URL=%s\n' "$DATABASE_URL" > "$RUNNER_TEMP/preview.env"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DATABASE_URL: ${{ steps.neon.outputs.db_url_pooled }}
+      - name: Upload preview version
+        if: steps.preview.outcome == 'success'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/web
+          # BETTER_AUTH_URL override so login works on the preview origin
+          command: >-
+            versions upload
+            --preview-alias pr-${{ github.event.number }}
+            --var BETTER_AUTH_URL:${{ steps.preview.outputs.url }}
+            --secrets-file ${{ runner.temp }}/preview.env
+            --message "PR #${{ github.event.number }} ${{ github.event.pull_request.head.sha }}"
+      - name: Comment preview URL
+        if: steps.preview.outcome == 'success'
+        run: |
+          gh pr comment ${{ github.event.number }} --edit-last --create-if-none \
+            --body "Preview: ${{ steps.preview.outputs.url }} (commit ${{ github.event.pull_request.head.sha }}, Neon branch \`preview/pr-${{ github.event.number }}\`)"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}

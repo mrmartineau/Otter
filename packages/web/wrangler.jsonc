@@ -80,6 +80,28 @@
    */
   "vars": {
     "BETTER_AUTH_URL": "https://otter.zander.wtf"
+  },
+  /**
+   * PR previews (.github/workflows/ci.yml). A separate `otter-web-preview`
+   * Worker, so preview versions never share secrets with production. No
+   * Hyperdrive: each version gets DATABASE_URL for its own Neon branch.
+   * Build with CLOUDFLARE_ENV=preview.
+   */
+  "env": {
+    "preview": {
+      "ai": { "binding": "AI" },
+      "preview_urls": true,
+      "ratelimits": [
+        {
+          "name": "RATE_LIMITER",
+          "namespace_id": "1001",
+          "simple": { "limit": 30, "period": 60 }
+        }
+      ],
+      "routes": [],
+      "vars": {},
+      "workers_dev": true
+    }
   }
   /**
    * Note: Use secrets to store sensitive data.
