@@ -125,7 +125,7 @@ struct FeedSubscriptionsView: View {
             Task {
                 let result = await store.importOPML(data)
                 message = "Added \(result.added) feed\(result.added == 1 ? "" : "s")."
-                    + (result.failed > 0 ? " \(result.failed) couldn't be loaded." : "")
+                    + (result.failed.isEmpty ? "" : " \(result.failed.count) couldn't be loaded right now:\n\n" + result.failed.joined(separator: "\n"))
             }
         }
         .alert("Feeds", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) {

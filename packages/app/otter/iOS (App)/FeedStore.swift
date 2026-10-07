@@ -236,21 +236,23 @@ final class FeedStore: ObservableObject {
         persist()
     }
 
-    /// Imports every `<outline xmlUrl=…>`; feeds that fail to load are skipped
-    /// and counted so the caller can say so.
-    func importOPML(_ data: Data) async -> (added: Int, failed: Int) {
-        let outlines = OPML.feeds(in: data)
-        var added = 0, failed = 0
-        for outline in outlines {
-            do {
-                let before = subscriptions.count
-                try await subscribe(url: outline.url, title: outline.title, folder: outline.folder)
-                if subscriptions.count > before { added += 1 }
-            } catch {
-                failed += 1
-            }
+    /// Imports every `<outline xmlUrl=…>`, then fetches them all at once.
+    /// Feeds that fail still stay subscribed — a site that is down today may
+    /// be back tomorrow — and are listed with the reason so the caller can say so.
+    func importOPML(_ data: Data) async -> (added: Int, failed: [String]) {
+        var known = Set(subscriptions.map(\.url))
+        let new = OPML.feeds(in: data).compactMap { outline -> FeedSubscription? in
+            let text = outline.url.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard let url = URL(string: text), let host = url.host, known.insert(url.absoluteString).inserted else { return nil }
+            return FeedSubscription(id: "rss:" + UUID().uuidString, url: url.absoluteString, title: outline.title ?? host, folder: outline.folder)
         }
-        return (added, failed)
+        subscriptions += new
+        saveSubscriptions()
+
+        let ids = Set(new.map(\.id))
+        await refresh(sources.filter { ids.contains($0.id) })
+        let failed = new.compactMap { s in errorsBySource[s.id].map { "\(s.title): \($0)" } }
+        return (new.count, failed)
     }
 
     func exportOPML() -> String {
