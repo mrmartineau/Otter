@@ -70,7 +70,7 @@ nonisolated struct ScrapeMetadata: Decodable {
 
 /// `GET /api/scrape-content?url=…` — the readable article, extracted and
 /// converted to markdown by the Worker's `xtractr`.
-nonisolated struct ArticleContent: Decodable {
+nonisolated struct ArticleContent: Codable {
     let title: String
     let author: String
     let domain: String

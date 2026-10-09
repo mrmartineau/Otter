@@ -38,9 +38,21 @@ final class ArticleReaderModel: ObservableObject {
 
     private let loader: () async throws -> ArticleContent
 
-    /// Live scrape of a bookmark's URL.
+    /// Live scrape of a bookmark's URL. Kept once it has loaded, so opening
+    /// the same story again doesn't wait on another scrape.
     init(url: String) {
-        loader = { try await OtterClient.shared.articleContent(url: url) }
+        let key = "article:" + url
+        loader = {
+            if let cached = await FeedCache.shared.load(ArticleContent.self, for: key) {
+                return cached.value
+            }
+            let article = try await OtterClient.shared.articleContent(url: url)
+            // An empty scrape may work next time; don't pin it for a week.
+            if article.hasContent {
+                await FeedCache.shared.save(article, for: key)
+            }
+            return article
+        }
     }
 
     /// The stored article behind a reading item, cached for offline.
