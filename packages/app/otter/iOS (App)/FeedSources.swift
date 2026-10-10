@@ -18,9 +18,6 @@ nonisolated enum FeedHTTP {
         let config = URLSessionConfiguration.default
         config.httpAdditionalHeaders = [
             "User-Agent": "OtterReader/1.0 (+https://github.com/mrmartineau/otter)",
-            // `reloadIgnoringLocalCacheData` only skips *this* device's cache.
-            // Feeds sit behind CDNs, so ask those to revalidate too.
-            "Cache-Control": "no-cache",
         ]
         config.timeoutIntervalForRequest = 20
         // Feeds ship long `Cache-Control` lifetimes, so the default protocol
@@ -31,8 +28,14 @@ nonisolated enum FeedHTTP {
         return URLSession(configuration: config)
     }()
 
-    static func get(_ url: URL) async throws -> Data {
-        let (data, response) = try await session.data(from: url)
+    /// `revalidate` is for RSS: `reloadIgnoringLocalCacheData` only skips
+    /// *this* device's cache, and feeds sit behind CDNs with long lifetimes,
+    /// so ask those to revalidate too. The HN and Lobsters APIs are live
+    /// already; sending it there just pushes requests past their edge cache.
+    static func get(_ url: URL, revalidate: Bool = false) async throws -> Data {
+        var request = URLRequest(url: url)
+        if revalidate { request.setValue("no-cache", forHTTPHeaderField: "Cache-Control") }
+        let (data, response) = try await session.data(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         guard (200 ..< 300).contains(status) else { throw FeedError.http(status) }
         return data
@@ -145,7 +148,7 @@ nonisolated struct RSSSource: FeedSource {
     }
 
     static func load(_ url: URL, sourceID: String) async throws -> ParsedFeed {
-        let data = try await FeedHTTP.get(url)
+        let data = try await FeedHTTP.get(url, revalidate: true)
         return try FeedParser.parse(data, sourceID: sourceID)
     }
 }

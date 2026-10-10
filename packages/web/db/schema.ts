@@ -357,6 +357,13 @@ export const bookmarks = pgTable(
     tweet: json('tweet'),
     type: bookmarkTypeEnum('type').default('link'),
     url: text('url'),
+    // `url` without scheme, `www.`, query, fragment or trailing slash,
+    // lowercased — what /api/check-url compares. Keep in step with `urlKey`
+    // in worker/bookmarks/urlKey.ts.
+    urlKey: text('url_key').generatedAlwaysAs(
+      (): SQL =>
+        sql`lower(regexp_replace(regexp_replace(${bookmarks.url}, '[?#].*$', ''), '^([a-z][a-z0-9+.-]*://)?(www\\.)?|/+$', '', 'gi'))`,
+    ),
     user: uuid('user').references(() => authUsers.id),
   },
   (table) => [
@@ -376,6 +383,7 @@ export const bookmarks = pgTable(
     index('bookmarks_search_text_idx').using('gin', table.searchText),
     index('bookmarks_tags_idx').using('gin', table.tags),
     index('bookmarks_url_trgm_idx').using('gin', table.url.op('gin_trgm_ops')),
+    index('bookmarks_user_url_key_idx').on(table.user, table.urlKey),
   ],
 )
 

@@ -9,7 +9,7 @@
 import Combine
 import SwiftUI
 
-nonisolated struct Comment: Identifiable, Hashable {
+nonisolated struct Comment: Identifiable, Hashable, Codable {
     let id: String
     let author: String
     let text: String
@@ -38,24 +38,69 @@ final class CommentsModel: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var error: String?
     @Published var collapsed: Set<String> = []
+    /// A fetch in flight behind a cached thread. Not shown; it only stops a
+    /// second load starting.
+    private var isRefreshing = false
 
+    /// A cached thread younger than this is shown without asking again.
+    private static let freshFor: TimeInterval = 5 * 60
+
+    /// Shows a cached thread straight away, then refreshes it behind the
+    /// scenes if it's more than a few minutes old.
     func load(_ ref: CommentsRef) async {
-        guard comments.isEmpty, !isLoading else { return }
+        guard comments.isEmpty, !isLoading, !isRefreshing else { return }
+
+        // Set before the cache read, so the overlay shows a spinner rather
+        // than "No comments yet" and a second call can't slip past the guard.
         isLoading = true
         error = nil
+
+        let cached = await FeedCache.shared.load([Comment].self, for: CommentsAPI.key(ref))
+        if let cached {
+            comments = cached.value
+            isLoading = false
+            guard Date().timeIntervalSince(cached.savedAt) > Self.freshFor else { return }
+        }
+
+        isRefreshing = true
+        defer { isRefreshing = false }
+
         do {
-            switch ref {
-            case let .hackerNews(id): comments = try await Self.hackerNews(id)
-            case let .lobsters(id): comments = try await Self.lobsters(id)
-            }
+            // Detached: a big thread is thousands of comments to decode and
+            // strip of HTML, which would otherwise run on the main actor.
+            // It also finishes (and fills the cache) if you back out early.
+            comments = try await Task.detached(priority: .userInitiated) {
+                try await CommentsAPI.fetch(ref)
+            }.value
         } catch {
-            self.error = error.localizedDescription
+            // Keep a stale thread on screen rather than an error over it.
+            if cached == nil { self.error = error.localizedDescription }
         }
         isLoading = false
     }
 
     func toggle(_ comment: Comment) {
         if collapsed.contains(comment.id) { collapsed.remove(comment.id) } else { collapsed.insert(comment.id) }
+    }
+}
+
+/// Fetching threads, off the main actor. Each fetch lands in `FeedCache`.
+nonisolated enum CommentsAPI {
+    static func key(_ ref: CommentsRef) -> String {
+        switch ref {
+        case let .hackerNews(id): return "comments:hn:\(id)"
+        case let .lobsters(id): return "comments:lobsters:\(id)"
+        }
+    }
+
+    static func fetch(_ ref: CommentsRef) async throws -> [Comment] {
+        let comments: [Comment]
+        switch ref {
+        case let .hackerNews(id): comments = try await hackerNews(id)
+        case let .lobsters(id): comments = try await lobsters(id)
+        }
+        await FeedCache.shared.save(comments, for: key(ref))
+        return comments
     }
 
     // MARK: Hacker News

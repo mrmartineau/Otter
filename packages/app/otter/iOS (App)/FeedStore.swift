@@ -41,8 +41,10 @@ final class FeedStore: ObservableObject {
 
     private let cache = DiskCache(fileName: "feeds.json")
     private let defaults = UserDefaults.standard
+    /// The last snapshot write, so the next one waits for it.
+    private var persisting: Task<Void, Never>?
 
-    private struct Snapshot: Codable {
+    nonisolated private struct Snapshot: Codable {
         var items: [String: [FeedItem]]
         var starred: [FeedItem]
         /// Optional so snapshots written before this existed still decode.
@@ -61,6 +63,7 @@ final class FeedStore: ObservableObject {
             lastRefreshBySource = snapshot.lastRefreshBySource ?? [:]
         }
         rebuildMenu()
+        Task.detached(priority: .background) { await FeedCache.shared.sweep() }
     }
 
     private func rebuildMenu() {
@@ -138,9 +141,10 @@ final class FeedStore: ObservableObject {
                 group.addTask { await self.refresh(source, persisting: false) }
             }
         }
-        // Once for the batch: each write encodes every feed's items on the main
-        // actor, and fifty of those in a row stall the UI.
+        // Once for the batch, and awaited: background refresh marks its task
+        // done when this returns, and iOS may suspend before a pending write.
         persist()
+        await persisting?.value
     }
 
     func refresh(_ source: any FeedSource, persisting: Bool = true) async {
@@ -148,7 +152,12 @@ final class FeedStore: ObservableObject {
         defer { refreshing.remove(source.id) }
 
         do {
-            let items = try await source.fetch()
+            // Detached so decoding and parsing run off the main actor. On it,
+            // every feed parsed in turn, and the UI and Hacker News waited
+            // behind them.
+            let items = try await Task.detached(priority: .userInitiated) {
+                try await source.fetch()
+            }.value
             itemsBySource[source.id] = items
             errorsBySource[source.id] = nil
             lastRefreshBySource[source.id] = Date()
@@ -263,13 +272,20 @@ final class FeedStore: ObservableObject {
         defaults.set(try? JSONEncoder().encode(subscriptions), forKey: "feeds.subscriptions")
     }
 
+    /// Encodes and writes off the main actor, one write after another so an
+    /// older snapshot never lands on top of a newer one.
     private func persist() {
         let snapshot = Snapshot(
             items: itemsBySource,
             starred: starred,
             lastRefreshBySource: lastRefreshBySource
         )
-        cache.store((try? JSONEncoder().encode(snapshot)) ?? Data())
+        let cache = cache
+        let previous = persisting
+        persisting = Task.detached(priority: .utility) {
+            await previous?.value
+            cache.store((try? JSONEncoder().encode(snapshot)) ?? Data())
+        }
     }
 }
 

@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, sql } from 'drizzle-orm'
+import { and, desc, eq, sql } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { API_HEADERS } from '@/constants'
 import type { BookmarkStatus, BookmarkType } from '@/types/db'
@@ -9,6 +9,7 @@ import { requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 import { bookmarkToRow } from './mapper'
 import { scheduleBookmarkSideEffects } from './sideEffects'
+import { urlKey } from './urlKey'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
 type BookmarkInsert = typeof bookmarks.$inferInsert
@@ -291,18 +292,22 @@ export const checkBookmarkUrl = async (context: HonoContext) => {
       return auth
     }
 
-    const urlInput = context.req.query('url_input') ?? ''
-    const data = await auth.requestContext.db
-      .select()
-      .from(bookmarks)
-      .where(
-        and(
-          eq(bookmarks.user, auth.userId),
-          eq(bookmarks.status, 'active'),
-          ilike(bookmarks.url, `%${urlInput}%`),
-        ),
-      )
-      .orderBy(desc(bookmarks.createdAt))
+    // An indexed equality on the normalised URL, not `ILIKE '%…%'`, which
+    // had to scan every bookmark the user owns.
+    const key = urlKey(context.req.query('url_input') ?? '')
+    const data = key
+      ? await auth.requestContext.db
+          .select()
+          .from(bookmarks)
+          .where(
+            and(
+              eq(bookmarks.user, auth.userId),
+              eq(bookmarks.urlKey, key),
+              eq(bookmarks.status, 'active'),
+            ),
+          )
+          .orderBy(desc(bookmarks.createdAt))
+      : []
 
     return new Response(
       JSON.stringify({ data: data.map(bookmarkToRow), error: null }),

@@ -1,0 +1,2 @@
+ALTER TABLE "bookmarks" ADD COLUMN "url_key" text GENERATED ALWAYS AS (lower(regexp_replace(regexp_replace("bookmarks"."url", '[?#].*$', ''), '^([a-z][a-z0-9+.-]*://)?(www\.)?|/+$', '', 'gi'))) STORED;--> statement-breakpoint
+CREATE INDEX "bookmarks_user_url_key_idx" ON "bookmarks" USING btree ("user","url_key");
