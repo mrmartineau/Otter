@@ -141,9 +141,10 @@ final class FeedStore: ObservableObject {
                 group.addTask { await self.refresh(source, persisting: false) }
             }
         }
-        // Once for the batch: each write encodes every feed's items on the main
-        // actor, and fifty of those in a row stall the UI.
+        // Once for the batch, and awaited: background refresh marks its task
+        // done when this returns, and iOS may suspend before a pending write.
         persist()
+        await persisting?.value
     }
 
     func refresh(_ source: any FeedSource, persisting: Bool = true) async {
