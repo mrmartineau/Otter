@@ -1,6 +1,8 @@
 import type { Context } from 'hono'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { AI_DECISION_MODEL } from '../ai/consts'
+
 const scrapeMetadata = vi.fn()
 const aiRun = vi.fn()
 
@@ -14,7 +16,15 @@ const context = { env: { AI: { run: aiRun } } } as unknown as Context
 
 /** The system prompt each AI call was given, in call order. */
 const systemPrompts = () =>
-  aiRun.mock.calls.map((call) => call[1].messages[0].content as string)
+  aiRun.mock.calls
+    .filter((call) => call[1].messages)
+    .map((call) => call[1].messages[0].content as string)
+
+/** What the classifier, Clef, was asked about. */
+const clefState = () =>
+  aiRun.mock.calls.find(([model]) => model === AI_DECISION_MODEL)?.[1].state as
+    | string
+    | undefined
 
 const promptFor = (kind: 'title' | 'description') =>
   systemPrompts().find((content) =>
@@ -33,7 +43,18 @@ const stubAi = ({
   tags?: string[]
   type?: string
 } = {}) => {
-  aiRun.mockImplementation(async (_model, options) => {
+  aiRun.mockImplementation(async (model, options) => {
+    if (model === AI_DECISION_MODEL) {
+      return {
+        answers: {
+          tags: {
+            probabilities: Object.fromEntries(tags.map((tag) => [tag, 0.9])),
+          },
+          type: { choice: type },
+        },
+      }
+    }
+
     const systemPrompt = options.messages[0].content as string
 
     if (systemPrompt.startsWith('You are a web page title rewriter')) {
@@ -44,7 +65,7 @@ const stubAi = ({
       return { response: description }
     }
 
-    return { response: { tags, type } }
+    return { response: { tag: '' } }
   })
 }
 
@@ -131,12 +152,9 @@ describe('scrapedBookmark', () => {
 
     await scrapedBookmark('https://github.com/owner/repo', {}, dbTags, context)
 
-    const classifyPrompt = systemPrompts().find((content) =>
-      content.startsWith('You tag saved web pages'),
-    )
-
-    expect(classifyPrompt).toBeDefined()
     // The classifier is one of three calls, and it never sees "owner/repo –".
+    expect(clefState()).toContain('GitHub - owner/repo: a thing')
+    expect(clefState()).not.toContain('owner/repo –')
     expect(aiRun).toHaveBeenCalledTimes(3)
   })
 

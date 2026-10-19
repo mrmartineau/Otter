@@ -2,7 +2,7 @@ import type { Context } from 'hono'
 import type { BookmarkType } from '@/types/db'
 import type { MetaTag } from '@/utils/fetching/meta'
 import { matchTagNames } from '@/utils/matchTags'
-import { AI_CLASSIFY_MODEL } from './consts'
+import { AI_CLASSIFY_MODEL, AI_DECISION_MODEL } from './consts'
 
 export type AiClassifyResponse = {
   tags: { name: string; isNew: boolean }[]
@@ -120,42 +120,180 @@ const buildShortlist = (tagNames: string[], text: string) => [
   ]),
 ]
 
-const classifySystemPrompt = (
-  candidates: string[],
-  currentType: string,
-) => `You tag saved web pages. You are given a URL, a title and a description.
+/** Clef's answer to a `choice` question: a probability for every option. */
+type ClefChoice = { choice?: string; probabilities?: Record<string, number> }
 
-Pick between 1 and 5 tags from this list. Pick only tags that clearly fit the page — most pages need two or three:
-${candidates.join(', ')}
-
-If, and only if, no tag in the list fits, put one new tag in "newTags". Write it lowercase, one or two words, kebab-case for two words.
-
-Also pick the content type. "${currentType}" is only a guess from the shape of the URL, so change it whenever the title or description says otherwise. A recipe page is "recipe", a thing for sale is "product", a blog post is "article", a repository is "link".
-
-Rules:
-- Never answer with a tag that is close to one in the list. Use the list one.
-- Never use a content type as a tag.
-- An empty "tags" is better than a tag that does not fit.`
+/** Not a tag. Lets Clef say nothing on the shortlist fits. */
+const NO_TAG = '__none__'
 
 /**
- * A JSON schema makes the shortlist the only spellings the model can answer
- * with, so it cannot invent a near-duplicate of a tag the user already has.
+ * How likely a tag has to be before it is applied. Clef spreads one
+ * probability across the whole shortlist, so a second tag that fits sits
+ * well below the first: Ghostty came back CLI 0.88, app:mac 0.11.
  */
-const responseSchema = (candidates: string[]) => ({
-  properties: {
-    newTags: { items: { type: 'string' }, maxItems: 1, type: 'array' },
-    tags: {
-      items: candidates.length
-        ? { enum: candidates, type: 'string' }
-        : { type: 'string' },
-      maxItems: MAX_TAGS,
-      type: 'array',
+const MIN_TAG_PROBABILITY = 0.1
+
+const TYPE_CRITERIA: Record<BookmarkType, string> = {
+  article: 'A blog post, essay or other written piece',
+  audio: 'A podcast, song or other audio',
+  book: 'A book',
+  document: 'A PDF, paper, spec or other document',
+  event: 'A conference, meetup or other event',
+  file: 'A file to download',
+  game: 'A video game or board game',
+  image: 'An image or photo',
+  link: 'A website, tool, app or repository',
+  note: 'A note',
+  place: 'A place: a restaurant, shop or location',
+  product: 'Something for sale',
+  recipe: 'A recipe',
+  video: 'A video',
+}
+
+const askClef = async ({
+  context,
+  candidates,
+  currentType,
+  state,
+}: {
+  context: Context
+  candidates: string[]
+  currentType: BookmarkType
+  state: string
+}) => {
+  const questions: Record<string, unknown> = {
+    type: {
+      criteria: TYPE_CRITERIA,
+      instructions: `What kind of bookmark is this? "${currentType}" is only a guess from the shape of the URL.`,
+      type: 'choice',
     },
-    type: { enum: [...BOOKMARK_TYPES], type: 'string' },
-  },
-  required: ['tags', 'type'],
-  type: 'object',
-})
+  }
+
+  if (candidates.length) {
+    questions.tags = {
+      criteria: {
+        ...Object.fromEntries(candidates.map((tag) => [tag, tag])),
+        [NO_TAG]: 'None of these tags fit the bookmark',
+      },
+      instructions:
+        'Which tags fit this bookmark? A tag written "Parent:Child" belongs to the Parent collection.',
+      type: 'choice',
+    }
+  }
+
+  const output = (await context.env.AI.run(AI_DECISION_MODEL, {
+    model: 'clef-flash',
+    questions,
+    state,
+  })) as {
+    answers?: { tags?: ClefChoice; type?: ClefChoice }
+  }
+
+  return output.answers ?? {}
+}
+
+/** Every tag likely enough to apply, most likely first. */
+const pickTags = (answer: ClefChoice | undefined) =>
+  Object.entries(answer?.probabilities ?? {})
+    .filter(
+      ([tag, probability]) =>
+        tag !== NO_TAG && probability >= MIN_TAG_PROBABILITY,
+    )
+    .sort(([, a], [, b]) => b - a)
+    .map(([tag]) => tag)
+
+/**
+ * Collections are the "Parent:Child" tags grouped by parent, so the generator
+ * can see "AI" holds "AI:Claude" and "AI:OpenAI" and add "AI:Gemini" beside
+ * them.
+ */
+const collections = (tagNames: string[]) => {
+  const byParent = new Map<string, string[]>()
+
+  for (const tag of tagNames) {
+    const index = tag.indexOf(':')
+
+    if (index > 0) {
+      const parent = tag.slice(0, index)
+      byParent.set(parent, [...(byParent.get(parent) ?? []), tag])
+    }
+  }
+
+  return [...byParent.entries()]
+    .slice(0, 30)
+    .map(([parent, tags]) => `${parent}: ${tags.slice(0, 6).join(', ')}`)
+}
+
+const newTagSystemPrompt = (
+  tagNames: string[],
+) => `You name a new tag for a saved web page. None of the user's existing tags fit it.
+
+The user groups tags into collections with a colon: "AI:Claude" is the Claude collection inside AI. Their collections, with some of the tags in each:
+${collections(tagNames).join('\n') || '(none yet)'}
+
+Some of their other tags:
+${tagNames
+  .filter((tag) => !tag.includes(':'))
+  .slice(0, 30)
+  .join(', ')}
+
+Rules:
+- If the page belongs in one of those collections but no tag in it fits, add a new tag to that collection: "Parent:Child", spelling Parent exactly as the user does.
+- Otherwise make one short top-level tag.
+- Match the user's casing and word separators.
+- Answer with one tag, never one the user already has.`
+
+const generateTag = async ({
+  context,
+  tagNames,
+  page,
+}: {
+  context: Context
+  tagNames: string[]
+  page: string
+}) => {
+  const { response } = (await context.env.AI.run(AI_CLASSIFY_MODEL, {
+    messages: [
+      { content: newTagSystemPrompt(tagNames), role: 'system' },
+      { content: page, role: 'user' },
+    ],
+    response_format: {
+      json_schema: {
+        properties: { tag: { type: 'string' } },
+        required: ['tag'],
+        type: 'object',
+      },
+      type: 'json_schema',
+    },
+  })) as { response?: { tag?: string } }
+
+  const tag =
+    typeof response?.tag === 'string'
+      ? response.tag.trim().replace(/\s*:\s*/g, ':')
+      : ''
+
+  if (!tag) {
+    return undefined
+  }
+
+  // Spell the parent the way the user does: "ai:Gemini" joins "AI".
+  const index = tag.indexOf(':')
+
+  if (index > 0) {
+    const parent = tag.slice(0, index).toLowerCase()
+    const existing = tagNames.find(
+      (name) =>
+        name.indexOf(':') > 0 &&
+        name.slice(0, name.indexOf(':')).toLowerCase() === parent,
+    )
+
+    if (existing) {
+      return `${existing.slice(0, existing.indexOf(':'))}${tag.slice(index)}`
+    }
+  }
+
+  return tag
+}
 
 export const classifyBookmark = async ({
   context,
@@ -177,26 +315,22 @@ export const classifyBookmark = async ({
     : 'link'
   const tagNames = usableTags(existingTags)
   const candidates = buildShortlist(tagNames, `${title} ${description}`)
+  const page = `URL: ${url}\nTitle: ${title}\nDescription: ${description}`
 
-  const messages = [
-    {
-      content: classifySystemPrompt(candidates, normalizedCurrentType),
-      role: 'system',
-    },
-    {
-      content: `URL: ${url}\nTitle: ${title}\nDescription: ${description}`,
-      role: 'user',
-    },
-  ]
+  const answers = await askClef({
+    candidates,
+    context,
+    currentType: normalizedCurrentType,
+    state: page,
+  })
 
-  const { response } = (await context.env.AI.run(AI_CLASSIFY_MODEL, {
-    messages,
-    response_format: {
-      json_schema: responseSchema(candidates),
-      type: 'json_schema',
-    },
-  })) as {
-    response?: { tags?: string[]; newTags?: string[]; type?: string }
+  // Clef can only choose from the shortlist, so when nothing on it fits the
+  // other model writes a tag in the style of the user's vocabulary.
+  let picked = pickTags(answers.tags)
+
+  if (!picked.length) {
+    const generated = await generateTag({ context, page, tagNames })
+    picked = generated ? [generated] : []
   }
 
   // Match case-insensitively but answer with the spelling already in the
@@ -215,13 +349,12 @@ export const classifyBookmark = async ({
   const seen = new Set<string>()
   const tags: AiClassifyResponse['tags'] = []
 
-  for (const raw of [...(response?.tags ?? []), ...(response?.newTags ?? [])]) {
-    const name = typeof raw === 'string' ? raw.trim() : ''
+  for (const name of picked) {
     const key = name.toLowerCase()
 
     if (
-      !name ||
       seen.has(key) ||
+      key === 'untagged' ||
       key.startsWith('like:') ||
       BOOKMARK_TYPE_SET.has(key)
     ) {
@@ -236,8 +369,8 @@ export const classifyBookmark = async ({
     }
   }
 
-  const type = isBookmarkType(response?.type)
-    ? response.type
+  const type = isBookmarkType(answers.type?.choice)
+    ? answers.type.choice
     : normalizedCurrentType
 
   return { tags, type }
