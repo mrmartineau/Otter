@@ -91,6 +91,21 @@ describe('classifyBookmark', () => {
     expect(shortlist()).not.toContain('popular-40')
   })
 
+  it('offers a collection tag its child alone is named by', async () => {
+    aiRun.mockResolvedValue(clefAnswer({ tags: { __none__: 1 } }))
+
+    await classifyBookmark({
+      context,
+      currentType: 'link',
+      description: 'Show an agent a problem instead of describing it.',
+      existingTags: [...existingTags, { count: 1, tag: 'AI:Agent' }],
+      title: 'Show an agent the problem.',
+      url: 'https://scrawl.kitlangton.com/',
+    })
+
+    expect(shortlist()).toContain('AI:Agent')
+  })
+
   it('offers app:mac and never the pieces it is made of', async () => {
     await classify()
 
@@ -233,6 +248,12 @@ describe('classifyBookmark', () => {
       const result = await classifyNew({ tags: { __none__: 1 } }, 'ai : Gemini')
 
       expect(result.tags).toEqual([{ isNew: true, name: 'AI:Gemini' }])
+    })
+
+    it('falls back to the collection itself', async () => {
+      const result = await classifyNew({ tags: { __none__: 1 } }, 'ai')
+
+      expect(result.tags).toEqual([{ isNew: true, name: 'AI' }])
     })
 
     it('reuses an existing tag the generator repeats', async () => {

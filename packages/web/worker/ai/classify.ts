@@ -108,6 +108,21 @@ const usableTags = (tags: MetaTag[]) => {
 }
 
 /**
+ * Collection tags the text names by their child alone: "Show an agent the
+ * problem" never says "AI", but it is an "AI:Agent" page. Only the child
+ * counts, so the word "AI" does not pull in every "AI:*" tag at once.
+ */
+const matchChildren = (tagNames: string[], text: string) => {
+  const inCollections = tagNames.filter((name) => name.indexOf(':') > 0)
+  const children = inCollections.map((name) =>
+    name.slice(name.lastIndexOf(':') + 1),
+  )
+  const matched = new Set(matchTagNames(text, children))
+
+  return inCollections.filter((_, index) => matched.has(children[index]))
+}
+
+/**
  * The model sees a shortlist, not the whole vocabulary. Handing it ~950 tag
  * names made it answer with popular unrelated ones — a mountain bike wheel
  * video came back tagged "golf" and "gaming". With ~50 candidates it picks
@@ -116,6 +131,7 @@ const usableTags = (tags: MetaTag[]) => {
 const buildShortlist = (tagNames: string[], text: string) => [
   ...new Set([
     ...matchTagNames(text, tagNames),
+    ...matchChildren(tagNames, text),
     ...tagNames.slice(0, POPULAR_TAG_COUNT),
   ]),
 ]
@@ -239,9 +255,10 @@ ${tagNames
 
 Rules:
 - If the page belongs in one of those collections but no tag in it fits, add a new tag to that collection: "Parent:Child", spelling Parent exactly as the user does.
+- If it belongs in a collection but is too general or one-off for a tag of its own, answer with the collection name alone, e.g. "AI".
 - Otherwise make one short top-level tag.
 - Match the user's casing and word separators.
-- Answer with one tag, never one the user already has.`
+- Answer with one tag. Never one the user already has, except a collection name alone.`
 
 const generateTag = async ({
   context,
@@ -276,23 +293,16 @@ const generateTag = async ({
     return undefined
   }
 
-  // Spell the parent the way the user does: "ai:Gemini" joins "AI".
+  // Spell the parent the way the user does: "ai:Gemini" joins "AI", and a
+  // bare "ai" is the AI collection.
   const index = tag.indexOf(':')
+  const head = index > 0 ? tag.slice(0, index) : tag
+  const parent = tagNames
+    .filter((name) => name.indexOf(':') > 0)
+    .map((name) => name.slice(0, name.indexOf(':')))
+    .find((name) => name.toLowerCase() === head.toLowerCase())
 
-  if (index > 0) {
-    const parent = tag.slice(0, index).toLowerCase()
-    const existing = tagNames.find(
-      (name) =>
-        name.indexOf(':') > 0 &&
-        name.slice(0, name.indexOf(':')).toLowerCase() === parent,
-    )
-
-    if (existing) {
-      return `${existing.slice(0, existing.indexOf(':'))}${tag.slice(index)}`
-    }
-  }
-
-  return tag
+  return parent ? `${parent}${index > 0 ? tag.slice(index) : ''}` : tag
 }
 
 export const classifyBookmark = async ({
