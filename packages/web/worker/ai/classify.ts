@@ -208,15 +208,21 @@ const askClef = async ({
   return output.answers ?? {}
 }
 
-/** Every tag likely enough to apply, most likely first. */
+/**
+ * Every tag likely enough to apply, most likely first. None when Clef's own
+ * pick is "nothing fits", even if a sibling tag clears the bar: a Gemini page
+ * can still score AI:Claude 0.3, and that is the page that needs a new tag.
+ */
 const pickTags = (answer: ClefChoice | undefined) =>
-  Object.entries(answer?.probabilities ?? {})
-    .filter(
-      ([tag, probability]) =>
-        tag !== NO_TAG && probability >= MIN_TAG_PROBABILITY,
-    )
-    .sort(([, a], [, b]) => b - a)
-    .map(([tag]) => tag)
+  answer?.choice === NO_TAG
+    ? []
+    : Object.entries(answer?.probabilities ?? {})
+        .filter(
+          ([tag, probability]) =>
+            tag !== NO_TAG && probability >= MIN_TAG_PROBABILITY,
+        )
+        .sort(([, a], [, b]) => b - a)
+        .map(([tag]) => tag)
 
 /**
  * Collections are the "Parent:Child" tags grouped by parent, so the generator
@@ -235,9 +241,9 @@ const collections = (tagNames: string[]) => {
     }
   }
 
-  return [...byParent.entries()]
-    .slice(0, 30)
-    .map(([parent, tags]) => `${parent}: ${tags.slice(0, 6).join(', ')}`)
+  return [...byParent.entries()].map(
+    ([parent, tags]) => `${parent}: ${tags.slice(0, 6).join(', ')}`,
+  )
 }
 
 const newTagSystemPrompt = (
@@ -346,10 +352,16 @@ export const classifyBookmark = async ({
   // Match case-insensitively but answer with the spelling already in the
   // database, or picking "cli" when the user has "CLI" saves a second tag.
   // Where both spellings exist, the most-used one wins, which is the one
-  // `existingTags` lists first.
+  // `existingTags` lists first. It is built from every tag, not the shortlist
+  // vocabulary, so a generated "mac" reuses the user's "mac" even though
+  // "app:mac" keeps it off the shortlist.
   const canonical = new Map<string, string>()
 
-  for (const tag of tagNames) {
+  for (const { tag } of existingTags) {
+    if (!tag) {
+      continue
+    }
+
     const key = tag.toLowerCase()
 
     if (!canonical.has(key)) {

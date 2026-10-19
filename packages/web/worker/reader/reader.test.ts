@@ -82,6 +82,13 @@ describe('autoTag', () => {
     expect(result.tags).toEqual(['AI:Agent'])
   })
 
+  it('saves nothing when no tag qualifies', async () => {
+    classify.mockResolvedValue({ tags: [], type: 'article' })
+
+    expect(await autoTag(context, db, 'u1', bookmark)).toBe(bookmark)
+    expect(saved).toBeUndefined()
+  })
+
   it('leaves a bookmark that already has tags alone', async () => {
     const tagged = { ...bookmark, tags: ['CSS'] }
 

@@ -227,6 +227,15 @@ describe('classifyBookmark', () => {
       expect(result.tags).toEqual([{ isNew: true, name: 'AI:Gemini' }])
     })
 
+    it('writes a new tag when Clef picks none over a likely sibling', async () => {
+      const result = await classifyNew(
+        { tags: { __none__: 0.55, 'AI:Claude': 0.3, CSS: 0.15 } },
+        'AI:Gemini',
+      )
+
+      expect(result.tags).toEqual([{ isNew: true, name: 'AI:Gemini' }])
+    })
+
     it('writes a new tag when no tag is likely enough', async () => {
       const result = await classifyNew(
         { tags: { __none__: 0.05, 'AI:Claude': 0.06, CSS: 0.04 } },
@@ -248,6 +257,22 @@ describe('classifyBookmark', () => {
       const result = await classifyNew({ tags: { __none__: 1 } }, 'ai : Gemini')
 
       expect(result.tags).toEqual([{ isNew: true, name: 'AI:Gemini' }])
+    })
+
+    it('reuses a tag the shortlist leaves out', async () => {
+      // "AI" is kept off the shortlist by "AI:Claude", but it is still theirs.
+      respond({ tags: { __none__: 1 } }, 'ai')
+
+      const result = await classifyBookmark({
+        context,
+        currentType: 'link',
+        description: '',
+        existingTags: [...aiTags, { count: 2, tag: 'AI' }],
+        title: 'Gemini',
+        url: 'https://gemini.google.com/',
+      })
+
+      expect(result.tags).toEqual([{ isNew: false, name: 'AI' }])
     })
 
     it('falls back to the collection itself', async () => {
