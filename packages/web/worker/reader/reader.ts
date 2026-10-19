@@ -18,6 +18,8 @@ import { errorResponse } from '@/utils/fetching/errorResponse'
 import { getErrorMessage } from '@/utils/get-error-message'
 import type { Db } from '../../db/client'
 import { bookmarks, highlights, readingItems } from '../../db/schema'
+import { classifyBookmark } from '../ai/classify'
+import { getTagCounts } from '../bookmarks/aggregates'
 import { requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 import { assertSafePublicUrl } from '../url-guard'
@@ -311,6 +313,54 @@ const ensureReadingRows = async (db: Db, userId: string) => {
  * POST /api/reader/items  { url }
  * Idempotent per URL: re-saving an article returns the existing item.
  */
+/**
+ * Tags a bookmark saved for later with the same classifier as every other
+ * save. It runs after extraction because a bare share has nothing else to go
+ * on. Only an untagged bookmark is touched, and the type stays "article",
+ * since that is what keeps it on the reading list.
+ *
+ * A failure leaves the bookmark untagged rather than failing the save.
+ */
+export const autoTag = async (
+  context: HonoContext,
+  db: Db,
+  userId: string,
+  bookmark: BookmarkRow,
+): Promise<BookmarkRow> => {
+  if (bookmark.tags?.length) {
+    return bookmark
+  }
+
+  try {
+    const { tags } = await classifyBookmark({
+      context,
+      currentType: 'article',
+      description: bookmark.description ?? '',
+      existingTags: await getTagCounts(db, userId),
+      title: bookmark.title ?? '',
+      url: bookmark.url ?? '',
+    })
+
+    if (!tags.length) {
+      return bookmark
+    }
+
+    const [updated] = await db
+      .update(bookmarks)
+      .set({ modifiedAt: new Date(), tags: tags.map((tag) => tag.name) })
+      .where(eq(bookmarks.id, bookmark.id))
+      .returning()
+
+    return updated ?? bookmark
+  } catch (error) {
+    console.warn(
+      `Classify failed for ${bookmark.url}: ${getErrorMessage(error)}`,
+    )
+
+    return bookmark
+  }
+}
+
 export const createReadingItem = async (context: HonoContext) => {
   try {
     const auth = await getAuthed(context, ['bookmarks:write'])
@@ -381,8 +431,9 @@ export const createReadingItem = async (context: HonoContext) => {
     }
 
     const extracted = await extractInto(db, item, bookmark)
+    const tagged = await autoTag(context, db, userId, extracted.bookmark)
 
-    return ok(itemToRow(extracted.item, extracted.bookmark), 201)
+    return ok(itemToRow(extracted.item, tagged), 201)
   } catch (error) {
     return errorResponse({
       error: getErrorMessage(error),
