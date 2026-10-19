@@ -363,15 +363,19 @@ export const classifyBookmark = async ({
 
     seen.add(key)
     tags.push({ isNew: !canonical.has(key), name: canonical.get(key) ?? name })
-
-    if (tags.length === MAX_TAGS) {
-      break
-    }
   }
+
+  // "AI:Agent" already files the bookmark under AI, so "AI" on its own adds
+  // nothing.
+  const keys = tags.map((tag) => tag.name.toLowerCase())
+  const leaves = tags.filter((tag) => {
+    const prefix = `${tag.name.toLowerCase()}:`
+    return !keys.some((key) => key.startsWith(prefix))
+  })
 
   const type = isBookmarkType(answers.type?.choice)
     ? answers.type.choice
     : normalizedCurrentType
 
-  return { tags, type }
+  return { tags: leaves.slice(0, MAX_TAGS), type }
 }

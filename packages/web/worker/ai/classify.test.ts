@@ -140,6 +140,15 @@ describe('classifyBookmark', () => {
     expect(generatorCall()).toBeUndefined()
   })
 
+  it('drops a collection when one of its tags is picked', async () => {
+    const result = await classify({ app: 0.2, 'app:mac': 0.5, CLI: 0.2 })
+
+    expect(result.tags).toEqual([
+      { isNew: false, name: 'app:mac' },
+      { isNew: false, name: 'CLI' },
+    ])
+  })
+
   it('caps the tags at five', async () => {
     const tags = Object.fromEntries(
       Array.from({ length: 8 }, (_, index) => [`popular-${index}`, 0.12]),
