@@ -29,7 +29,9 @@ final class ReadingStore: ObservableObject {
 
     private let cache = DiskCache(fileName: "reading-items.json")
     private let defaults = UserDefaults.standard
-    private let sinceKey = "reading.since"
+    // v2: a v1 cursor could outlive its purged cache and leave a partial list.
+    // The new name forces one full sync on every install.
+    private let sinceKey = "reading.since.v2"
     private let pendingKey = "reading.pending"
     private var pending: [PendingMutation] {
         didSet {
@@ -42,7 +44,13 @@ final class ReadingStore: ObservableObject {
     private init() {
         pending = defaults.data(forKey: pendingKey)
             .flatMap { try? JSONDecoder().decode([PendingMutation].self, from: $0) } ?? []
-        items = cache.load([ReadingItem].self) ?? []
+        // iOS can purge Caches but keeps UserDefaults. A cursor without its
+        // list would only pull recent changes, so start over with a full sync.
+        if let cached = cache.load([ReadingItem].self) {
+            items = cached
+        } else {
+            defaults.removeObject(forKey: sinceKey)
+        }
 
         NotificationCenter.default.addObserver(
             forName: .otterSignedOut,
@@ -105,7 +113,8 @@ final class ReadingStore: ObservableObject {
     }
 
     private func merge(_ changes: [ReadingItem], replaceAll: Bool) {
-        var byId = replaceAll ? [:] : Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
+        let current = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
+        var byId = replaceAll ? [:] : current
 
         for change in changes {
             if change.isDeleted {
@@ -113,7 +122,7 @@ final class ReadingStore: ObservableObject {
             } else {
                 // Keep locally cached content; the list endpoint omits it.
                 var merged = change
-                merged.content = change.content ?? byId[change.id]?.content
+                merged.content = change.content ?? current[change.id]?.content
                 byId[change.id] = merged
             }
         }
