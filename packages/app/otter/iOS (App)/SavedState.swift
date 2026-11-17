@@ -16,6 +16,12 @@ enum SavedState {
     static let maxAge: TimeInterval = 5 * 60
     private static let savedAtKey = "state.savedAt"
 
+    /// Younger than `maxAge`. A clock that has gone backwards counts as old.
+    private static func isFresh(now: Date, defaults: UserDefaults) -> Bool {
+        let age = now.timeIntervalSince1970 - defaults.double(forKey: savedAtKey)
+        return age >= 0 && age < maxAge
+    }
+
     /// The saved value, or nil when nothing is saved or it is older than `maxAge`.
     /// Views call this from their initialisers, so keep it cheap.
     static func load<Value: Decodable>(
@@ -24,9 +30,9 @@ enum SavedState {
         now: Date = .now,
         defaults: UserDefaults = .standard
     ) -> Value? {
-        let age = now.timeIntervalSince1970 - defaults.double(forKey: savedAtKey)
-
-        guard age < maxAge, let data = defaults.data(forKey: "state.\(key)") else { return nil }
+        guard isFresh(now: now, defaults: defaults),
+              let data = defaults.data(forKey: "state.\(key)")
+        else { return nil }
 
         return try? JSONDecoder().decode(type, from: data)
     }
@@ -45,7 +51,7 @@ enum SavedState {
     /// before any view reads. Without it, a later save restarts the clock and
     /// brings back values from days ago that this launch never showed.
     static func purgeExpired(now: Date = .now, defaults: UserDefaults = .standard) {
-        guard now.timeIntervalSince1970 - defaults.double(forKey: savedAtKey) >= maxAge else { return }
+        guard !isFresh(now: now, defaults: defaults) else { return }
 
         for key in defaults.dictionaryRepresentation().keys where key.hasPrefix("state.") {
             defaults.removeObject(forKey: key)
