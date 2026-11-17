@@ -39,3 +39,5 @@ Most day-to-day work happens in `packages/web` — see `packages/web/CLAUDE.md` 
 - **Lint/format:** Biome, config at `biome.json` extending `@mrmartineau/kit`. Single quotes, no semicolons. Run `pnpm check`.
 - **Commits & releases:** Conventional Commits drive `semantic-release` with `semantic-release-monorepo` — each package versions independently from its own commits. `fix:` → patch, `feat:` → minor, `feat!:`/`BREAKING CHANGE:` → major. Scope commits to the package (`feat(web): …`). Releases are GitHub releases only; nothing publishes to npm.
 - **Setup/ops:** full Supabase + Cloudflare walkthrough in `docs/setup-instructions.md`. Migration notes in `docs/`.
+
+@AGENTS.md

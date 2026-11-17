@@ -38,6 +38,9 @@ final class CommentsModel: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var error: String?
     @Published var collapsed: Set<String> = []
+    /// A fetch in flight behind a cached thread. Not shown; it only stops a
+    /// second load starting.
+    private var isRefreshing = false
 
     /// A cached thread younger than this is shown without asking again.
     private static let freshFor: TimeInterval = 5 * 60
@@ -45,16 +48,22 @@ final class CommentsModel: ObservableObject {
     /// Shows a cached thread straight away, then refreshes it behind the
     /// scenes if it's more than a few minutes old.
     func load(_ ref: CommentsRef) async {
-        guard comments.isEmpty, !isLoading else { return }
+        guard comments.isEmpty, !isLoading, !isRefreshing else { return }
+
+        // Set before the cache read, so the overlay shows a spinner rather
+        // than "No comments yet" and a second call can't slip past the guard.
+        isLoading = true
+        error = nil
 
         let cached = await FeedCache.shared.load([Comment].self, for: CommentsAPI.key(ref))
         if let cached {
             comments = cached.value
+            isLoading = false
             guard Date().timeIntervalSince(cached.savedAt) > Self.freshFor else { return }
-        } else {
-            isLoading = true
         }
-        error = nil
+
+        isRefreshing = true
+        defer { isRefreshing = false }
 
         do {
             // Detached: a big thread is thousands of comments to decode and
