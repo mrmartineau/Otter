@@ -13,6 +13,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Drop saved screens and filters that are too old, before any view reads them.
+        SavedState.purgeExpired()
+
         // Start listening for save-bookmark requests (app intents, otter:// URLs)
         // before any scene — and therefore any SwiftUI view — exists.
         _ = SaveRequestCenter.shared

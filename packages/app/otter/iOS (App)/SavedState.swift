@@ -41,6 +41,17 @@ enum SavedState {
         touch(now: now, defaults: defaults)
     }
 
+    /// Deletes everything saved once it is too old. Call it once at launch,
+    /// before any view reads. Without it, a later save restarts the clock and
+    /// brings back values from days ago that this launch never showed.
+    static func purgeExpired(now: Date = .now, defaults: UserDefaults = .standard) {
+        guard now.timeIntervalSince1970 - defaults.double(forKey: savedAtKey) >= maxAge else { return }
+
+        for key in defaults.dictionaryRepresentation().keys where key.hasPrefix("state.") {
+            defaults.removeObject(forKey: key)
+        }
+    }
+
     /// Restarts the five minutes. Called as the app goes to the background, so
     /// the clock runs from the moment you leave.
     static func touch(now: Date = .now, defaults: UserDefaults = .standard) {

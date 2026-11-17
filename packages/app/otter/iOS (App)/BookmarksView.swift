@@ -24,7 +24,7 @@ nonisolated enum LibraryDestination: Hashable, Codable {
 }
 
 /// Lets a feed push the article reader onto the Library stack, so the reader
-/// is saved with it. Unset inside the search sheet, whose stack isn't saved.
+/// is saved with it.
 private struct OpenReaderKey: EnvironmentKey {
     static let defaultValue: ((ArticleReaderRequest) -> Void)? = nil
 }
@@ -89,7 +89,6 @@ struct BookmarksView: View {
                 SavedState.save(String?.none, key: "search.query")
             }) {
                 SearchView()
-                    .environment(\.openReader, nil)
             }
             .navigationDestination(for: LibraryDestination.self) { destination in
                 switch destination {

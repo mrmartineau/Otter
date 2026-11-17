@@ -11,7 +11,6 @@ struct BookmarkFeedView: View {
     @StateObject private var model: BookmarkFeedModel
     @State private var editing: Bookmark?
     @State private var detail: Bookmark?
-    @State private var reader: ArticleReaderRequest?
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openReader) private var openReader
 
@@ -62,13 +61,7 @@ struct BookmarkFeedView: View {
                     onEdit: { editing = bookmark },
                     onShowDetail: { detail = bookmark },
                     onOpenReader: { mode in
-                        let request = ArticleReaderRequest(bookmark: bookmark, mode: mode)
-
-                        if let openReader {
-                            openReader(request)
-                        } else {
-                            reader = request
-                        }
+                        openReader?(ArticleReaderRequest(bookmark: bookmark, mode: mode))
                     },
                     onToggleStar: { Task { await model.toggleStar(bookmark) } },
                     onTogglePublic: { Task { await model.togglePublic(bookmark) } },
@@ -138,9 +131,6 @@ struct BookmarkFeedView: View {
                     model.replace(saved)
                 }
             }
-        }
-        .navigationDestination(item: $reader) { request in
-            ArticleReaderView(bookmark: request.bookmark, mode: request.mode)
         }
         .sheet(item: $detail) { bookmark in
             NavigationStack {

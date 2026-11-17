@@ -153,13 +153,21 @@ struct ReadingListView: View {
         }
     }
 
+    /// Pushes the article. The saved copy leaves out the cached text, which can
+    /// be large; the reader takes the full item from the store.
+    private func open(_ item: ReadingItem) {
+        var saved = item
+        saved.content = nil
+        if path.last != saved { path.append(saved) }
+    }
+
     private var list: some View {
         List {
             ForEach(visible) { item in
                 ReadingRow(item: item)
                     .listRowBackground(Color.clear)
                     .contentShape(Rectangle())
-                    .onTapGesture { if path.last != item { path.append(item) } }
+                    .onTapGesture { open(item) }
                     .swipeActions(edge: .trailing) {
                         Button {
                             editor.edit(item)
