@@ -155,9 +155,18 @@ final class FeedStore: ObservableObject {
             // Detached so decoding and parsing run off the main actor. On it,
             // every feed parsed in turn, and the UI and Hacker News waited
             // behind them.
-            let items = try await Task.detached(priority: .userInitiated) {
+            // A detached task does not inherit cancellation, so cancel it by
+            // hand when this task is cancelled.
+            let fetch = Task.detached(priority: .userInitiated) {
                 try await source.fetch()
-            }.value
+            }
+            let items = try await withTaskCancellationHandler {
+                try await fetch.value
+            } onCancel: {
+                fetch.cancel()
+            }
+            // A late result must not overwrite a newer refresh.
+            try Task.checkCancellation()
             itemsBySource[source.id] = items
             errorsBySource[source.id] = nil
             lastRefreshBySource[source.id] = Date()
