@@ -13,13 +13,13 @@
 import Combine
 import SwiftUI
 
-enum ArticleReaderMode: Hashable {
+nonisolated enum ArticleReaderMode: Hashable, Codable {
     case read
     case summary
 }
 
 /// What the feed asks for when you pick "Read article" or "Summary".
-struct ArticleReaderRequest: Identifiable, Hashable {
+nonisolated struct ArticleReaderRequest: Identifiable, Hashable, Codable {
     let bookmark: Bookmark
     let mode: ArticleReaderMode
 

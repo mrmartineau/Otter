@@ -11,7 +11,7 @@ nonisolated extension Notification.Name {
 }
 
 /// Where a list of bookmarks comes from. Each case maps to one API endpoint.
-nonisolated enum BookmarkFeedSource: Hashable {
+nonisolated enum BookmarkFeedSource: Hashable, Codable {
     case all
     case tag(String)
     case collection(String)
@@ -70,7 +70,7 @@ nonisolated struct OtterMeta: Decodable {
 }
 
 /// A row from `GET /api/collections-tags` — a `prefix:` namespace across tags.
-nonisolated struct OtterCollection: Decodable, Identifiable, Hashable {
+nonisolated struct OtterCollection: Codable, Identifiable, Hashable {
     let collection: String
     let bookmarkCount: Int
     let tags: [String]
@@ -92,7 +92,7 @@ nonisolated struct OtterCollection: Decodable, Identifiable, Hashable {
 }
 
 /// The toggles the web feed header offers, applied on top of a feed source.
-nonisolated struct BookmarkFilter: Hashable {
+nonisolated struct BookmarkFilter: Hashable, Codable {
     var star = false
     var isPublic = false
     /// 0 = off, 1 = last 7 days, 2 = 8–14 days ago, and so on.

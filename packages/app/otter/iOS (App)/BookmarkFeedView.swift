@@ -13,6 +13,7 @@ struct BookmarkFeedView: View {
     @State private var detail: Bookmark?
     @State private var reader: ArticleReaderRequest?
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openReader) private var openReader
 
     /// Chips shown above the list — a collection's tags, mirroring the web sub-nav.
     private let relatedTags: [String]
@@ -39,7 +40,7 @@ struct BookmarkFeedView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 6) {
                             ForEach(relatedTags, id: \.self) { tag in
-                                NavigationLink(value: BookmarkFeedSource.tag(tag)) {
+                                NavigationLink(value: LibraryDestination.feed(.tag(tag))) {
                                     Text(tag)
                                         .font(.footnote)
                                         .padding(.horizontal, 10)
@@ -61,7 +62,13 @@ struct BookmarkFeedView: View {
                     onEdit: { editing = bookmark },
                     onShowDetail: { detail = bookmark },
                     onOpenReader: { mode in
-                        reader = ArticleReaderRequest(bookmark: bookmark, mode: mode)
+                        let request = ArticleReaderRequest(bookmark: bookmark, mode: mode)
+
+                        if let openReader {
+                            openReader(request)
+                        } else {
+                            reader = request
+                        }
                     },
                     onToggleStar: { Task { await model.toggleStar(bookmark) } },
                     onTogglePublic: { Task { await model.togglePublic(bookmark) } },

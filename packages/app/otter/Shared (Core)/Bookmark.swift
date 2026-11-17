@@ -6,7 +6,7 @@
 import Foundation
 
 /// A row from `GET /api/bookmarks`. Only the fields the app renders are decoded.
-nonisolated struct Bookmark: Identifiable, Hashable, Decodable {
+nonisolated struct Bookmark: Identifiable, Hashable, Codable {
     let id: String
     let url: String?
     let title: String?
@@ -52,6 +52,27 @@ nonisolated struct Bookmark: Identifiable, Hashable, Decodable {
         createdAt = try container
             .decodeIfPresent(String.self, forKey: .createdAt)
             .flatMap(Bookmark.parseTimestamp)
+    }
+
+    /// Written in the API's own shape, so `init(from:)` reads it back. The
+    /// synthesised version would write `createdAt` as a number.
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encodeIfPresent(url, forKey: .url)
+        try container.encodeIfPresent(title, forKey: .title)
+        try container.encodeIfPresent(description, forKey: .description)
+        try container.encodeIfPresent(image, forKey: .image)
+        try container.encodeIfPresent(note, forKey: .note)
+        try container.encodeIfPresent(tags, forKey: .tags)
+        try container.encodeIfPresent(type, forKey: .type)
+        try container.encode(star, forKey: .star)
+        try container.encode(isPublic, forKey: .isPublic)
+        try container.encode(status, forKey: .status)
+        try container.encodeIfPresent(
+            createdAt.map(Bookmark.fractionalFormatter.string(from:)),
+            forKey: .createdAt
+        )
     }
 
     var displayTitle: String {

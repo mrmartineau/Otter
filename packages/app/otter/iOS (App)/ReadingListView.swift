@@ -62,10 +62,10 @@ struct ReadingListView: View {
     @ObservedObject var model: OtterAppModel
     @ObservedObject private var store = ReadingStore.shared
 
-    @State private var showArchived = false
-    @State private var query = ""
+    @AppStorage("read.showArchived") private var showArchived = false
+    @Restored("read.query") private var query = ""
     @StateObject private var editor = ReadingItemEditor()
-    @State private var reader: ReadingItem?
+    @Restored("path.read") private var path: [ReadingItem] = []
     @State private var isAdding = false
     @State private var newURL = ""
     @State private var saveError: String?
@@ -83,7 +83,7 @@ struct ReadingListView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
                 if !model.isSignedIn {
                     ContentUnavailableView {
@@ -124,8 +124,9 @@ struct ReadingListView: View {
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await store.sync() } }
             }
-            .navigationDestination(item: $reader) { item in
-                ArticleReaderView(item: item)
+            .navigationDestination(for: ReadingItem.self) { item in
+                // A restored item is a snapshot, so take the store's newer copy.
+                ArticleReaderView(item: store.items.first { $0.id == item.id } ?? item)
             }
             .readingItemEditor(editor)
             .alert("Save article", isPresented: $isAdding) {
@@ -158,7 +159,7 @@ struct ReadingListView: View {
                 ReadingRow(item: item)
                     .listRowBackground(Color.clear)
                     .contentShape(Rectangle())
-                    .onTapGesture { reader = item }
+                    .onTapGesture { if path.last != item { path.append(item) } }
                     .swipeActions(edge: .trailing) {
                         Button {
                             editor.edit(item)

@@ -16,7 +16,7 @@ struct CollectionsList: View {
 
     var body: some View {
         List(store.collections) { collection in
-            NavigationLink(value: collection) {
+            NavigationLink(value: LibraryDestination.collection(collection)) {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Label(collection.collection, systemImage: "folder")
