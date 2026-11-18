@@ -162,16 +162,17 @@
   background-color: var(--theme2);
 }
 
+/* FeedCards sets --columns, each card's --column and top, and the height */
 .feed-cards {
-  display: grid;
-  grid-template-columns: repeat(var(--columns, 1), minmax(0, 1fr));
-  align-items: start;
-  gap: var(--space-s);
-}
+  --columns: 1;
+  position: relative;
+  column-gap: var(--space-s);
 
-.feed-cards-column {
-  display: grid;
-  gap: var(--space-s);
+  > .bookmark-card {
+    position: absolute;
+    left: calc(var(--column, 0) * (100% + var(--space-s)) / var(--columns));
+    width: calc((100% - (var(--columns) - 1) * var(--space-s)) / var(--columns));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

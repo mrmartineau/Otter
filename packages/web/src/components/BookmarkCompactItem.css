@@ -99,7 +99,7 @@ time.bookmark-compact-meta {
   padding: 0 var(--space-xs) var(--space-s) calc(20px + var(--space-xs) * 2);
   animation: bookmark-compact-open 200ms var(--ease-out-3);
 
-  img {
+  > img {
     flex-shrink: 0;
     width: 140px;
     aspect-ratio: 16 / 10;

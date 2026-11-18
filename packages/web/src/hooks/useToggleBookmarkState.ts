@@ -4,6 +4,7 @@ import popUpOffSfx from '@mrmartineau/kit/sounds/pop-up-off.mp3'
 import popUpOnSfx from '@mrmartineau/kit/sounds/pop-up-on.mp3'
 import useSound from '@mrmartineau/use-sound'
 import { useQueryClient } from '@tanstack/react-query'
+import { useRef } from 'react'
 import { toast } from 'sonner'
 import type { Bookmark } from '@/types/db'
 import { updateBookmark } from '@/utils/fetching/bookmarks'
@@ -21,12 +22,23 @@ export const useToggleBookmarkState = ({
   const [playPopOff] = useSound(popOffSfx, { volume: 0.3 })
   const [playPopUpOn] = useSound(popUpOnSfx, { volume: 0.3 })
   const [playPopUpOff] = useSound(popUpOffSfx, { volume: 0.3 })
+  // `star` and `isPublic` only change after the refetch. A second click before
+  // then would send the same value again, so it is ignored.
+  const pending = useRef(new Set<ToggleColumn>())
 
   return async (column: ToggleColumn): Promise<void> => {
+    if (pending.current.has(column)) {
+      return
+    }
+    pending.current.add(column)
     const updateData =
       column === 'public' ? { public: !isPublic } : { star: !star }
-    await updateBookmark(id, updateData)
-    await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+    try {
+      await updateBookmark(id, updateData)
+      await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+    } finally {
+      pending.current.delete(column)
+    }
     const label =
       column === 'public'
         ? !isPublic

@@ -6,9 +6,8 @@ import {
 } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import type { FileRouteTypes } from '@tanstack/react-router'
-import { type CSSProperties, memo, type ReactNode, useRef } from 'react'
+import { memo, type ReactNode, useLayoutEffect, useRef } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { useResizeObserver } from 'usehooks-ts'
 import { Button } from '@/components/Button'
 import { CONTENT, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { useFeedOptions } from '@/hooks/useFeedOptions'
@@ -19,6 +18,7 @@ import { getCollectionsTagsOptions } from '@/utils/fetching/collections'
 import type { ShareKind } from '@/utils/fetching/shares'
 import type { Bookmark, Collection, Toot, Tweet } from '../types/db'
 import { cn } from '../utils/classnames'
+import { masonryLayout } from '../utils/masonryLayout'
 import { BookmarkCard } from './BookmarkCard'
 import { BookmarkCompactItem } from './BookmarkCompactItem'
 import { BookmarkFeedItem } from './BookmarkFeedItem'
@@ -64,14 +64,12 @@ export function isToot(item: FeedItemModel): item is Toot {
   return 'toot_id' in item
 }
 
-// CARD_GAP is the smallest value of --space-s, the gap in .feed-cards
 const CARD_MIN_WIDTH = 240
-const CARD_GAP = 16
 const MAX_CARD_COLUMNS = 3
 
 /**
- * Deals the cards into columns in turn (1st → column 1, 2nd → column 2…), so
- * the newest stay along the top and loading more only adds to the bottom.
+ * Cards stay in the page in feed order, so keyboard and screen-reader order
+ * match the feed. Each one is then placed at the top of the shortest column.
  */
 const FeedCards = ({
   items,
@@ -83,36 +81,58 @@ const FeedCards = ({
   collections: Collection[]
 }) => {
   const ref = useRef<HTMLDivElement>(null)
-  const { width = 0 } = useResizeObserver({ ref })
-  const columnCount = Math.min(
-    MAX_CARD_COLUMNS,
-    Math.max(1, Math.floor((width + CARD_GAP) / (CARD_MIN_WIDTH + CARD_GAP))),
-  )
-  const columns = Array.from({ length: columnCount }, (_, column) =>
-    items
-      .map((item, index) => ({ index, item }))
-      .filter(({ index }) => index % columnCount === column),
-  )
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: new items mean new cards to watch and place
+  useLayoutEffect(() => {
+    const grid = ref.current
+    if (!grid) {
+      return
+    }
+    const cards = Array.from(grid.children) as HTMLElement[]
+
+    const layout = () => {
+      const gap = Number.parseFloat(getComputedStyle(grid).columnGap) || 0
+      const columnCount = Math.min(
+        MAX_CARD_COLUMNS,
+        Math.max(
+          1,
+          Math.floor((grid.clientWidth + gap) / (CARD_MIN_WIDTH + gap)),
+        ),
+      )
+      // Set first: it changes the cards' width, so the heights below are right
+      grid.style.setProperty('--columns', String(columnCount))
+      const { positions, height } = masonryLayout(
+        cards.map((card) => card.offsetHeight),
+        columnCount,
+        gap,
+      )
+      positions.forEach(({ column, top }, index) => {
+        cards[index].style.setProperty('--column', String(column))
+        cards[index].style.top = `${top}px`
+      })
+      grid.style.height = `${height}px`
+    }
+
+    layout()
+    // Only the cards are watched: a width change resizes them too, and
+    // watching the grid would fire again on the height set above
+    const observer = new ResizeObserver(layout)
+    for (const card of cards) {
+      observer.observe(card)
+    }
+    return () => observer.disconnect()
+  }, [items])
 
   return (
-    <div
-      ref={ref}
-      className="feed-cards"
-      style={{ '--columns': columnCount } as CSSProperties}
-    >
-      {columns.map((column, columnIndex) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: columns have no identity beyond their position
-        <div className="feed-cards-column" key={columnIndex}>
-          {column.map(({ item, index }) => (
-            <BookmarkCard
-              {...item}
-              allowDeletion={allowDeletion}
-              collections={collections}
-              index={index}
-              key={item.id}
-            />
-          ))}
-        </div>
+    <div ref={ref} className="feed-cards">
+      {items.map((item, index) => (
+        <BookmarkCard
+          {...item}
+          allowDeletion={allowDeletion}
+          collections={collections}
+          index={index}
+          key={item.id}
+        />
       ))}
     </div>
   )

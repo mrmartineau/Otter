@@ -52,39 +52,46 @@ export const BookmarkActions = ({
 }: BookmarkActionsProps) => {
   const { id, url } = props
 
-  const handleCopyUrl = () => {
+  const handleCopyUrl = async () => {
     if (!url) {
       return
     }
-    navigator.clipboard.writeText(url)
-    toast.success('URL copied to clipboard')
+    try {
+      await navigator.clipboard.writeText(url)
+      toast.success('URL copied to clipboard')
+    } catch {
+      toast.error('Could not copy the URL')
+    }
   }
 
   return (
     <div className="bookmark-actions">
       {showToggles ? <BookmarkToggles {...props} /> : null}
+      {/* Copy and read both need a URL; the reader scrapes it */}
       {url ? (
-        <IconButton
-          size="m"
-          className="feed-icon-button"
-          aria-label="Copy URL to clipboard"
-          title="Copy URL"
-          onClick={handleCopyUrl}
-        >
-          <CopyIcon size={16} weight="duotone" />
-        </IconButton>
+        <>
+          <IconButton
+            size="m"
+            className="feed-icon-button"
+            aria-label="Copy URL to clipboard"
+            title="Copy URL"
+            onClick={handleCopyUrl}
+          >
+            <CopyIcon size={16} weight="duotone" />
+          </IconButton>
+          <Link
+            href={`/bookmark/${id}/read`}
+            className={iconButtonVariants({
+              className: 'feed-icon-button',
+              size: 'm',
+            })}
+            aria-label="Read article"
+            title="Read article"
+          >
+            <ArticleIcon size={16} weight="duotone" />
+          </Link>
+        </>
       ) : null}
-      <Link
-        href={`/bookmark/${id}/read`}
-        className={iconButtonVariants({
-          className: 'feed-icon-button',
-          size: 'm',
-        })}
-        aria-label="Read article"
-        title="Read article"
-      >
-        <ArticleIcon size={16} weight="duotone" />
-      </Link>
       <FeedItemActions {...props} />
     </div>
   )

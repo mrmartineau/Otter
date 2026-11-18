@@ -95,6 +95,16 @@ export const TypeToIcon = ({ type, color, ...rest }: TypeToIconProps) => {
           {...rest}
         />
       )
+    case 'book':
+      return (
+        <BookOpenTextIcon
+          aria-label="Book"
+          weight="duotone"
+          size={18}
+          color={color}
+          {...rest}
+        />
+      )
     case 'game':
       return (
         <GameControllerIcon

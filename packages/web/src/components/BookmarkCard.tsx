@@ -142,16 +142,17 @@ const Cover = ({
   type,
   url,
 }: BookmarkFeedItemProps & { imageUrl: string | null; ratio: string }) => {
-  const [isBroken, setIsBroken] = useState(false)
+  // Keyed by URL, so an edited image gets a fresh try
+  const [brokenUrl, setBrokenUrl] = useState<string | null>(null)
 
   return (
     <div className="bookmark-card-cover" style={{ aspectRatio: ratio }}>
-      {imageUrl && !isBroken ? (
+      {imageUrl && imageUrl !== brokenUrl ? (
         <img
           src={imageUrl}
           alt=""
           loading="lazy"
-          onError={() => setIsBroken(true)}
+          onError={() => setBrokenUrl(imageUrl)}
         />
       ) : (
         <div className="bookmark-card-cover-empty">

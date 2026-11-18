@@ -71,7 +71,7 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
             size="m"
             className="feed-icon-button bookmark-compact-caret"
             aria-expanded={isOpen}
-            aria-controls={detailId}
+            aria-controls={isOpen ? detailId : undefined}
             aria-label={isOpen ? 'Hide details' : 'Show details'}
             onClick={() => setIsOpen((open) => !open)}
           >

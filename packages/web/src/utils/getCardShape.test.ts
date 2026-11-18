@@ -16,9 +16,16 @@ describe('getCardShape', () => {
   })
 
   it('gives things with a picture the object shape', () => {
-    expect(shape('recipe')).toBe('object')
-    expect(shape('product')).toBe('object')
-    expect(shape('place')).toBe('object')
+    for (const type of [
+      'book',
+      'event',
+      'game',
+      'place',
+      'product',
+      'recipe',
+    ] as const) {
+      expect(shape(type)).toBe('object')
+    }
   })
 
   it('treats a note with no url as a note, whatever its type', () => {
