@@ -2,9 +2,10 @@ import { simpleUrl } from '@/utils/simpleUrl'
 
 interface FaviconProps {
   url: string
+  size?: number
 }
 
-export const Favicon = ({ url }: FaviconProps) => {
+export const Favicon = ({ url, size = 20 }: FaviconProps) => {
   const urlDomain = simpleUrl(url)
   const favicon = `https://icons.duckduckgo.com/ip3/${urlDomain}.ico`
   // let favicon = `https://www.fastmailcdn.com/avatar/${urlDomain}`
@@ -15,8 +16,8 @@ export const Favicon = ({ url }: FaviconProps) => {
     <img
       src={favicon}
       alt=""
-      width="20"
-      height="20"
+      width={size}
+      height={size}
       loading="lazy"
       className="block shrink-0 overflow-hidden rounded-full"
       onError={(event) => {

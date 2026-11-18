@@ -72,3 +72,103 @@
   gap: var(--space-3xs);
   font-size: var(--step--2);
 }
+
+/* View switch: list / compact / cards */
+.feed-view-switch {
+  display: inline-flex;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 2px;
+  border: 1px solid var(--theme5);
+  border-radius: var(--radii-l);
+  background-color: var(--theme3);
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: calc(var(--radii-l) - 2px);
+    color: var(--theme10);
+    font-size: var(--step--2);
+    cursor: pointer;
+    transition:
+      background-color 150ms var(--ease-out-2),
+      color 150ms var(--ease-out-2);
+
+    &:hover {
+      color: var(--theme12);
+    }
+
+    &[aria-pressed="true"] {
+      background-color: var(--theme1);
+      color: var(--theme12);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+    }
+  }
+
+  span {
+    @media (max-width: 499px) {
+      display: none;
+    }
+  }
+}
+
+/* Small icon buttons in the compact and card views. Pressed = coloured icon, not a filled button. */
+.feed-icon-button.icon-button-base {
+  width: 28px;
+  height: 28px;
+  color: var(--theme10);
+  transition:
+    background-color 150ms var(--ease-out-2),
+    transform 150ms var(--ease-out-2);
+
+  &:hover {
+    background-color: var(--theme4);
+    color: var(--theme12);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+
+  &[aria-pressed="true"] {
+    background-color: transparent;
+    color: var(--accent10);
+
+    &:hover {
+      background-color: var(--theme4);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.3;
+  }
+}
+
+.bookmark-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+
+.feed-compact {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radii-l);
+  background-color: var(--theme2);
+}
+
+.feed-cards {
+  columns: 3 240px;
+  column-gap: var(--space-s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feed-icon-button.icon-button-base {
+    transition: none;
+  }
+}
