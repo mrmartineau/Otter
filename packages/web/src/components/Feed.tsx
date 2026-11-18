@@ -64,7 +64,7 @@ export function isToot(item: FeedItemModel): item is Toot {
   return 'toot_id' in item
 }
 
-// Matches the --space-s gap in .feed-cards
+// CARD_GAP is the smallest value of --space-s, the gap in .feed-cards
 const CARD_MIN_WIDTH = 240
 const CARD_GAP = 16
 const MAX_CARD_COLUMNS = 3
