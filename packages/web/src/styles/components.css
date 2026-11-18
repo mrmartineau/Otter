@@ -1,6 +1,8 @@
 @import "../components/CmdK/CmdK.css";
 @import "../components/TagList/TagList.css";
 @import "../components/Button.css";
+@import "../components/BookmarkCard.css";
+@import "../components/BookmarkCompactItem.css";
 @import "../components/BookmarkForm.css";
 @import "../components/Card.css";
 @import "../components/CodeBlock.css";

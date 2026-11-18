@@ -1,0 +1,155 @@
+.bookmark-compact {
+  & + & {
+    border-top: 1px solid var(--border);
+  }
+
+  &:hover,
+  &[data-open] {
+    /* Between the row (theme2) and its border (theme3), so rows stay split */
+    background-color: color-mix(in oklab, var(--theme2), var(--theme3));
+  }
+}
+
+.bookmark-compact-line {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 40px;
+  padding: 6px var(--space-xs);
+  font-size: var(--step--1);
+  cursor: pointer;
+  user-select: none;
+
+  @media (min-width: 800px) {
+    grid-template-columns: 20px minmax(0, 1fr) 9rem minmax(0, 9rem) 5.5rem auto;
+  }
+}
+
+.bookmark-compact-type {
+  display: grid;
+  place-items: center;
+  color: var(--theme9);
+}
+
+.bookmark-compact-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  min-width: 0;
+  color: var(--theme12);
+  font-weight: 500;
+  text-decoration: none;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:hover span {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.bookmark-compact-meta {
+  overflow: hidden;
+  font-size: var(--step--2);
+  font-variant-numeric: tabular-nums;
+  color: var(--theme10);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bookmark-compact-domain,
+.bookmark-compact-tags {
+  display: none;
+
+  @media (min-width: 800px) {
+    display: block;
+  }
+}
+
+.bookmark-compact-tags a {
+  margin-right: 0.6em;
+}
+
+time.bookmark-compact-meta {
+  text-align: right;
+}
+
+.bookmark-compact-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.bookmark-compact-caret svg {
+  transition: transform 200ms var(--ease-out-3);
+}
+
+.bookmark-compact-caret[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.bookmark-compact-detail {
+  display: flex;
+  gap: var(--space-s);
+  padding: 0 var(--space-xs) var(--space-s) calc(20px + var(--space-xs) * 2);
+  animation: bookmark-compact-open 200ms var(--ease-out-3);
+
+  > img {
+    flex-shrink: 0;
+    width: 140px;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    border-radius: var(--radii-m);
+  }
+
+  .bookmark-actions {
+    justify-self: start;
+    /* Line the first icon up with the text above */
+    margin: var(--space-3xs) 0 0 -6px;
+  }
+}
+
+.bookmark-compact-detail-text {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2xs);
+  max-width: 60ch;
+  font-size: var(--step--1);
+  color: var(--theme11);
+  overflow-wrap: anywhere;
+
+  p {
+    margin: 0;
+  }
+}
+
+.bookmark-compact-note {
+  display: flex;
+  gap: var(--space-3xs);
+  padding-left: var(--space-2xs);
+  border-left: 2px solid var(--accent8);
+  color: var(--theme12);
+}
+
+@keyframes bookmark-compact-open {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bookmark-compact-detail {
+    animation: none;
+  }
+
+  .bookmark-compact-caret svg {
+    transition: none;
+  }
+}
