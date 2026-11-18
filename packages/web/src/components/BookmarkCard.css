@@ -1,12 +1,10 @@
 .bookmark-card {
   display: grid;
   gap: var(--space-2xs);
-  margin-bottom: var(--space-s);
   padding: var(--space-xs);
   border: 1px solid var(--border);
   border-radius: var(--radii-xl);
   background-color: var(--theme2);
-  break-inside: avoid;
   overflow-wrap: anywhere;
   animation: bookmark-card-in 260ms var(--ease-out-3) both;
   animation-delay: calc(var(--i, 0) * 30ms);
@@ -32,13 +30,7 @@
 }
 
 .bookmark-card-description {
-  display: -webkit-box;
-  margin: 0;
-  overflow: hidden;
-  font-size: var(--step--1);
   color: var(--theme11);
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
 }
 
 /* Media runs to the card's edges */
@@ -163,15 +155,8 @@
 }
 
 .bookmark-card-note-text {
-  display: -webkit-box;
-  margin: 0;
-  overflow: hidden;
-  font-size: var(--step-0);
   line-height: var(--line-height-relaxed);
   color: var(--accent12);
-  white-space: pre-line;
-  -webkit-line-clamp: 10;
-  -webkit-box-orient: vertical;
 }
 
 .bookmark-card-thumb {
@@ -183,7 +168,8 @@
 }
 
 .bookmark-card-inline-note {
-  margin: 0;
+  display: flex;
+  gap: var(--space-3xs);
   padding: var(--space-2xs);
   border-radius: var(--radii-l);
   background-color: var(--accent3);

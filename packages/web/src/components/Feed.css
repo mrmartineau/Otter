@@ -163,8 +163,15 @@
 }
 
 .feed-cards {
-  columns: 3 240px;
-  column-gap: var(--space-s);
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 1), minmax(0, 1fr));
+  align-items: start;
+  gap: var(--space-s);
+}
+
+.feed-cards-column {
+  display: grid;
+  gap: var(--space-s);
 }
 
 @media (prefers-reduced-motion: reduce) {

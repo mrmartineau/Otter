@@ -130,6 +130,8 @@ time.bookmark-compact-meta {
 }
 
 .bookmark-compact-note {
+  display: flex;
+  gap: var(--space-3xs);
   padding-left: var(--space-2xs);
   border-left: 2px solid var(--accent8);
   color: var(--theme12);

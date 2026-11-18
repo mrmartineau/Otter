@@ -6,8 +6,9 @@ import {
 } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import type { FileRouteTypes } from '@tanstack/react-router'
-import { memo, type ReactNode } from 'react'
+import { type CSSProperties, memo, type ReactNode, useRef } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useResizeObserver } from 'usehooks-ts'
 import { Button } from '@/components/Button'
 import { CONTENT, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { useFeedOptions } from '@/hooks/useFeedOptions'
@@ -63,6 +64,60 @@ export function isToot(item: FeedItemModel): item is Toot {
   return 'toot_id' in item
 }
 
+// Matches the --space-s gap in .feed-cards
+const CARD_MIN_WIDTH = 240
+const CARD_GAP = 16
+const MAX_CARD_COLUMNS = 3
+
+/**
+ * Deals the cards into columns in turn (1st → column 1, 2nd → column 2…), so
+ * the newest stay along the top and loading more only adds to the bottom.
+ */
+const FeedCards = ({
+  items,
+  allowDeletion,
+  collections,
+}: {
+  items: Bookmark[]
+  allowDeletion: boolean
+  collections: Collection[]
+}) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const { width = 0 } = useResizeObserver({ ref })
+  const columnCount = Math.min(
+    MAX_CARD_COLUMNS,
+    Math.max(1, Math.floor((width + CARD_GAP) / (CARD_MIN_WIDTH + CARD_GAP))),
+  )
+  const columns = Array.from({ length: columnCount }, (_, column) =>
+    items
+      .map((item, index) => ({ index, item }))
+      .filter(({ index }) => index % columnCount === column),
+  )
+
+  return (
+    <div
+      ref={ref}
+      className="feed-cards"
+      style={{ '--columns': columnCount } as CSSProperties}
+    >
+      {columns.map((column, columnIndex) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: columns have no identity beyond their position
+        <div className="feed-cards-column" key={columnIndex}>
+          {column.map(({ item, index }) => (
+            <BookmarkCard
+              {...item}
+              allowDeletion={allowDeletion}
+              collections={collections}
+              index={index}
+              key={item.id}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 interface FeedItemsProps {
   items: FeedItemModel[]
   view: FeedView
@@ -93,17 +148,11 @@ const FeedItems = ({
 
   if (view === 'cards') {
     return (
-      <div className="feed-cards">
-        {items.filter(isBookmark).map((item, index) => (
-          <BookmarkCard
-            {...item}
-            allowDeletion={allowDeletion}
-            collections={collections}
-            index={index}
-            key={item.id}
-          />
-        ))}
-      </div>
+      <FeedCards
+        items={items.filter(isBookmark)}
+        allowDeletion={allowDeletion}
+        collections={collections}
+      />
     )
   }
 

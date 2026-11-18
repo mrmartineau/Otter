@@ -9,6 +9,8 @@ export const getRelativeDateSource = (
   formatted: string
   ago: number
   relative: string
+  /** Relative for the last week ("2 days ago"), the formatted date after that */
+  short: string
 } => {
   const originalDate = new Date(date)
   const formatDate = new Intl.DateTimeFormat('en', {
@@ -21,6 +23,7 @@ export const getRelativeDateSource = (
     ago,
     formatted,
     relative,
+    short: ago < 8 ? relative : formatted,
   }
 }
 

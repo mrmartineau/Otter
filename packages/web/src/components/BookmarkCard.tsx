@@ -1,6 +1,7 @@
 import { NoteIcon, PlayIcon } from '@phosphor-icons/react'
+import { Link as RouterLink } from '@tanstack/react-router'
 import urlJoin from 'proper-url-join'
-import { type CSSProperties, type ReactNode, useState } from 'react'
+import { type CSSProperties, type JSX, type ReactNode, useState } from 'react'
 import { useClickBookmark } from '@/hooks/useClickBookmark'
 import { getRelativeDate } from '@/utils/dates'
 import { fullPath } from '@/utils/fullPath'
@@ -10,6 +11,7 @@ import { BookmarkActions } from './BookmarkActions'
 import type { BookmarkFeedItemProps } from './BookmarkFeedItem'
 import { Favicon } from './Favicon'
 import { Link } from './Link'
+import { Markdown } from './Markdown'
 import { TypeToIcon } from './TypeToIcon'
 
 const VISIBLE_TAGS = 4
@@ -32,15 +34,16 @@ export const BookmarkCard = ({ index = 0, ...props }: BookmarkCardProps) => {
   const onClick = () => handleClickRegister(id)
 
   const titleLink = (
-    <a href={href} className="bookmark-card-title" onClick={onClick}>
+    <RouterLink to={href} className="bookmark-card-title" onClick={onClick}>
       {displayTitle}
-    </a>
+    </RouterLink>
   )
-  const media = (ratio: string, overlay?: ReactNode) => (
-    <a href={href} className="bookmark-card-media" onClick={onClick}>
+  // JSX.Element, not ReactNode: the router's Link is typed against React 18's ReactNode
+  const media = (ratio: string, overlay?: JSX.Element) => (
+    <RouterLink to={href} className="bookmark-card-media" onClick={onClick}>
       <Cover {...props} imageUrl={imageUrl} ratio={ratio} />
       {overlay}
-    </a>
+    </RouterLink>
   )
 
   let body: ReactNode
@@ -49,7 +52,11 @@ export const BookmarkCard = ({ index = 0, ...props }: BookmarkCardProps) => {
       body = (
         <>
           {title ? <h4 className="bookmark-card-note-title">{title}</h4> : null}
-          <p className="bookmark-card-note-text">{note || description}</p>
+          {note || description ? (
+            <div className="bookmark-card-note-text">
+              <Markdown textSize={0}>{note || description || ''}</Markdown>
+            </div>
+          ) : null}
         </>
       )
       break
@@ -99,7 +106,9 @@ export const BookmarkCard = ({ index = 0, ...props }: BookmarkCardProps) => {
         <>
           {titleLink}
           {description ? (
-            <p className="bookmark-card-description">{description}</p>
+            <div className="bookmark-card-description">
+              <Markdown>{description}</Markdown>
+            </div>
           ) : null}
           {imageUrl ? (
             <img
@@ -110,9 +119,10 @@ export const BookmarkCard = ({ index = 0, ...props }: BookmarkCardProps) => {
             />
           ) : null}
           {note ? (
-            <p className="bookmark-card-inline-note">
-              <NoteIcon size={14} weight="duotone" aria-label="Note" /> {note}
-            </p>
+            <div className="bookmark-card-inline-note">
+              <NoteIcon size={14} weight="duotone" aria-label="Note" />
+              <Markdown>{note}</Markdown>
+            </div>
           ) : null}
         </>
       )
@@ -175,9 +185,7 @@ const BookmarkCardFooter = (props: BookmarkFeedItemProps) => {
         <span className="bookmark-card-domain">
           {url ? simpleUrl(url) : 'note'}
         </span>
-        <time dateTime={created_at}>
-          {createdDate.ago < 8 ? createdDate.relative : createdDate.formatted}
-        </time>
+        <time dateTime={created_at}>{createdDate.short}</time>
       </div>
       <BookmarkActions {...props} />
     </footer>

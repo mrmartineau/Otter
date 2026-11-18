@@ -1,4 +1,5 @@
 import { CaretDownIcon, NoteIcon } from '@phosphor-icons/react'
+import { Link as RouterLink } from '@tanstack/react-router'
 import urlJoin from 'proper-url-join'
 import { useId, useState } from 'react'
 import { useClickBookmark } from '@/hooks/useClickBookmark'
@@ -10,6 +11,7 @@ import type { BookmarkFeedItemProps } from './BookmarkFeedItem'
 import { Favicon } from './Favicon'
 import { IconButton } from './IconButton'
 import { Link } from './Link'
+import { Markdown } from './Markdown'
 import { TypeToIcon } from './TypeToIcon'
 
 const VISIBLE_TAGS = 2
@@ -41,14 +43,14 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
         <span className="bookmark-compact-type">
           {type ? <TypeToIcon type={type} size={16} /> : null}
         </span>
-        <a
+        <RouterLink
           className="bookmark-compact-title"
-          href={url ?? `/bookmark/${id}`}
+          to={url ?? `/bookmark/${id}`}
           onClick={() => handleClickRegister(id)}
         >
           {url ? <Favicon url={url} size={16} /> : null}
           <span>{title || url || 'Untitled'}</span>
-        </a>
+        </RouterLink>
         <span className="bookmark-compact-meta bookmark-compact-domain">
           {url ? simpleUrl(url) : null}
         </span>
@@ -61,7 +63,7 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
           {hiddenTagCount > 0 ? <span>+{hiddenTagCount}</span> : null}
         </span>
         <time className="bookmark-compact-meta" dateTime={created_at}>
-          {createdDate.ago < 8 ? createdDate.relative : createdDate.formatted}
+          {createdDate.short}
         </time>
         <span className="bookmark-compact-actions">
           <BookmarkToggles {...props} />
@@ -80,11 +82,14 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
       {isOpen ? (
         <div className="bookmark-compact-detail" id={detailId}>
           <div className="bookmark-compact-detail-text">
-            {description ? <p>{description}</p> : null}
+            {description ? (
+              <Markdown preventClamping>{description}</Markdown>
+            ) : null}
             {note ? (
-              <p className="bookmark-compact-note">
-                <NoteIcon size={14} weight="duotone" aria-label="Note" /> {note}
-              </p>
+              <div className="bookmark-compact-note">
+                <NoteIcon size={14} weight="duotone" aria-label="Note" />
+                <Markdown preventClamping>{note}</Markdown>
+              </div>
             ) : null}
             <BookmarkActions {...props} showToggles={false} />
           </div>

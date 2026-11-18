@@ -219,11 +219,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                       size="16"
                       className="shrink-0"
                     />
-                    <time dateTime={created_at}>
-                      {createdDate.ago < 8
-                        ? createdDate.relative
-                        : createdDate.formatted}
-                    </time>
+                    <time dateTime={created_at}>{createdDate.short}</time>
                   </Flex>
                 </TooltipTrigger>
                 <TooltipContent>{dateTooltip}</TooltipContent>
