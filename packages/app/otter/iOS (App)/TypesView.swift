@@ -13,7 +13,7 @@ struct TypesView: View {
     var body: some View {
         List(store.types, id: \.type) { item in
             if let type = item.type {
-                NavigationLink(value: BookmarkFeedSource.type(type)) {
+                NavigationLink(value: LibraryDestination.feed(.type(type))) {
                     HStack {
                         Label(
                             BookmarkTypes.label(for: type),

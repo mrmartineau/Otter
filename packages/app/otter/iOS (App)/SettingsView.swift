@@ -5,15 +5,20 @@
 
 import SwiftUI
 
+nonisolated enum SettingsDestination: Hashable, Codable {
+    case subscriptions
+}
+
 struct SettingsView: View {
     @ObservedObject var model: OtterAppModel
     @AppStorage("reader.textSize") private var textSize = ReaderTextSize.medium
     @AppStorage("reader.font") private var fontDesign = ReaderFont.system
     @AppStorage("feeds.openInReader") private var openInReader = true
     @AppStorage(DarkTheme.storageKey) private var darkTheme = DarkTheme.soft
+    @Restored("path.settings") private var path: [SettingsDestination] = []
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Form {
                 Section("Account") {
                     if model.isSignedIn {
@@ -58,7 +63,7 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    NavigationLink("Subscriptions") { FeedSubscriptionsView() }
+                    NavigationLink("Subscriptions", value: SettingsDestination.subscriptions)
                     Toggle("Open stories in the reader", isOn: $openInReader)
                 } header: {
                     Text("Feeds")
@@ -76,6 +81,9 @@ struct SettingsView: View {
             }
             .otterTheme()
             .navigationTitle("Settings")
+            .navigationDestination(for: SettingsDestination.self) { _ in
+                FeedSubscriptionsView()
+            }
         }
     }
 }

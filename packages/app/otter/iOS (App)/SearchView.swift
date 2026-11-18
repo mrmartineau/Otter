@@ -10,7 +10,7 @@ import SwiftUI
 
 @MainActor
 final class SearchModel: ObservableObject {
-    @Published var query = ""
+    @Published var query = SavedState.load(String.self, key: "search.query") ?? ""
     @Published var results: [Bookmark] = []
     @Published var totalCount = 0
     @Published var isSearching = false
@@ -243,8 +243,14 @@ struct SearchView: View {
                 placement: .navigationBarDrawer(displayMode: .always),
                 prompt: "Search bookmarks"
             )
-            .onChange(of: model.query) { _, _ in
+            .onChange(of: model.query) { _, newQuery in
+                SavedState.save(newQuery, key: "search.query")
                 model.queryChanged()
+            }
+            // A query that came back after a relaunch has no results yet.
+            // Coming back from an article keeps the ones it has.
+            .task {
+                if model.results.isEmpty { model.submit() }
             }
             .onSubmit(of: .search) {
                 model.submit()

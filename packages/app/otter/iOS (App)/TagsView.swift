@@ -9,7 +9,7 @@ import SwiftUI
 struct TagsView: View {
     @ObservedObject private var store = MetadataStore.shared
     @Environment(\.scenePhase) private var scenePhase
-    @State private var query = ""
+    @Restored("tags.query") private var query = ""
 
     private var filtered: [TagCount] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -22,7 +22,7 @@ struct TagsView: View {
     var body: some View {
         List(filtered, id: \.tag) { item in
             if let tag = item.tag {
-                NavigationLink(value: BookmarkFeedSource.tag(tag)) {
+                NavigationLink(value: LibraryDestination.feed(.tag(tag))) {
                     HStack {
                         Label(tag, systemImage: tag == "Untagged" ? "tray" : "number")
                         Spacer()

@@ -22,6 +22,10 @@ final class BookmarkFeedModel: ObservableObject {
     /// Surfaced as an alert when an edit or trash action fails.
     @Published var actionError: String?
 
+    /// Where this screen's toggles are saved. The Stars and Public screens share
+    /// a source with the main feed, so the starting toggles are part of the key.
+    private let filterKey: String
+
     private let pageSize = 25
     private var hasLoaded = false
     private var lastLoaded: Date?
@@ -31,7 +35,8 @@ final class BookmarkFeedModel: ObservableObject {
 
     init(source: BookmarkFeedSource, filter: BookmarkFilter = .none) {
         self.source = source
-        self.filter = filter
+        self.filterKey = "filter.\(source)|\(filter)"
+        self.filter = SavedState.load(BookmarkFilter.self, key: filterKey) ?? filter
     }
 
     /// Re-runs the query from the top whenever a toggle changes.
@@ -39,6 +44,7 @@ final class BookmarkFeedModel: ObservableObject {
         guard newFilter != filter else { return }
 
         filter = newFilter
+        SavedState.save(newFilter, key: filterKey)
         bookmarks = []
         totalCount = 0
         hasLoaded = true

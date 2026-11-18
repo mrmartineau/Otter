@@ -8,6 +8,12 @@
 
 import SwiftUI
 
+/// The screens a story opens. They live in the Feeds stack so they can be saved.
+nonisolated enum FeedDestination: Hashable, Codable {
+    case comments(FeedItem)
+    case reader(FeedItem)
+}
+
 struct FeedsView: View {
     @ObservedObject var model: OtterAppModel
     @ObservedObject private var store = FeedStore.shared
@@ -15,8 +21,7 @@ struct FeedsView: View {
 
     /// "starred" is a virtual source: everything starred across feeds.
     @AppStorage("feeds.selected") private var selected = "hn"
-    @State private var commentsItem: FeedItem?
-    @State private var readerItem: FeedItem?
+    @Restored("path.feeds") private var path: [FeedDestination] = []
     /// Feed stories are usually articles; the reader shows "Open in browser"
     /// when a page turns out not to be one.
     @AppStorage("feeds.openInReader") private var openInReader = true
@@ -94,7 +99,7 @@ struct FeedsView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             list
             .navigationTitle(currentTitle)
             .navigationBarTitleDisplayMode(.inline)
@@ -142,12 +147,14 @@ struct FeedsView: View {
                     }
                 }
             }
-            .navigationDestination(item: $commentsItem) { item in
-                CommentsView(item: item)
-            }
-            .navigationDestination(item: $readerItem) { item in
-                if let url = item.linkURL {
-                    ArticleReaderView(url: url, title: item.title)
+            .navigationDestination(for: FeedDestination.self) { destination in
+                switch destination {
+                case let .comments(item):
+                    CommentsView(item: item)
+                case let .reader(item):
+                    if let url = item.linkURL {
+                        ArticleReaderView(url: url, title: item.title)
+                    }
                 }
             }
             .task { await store.refreshIfStale() }
@@ -188,7 +195,7 @@ struct FeedsView: View {
                     isRead: store.isRead(item),
                     isStarred: store.isStarred(item),
                     sourceTitle: isMerged ? store.title(forSource: item.sourceID) : nil,
-                    onComments: { commentsItem = item }
+                    onComments: { push(.comments(item)) }
                 )
                     .listRowBackground(Color.clear)
                     .contentShape(Rectangle())
@@ -235,7 +242,7 @@ struct FeedsView: View {
                             ShareLink(item: url) { Label("Share", systemImage: "square.and.arrow.up") }
                         }
                         if item.commentsRef != nil {
-                            Button { commentsItem = item } label: { Label("Comments", systemImage: "bubble.left.and.bubble.right") }
+                            Button { push(.comments(item)) } label: { Label("Comments", systemImage: "bubble.left.and.bubble.right") }
                         }
                         Button { readLater(item) } label: { Label("Read later", systemImage: "book") }
                     }
@@ -263,6 +270,11 @@ struct FeedsView: View {
         }
     }
 
+    /// Ignores a second tap on the same story while the first is still opening.
+    private func push(_ destination: FeedDestination) {
+        if path.last != destination { path.append(destination) }
+    }
+
     /// Discussion-only posts (Ask HN, Lobsters text posts) open their thread.
     /// Anything else opens in the reader when signed in, else the browser.
     private func open(_ item: FeedItem) {
@@ -270,9 +282,9 @@ struct FeedsView: View {
         guard let url = item.linkURL else { return }
 
         if item.commentsRef != nil, item.url == item.commentsURL {
-            commentsItem = item
+            push(.comments(item))
         } else if openInReader, model.isSignedIn, ["http", "https"].contains(url.scheme ?? "") {
-            readerItem = item
+            push(.reader(item))
         } else {
             openURL(url)
         }

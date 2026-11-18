@@ -46,6 +46,8 @@ struct RootView: View {
         }
         .task { await model.restore() }
         .onChange(of: scenePhase) { _, phase in
+            if phase == .background { SavedState.touch() }
+
             guard phase == .active else { return }
 
             // Saving from the share sheet can rotate the grant in the extension's
