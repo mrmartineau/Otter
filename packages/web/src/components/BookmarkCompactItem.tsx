@@ -23,7 +23,6 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
   const handleClickRegister = useClickBookmark()
   const createdDate = getRelativeDate(created_at)
   const imageUrl = image && url ? fullPath(url, image) : null
-  const hasDetail = Boolean(description || note || imageUrl)
   const hiddenTagCount = (tags?.length ?? 0) - VISIBLE_TAGS
 
   return (
@@ -33,10 +32,8 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
       <div
         className="bookmark-compact-line"
         onClick={(event) => {
-          if (
-            hasDetail &&
-            !(event.target as HTMLElement).closest('a, button')
-          ) {
+          // Every row opens: the edit and trash actions live in the open part
+          if (!(event.target as HTMLElement).closest('a, button')) {
             setIsOpen((open) => !open)
           }
         }}
@@ -74,7 +71,6 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
             aria-expanded={isOpen}
             aria-controls={detailId}
             aria-label={isOpen ? 'Hide details' : 'Show details'}
-            disabled={!hasDetail}
             onClick={() => setIsOpen((open) => !open)}
           >
             <CaretDownIcon size={14} weight="bold" />
