@@ -19,6 +19,7 @@
     "@tanstack/react-query-persist-client": "^5.90.24",
     "@tanstack/react-router": "^1.167.0",
     "@tanstack/react-router-devtools": "^1.166.7",
+    "@tanstack/redact": "^0.2.0",
     "bcryptjs": "^3.0.2",
     "better-auth": "^1.6.9",
     "change-case": "^5.4.4",
