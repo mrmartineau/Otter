@@ -61,10 +61,7 @@ export const BookmarkCard = ({ index = 0, ...props }: BookmarkCardProps) => {
       )
       break
     case 'picture':
-      body = media(
-        '4 / 5',
-        <span className="bookmark-card-overlay">{displayTitle}</span>,
-      )
+      body = media('4 / 5', <span className="bookmark-card-overlay">{displayTitle}</span>)
       break
     case 'video':
       body = (
@@ -111,12 +108,7 @@ export const BookmarkCard = ({ index = 0, ...props }: BookmarkCardProps) => {
             </div>
           ) : null}
           {imageUrl ? (
-            <img
-              className="bookmark-card-thumb"
-              src={imageUrl}
-              alt=""
-              loading="lazy"
-            />
+            <img className="bookmark-card-thumb" src={imageUrl} alt="" loading="lazy" />
           ) : null}
           {note ? (
             <div className="bookmark-card-inline-note">
@@ -148,12 +140,7 @@ const Cover = ({
   return (
     <div className="bookmark-card-cover" style={{ aspectRatio: ratio }}>
       {imageUrl && imageUrl !== brokenUrl ? (
-        <img
-          src={imageUrl}
-          alt=""
-          loading="lazy"
-          onError={() => setBrokenUrl(imageUrl)}
-        />
+        <img src={imageUrl} alt="" loading="lazy" onError={() => setBrokenUrl(imageUrl)} />
       ) : (
         <div className="bookmark-card-cover-empty">
           {type ? <TypeToIcon type={type} size={40} /> : null}
@@ -183,9 +170,7 @@ const BookmarkCardFooter = (props: BookmarkFeedItemProps) => {
       ) : null}
       <div className="bookmark-card-meta">
         {url ? <Favicon url={url} size={16} /> : null}
-        <span className="bookmark-card-domain">
-          {url ? simpleUrl(url) : 'note'}
-        </span>
+        <span className="bookmark-card-domain">{url ? simpleUrl(url) : 'note'}</span>
         <time dateTime={created_at}>{createdDate.short}</time>
       </div>
       <BookmarkActions {...props} />

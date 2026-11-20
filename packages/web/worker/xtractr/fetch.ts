@@ -2,9 +2,7 @@ const MAX_SIZE = 5 * 1024 * 1024 // 5MB
 
 export { MAX_SIZE }
 
-export async function readResponseWithLimit(
-  response: Response,
-): Promise<string> {
+export async function readResponseWithLimit(response: Response): Promise<string> {
   const reader = response.body?.getReader()
   if (!reader) {
     return response.text()
@@ -19,9 +17,7 @@ export async function readResponseWithLimit(
     totalSize += value.byteLength
     if (totalSize > MAX_SIZE) {
       reader.cancel()
-      throw new Error(
-        `Page too large (>${Math.round(MAX_SIZE / 1024 / 1024)}MB, max 5MB)`,
-      )
+      throw new Error(`Page too large (>${Math.round(MAX_SIZE / 1024 / 1024)}MB, max 5MB)`)
     }
     chunks.push(value)
   }

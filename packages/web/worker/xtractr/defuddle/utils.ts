@@ -54,11 +54,7 @@ export function textPreview(el: Element): string {
   return (el.textContent || '').trim().substring(0, 200)
 }
 
-export function logDebug(
-  debug: boolean,
-  message: string,
-  ...args: any[]
-): void {
+export function logDebug(debug: boolean, message: string, ...args: any[]): void {
   if (debug) {
     console.log('Defuddle:', message, ...args)
   }

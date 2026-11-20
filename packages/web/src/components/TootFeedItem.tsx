@@ -28,9 +28,7 @@ export const TootFeedItem = (props: Toot) => {
       <div className="feed-item-cols">
         <div className="feed-item-content">
           <div className="flex items-center gap-xs">
-            {user_avatar ? (
-              <img src={user_avatar} alt="" className="feed-avatar" />
-            ) : null}
+            {user_avatar ? <img src={user_avatar} alt="" className="feed-avatar" /> : null}
             <Flex direction="column">
               <div className="text-step--1">{user_name}</div>
               <div className="text-step--2">@{user_id}</div>
@@ -40,13 +38,10 @@ export const TootFeedItem = (props: Toot) => {
         </div>
         {tootMedia?.length ? (
           <div>
-            <h3 className={cn(headingVariants({ variant: 'date' }), 'mt-0!')}>
-              Media
-            </h3>
+            <h3 className={cn(headingVariants({ variant: 'date' }), 'mt-0!')}>Media</h3>
             <div className="toot-media-grid">
               {tootMedia.map((item) => {
-                const isVideoType =
-                  item.type === 'gifv' || item.type === 'video'
+                const isVideoType = item.type === 'gifv' || item.type === 'video'
                 const isPhotoType = item.type === 'image'
                 return (
                   <div key={item.id}>
@@ -71,20 +66,14 @@ export const TootFeedItem = (props: Toot) => {
       <div className="flex flex-col gap-2xs">
         {toot_url ? (
           <div>
-            <Link
-              rel="external"
-              href={toot_url}
-              className="flex items-center gap-2xs text-step--1"
-            >
+            <Link rel="external" href={toot_url} className="flex items-center gap-2xs text-step--1">
               <LinkSimpleHorizontalIcon weight="duotone" size="14" /> Toot
             </Link>
           </div>
         ) : null}
         {tootUrls?.length ? (
           <div>
-            <h3 className={clsx(headingVariants({ variant: 'date' }), 'mt-0!')}>
-              URLs
-            </h3>
+            <h3 className={clsx(headingVariants({ variant: 'date' }), 'mt-0!')}>URLs</h3>
             <ul className="flex flex-col gap-2xs">
               {tootUrls.map((item) => {
                 return (

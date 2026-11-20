@@ -17,11 +17,7 @@ interface MarkdownProps {
   textSize?: number
 }
 
-export const Markdown = ({
-  children,
-  preventClamping = false,
-  textSize = -1,
-}: MarkdownProps) => {
+export const Markdown = ({ children, preventClamping = false, textSize = -1 }: MarkdownProps) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const [isClamped, setClamped] = useState(false)
   const [isExpanded, toggleExpanded] = useToggle(preventClamping)
@@ -29,9 +25,7 @@ export const Markdown = ({
   useEffect(() => {
     function handleResize() {
       if (contentRef && contentRef.current && !preventClamping) {
-        setClamped(
-          contentRef.current.scrollHeight > contentRef.current.clientHeight,
-        )
+        setClamped(contentRef.current.scrollHeight > contentRef.current.clientHeight)
       }
     }
     if (!preventClamping) {
@@ -50,12 +44,7 @@ export const Markdown = ({
         } text-step-${textSize}`}
       >
         <ReactMarkdown
-          remarkPlugins={[
-            remarkSqueezeParagraphs,
-            remarkBreaks,
-            remarkGfm,
-            remarkTruncateLinks,
-          ]}
+          remarkPlugins={[remarkSqueezeParagraphs, remarkBreaks, remarkGfm, remarkTruncateLinks]}
           components={{
             // @ts-ignore
             a: ({ node, ...props }) => <Link variant="accent" {...props} />,

@@ -7,12 +7,7 @@ import { useDeleteMedia } from '@/utils/fetching/media'
 import { Flex } from './Flex'
 import { IconButton } from './IconButton'
 import { Rating } from './Rating'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from './Tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './Tooltip'
 import { MediaTypeToIcon } from './TypeToIcon'
 
 interface MediaCardProps extends ComponentProps<'div'> {
@@ -21,13 +16,7 @@ interface MediaCardProps extends ComponentProps<'div'> {
   status?: MediaStatus
 }
 
-export const MediaCard = ({
-  media,
-  className,
-  onEdit,
-  status,
-  ...rest
-}: MediaCardProps) => {
+export const MediaCard = ({ media, className, onEdit, status, ...rest }: MediaCardProps) => {
   const { ref, isDragging } = useSortable({
     accept: 'item',
     group: status,
@@ -74,11 +63,7 @@ export const MediaCard = ({
               <div className="shrink-0">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <MediaTypeToIcon
-                      type={media.type}
-                      size="16"
-                      className="inline-block"
-                    />
+                    <MediaTypeToIcon type={media.type} size="16" className="inline-block" />
                   </TooltipTrigger>
                   <TooltipContent>{media.type}</TooltipContent>
                 </Tooltip>
@@ -103,11 +88,7 @@ export const MediaCard = ({
             ) : null}
             <Tooltip>
               <TooltipTrigger asChild>
-                <IconButton
-                  onClick={handleDelete}
-                  size="s"
-                  disabled={deleteMedia.isPending}
-                >
+                <IconButton onClick={handleDelete} size="s" disabled={deleteMedia.isPending}>
                   <TrashIcon size={16} weight="duotone" />
                 </IconButton>
               </TooltipTrigger>

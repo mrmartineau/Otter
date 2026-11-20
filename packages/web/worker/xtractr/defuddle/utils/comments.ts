@@ -32,11 +32,7 @@ export interface CommentData {
  * @param postContent - The main post body HTML
  * @param comments - Pre-built comments HTML string (from buildCommentTree)
  */
-export function buildContentHtml(
-  site: string,
-  postContent: string,
-  comments: string,
-): string {
+export function buildContentHtml(site: string, postContent: string, comments: string): string {
   return `
 		<div class="${site} post">
 			<div class="post-content">
@@ -78,10 +74,7 @@ export function buildCommentTree(comments: CommentData[]): string {
     } else {
       const currentDepth = blockquoteStack[blockquoteStack.length - 1] ?? -1
       if (depth < currentDepth) {
-        while (
-          blockquoteStack.length > 0 &&
-          blockquoteStack[blockquoteStack.length - 1] >= depth
-        ) {
+        while (blockquoteStack.length > 0 && blockquoteStack[blockquoteStack.length - 1] >= depth) {
           parts.push('</blockquote>')
           blockquoteStack.pop()
         }

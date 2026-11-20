@@ -106,12 +106,7 @@ export const importBookmarks = async (context: HonoContext) => {
     const existing = await auth.requestContext.db
       .select({ url: bookmarks.url })
       .from(bookmarks)
-      .where(
-        and(
-          eq(bookmarks.user, auth.userId),
-          sql`${bookmarks.url} = ANY(${parsedUrls})`,
-        ),
-      )
+      .where(and(eq(bookmarks.user, auth.userId), sql`${bookmarks.url} = ANY(${parsedUrls})`))
     const existingUrls = new Set(existing.map((row) => row.url).filter(Boolean))
     const toInsert: BookmarkInsert[] = parsed
       .filter((item) => !existingUrls.has(item.url))
@@ -170,9 +165,7 @@ export const exportBookmarks = async (context: HonoContext) => {
     const rows = await auth.requestContext.db
       .select()
       .from(bookmarks)
-      .where(
-        and(eq(bookmarks.user, auth.userId), eq(bookmarks.status, 'active')),
-      )
+      .where(and(eq(bookmarks.user, auth.userId), eq(bookmarks.status, 'active')))
       .orderBy(desc(bookmarks.createdAt))
     const html = serializeNetscapeBookmarks(
       rows

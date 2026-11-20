@@ -26,31 +26,21 @@ async function buildForBrowser(browser) {
 
   // Read and merge manifests
   const baseManifestPath = path.resolve(__dirname, '../manifests/base.json')
-  const browserManifestPath = path.resolve(
-    __dirname,
-    `../manifests/${browser}.json`,
-  )
+  const browserManifestPath = path.resolve(__dirname, `../manifests/${browser}.json`)
 
   const baseManifest = JSON.parse(fs.readFileSync(baseManifestPath, 'utf8'))
-  const browserManifest = JSON.parse(
-    fs.readFileSync(browserManifestPath, 'utf8'),
-  )
+  const browserManifest = JSON.parse(fs.readFileSync(browserManifestPath, 'utf8'))
   const finalManifest = {
     ...baseManifest,
     ...browserManifest,
     permissions: [
-      ...new Set([
-        ...(baseManifest.permissions ?? []),
-        ...(browserManifest.permissions ?? []),
-      ]),
+      ...new Set([...(baseManifest.permissions ?? []), ...(browserManifest.permissions ?? [])]),
     ],
   }
 
   // Run webpack build
   const webpackConfig = require('./webpack.config.js')
-  const compiler = webpack(
-    webpackConfig({}, { env: { TARGET: browser }, mode: 'production' }),
-  )
+  const compiler = webpack(webpackConfig({}, { env: { TARGET: browser }, mode: 'production' }))
 
   await new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
@@ -72,10 +62,7 @@ async function buildForBrowser(browser) {
   }
 
   // Write browser-specific manifest (overwrites the one copied from webpack)
-  fs.writeFileSync(
-    path.join(finalDistDir, 'manifest.json'),
-    JSON.stringify(finalManifest, null, 2),
-  )
+  fs.writeFileSync(path.join(finalDistDir, 'manifest.json'), JSON.stringify(finalManifest, null, 2))
 
   console.log(`✅ ${browser} build complete`)
 }

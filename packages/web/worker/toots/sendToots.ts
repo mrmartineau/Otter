@@ -13,9 +13,7 @@ type HonoContext = Context<{ Bindings: WorkerEnv }>
 export const sendToots = async (context: HonoContext) => {
   const webhookSecret = context.req.header('x-otter-webhook-secret')
   const isWebhookRequest =
-    webhookSecret &&
-    context.env.WEBHOOK_SECRET &&
-    webhookSecret === context.env.WEBHOOK_SECRET
+    webhookSecret && context.env.WEBHOOK_SECRET && webhookSecret === context.env.WEBHOOK_SECRET
 
   if (!isWebhookRequest) {
     const requestContext = await requireRequestContext(context)
@@ -58,8 +56,7 @@ export const sendToots = async (context: HonoContext) => {
   }
 
   const filteredTagsString = filteredTags(body.record.tags)
-  const tagsString =
-    filteredTagsString.length > 0 ? `${filteredTagsString}` : ''
+  const tagsString = filteredTagsString.length > 0 ? `${filteredTagsString}` : ''
   const descriptionString =
     body.record.description?.length > 0 ? ` - ${body.record.description}` : ''
   const personalAccessToken = context.env.PERSONAL_MASTODON_ACCESS_TOKEN

@@ -47,12 +47,9 @@ const getSearchResults = async <T>(
   params: Partial<ApiParametersQuery>,
 ) => {
   const parsed = apiParameters(params)
-  const response = await fetch(
-    `${path}${queryString({ ...parsed, q: searchTerm })}`,
-    {
-      credentials: 'include',
-    },
-  )
+  const response = await fetch(`${path}${queryString({ ...parsed, q: searchTerm })}`, {
+    credentials: 'include',
+  })
   const body = await parseJsonResponse<{ data: T[]; count: number }>(response)
 
   return {
@@ -62,10 +59,7 @@ const getSearchResults = async <T>(
   } satisfies ApiListResponse<T[]>
 }
 
-export const getSearchBookmarks = async ({
-  searchTerm,
-  params,
-}: SearchFetchingOptions) =>
+export const getSearchBookmarks = async ({ searchTerm, params }: SearchFetchingOptions) =>
   await getSearchResults<Bookmark>('/api/search', searchTerm, params)
 
 export const getSearchBookmarksOptions = ({
@@ -83,11 +77,7 @@ export const getSearchBookmarksInfiniteOptions = ({
   searchTerm,
   params,
 }: Pick<SearchFetchingOptions, 'searchTerm' | 'params'>) => {
-  const {
-    limit = DEFAULT_API_RESPONSE_LIMIT,
-    offset: _offset,
-    ...rest
-  } = apiParameters(params)
+  const { limit = DEFAULT_API_RESPONSE_LIMIT, offset: _offset, ...rest } = apiParameters(params)
   return infiniteQueryOptions({
     getNextPageParam: (
       lastPage: Awaited<ReturnType<typeof getSearchBookmarks>>,
@@ -109,10 +99,7 @@ export const getSearchBookmarksInfiniteOptions = ({
   })
 }
 
-export const getSearchTweets = async ({
-  searchTerm,
-  params,
-}: SearchFetchingOptions) =>
+export const getSearchTweets = async ({ searchTerm, params }: SearchFetchingOptions) =>
   await getSearchResults<Tweet>('/api/search/tweets', searchTerm, params)
 
 export const getSearchTweetsOptions = ({
@@ -126,10 +113,7 @@ export const getSearchTweetsOptions = ({
   })
 }
 
-export const getSearchToots = async ({
-  searchTerm,
-  params,
-}: SearchFetchingOptions) =>
+export const getSearchToots = async ({ searchTerm, params }: SearchFetchingOptions) =>
   await getSearchResults<Toot>('/api/search/toots', searchTerm, params)
 
 export const getSearchTootsOptions = ({

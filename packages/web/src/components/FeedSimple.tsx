@@ -21,12 +21,7 @@ export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
 
   return (
     <div className="feed-simple">
-      <h3
-        className={cn(
-          headingVariants({ variant: 'feedTitle' }),
-          'flex items-center gap-2xs',
-        )}
-      >
+      <h3 className={cn(headingVariants({ variant: 'feedTitle' }), 'flex items-center gap-2xs')}>
         {icon}
         {title}
       </h3>
@@ -42,10 +37,7 @@ export const FeedSimple = memo(({ title, icon, items }: FeedSimpleProps) => {
             return <TootFeedItem {...item} key={item.id} />
           }
           return (
-            <ErrorBoundary
-              fallback={<div>Something went wrong</div>}
-              key={item.id}
-            >
+            <ErrorBoundary fallback={<div>Something went wrong</div>} key={item.id}>
               <BookmarkFeedItem {...item} allowDeletion={false} />
             </ErrorBoundary>
           )

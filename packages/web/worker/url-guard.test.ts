@@ -3,12 +3,8 @@ import { assertSafePublicUrl, safeFetch } from './url-guard'
 
 describe('assertSafePublicUrl', () => {
   it('allows public http(s) URLs', () => {
-    expect(assertSafePublicUrl('https://example.com/page').hostname).toBe(
-      'example.com',
-    )
-    expect(assertSafePublicUrl('http://example.com/rss.xml').protocol).toBe(
-      'http:',
-    )
+    expect(assertSafePublicUrl('https://example.com/page').hostname).toBe('example.com')
+    expect(assertSafePublicUrl('http://example.com/rss.xml').protocol).toBe('http:')
   })
 
   it('rejects invalid URLs', () => {
@@ -25,9 +21,7 @@ describe('assertSafePublicUrl', () => {
   })
 
   it('rejects localhost and internal hostnames', () => {
-    expect(() => assertSafePublicUrl('http://localhost:8787')).toThrow(
-      'URL host is not allowed',
-    )
+    expect(() => assertSafePublicUrl('http://localhost:8787')).toThrow('URL host is not allowed')
     expect(() => assertSafePublicUrl('http://foo.localhost')).toThrow()
     expect(() => assertSafePublicUrl('http://db.internal')).toThrow()
     expect(() => assertSafePublicUrl('http://printer.local')).toThrow()
@@ -46,19 +40,13 @@ describe('assertSafePublicUrl', () => {
       '192.168.1.1',
       '198.18.0.1',
     ]) {
-      expect(() => assertSafePublicUrl(`http://${host}/`)).toThrow(
-        'URL host is not allowed',
-      )
+      expect(() => assertSafePublicUrl(`http://${host}/`)).toThrow('URL host is not allowed')
     }
   })
 
   it('allows public IPv4 addresses', () => {
-    expect(assertSafePublicUrl('http://93.184.216.34/').hostname).toBe(
-      '93.184.216.34',
-    )
-    expect(assertSafePublicUrl('http://172.32.0.1/').hostname).toBe(
-      '172.32.0.1',
-    )
+    expect(assertSafePublicUrl('http://93.184.216.34/').hostname).toBe('93.184.216.34')
+    expect(assertSafePublicUrl('http://172.32.0.1/').hostname).toBe('172.32.0.1')
   })
 
   it('rejects loopback, unique-local and mapped IPv6 addresses', () => {
@@ -70,22 +58,16 @@ describe('assertSafePublicUrl', () => {
       '[fe80::1]',
       '[::ffff:10.0.0.1]',
     ]) {
-      expect(() => assertSafePublicUrl(`http://${host}/`)).toThrow(
-        'URL host is not allowed',
-      )
+      expect(() => assertSafePublicUrl(`http://${host}/`)).toThrow('URL host is not allowed')
     }
   })
 
   it('rejects the full fe80::/10 link-local range', () => {
     for (const host of ['[fe80::1]', '[fe90::1]', '[fea0::1]', '[febf::1]']) {
-      expect(() => assertSafePublicUrl(`http://${host}/`)).toThrow(
-        'URL host is not allowed',
-      )
+      expect(() => assertSafePublicUrl(`http://${host}/`)).toThrow('URL host is not allowed')
     }
     // fec0::/10 (deprecated site-local) is outside fe80::/10
-    expect(assertSafePublicUrl('http://[2001:db8::1]/').hostname).toBe(
-      '[2001:db8::1]',
-    )
+    expect(assertSafePublicUrl('http://[2001:db8::1]/').hostname).toBe('[2001:db8::1]')
   })
 })
 
@@ -115,20 +97,16 @@ describe('safeFetch', () => {
 
     const response = await safeFetch('https://example.com/start')
     expect(await response.text()).toBe('ok')
-    expect(calls).toEqual([
-      'https://example.com/start',
-      'https://example.com/final',
-    ])
+    expect(calls).toEqual(['https://example.com/start', 'https://example.com/final'])
   })
 
   it('rejects hostnames that resolve to private addresses', async () => {
     globalThis.fetch = (async (input: RequestInfo | URL) => {
       const url = String(input)
       if (url.startsWith('https://cloudflare-dns.com/')) {
-        return new Response(
-          JSON.stringify({ Answer: [{ data: '10.0.0.5', type: 1 }] }),
-          { status: 200 },
-        )
+        return new Response(JSON.stringify({ Answer: [{ data: '10.0.0.5', type: 1 }] }), {
+          status: 200,
+        })
       }
       return new Response('ok', { status: 200 })
     }) as typeof fetch
@@ -158,9 +136,7 @@ describe('safeFetch', () => {
         status: 302,
       })) as typeof fetch
 
-    await expect(safeFetch('https://example.com/start')).rejects.toThrow(
-      'URL host is not allowed',
-    )
+    await expect(safeFetch('https://example.com/start')).rejects.toThrow('URL host is not allowed')
   })
 
   it('rejects redirects to non-http schemes', async () => {
@@ -185,8 +161,6 @@ describe('safeFetch', () => {
       })
     }) as typeof fetch
 
-    await expect(safeFetch('https://example.com/start')).rejects.toThrow(
-      'Too many redirects',
-    )
+    await expect(safeFetch('https://example.com/start')).rejects.toThrow('Too many redirects')
   })
 })

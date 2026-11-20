@@ -55,10 +55,7 @@ export interface McpToolDefinition {
 }
 
 // Helper to create a JSON-RPC success response
-export const jsonRpcSuccess = (
-  id: string | number | null,
-  result: unknown,
-): JsonRpcResponse => ({
+export const jsonRpcSuccess = (id: string | number | null, result: unknown): JsonRpcResponse => ({
   id,
   jsonrpc: '2.0',
   result,

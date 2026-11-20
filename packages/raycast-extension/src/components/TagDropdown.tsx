@@ -18,9 +18,7 @@ export const TagDropdown = ({ tags, onChange }: TagDropdownProps) => {
       <List.Dropdown.Item title="All items" value="all" key="all-tags" />
       {untaggedItem?.count ? (
         <List.Dropdown.Item
-          title={`Untagged items${
-            untaggedItem.count ? ` (${untaggedItem.count})` : ''
-          })`}
+          title={`Untagged items${untaggedItem.count ? ` (${untaggedItem.count})` : ''})`}
           value="Untagged"
           key="untagged-items"
         />

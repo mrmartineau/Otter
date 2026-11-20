@@ -97,16 +97,10 @@ export type TootUrls = {
   start: number
 }[]
 
-export interface BookmarkFormValues
-  extends Omit<
-    Bookmark,
-    | 'id'
-    | 'created_at'
-    | 'modified_at'
-    | 'collection'
-    | 'click_count'
-    | 'excerpt'
-  > {
+export interface BookmarkFormValues extends Omit<
+  Bookmark,
+  'id' | 'created_at' | 'modified_at' | 'collection' | 'click_count' | 'excerpt'
+> {
   id?: string
 }
 
@@ -142,28 +136,10 @@ export interface Collection {
   tags: string[] | null
 }
 
-export type MediaType =
-  | 'tv'
-  | 'film'
-  | 'game'
-  | 'book'
-  | 'podcast'
-  | 'music'
-  | 'other'
+export type MediaType = 'tv' | 'film' | 'game' | 'book' | 'podcast' | 'music' | 'other'
 
 export type MediaStatus = 'now' | 'skipped' | 'done' | 'wishlist'
-export type MediaRating =
-  | '0'
-  | '0.5'
-  | '1'
-  | '1.5'
-  | '2'
-  | '2.5'
-  | '3'
-  | '3.5'
-  | '4'
-  | '4.5'
-  | '5'
+export type MediaRating = '0' | '0.5' | '1' | '1.5' | '2' | '2.5' | '3' | '3.5' | '4' | '4.5' | '5'
 
 export interface Media {
   created_at: string
@@ -194,12 +170,7 @@ export interface MediaFilters {
   status?: MediaStatus
 }
 
-export type JournalStatus =
-  | 'active'
-  | 'inactive'
-  | 'deleted'
-  | 'archived'
-  | 'draft'
+export type JournalStatus = 'active' | 'inactive' | 'deleted' | 'archived' | 'draft'
 
 export interface Journal {
   created_at: string | null
@@ -210,10 +181,7 @@ export interface Journal {
   status: JournalStatus
 }
 
-export type JournalInsert = Omit<
-  Journal,
-  'created_at' | 'id' | 'owner' | 'status'
-> & {
+export type JournalInsert = Omit<Journal, 'created_at' | 'id' | 'owner' | 'status'> & {
   id?: number
   status?: JournalStatus
 }

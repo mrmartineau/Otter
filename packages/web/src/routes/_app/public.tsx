@@ -25,10 +25,9 @@ export const Route = createFileRoute('/_app/public')({
 
 function Page() {
   const search = useSearch({ from: '/_app/public' })
-  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useSuspenseInfiniteQuery(
-      getBookmarksInfiniteOptions({ ...search, public: true }),
-    )
+  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } = useSuspenseInfiniteQuery(
+    getBookmarksInfiniteOptions({ ...search, public: true }),
+  )
 
   const items = data.pages.flatMap((page) => page.data ?? []) as Bookmark[]
   const count = data.pages[0]?.count ?? 0

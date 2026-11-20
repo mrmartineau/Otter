@@ -1,13 +1,4 @@
-import {
-  and,
-  arrayContains,
-  asc,
-  count,
-  desc,
-  eq,
-  ilike,
-  or,
-} from 'drizzle-orm'
+import { and, arrayContains, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { apiParameters } from '@/utils/fetching/apiParameters'
@@ -97,10 +88,7 @@ export const getTweets = async (context: HonoContext) => {
       order,
     } = apiParameters(searchParamsToObject(context.req.url))
     const liked = context.req.query('liked') === 'true'
-    const where = and(
-      eq(tweets.dbUserId, auth.userId),
-      eq(tweets.likedTweet, liked),
-    )
+    const where = and(eq(tweets.dbUserId, auth.userId), eq(tweets.likedTweet, liked))
     const [{ value: total }] = await auth.requestContext.db
       .select({ value: count() })
       .from(tweets)
@@ -145,12 +133,7 @@ export const getTweet = async (context: HonoContext) => {
     const [tweet] = await auth.requestContext.db
       .select()
       .from(tweets)
-      .where(
-        and(
-          eq(tweets.id, getIdParam(context)),
-          eq(tweets.dbUserId, auth.userId),
-        ),
-      )
+      .where(and(eq(tweets.id, getIdParam(context)), eq(tweets.dbUserId, auth.userId)))
       .limit(1)
 
     if (!tweet) {
@@ -161,13 +144,10 @@ export const getTweet = async (context: HonoContext) => {
       })
     }
 
-    return new Response(
-      JSON.stringify({ data: tweetToRow(tweet), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: tweetToRow(tweet), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse({
       error: getErrorMessage(error),
@@ -191,10 +171,7 @@ export const getToots = async (context: HonoContext) => {
       order,
     } = apiParameters(searchParamsToObject(context.req.url))
     const liked = context.req.query('liked') === 'true'
-    const where = and(
-      eq(toots.dbUserId, auth.userId),
-      eq(toots.likedToot, liked),
-    )
+    const where = and(eq(toots.dbUserId, auth.userId), eq(toots.likedToot, liked))
     const [{ value: total }] = await auth.requestContext.db
       .select({ value: count() })
       .from(toots)
@@ -239,9 +216,7 @@ export const getToot = async (context: HonoContext) => {
     const [toot] = await auth.requestContext.db
       .select()
       .from(toots)
-      .where(
-        and(eq(toots.id, getIdParam(context)), eq(toots.dbUserId, auth.userId)),
-      )
+      .where(and(eq(toots.id, getIdParam(context)), eq(toots.dbUserId, auth.userId)))
       .limit(1)
 
     if (!toot) {
@@ -252,13 +227,10 @@ export const getToot = async (context: HonoContext) => {
       })
     }
 
-    return new Response(
-      JSON.stringify({ data: tootToRow(toot), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: tootToRow(toot), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse({
       error: getErrorMessage(error),
@@ -278,11 +250,7 @@ export const searchTweets = async (context: HonoContext) => {
 
     const { q, ...rawParams } = searchParamsToObject(context.req.url)
     const searchTerm = String(q ?? '')
-    const {
-      limit = DEFAULT_API_RESPONSE_LIMIT,
-      offset = 0,
-      order,
-    } = apiParameters(rawParams)
+    const { limit = DEFAULT_API_RESPONSE_LIMIT, offset = 0, order } = apiParameters(rawParams)
     const pattern = `%${searchTerm}%`
     const where = and(
       eq(tweets.dbUserId, auth.userId),
@@ -335,11 +303,7 @@ export const searchToots = async (context: HonoContext) => {
 
     const { q, ...rawParams } = searchParamsToObject(context.req.url)
     const searchTerm = String(q ?? '')
-    const {
-      limit = DEFAULT_API_RESPONSE_LIMIT,
-      offset = 0,
-      order,
-    } = apiParameters(rawParams)
+    const { limit = DEFAULT_API_RESPONSE_LIMIT, offset = 0, order } = apiParameters(rawParams)
     const pattern = `%${searchTerm}%`
     const where = and(
       eq(toots.dbUserId, auth.userId),

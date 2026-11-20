@@ -21,8 +21,7 @@ const config = (_, argv) => {
     },
     resolve: {
       alias: {
-        'webextension-polyfill':
-          'webextension-polyfill/dist/browser-polyfill.min.js',
+        'webextension-polyfill': 'webextension-polyfill/dist/browser-polyfill.min.js',
       },
     },
   })

@@ -1,9 +1,4 @@
-import {
-  type Dispatch,
-  type DispatchWithoutAction,
-  useCallback,
-  useState,
-} from 'react'
+import { type Dispatch, type DispatchWithoutAction, useCallback, useState } from 'react'
 
 /**
  * @name useToggle

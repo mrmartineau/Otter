@@ -46,10 +46,7 @@ interface BookmarkActionsProps extends BookmarkFeedItemProps {
 }
 
 /** The action row for the compact and card views: toggles, copy, read and the ⋯ menu. */
-export const BookmarkActions = ({
-  showToggles = true,
-  ...props
-}: BookmarkActionsProps) => {
+export const BookmarkActions = ({ showToggles = true, ...props }: BookmarkActionsProps) => {
   const { id, url } = props
 
   const handleCopyUrl = async () => {

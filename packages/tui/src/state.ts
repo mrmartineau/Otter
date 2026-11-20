@@ -1,13 +1,6 @@
 import type { Bookmark, TagCount } from './api.ts'
 
-export type Mode =
-  | 'add'
-  | 'confirm-delete'
-  | 'detail'
-  | 'help'
-  | 'list'
-  | 'search'
-  | 'tags'
+export type Mode = 'add' | 'confirm-delete' | 'detail' | 'help' | 'list' | 'search' | 'tags'
 
 export interface AppState {
   count: number

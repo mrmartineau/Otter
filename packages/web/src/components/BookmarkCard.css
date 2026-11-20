@@ -70,9 +70,7 @@
   height: 100%;
   font-size: var(--step--2);
   color: var(--theme9);
-  background:
-    radial-gradient(circle at 30% 20%, var(--accent4), transparent 60%),
-    var(--theme3);
+  background: radial-gradient(circle at 30% 20%, var(--accent4), transparent 60%), var(--theme3);
 }
 
 .bookmark-card-play {
@@ -119,7 +117,7 @@
   color: white;
 }
 
-.bookmark-card[data-shape="picture"] .bookmark-card-cover {
+.bookmark-card[data-shape='picture'] .bookmark-card-cover {
   border-radius: var(--radii-xl) var(--radii-xl) 0 0;
 }
 
@@ -134,7 +132,7 @@
   }
 }
 
-.bookmark-card[data-shape="note"] {
+.bookmark-card[data-shape='note'] {
   border-color: var(--accent5);
   background-color: var(--accent3);
   rotate: -0.6deg;
@@ -230,7 +228,7 @@
     flex-shrink: 0;
 
     &::before {
-      content: "·";
+      content: '·';
       margin-right: var(--space-3xs);
     }
   }

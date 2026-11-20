@@ -21,8 +21,7 @@ const isOptionsSetup = async () => {
 }
 
 const openBookmarkletPage = async (url) => {
-  const { otterInstanceUrl, newBookmarkWindowBehaviour } =
-    await getStorageItems()
+  const { otterInstanceUrl, newBookmarkWindowBehaviour } = await getStorageItems()
   // create new bookmark
   if (newBookmarkWindowBehaviour === 'tab') {
     chrome.tabs.create({

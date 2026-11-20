@@ -70,10 +70,7 @@ async function getAccessTokenInner() {
   return tokens.access_token
 }
 
-export async function apiFetch<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<T> {
+export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const accessToken = await getAccessToken()
   const headers = new Headers(options.headers)
   headers.set('Authorization', `Bearer ${accessToken}`)
@@ -107,8 +104,7 @@ export function apiUrl(path: string, query?: Record<string, unknown>) {
     if (
       typeof value === 'string' ||
       typeof value === 'number' ||
-      (Array.isArray(value) &&
-        value.every((item): item is string => typeof item === 'string'))
+      (Array.isArray(value) && value.every((item): item is string => typeof item === 'string'))
     ) {
       queryValues[key] = value
     }
@@ -119,9 +115,7 @@ export function apiUrl(path: string, query?: Record<string, unknown>) {
   })
 }
 
-async function postToken(
-  params: Record<string, string>,
-): Promise<OAuth.TokenResponse> {
+async function postToken(params: Record<string, string>): Promise<OAuth.TokenResponse> {
   const body = new URLSearchParams({
     ...params,
     client_id: prefs.oauthClientId,
@@ -154,9 +148,7 @@ async function fetchTokens(
   })
 }
 
-async function refreshTokens(
-  refreshToken: string,
-): Promise<OAuth.TokenResponse> {
+async function refreshTokens(refreshToken: string): Promise<OAuth.TokenResponse> {
   return postToken({
     grant_type: 'refresh_token',
     refresh_token: refreshToken,

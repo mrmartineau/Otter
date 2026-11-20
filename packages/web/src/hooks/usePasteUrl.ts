@@ -18,20 +18,14 @@ function isUrl(text: string): boolean {
 export function usePasteUrl() {
   const navigate = useNavigate()
   const matchRoute = useMatchRoute()
-  const isNewBookmarkRoute = Boolean(
-    matchRoute({ fuzzy: true, to: '/new/bookmark' }),
-  )
+  const isNewBookmarkRoute = Boolean(matchRoute({ fuzzy: true, to: '/new/bookmark' }))
 
   useEffect(() => {
     function handlePaste(event: ClipboardEvent) {
       if (isNewBookmarkRoute) return
 
       const target = event.target as HTMLElement
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return
       }
 

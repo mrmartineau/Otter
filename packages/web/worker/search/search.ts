@@ -47,9 +47,7 @@ export const getSearch = async (context: HonoContext) => {
   try {
     const { q, ...searchParams } = searchParamsToObject(context.req.url)
     const searchTerm = String(q ?? '')
-    const requestContext = await requireRequestContext(context, [
-      'bookmarks:read',
-    ])
+    const requestContext = await requireRequestContext(context, ['bookmarks:read'])
 
     if (requestContext instanceof Response) {
       return requestContext
@@ -80,16 +78,10 @@ export const getSearch = async (context: HonoContext) => {
       star === undefined ? undefined : eq(bookmarks.star, star),
       tag ? arrayContains(bookmarks.tags, [tag]) : undefined,
       dateWindow
-        ? gte(
-            bookmarks.createdAt,
-            sql`now() - ${dateWindow * 7} * interval '1 day'`,
-          )
+        ? gte(bookmarks.createdAt, sql`now() - ${dateWindow * 7} * interval '1 day'`)
         : undefined,
       dateWindow && dateWindow > 1
-        ? lt(
-            bookmarks.createdAt,
-            sql`now() - ${(dateWindow - 1) * 7} * interval '1 day'`,
-          )
+        ? lt(bookmarks.createdAt, sql`now() - ${(dateWindow - 1) * 7} * interval '1 day'`)
         : undefined,
       hasSearchTerm
         ? or(
@@ -103,10 +95,7 @@ export const getSearch = async (context: HonoContext) => {
       order === 'asc'
         ? [asc(bookmarks.createdAt)]
         : hasSearchTerm
-          ? [
-              desc(sql`ts_rank(${bookmarks.searchText}, ${tsQuery})`),
-              desc(bookmarks.createdAt),
-            ]
+          ? [desc(sql`ts_rank(${bookmarks.searchText}, ${tsQuery})`), desc(bookmarks.createdAt)]
           : [desc(bookmarks.createdAt)]
     const rows = await requestContext.db
       .select({

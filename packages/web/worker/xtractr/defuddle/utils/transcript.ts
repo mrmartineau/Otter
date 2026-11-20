@@ -76,8 +76,7 @@ export function buildTranscript(
     }
 
     const timestamp = formatTimestamp(segment.start)
-    const speakerClass =
-      segment.speaker !== undefined ? ` speaker-${segment.speaker}` : ''
+    const speakerClass = segment.speaker !== undefined ? ` speaker-${segment.speaker}` : ''
     const tsHtml = `<strong><span class="timestamp" data-timestamp="${segment.start}">${timestamp}</span></strong>`
     htmlParts.push(
       `<p class="transcript-segment${speakerClass}">${tsHtml} · ${escapeHtml(segment.text)}</p>`,

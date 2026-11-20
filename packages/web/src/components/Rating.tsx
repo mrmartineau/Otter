@@ -33,8 +33,6 @@ interface RatingProps extends ComponentProps<'div'> {
 
 export const Rating = ({ rating, className, size = 16 }: RatingProps) => {
   return (
-    <div className={cn('flex items-center gap-1', className)}>
-      {getRatingDisplay(rating, size)}
-    </div>
+    <div className={cn('flex items-center gap-1', className)}>{getRatingDisplay(rating, size)}</div>
   )
 }

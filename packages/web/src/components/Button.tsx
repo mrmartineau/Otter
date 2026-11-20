@@ -21,8 +21,7 @@ const buttonVariants = cva(['button-base', 'focus'], {
       cmdk: 'button-cmdk',
       collapsible: 'button-collapsible',
       default: 'bg-accent9 hover:bg-accent7',
-      destructive:
-        'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+      destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
       ghost: 'button-ghost',
       icon: 'h-10 w-10 hover:bg-theme6 hover:text-theme10 button-icon',
       nav: 'text-text hover:bg-theme3 rounded-lg shrink-0',
@@ -33,25 +32,13 @@ const buttonVariants = cva(['button-base', 'focus'], {
 })
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean
 }
 
-const Button = ({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: ButtonProps) => {
+const Button = ({ className, variant, size, asChild = false, ...props }: ButtonProps) => {
   const Comp = asChild ? SlotPrimitive.Slot : 'button'
-  return (
-    <Comp
-      className={cn(buttonVariants({ size, variant }), className)}
-      {...props}
-    />
-  )
+  return <Comp className={cn(buttonVariants({ size, variant }), className)} {...props} />
 }
 Button.displayName = 'Button'
 

@@ -48,9 +48,7 @@ export function escapeHtml(text: string): string {
  * Handles SVG elements where className is an SVGAnimatedString.
  */
 export function getClassName(el: Element): string {
-  return typeof el.className === 'string'
-    ? el.className
-    : el.getAttribute('class') || ''
+  return typeof el.className === 'string' ? el.className : el.getAttribute('class') || ''
 }
 
 /**
@@ -60,10 +58,7 @@ export function getClassName(el: Element): string {
 export function isDangerousUrl(url: string): boolean {
   // oxlint-disable-next-line no-control-regex -- ignore
   const normalized = url.replace(/[\s\u0000-\u001F]+/g, '').toLowerCase()
-  return (
-    normalized.startsWith('javascript:') ||
-    normalized.startsWith('data:text/html')
-  )
+  return normalized.startsWith('javascript:') || normalized.startsWith('data:text/html')
 }
 
 /**

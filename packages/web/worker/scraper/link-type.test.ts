@@ -4,9 +4,7 @@ import { linkType } from './link-type'
 describe('linkType', () => {
   test('video', () => {
     expect(linkType('http://youtube.com')).toBe('video')
-    expect(linkType('https://www.youtube.com/watch?v=1Cz8_6aZ248')).toBe(
-      'video',
-    )
+    expect(linkType('https://www.youtube.com/watch?v=1Cz8_6aZ248')).toBe('video')
     expect(linkType('https://youtu.be/1Cz8_6aZ248')).toBe('video')
     expect(linkType('https://youtu.be/1Cz8_6aZ248', true)).toBe('video')
     expect(linkType('https://vimeo.com/746423508')).toBe('video')

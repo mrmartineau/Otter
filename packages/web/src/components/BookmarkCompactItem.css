@@ -89,7 +89,7 @@ time.bookmark-compact-meta {
   transition: transform 200ms var(--ease-out-3);
 }
 
-.bookmark-compact-caret[aria-expanded="true"] svg {
+.bookmark-compact-caret[aria-expanded='true'] svg {
   transform: rotate(180deg);
 }
 

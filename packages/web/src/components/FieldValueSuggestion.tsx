@@ -1,15 +1,11 @@
 import { Button } from '@/components/Button'
-
 import type { BookmarkFormValues } from '../types/db'
 import { Flex } from './Flex'
 
 interface FieldValueSuggestionProps {
   fieldId: keyof BookmarkFormValues
   suggestion?: string
-  setFieldValue: (
-    field: keyof BookmarkFormValues,
-    value: string | undefined,
-  ) => void
+  setFieldValue: (field: keyof BookmarkFormValues, value: string | undefined) => void
   type?: 'ai' | 'default' | 'original'
 }
 
@@ -38,22 +34,13 @@ export const FieldValueSuggestion = ({
       break
   }
   return (
-    <Flex
-      direction="column"
-      gap="2xs"
-      className="input-base mt-2xs px-2xs pb-m text-step--3"
-    >
+    <Flex direction="column" gap="2xs" className="input-base mt-2xs px-2xs pb-m text-step--3">
       <div>
         <b>{title}</b>
         <div>{suggestion}</div>
       </div>
       <div>
-        <Button
-          variant="outline"
-          size="2xs"
-          onClick={handleClick}
-          type="button"
-        >
+        <Button variant="outline" size="2xs" onClick={handleClick} type="button">
           Use {title}
         </Button>
       </div>

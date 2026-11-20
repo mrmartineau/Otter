@@ -55,14 +55,8 @@ const readSeconds = (raw: string | undefined, fallback: number) => {
 }
 
 export const getTokenLifetimes = (env: AuthEnv) => ({
-  accessTokenExpiresIn: readSeconds(
-    env.OAUTH_ACCESS_TOKEN_TTL,
-    DEFAULT_ACCESS_TOKEN_TTL,
-  ),
-  refreshTokenExpiresIn: readSeconds(
-    env.OAUTH_REFRESH_TOKEN_TTL,
-    DEFAULT_REFRESH_TOKEN_TTL,
-  ),
+  accessTokenExpiresIn: readSeconds(env.OAUTH_ACCESS_TOKEN_TTL, DEFAULT_ACCESS_TOKEN_TTL),
+  refreshTokenExpiresIn: readSeconds(env.OAUTH_REFRESH_TOKEN_TTL, DEFAULT_REFRESH_TOKEN_TTL),
 })
 
 const getTrustedOrigins = (env: AuthEnv) => {
@@ -77,17 +71,14 @@ const getTrustedOrigins = (env: AuthEnv) => {
   return env.BETTER_AUTH_URL ? [env.BETTER_AUTH_URL] : undefined
 }
 
-const isSignUpDisabled = (env: AuthEnv) =>
-  env.BETTER_AUTH_DISABLE_SIGNUP !== 'false'
+const isSignUpDisabled = (env: AuthEnv) => env.BETTER_AUTH_DISABLE_SIGNUP !== 'false'
 
 export const getOAuthAudience = (env: AuthEnv) => {
   return (env.BETTER_AUTH_URL ?? 'http://localhost:5678').replace(/\/+$/, '')
 }
 
 const getTrustedOAuthClients = (env: AuthEnv) =>
-  env.RAYCAST_OAUTH_CLIENT_ID
-    ? new Set([env.RAYCAST_OAUTH_CLIENT_ID])
-    : undefined
+  env.RAYCAST_OAUTH_CLIENT_ID ? new Set([env.RAYCAST_OAUTH_CLIENT_ID]) : undefined
 
 export const createAuth = (env: AuthEnv, db: Db) => {
   return betterAuth({

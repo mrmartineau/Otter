@@ -1,11 +1,7 @@
 import { FolderIcon } from '@phosphor-icons/react'
 import { CONTENT } from '../constants'
 import type { CollectionType } from '../utils/fetching/meta'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from './Collapsible'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './Collapsible'
 import { Flex } from './Flex'
 import { SidebarLink } from './SidebarLink'
 import { Text } from './Text'
@@ -16,8 +12,7 @@ interface TypeListProps {
 export const CollectionList = ({ collections }: TypeListProps) => (
   <Collapsible stateKey="collections">
     <CollapsibleTrigger>
-      {CONTENT.collectionsNav}{' '}
-      <Text variant="count">{collections?.length}</Text>
+      {CONTENT.collectionsNav} <Text variant="count">{collections?.length}</Text>
     </CollapsibleTrigger>
     <CollapsibleContent>
       <Flex gapY="3xs" direction="column">
@@ -47,11 +42,7 @@ export const CollectionList = ({ collections }: TypeListProps) => (
                     activePath={`/collection/${encodeURIComponent(item.collection)}`}
                     key={item.collection}
                   >
-                    <FolderIcon
-                      size={18}
-                      weight="duotone"
-                      aria-label={item.collection}
-                    />
+                    <FolderIcon size={18} weight="duotone" aria-label={item.collection} />
                     {item.collection}
                   </SidebarLink>
                 )

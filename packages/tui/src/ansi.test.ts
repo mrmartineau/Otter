@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  padToWidth,
-  sanitize,
-  stringWidth,
-  stripAnsi,
-  truncate,
-} from './ansi.ts'
+import { padToWidth, sanitize, stringWidth, stripAnsi, truncate } from './ansi.ts'
 
 describe('stripAnsi', () => {
   it('removes SGR sequences', () => {

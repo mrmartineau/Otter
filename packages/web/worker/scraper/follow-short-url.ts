@@ -43,9 +43,7 @@ export const followShortUrl = async (
     // re-validate every hop so a public short URL cannot redirect the
     // worker to an internal address (SSRF).
     const resolvedLocation = (
-      await assertSafePublicUrlResolved(
-        new URL(location, currentUrl).toString(),
-      )
+      await assertSafePublicUrlResolved(new URL(location, currentUrl).toString())
     ).toString()
     urls.push(resolvedLocation)
     return followShortUrl(urls, redirectCount + 1)

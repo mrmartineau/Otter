@@ -1,8 +1,5 @@
 import { TwitterLogoIcon } from '@phosphor-icons/react'
-import {
-  useSuspenseInfiniteQuery,
-  useSuspenseQuery,
-} from '@tanstack/react-query'
+import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import { CONTENT, createTitle } from '@/constants'
@@ -32,10 +29,9 @@ export const Route = createFileRoute('/_app/tweets')({
 function Page() {
   const { liked, ...search } = useSearch({ from: '/_app/tweets' })
   const { data: dbMeta } = useSuspenseQuery(getMetaOptions())
-  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useSuspenseInfiniteQuery(
-      getTweetsInfiniteOptions({ likes: liked ?? false, params: search }),
-    )
+  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } = useSuspenseInfiniteQuery(
+    getTweetsInfiniteOptions({ likes: liked ?? false, params: search }),
+  )
 
   const items = data.pages.flatMap((page) => page.data ?? [])
   const count = data.pages[0]?.count ?? 0
@@ -52,9 +48,7 @@ function Page() {
     subNav.push({
       href: '/tweets?liked=true',
       isActive: liked,
-      text: dbMeta.likedTweets
-        ? `My Liked Tweets (${dbMeta.likedTweets})`
-        : 'My Liked Tweets',
+      text: dbMeta.likedTweets ? `My Liked Tweets (${dbMeta.likedTweets})` : 'My Liked Tweets',
     })
   }
 
@@ -65,9 +59,7 @@ function Page() {
       limit={search.limit}
       allowGroupByDate={true}
       title={CONTENT.tweetsTitle}
-      icon={
-        <TwitterLogoIcon aria-label="My tweets" size={24} weight="duotone" />
-      }
+      icon={<TwitterLogoIcon aria-label="My tweets" size={24} weight="duotone" />}
       feedType="tweets"
       subNav={subNav}
       showFeedOptions={false}

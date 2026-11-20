@@ -9,11 +9,11 @@
 
 type ExtensionPreferences = {
   /** OAuth Client ID - Your Raycast OAuth client ID from Otter */
-  "oauthClientId": string,
+  oauthClientId: string
   /** Otter Instance URL - e.g. https://otter.zander.wtf */
-  "otterBasePath": string,
+  otterBasePath: string
   /** Show Detail View to Side or List View - Show detail view to side or list view */
-  "showDetailView": boolean
+  showDetailView: boolean
 }
 
 /** Preferences accessible in all the extension's commands */
@@ -40,4 +40,3 @@ declare namespace Arguments {
   /** Arguments passed to the `menubar` command */
   export type Menubar = {}
 }
-

@@ -85,17 +85,8 @@ export const ShareDialog = ({ kind, name }: ShareDialogProps) => {
         {shareUrl ? (
           <Flex direction="column" gap="s">
             <Flex gap="2xs" align="center">
-              <Input
-                readOnly
-                value={shareUrl}
-                onFocus={(event) => event.currentTarget.select()}
-              />
-              <Button
-                size="s"
-                variant="secondary"
-                onClick={handleCopy}
-                aria-label="Copy link"
-              >
+              <Input readOnly value={shareUrl} onFocus={(event) => event.currentTarget.select()} />
+              <Button size="s" variant="secondary" onClick={handleCopy} aria-label="Copy link">
                 {copied ? (
                   <CheckIcon size={16} weight="bold" />
                 ) : (
@@ -105,12 +96,7 @@ export const ShareDialog = ({ kind, name }: ShareDialogProps) => {
               </Button>
             </Flex>
             <Flex gap="2xs" justify="end">
-              <Button
-                size="s"
-                variant="ghost"
-                onClick={handleRotate}
-                disabled={enable.isPending}
-              >
+              <Button size="s" variant="ghost" onClick={handleRotate} disabled={enable.isPending}>
                 <ArrowsClockwiseIcon size={16} weight="duotone" /> Rotate link
               </Button>
               <Button

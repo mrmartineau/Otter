@@ -10,13 +10,7 @@ import { Input } from '@/components/Input'
 import type { MediaInsert, MediaRating, MediaStatus } from '@/types/db'
 import { getMediaSearchOptions } from '@/utils/fetching/media'
 import { IconControl } from './IconControl'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './Select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './Select'
 import { MediaTypeToIcon } from './TypeToIcon'
 
 export interface ComboOption {
@@ -24,9 +18,7 @@ export interface ComboOption {
   value: string
 }
 
-export const setComboboxValue = (
-  platforms?: string[] | null,
-): readonly ComboOption[] => {
+export const setComboboxValue = (platforms?: string[] | null): readonly ComboOption[] => {
   if (!platforms) {
     return []
   }
@@ -36,15 +28,7 @@ export const setComboboxValue = (
   }))
 }
 
-const mediaTypes = [
-  'tv',
-  'film',
-  'game',
-  'book',
-  'podcast',
-  'music',
-  'other',
-] as const
+const mediaTypes = ['tv', 'film', 'game', 'book', 'podcast', 'music', 'other'] as const
 
 const statuses = [
   { label: 'Wishlist', value: 'wishlist' },
@@ -52,19 +36,7 @@ const statuses = [
   { label: 'Done', value: 'done' },
 ] as const
 
-const ratings = [
-  '0',
-  '0.5',
-  '1',
-  '1.5',
-  '2',
-  '2.5',
-  '3',
-  '3.5',
-  '4',
-  '4.5',
-  '5',
-] as const
+const ratings = ['0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'] as const
 
 interface MediaFormProps extends Omit<ComponentProps<'div'>, 'id'> {
   type: 'new' | 'edit'
@@ -87,15 +59,14 @@ export const MediaForm = ({
 }: MediaFormProps) => {
   const isNew = type === 'new'
 
-  const { register, handleSubmit, setValue, watch, reset } =
-    useForm<MediaInsert>({
-      defaultValues: {
-        name: '',
-        status: 'wishlist',
-        type: 'tv',
-        ...initialValues,
-      },
-    })
+  const { register, handleSubmit, setValue, watch, reset } = useForm<MediaInsert>({
+    defaultValues: {
+      name: '',
+      status: 'wishlist',
+      type: 'tv',
+      ...initialValues,
+    },
+  })
 
   const watchPlatform = watch('platform')
   const watchType = watch('type')
@@ -129,10 +100,7 @@ export const MediaForm = ({
   return (
     <div className="media-form" {...rest}>
       <h2 className="mb-s">{isNew ? 'New media item' : 'Edit media item'}</h2>
-      <form
-        onSubmit={handleSubmit(handleSubmitForm)}
-        className="flex flex-col gap-m"
-      >
+      <form onSubmit={handleSubmit(handleSubmitForm)} className="flex flex-col gap-m">
         <input type="hidden" {...register('sort_order')} value={0} />
         <input type="hidden" {...register('image')} />
         <input type="hidden" {...register('media_id')} />
@@ -173,10 +141,7 @@ export const MediaForm = ({
               />
             </FormGroup>
             {debouncedSearch ? (
-              <div
-                className="media-form-results flex flex-col gap-xs"
-                aria-live="polite"
-              >
+              <div className="media-form-results flex flex-col gap-xs" aria-live="polite">
                 {limitedMediaSearch?.length ? (
                   limitedMediaSearch.map((item) => (
                     <Button
@@ -200,9 +165,7 @@ export const MediaForm = ({
                       <div className="flex flex-col gap-xs text-sm text-left">
                         <div>{item.title}</div>
                         {item?.maker ? (
-                          <div className="text-muted-foreground">
-                            {item.maker}
-                          </div>
+                          <div className="text-muted-foreground">{item.maker}</div>
                         ) : null}
                       </div>
                     </Button>
@@ -234,16 +197,9 @@ export const MediaForm = ({
                 inputId="platform"
                 options={transformedPlatformsForCombobox}
                 onChange={(option) => {
-                  setValue(
-                    'platform',
-                    (option as ComboOption[])[0]?.value || '',
-                  )
+                  setValue('platform', (option as ComboOption[])[0]?.value || '')
                 }}
-                value={
-                  watchPlatform
-                    ? [{ label: watchPlatform, value: watchPlatform }]
-                    : []
-                }
+                value={watchPlatform ? [{ label: watchPlatform, value: watchPlatform }] : []}
                 maxMenuHeight={100}
                 placeholder="Select or enter platform"
               />

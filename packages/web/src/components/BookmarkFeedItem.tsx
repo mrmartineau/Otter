@@ -1,5 +1,4 @@
 import { NoteIcon, TwitterLogoIcon } from '@phosphor-icons/react'
-
 import { useClickBookmark } from '../hooks/useClickBookmark'
 import type { Bookmark, Collection } from '../types/db'
 import { fullPath } from '../utils/fullPath'
@@ -24,11 +23,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
         <div className="feed-item-content">
           {url && title ? (
             <div>
-              <Link
-                href={url}
-                variant="feedTitle"
-                onClick={() => handleClickRegister(id)}
-              >
+              <Link href={url} variant="feedTitle" onClick={() => handleClickRegister(id)}>
                 {title}
               </Link>
             </div>
@@ -36,9 +31,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
             <div>{title}</div>
           ) : null}
           {description ? (
-            <Markdown preventClamping={props.preventMarkdownClamping}>
-              {description}
-            </Markdown>
+            <Markdown preventClamping={props.preventMarkdownClamping}>{description}</Markdown>
           ) : null}
           {note ? (
             <div className="feed-item-note">
@@ -55,9 +48,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
                 />
                 Note
               </Flex>
-              <Markdown preventClamping={props.preventMarkdownClamping}>
-                {note}
-              </Markdown>
+              <Markdown preventClamping={props.preventMarkdownClamping}>{note}</Markdown>
             </div>
           ) : null}
           {tweet?.text ? (
@@ -67,9 +58,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
               </div>
               <div className="shrink-0 text-step--1 tracking-tight">
                 <Link href={tweet.url}>@{tweet.username}</Link>
-                <Markdown preventClamping={props.preventMarkdownClamping}>
-                  {tweet.text}
-                </Markdown>
+                <Markdown preventClamping={props.preventMarkdownClamping}>{tweet.text}</Markdown>
               </div>
             </Flex>
           ) : null}
@@ -80,11 +69,7 @@ export const BookmarkFeedItem = (props: BookmarkFeedItemProps) => {
           </div>
         ) : null}
       </div>
-      <FeedItemFooter
-        {...props}
-        key={`footer-${id}`}
-        collections={props.collections}
-      />
+      <FeedItemFooter {...props} key={`footer-${id}`} collections={props.collections} />
     </div>
   )
 }

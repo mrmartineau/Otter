@@ -91,10 +91,7 @@ function mapSchemaType(schemaType: string): LinkType | undefined {
   return schemaTypeMap[schemaKey]
 }
 
-function detectPageTypeFromJsonLd(
-  value: unknown,
-  depth = 0,
-): LinkType | undefined {
+function detectPageTypeFromJsonLd(value: unknown, depth = 0): LinkType | undefined {
   if (!value || typeof value !== 'object' || depth > MAX_JSON_LD_DEPTH) {
     return undefined
   }
@@ -161,9 +158,7 @@ function findMetaTagContent(
   return undefined
 }
 
-function detectPageTypeFromMetaTags(
-  metaTags: DefuddleMetaTag[] | undefined,
-): LinkType | undefined {
+function detectPageTypeFromMetaTags(metaTags: DefuddleMetaTag[] | undefined): LinkType | undefined {
   const ogTypeContent = findMetaTagContent(metaTags, 'og:type')?.toLowerCase()
   if (ogTypeContent) {
     for (const ogTypeRule of ogTypeMap) {
@@ -179,10 +174,7 @@ function detectPageTypeFromMetaTags(
       continue
     }
 
-    if (
-      metaKey === 'twitter:card' &&
-      metaTag.content?.toLowerCase() === 'player'
-    ) {
+    if (metaKey === 'twitter:card' && metaTag.content?.toLowerCase() === 'player') {
       return 'video'
     }
 

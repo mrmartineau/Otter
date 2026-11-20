@@ -1,6 +1,5 @@
 import memoizeOne from 'memoize-one'
 import relativeDate from 'tiny-relative-date'
-
 import { daysAgo } from './daysAgo'
 
 export const getRelativeDateSource = (

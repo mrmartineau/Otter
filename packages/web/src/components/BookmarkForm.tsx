@@ -19,31 +19,19 @@ import { toast } from 'sonner'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { Textarea } from '@/components/Textarea'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/Tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip'
 import { useClassifyMutation } from '@/hooks/useClassifyMutation'
 import { useIsBookmarklet } from '@/hooks/useIsBookmarklet'
 import { useIsMobile } from '@/hooks/useMobile'
 import { useScrapeMutation } from '@/hooks/useScrapeMutation'
-import {
-  rewriteDescriptionOptions,
-  rewriteTitleOptions,
-} from '@/utils/fetching/ai'
+import { rewriteDescriptionOptions, rewriteTitleOptions } from '@/utils/fetching/ai'
 import {
   CONTENT,
   DEFAULT_BOOKMARK_FORM_URL_PLACEHOLDER,
   ROUTE_NEW_BOOKMARK_CONFIRMATION,
 } from '../constants'
 import type { Bookmark, BookmarkFormValues } from '../types/db'
-import {
-  checkBookmarkUrl,
-  createBookmark,
-  updateBookmark,
-} from '../utils/fetching/bookmarks'
+import { checkBookmarkUrl, createBookmark, updateBookmark } from '../utils/fetching/bookmarks'
 import type { MetaTag } from '../utils/fetching/meta'
 import { fullPath } from '../utils/fullPath'
 import { Combobox } from './Combobox'
@@ -58,9 +46,7 @@ export interface ComboOption {
   value: string
 }
 
-export const setComboboxValue = (
-  tags?: string[] | null,
-): readonly ComboOption[] => {
+export const setComboboxValue = (tags?: string[] | null): readonly ComboOption[] => {
   if (!tags) {
     return []
   }
@@ -97,9 +83,7 @@ export const BookmarkForm = ({
 }: BookmarkFormProps) => {
   const isNew = type === 'new'
   const navigate = useNavigate()
-  const [possibleMatchingItems, setPossibleMatchingItems] = useState<
-    Bookmark[] | null
-  >(null)
+  const [possibleMatchingItems, setPossibleMatchingItems] = useState<Bookmark[] | null>(null)
   const [newTagNames, setNewTagNames] = useState<Set<string>>(new Set())
   const [showNote, setShowNote] = useState(() => !!initialValues?.note)
   const hasAutoClassified = useRef(false)
@@ -133,19 +117,15 @@ export const BookmarkForm = ({
   )
 
   // AI title rewrite
-  const { mutate: handleAiTitleMutate, isPending: isTitleAiLoading } =
-    useMutation({
-      ...rewriteTitleOptions(watchTitle),
-      onSuccess: (data) => {
-        setFieldValue('title', data.response)
-      },
-    })
+  const { mutate: handleAiTitleMutate, isPending: isTitleAiLoading } = useMutation({
+    ...rewriteTitleOptions(watchTitle),
+    onSuccess: (data) => {
+      setFieldValue('title', data.response)
+    },
+  })
 
   // AI description rewrite
-  const {
-    mutate: handleAiDescriptionMutate,
-    isPending: isDescriptionAiLoading,
-  } = useMutation({
+  const { mutate: handleAiDescriptionMutate, isPending: isDescriptionAiLoading } = useMutation({
     // @ts-expect-error - TODO: fix this
     ...rewriteDescriptionOptions(watchDescription, watchTitle),
     onSuccess: (data) => {
@@ -156,9 +136,7 @@ export const BookmarkForm = ({
   const existingTagNames = useMemo(
     () =>
       tags
-        ?.filter(
-          (item) => item.tag !== 'Untagged' && !item.tag?.startsWith('like:'),
-        )
+        ?.filter((item) => item.tag !== 'Untagged' && !item.tag?.startsWith('like:'))
         .map((item) => item.tag as string) ?? [],
     [tags],
   )
@@ -179,9 +157,7 @@ export const BookmarkForm = ({
       {
         onSuccess: (data) => {
           const existingTags = form.state.values.tags ?? []
-          const newNames = new Set(
-            data.tags.filter((t) => t.isNew).map((t) => t.name),
-          )
+          const newNames = new Set(data.tags.filter((t) => t.isNew).map((t) => t.name))
           const suggestedNames = data.tags.map((t) => t.name)
           const merged = [
             ...existingTags,
@@ -283,22 +259,17 @@ export const BookmarkForm = ({
     }
   }, [])
 
-  const checkMatchingItems = useCallback(
-    async (link: string): Promise<void> => {
-      try {
-        // Host + path, so other pages on the same site don't match. The web
-        // extension popup matches the same way.
-        const { host, pathname } = new URL(link)
-        const { data } = await checkBookmarkUrl(
-          `${host}${pathname.replace(/\/$/, '')}`,
-        )
-        setPossibleMatchingItems(data as Bookmark[])
-      } catch {
-        setPossibleMatchingItems(null)
-      }
-    },
-    [],
-  )
+  const checkMatchingItems = useCallback(async (link: string): Promise<void> => {
+    try {
+      // Host + path, so other pages on the same site don't match. The web
+      // extension popup matches the same way.
+      const { host, pathname } = new URL(link)
+      const { data } = await checkBookmarkUrl(`${host}${pathname.replace(/\/$/, '')}`)
+      setPossibleMatchingItems(data as Bookmark[])
+    } catch {
+      setPossibleMatchingItems(null)
+    }
+  }, [])
 
   const handleCheckExistingItem = useCallback(
     async (value?: string) => {
@@ -337,13 +308,7 @@ export const BookmarkForm = ({
           <PossibleMatchingItems items={possibleMatchingItems} />
           <div className="bookmark-form-grid">
             <form.Field name="feed">
-              {(field) => (
-                <input
-                  type="hidden"
-                  name={field.name}
-                  value={field.state.value ?? ''}
-                />
-              )}
+              {(field) => <input type="hidden" name={field.name} value={field.state.value ?? ''} />}
             </form.Field>
             <div className="bookmark-form-col">
               {/* URL */}
@@ -406,9 +371,7 @@ export const BookmarkForm = ({
                     ? (scrapeMutation.data?.title ?? undefined)
                     : undefined
                 }
-                onUseSuggestion={() =>
-                  setFieldValue('title', scrapeMutation.data?.title)
-                }
+                onUseSuggestion={() => setFieldValue('title', scrapeMutation.data?.title)}
                 labelSuffix={
                   <TooltipProvider>
                     <Tooltip>
@@ -496,23 +459,16 @@ export const BookmarkForm = ({
                         <IconButton
                           type="button"
                           size="s"
-                          disabled={
-                            (!watchUrl && !watchTitle) ||
-                            classifyMutation.isPending
-                          }
+                          disabled={(!watchUrl && !watchTitle) || classifyMutation.isPending}
                           onClick={() => triggerClassify()}
                         >
                           <SparkleIcon weight="duotone" size="18" />
                         </IconButton>
                       </TooltipTrigger>
                       {classifyMutation.isPending ? (
-                        <div className="text-xs text-muted-foreground">
-                          Finding tags…
-                        </div>
+                        <div className="text-xs text-muted-foreground">Finding tags…</div>
                       ) : null}
-                      <TooltipContent>
-                        {CONTENT.findMatchingTags}
-                      </TooltipContent>
+                      <TooltipContent>{CONTENT.findMatchingTags}</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 }

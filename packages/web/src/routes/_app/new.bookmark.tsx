@@ -1,10 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import {
-  createFileRoute,
-  Outlet,
-  useMatchRoute,
-  useSearch,
-} from '@tanstack/react-router'
+import { createFileRoute, Outlet, useMatchRoute, useSearch } from '@tanstack/react-router'
 import { Suspense } from 'react'
 import { BookmarkForm } from '@/components/BookmarkForm'
 import { Loader } from '@/components/Loader'
@@ -21,9 +16,7 @@ export const Route = createFileRoute('/_app/new/bookmark')({
     ],
   }),
   loader: async (opts) => {
-    const tags = await opts.context.queryClient.ensureQueryData(
-      getMetaOptions(),
-    )
+    const tags = await opts.context.queryClient.ensureQueryData(getMetaOptions())
     const response = { tags }
     return response
   },
@@ -44,9 +37,7 @@ export const Route = createFileRoute('/_app/new/bookmark')({
 
 function RouteComponent() {
   const matchRoute = useMatchRoute()
-  const isConfirmationRoute = Boolean(
-    matchRoute({ to: '/new/bookmark/confirmation' }),
-  )
+  const isConfirmationRoute = Boolean(matchRoute({ to: '/new/bookmark/confirmation' }))
   const searchParams = useSearch({ from: '/_app/new/bookmark' })
   const { data } = useSuspenseQuery(getMetaOptions())
 

@@ -26,13 +26,12 @@ export const Route = createFileRoute('/_app/collection/$collection')({
 function Page() {
   const collection = Route.useParams().collection
   const search = useSearch({ from: '/_app/collection/$collection' })
-  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useSuspenseInfiniteQuery(
-      getCollectionsInfiniteOptions({
-        name: collection,
-        params: search,
-      }),
-    )
+  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } = useSuspenseInfiniteQuery(
+    getCollectionsInfiniteOptions({
+      name: collection,
+      params: search,
+    }),
+  )
   const subNav = useCollectionsSubNav(collection)
 
   const items = data.pages.flatMap((page) => page.data ?? []) as Bookmark[]

@@ -1,13 +1,4 @@
-import {
-  and,
-  arrayContains,
-  count,
-  desc,
-  eq,
-  isNull,
-  or,
-  sql,
-} from 'drizzle-orm'
+import { and, arrayContains, count, desc, eq, isNull, or, sql } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import { errorResponse } from '@/utils/fetching/errorResponse'
@@ -26,22 +17,12 @@ const isShareKind = (value: unknown): value is ShareKind =>
 
 const generateToken = () => crypto.randomUUID().replace(/-/g, '')
 
-const shareBookmarksCondition = (
-  kind: ShareKind,
-  name: string,
-  userId: string,
-) => {
-  const base = and(
-    eq(bookmarks.user, userId),
-    eq(bookmarks.status, 'active'),
-  )
+const shareBookmarksCondition = (kind: ShareKind, name: string, userId: string) => {
+  const base = and(eq(bookmarks.user, userId), eq(bookmarks.status, 'active'))
 
   if (kind === 'tag') {
     if (name === 'Untagged') {
-      return and(
-        base,
-        or(isNull(bookmarks.tags), sql`cardinality(${bookmarks.tags}) = 0`),
-      )
+      return and(base, or(isNull(bookmarks.tags), sql`cardinality(${bookmarks.tags}) = 0`))
     }
     return and(base, arrayContains(bookmarks.tags, [name]))
   }
@@ -58,9 +39,7 @@ const shareBookmarksCondition = (
 
 export const listShares = async (context: HonoContext) => {
   try {
-    const requestContext = await requireRequestContext(context, [
-      'profile:read',
-    ])
+    const requestContext = await requireRequestContext(context, ['profile:read'])
     if (requestContext instanceof Response) return requestContext
 
     const userId = requestContext.user?.id
@@ -68,10 +47,7 @@ export const listShares = async (context: HonoContext) => {
       return errorResponse({ reason: 'Not authorised', status: 401 })
     }
 
-    const rows = await requestContext.db
-      .select()
-      .from(shares)
-      .where(eq(shares.userId, userId))
+    const rows = await requestContext.db.select().from(shares).where(eq(shares.userId, userId))
 
     return new Response(
       JSON.stringify(
@@ -96,9 +72,7 @@ export const listShares = async (context: HonoContext) => {
 
 export const createOrRotateShare = async (context: HonoContext) => {
   try {
-    const requestContext = await requireRequestContext(context, [
-      'profile:read',
-    ])
+    const requestContext = await requireRequestContext(context, ['profile:read'])
     if (requestContext instanceof Response) return requestContext
 
     const userId = requestContext.user?.id
@@ -125,13 +99,7 @@ export const createOrRotateShare = async (context: HonoContext) => {
     const [existing] = await requestContext.db
       .select()
       .from(shares)
-      .where(
-        and(
-          eq(shares.userId, userId),
-          eq(shares.kind, kind),
-          eq(shares.name, name),
-        ),
-      )
+      .where(and(eq(shares.userId, userId), eq(shares.kind, kind), eq(shares.name, name)))
       .limit(1)
 
     if (existing && !rotate) {
@@ -153,10 +121,10 @@ export const createOrRotateShare = async (context: HonoContext) => {
         .set({ token, updatedAt: new Date() })
         .where(eq(shares.id, existing.id))
         .returning()
-      return new Response(
-        JSON.stringify({ kind: row.kind, name: row.name, token: row.token }),
-        { headers: API_HEADERS, status: 200 },
-      )
+      return new Response(JSON.stringify({ kind: row.kind, name: row.name, token: row.token }), {
+        headers: API_HEADERS,
+        status: 200,
+      })
     }
 
     const [row] = await requestContext.db
@@ -164,10 +132,10 @@ export const createOrRotateShare = async (context: HonoContext) => {
       .values({ kind, name, token, userId })
       .returning()
 
-    return new Response(
-      JSON.stringify({ kind: row.kind, name: row.name, token: row.token }),
-      { headers: API_HEADERS, status: 200 },
-    )
+    return new Response(JSON.stringify({ kind: row.kind, name: row.name, token: row.token }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse({
       error: getErrorMessage(error),
@@ -179,9 +147,7 @@ export const createOrRotateShare = async (context: HonoContext) => {
 
 export const deleteShare = async (context: HonoContext) => {
   try {
-    const requestContext = await requireRequestContext(context, [
-      'profile:read',
-    ])
+    const requestContext = await requireRequestContext(context, ['profile:read'])
     if (requestContext instanceof Response) return requestContext
 
     const userId = requestContext.user?.id
@@ -202,13 +168,7 @@ export const deleteShare = async (context: HonoContext) => {
 
     await requestContext.db
       .delete(shares)
-      .where(
-        and(
-          eq(shares.userId, userId),
-          eq(shares.kind, kind),
-          eq(shares.name, name),
-        ),
-      )
+      .where(and(eq(shares.userId, userId), eq(shares.kind, kind), eq(shares.name, name)))
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: API_HEADERS,
@@ -266,10 +226,7 @@ export const getPublicShare = async (context: HonoContext) => {
 
     const where = shareBookmarksCondition(share.kind, share.name, share.userId)
 
-    const [{ value: total }] = await db
-      .select({ value: count() })
-      .from(bookmarks)
-      .where(where)
+    const [{ value: total }] = await db.select({ value: count() }).from(bookmarks).where(where)
 
     const rows = await db
       .select()

@@ -1,8 +1,4 @@
-import {
-  queryOptions,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type {
   Journal,
@@ -60,10 +56,9 @@ export const getJournalEntries = async (filters: JournalEntryFilters = {}) => {
   }
 
   const queryString = searchParams.toString()
-  const response = await fetch(
-    `/api/journal-entries${queryString ? `?${queryString}` : ''}`,
-    { credentials: 'include' },
-  )
+  const response = await fetch(`/api/journal-entries${queryString ? `?${queryString}` : ''}`, {
+    credentials: 'include',
+  })
   return await parseJsonResponse<ListResponse<JournalEntry>>(response)
 }
 
@@ -202,13 +197,7 @@ export const useUpdateJournalEntry = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number
-      data: JournalEntryUpdate
-    }) => {
+    mutationFn: async ({ id, data }: { id: number; data: JournalEntryUpdate }) => {
       const response = await fetch(`/api/journal-entries/${id}`, {
         body: JSON.stringify(data),
         credentials: 'include',

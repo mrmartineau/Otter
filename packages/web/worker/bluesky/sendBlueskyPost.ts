@@ -122,12 +122,10 @@ export const sendBlueskyPost = async (context: HonoContext) => {
         const imageResponse = await fetch(body.record.image)
         if (imageResponse.ok) {
           const imageBuffer = await imageResponse.arrayBuffer()
-          const contentType =
-            imageResponse.headers.get('content-type') ?? 'image/jpeg'
-          const { data: blobData } = await agent.uploadBlob(
-            new Uint8Array(imageBuffer),
-            { encoding: contentType },
-          )
+          const contentType = imageResponse.headers.get('content-type') ?? 'image/jpeg'
+          const { data: blobData } = await agent.uploadBlob(new Uint8Array(imageBuffer), {
+            encoding: contentType,
+          })
           embed.external.thumb = blobData.blob
         }
       } catch (imageError) {
@@ -166,8 +164,7 @@ export const sendBlueskyPost = async (context: HonoContext) => {
         .update(userIntegrations)
         .set({
           blueskyEnabled: false,
-          blueskyLastError:
-            'Authentication failed. Please check your handle and app password.',
+          blueskyLastError: 'Authentication failed. Please check your handle and app password.',
         })
         .where(eq(userIntegrations.userId, body.record.user))
     }

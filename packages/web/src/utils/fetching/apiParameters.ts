@@ -1,7 +1,4 @@
-import {
-  DEFAULT_API_RESPONSE_LIMIT,
-  DEFAULT_API_RESPONSE_ORDER,
-} from '../../constants'
+import { DEFAULT_API_RESPONSE_LIMIT, DEFAULT_API_RESPONSE_ORDER } from '../../constants'
 import type { RequestOrder, Status } from '../../types/api'
 
 export interface BaseApiParameters {

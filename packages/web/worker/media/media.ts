@@ -8,9 +8,7 @@ import { requireRequestContext } from '../context'
 import type { WorkerEnv } from '../env'
 
 type HonoContext = Context<{ Bindings: WorkerEnv }>
-type GroupedMedia = Partial<
-  Record<MediaType, Partial<Record<MediaStatus, Media[]>>>
->
+type GroupedMedia = Partial<Record<MediaType, Partial<Record<MediaStatus, Media[]>>>>
 type MediaRow = typeof media.$inferSelect
 
 const mediaToRow = (item: MediaRow): Media => ({
@@ -82,8 +80,7 @@ export const getMedia = async (context: HonoContext) => {
     }
 
     const url = new URL(context.req.url)
-    const limitParam =
-      url.searchParams.get('limit') ?? DEFAULT_API_RESPONSE_LIMIT
+    const limitParam = url.searchParams.get('limit') ?? DEFAULT_API_RESPONSE_LIMIT
     const statusesParam = url.searchParams.get('statuses')
     const includeEmptyParam = url.searchParams.get('includeEmpty')
     const data = await auth.requestContext.db
@@ -100,16 +97,9 @@ export const getMedia = async (context: HonoContext) => {
       'music',
       'other',
     ]
-    const statusOrder: readonly MediaStatus[] = [
-      'wishlist',
-      'now',
-      'skipped',
-      'done',
-    ]
+    const statusOrder: readonly MediaStatus[] = ['wishlist', 'now', 'skipped', 'done']
     const parsedLimit = Number(limitParam)
-    const perStatusLimit = Number.isFinite(parsedLimit)
-      ? Math.max(0, parsedLimit)
-      : undefined
+    const perStatusLimit = Number.isFinite(parsedLimit) ? Math.max(0, parsedLimit) : undefined
     const requestedStatuses: readonly MediaStatus[] = statusesParam
       ? (statusesParam
           .split(',')
@@ -146,9 +136,7 @@ export const getMedia = async (context: HonoContext) => {
     }
 
     const includeEmpty =
-      includeEmptyParam === 'true' ||
-      includeEmptyParam === '1' ||
-      includeEmptyParam === 'yes'
+      includeEmptyParam === 'true' || includeEmptyParam === '1' || includeEmptyParam === 'yes'
     const ordered: GroupedMedia = {}
 
     for (const t of typeOrder) {
@@ -198,12 +186,7 @@ export const getMediaItem = async (context: HonoContext) => {
     const [item] = await auth.requestContext.db
       .select()
       .from(media)
-      .where(
-        and(
-          eq(media.id, Number(context.req.param('id'))),
-          eq(media.user, auth.userId),
-        ),
-      )
+      .where(and(eq(media.id, Number(context.req.param('id'))), eq(media.user, auth.userId)))
       .limit(1)
 
     if (!item) {
@@ -220,13 +203,10 @@ export const getMediaItem = async (context: HonoContext) => {
       )
     }
 
-    return new Response(
-      JSON.stringify({ data: mediaToRow(item), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: mediaToRow(item), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     const errorMessage = getErrorMessage(error)
     return new Response(
@@ -260,13 +240,10 @@ export const createMedia = async (context: HonoContext) => {
       })
       .returning()
 
-    return new Response(
-      JSON.stringify({ data: mediaToRow(item), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: mediaToRow(item), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     const errorMessage = getErrorMessage(error)
     return new Response(
@@ -298,12 +275,7 @@ export const updateMedia = async (context: HonoContext) => {
         ...toMediaSet(body),
         modifiedAt: new Date(),
       })
-      .where(
-        and(
-          eq(media.id, Number(context.req.param('id'))),
-          eq(media.user, auth.userId),
-        ),
-      )
+      .where(and(eq(media.id, Number(context.req.param('id'))), eq(media.user, auth.userId)))
       .returning()
 
     if (!item) {
@@ -320,13 +292,10 @@ export const updateMedia = async (context: HonoContext) => {
       )
     }
 
-    return new Response(
-      JSON.stringify({ data: mediaToRow(item), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: mediaToRow(item), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     const errorMessage = getErrorMessage(error)
     return new Response(
@@ -353,12 +322,7 @@ export const deleteMedia = async (context: HonoContext) => {
 
     const [item] = await auth.requestContext.db
       .delete(media)
-      .where(
-        and(
-          eq(media.id, Number(context.req.param('id'))),
-          eq(media.user, auth.userId),
-        ),
-      )
+      .where(and(eq(media.id, Number(context.req.param('id'))), eq(media.user, auth.userId)))
       .returning()
 
     if (!item) {
@@ -375,13 +339,10 @@ export const deleteMedia = async (context: HonoContext) => {
       )
     }
 
-    return new Response(
-      JSON.stringify({ data: mediaToRow(item), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: mediaToRow(item), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     const errorMessage = getErrorMessage(error)
     return new Response(

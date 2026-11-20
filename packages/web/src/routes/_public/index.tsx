@@ -5,12 +5,7 @@ import { Link } from '@/components/Link'
 import { PublicBookmarkItem } from '@/components/PublicBookmarkItem'
 import type { Bookmark } from '@/types/db'
 import { getRecentPublicBookmarksOptions } from '@/utils/fetching/recentPublicBookmarks'
-import {
-  CONTENT,
-  ROUTE_HOME,
-  ROUTE_RECENT,
-  ROUTE_SIGNIN,
-} from '../../constants'
+import { CONTENT, ROUTE_HOME, ROUTE_RECENT, ROUTE_SIGNIN } from '../../constants'
 
 const RECENT_PREVIEW_LIMIT = 5
 const GITHUB_URL = 'https://github.com/mrmartineau/Otter'
@@ -36,8 +31,7 @@ const chapters = [
         title: 'Bookmarking',
       },
       {
-        description:
-          'A kanban board for movies, TV shows and games — from “one day” to “done”.',
+        description: 'A kanban board for movies, TV shows and games — from “one day” to “done”.',
         title: 'Media tracking',
       },
       {
@@ -46,8 +40,7 @@ const chapters = [
         title: 'Journalling',
       },
       {
-        description:
-          'Parse RSS feeds and pull rich metadata out of any URL you throw at it.',
+        description: 'Parse RSS feeds and pull rich metadata out of any URL you throw at it.',
         title: 'RSS & scraping',
       },
     ],
@@ -57,8 +50,7 @@ const chapters = [
   {
     features: [
       {
-        description:
-          'Tags, collections, stars and filters. File things the way your brain works.',
+        description: 'Tags, collections, stars and filters. File things the way your brain works.',
         title: 'Tags & collections',
       },
       {
@@ -71,8 +63,7 @@ const chapters = [
         title: 'AI assist',
       },
       {
-        description:
-          'Dark and light mode that quietly follows your system preference.',
+        description: 'Dark and light mode that quietly follows your system preference.',
         title: 'Easy on the eyes',
       },
     ],
@@ -82,13 +73,11 @@ const chapters = [
   {
     features: [
       {
-        description:
-          'Native iOS share extension — save from anywhere on your phone.',
+        description: 'Native iOS share extension — save from anywhere on your phone.',
         title: 'In your pocket',
       },
       {
-        description:
-          'Chrome and Firefox extensions, a Raycast extension and a trusty bookmarklet.',
+        description: 'Chrome and Firefox extensions, a Raycast extension and a trusty bookmarklet.',
         title: 'In your browser',
       },
       {
@@ -147,28 +136,22 @@ function Index() {
           Hold on to <em>the good stuff</em>.
         </h1>
         <p className="landing-lede">
-          Otter is where your links, articles, videos and half-watched TV shows
-          live. Save it, tag it, find it again — on your own infrastructure,
-          with nobody reading over your shoulder.
+          Otter is where your links, articles, videos and half-watched TV shows live. Save it, tag
+          it, find it again — on your own infrastructure, with nobody reading over your shoulder.
         </p>
         <div className="landing-cta-row">
           <a href={ROUTE_SIGNIN} className="landing-btn landing-btn-primary">
             Start your collection
             <ArrowRightIcon weight="bold" width="16" height="16" />
           </a>
-          <a
-            href={GITHUB_URL}
-            className="landing-btn"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={GITHUB_URL} className="landing-btn" target="_blank" rel="noopener noreferrer">
             Read the source
             <ArrowUpRightIcon weight="bold" width="16" height="16" />
           </a>
         </div>
         <p className="landing-aside">
-          * Sea otters keep a favourite rock in a pouch under their arm. This is
-          that, for the internet.
+          * Sea otters keep a favourite rock in a pouch under their arm. This is that, for the
+          internet.
         </p>
         <div className="landing-stamp" aria-hidden="true">
           <svg viewBox="0 0 200 200" aria-hidden="true">
@@ -179,9 +162,7 @@ function Index() {
               />
             </defs>
             <text>
-              <textPath href="#landing-stamp-circle">
-                Save it · tag it · find it again ·
-              </textPath>
+              <textPath href="#landing-stamp-circle">Save it · tag it · find it again ·</textPath>
             </text>
           </svg>
           <img src="/otter-logo.svg" alt="" />
@@ -257,8 +238,8 @@ function Index() {
             Your rules.
           </h2>
           <p>
-            Run it yourself on Cloudflare Workers and Postgres, or just sign in
-            and start saving. Either way, no algorithm gets a vote.
+            Run it yourself on Cloudflare Workers and Postgres, or just sign in and start saving.
+            Either way, no algorithm gets a vote.
           </p>
           <a href={ROUTE_SIGNIN} className="landing-btn landing-btn-primary">
             {CONTENT.signInTitle}

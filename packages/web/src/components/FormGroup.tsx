@@ -1,7 +1,6 @@
 import { type ComponentProps, type JSX, type ReactNode, useState } from 'react'
 import { Label } from '@/components/Label'
 import { cn } from '@/utils/classnames'
-
 import { Button } from './Button'
 import { Text } from './Text'
 
@@ -35,10 +34,7 @@ export const FormGroup = ({
 
   return (
     <div className={cn('form-group', className)} {...rest}>
-      <Label
-        htmlFor={name}
-        className={cn({ hidden: !labelIsVisible, 'mb-1': true })}
-      >
+      <Label htmlFor={name} className={cn({ hidden: !labelIsVisible, 'mb-1': true })}>
         {label} {labelSuffix}
         {hasSuggestion ? (
           <Button

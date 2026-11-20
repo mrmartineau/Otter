@@ -164,8 +164,7 @@ export const scraperRules: GetMetadataOptions[] = [
         selector: '#content #microformat script[type="application/ld+json"]',
       },
       {
-        selector:
-          'ytd-player-microformat-renderer script[type="application/ld+json"]',
+        selector: 'ytd-player-microformat-renderer script[type="application/ld+json"]',
       },
       {
         selector: 'script[type="application/ld+json"]',

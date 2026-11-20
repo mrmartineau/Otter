@@ -18,8 +18,7 @@ const VISIBLE_TAGS = 2
 
 /** One line per bookmark. Click the row (or the arrow) to see the rest. */
 export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
-  const { id, title, url, description, note, image, tags, type, created_at } =
-    props
+  const { id, title, url, description, note, image, tags, type, created_at } = props
   const [isOpen, setIsOpen] = useState(false)
   const detailId = useId()
   const handleClickRegister = useClickBookmark()
@@ -82,9 +81,7 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
       {isOpen ? (
         <div className="bookmark-compact-detail" id={detailId}>
           <div className="bookmark-compact-detail-text">
-            {description ? (
-              <Markdown preventClamping>{description}</Markdown>
-            ) : null}
+            {description ? <Markdown preventClamping>{description}</Markdown> : null}
             {note ? (
               <div className="bookmark-compact-note">
                 <NoteIcon size={14} weight="duotone" aria-label="Note" />

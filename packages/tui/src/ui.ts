@@ -26,8 +26,7 @@ const CURSOR_BLOCK = '▌'
 
 // Each bookmark renders as two lines plus a blank separator between items,
 // so N items occupy 3N - 1 rows.
-export const visibleItems = (height: number) =>
-  Math.max(1, Math.floor((height - 3) / 3))
+export const visibleItems = (height: number) => Math.max(1, Math.floor((height - 3) / 3))
 
 const filterChips = (state: AppState) => {
   const chips: string[] = []
@@ -55,9 +54,7 @@ const header = (state: AppState, width: number) => {
   const left = ` ${accent(bold('🦦 Otter'))}  ${filterChips(state)}`
   const page = Math.floor(state.offset / state.pageSize) + 1
   const pages = Math.max(1, Math.ceil(state.count / state.pageSize))
-  const right = `${muted(
-    `${formatCount(state.count)} saved · page ${page}/${pages}`,
-  )} `
+  const right = `${muted(`${formatCount(state.count)} saved · page ${page}/${pages}`)} `
   const gap = width - stringWidth(left) - stringWidth(right)
 
   if (gap < 1) {
@@ -67,11 +64,7 @@ const header = (state: AppState, width: number) => {
   return left + ' '.repeat(gap) + right
 }
 
-const bookmarkLines = (
-  bookmark: Bookmark,
-  selected: boolean,
-  width: number,
-) => {
+const bookmarkLines = (bookmark: Bookmark, selected: boolean, width: number) => {
   const marker = selected ? accent('❯ ') : '  '
   const star = bookmark.star ? starColor('★ ') : '  '
   const type = bookmark.type ?? ''
@@ -79,13 +72,9 @@ const bookmarkLines = (
   const rawTitle = bookmark.title || bookmark.url || '(untitled)'
   const title = truncate(rawTitle, Math.max(titleMax, 8))
   const styledTitle = selected ? bold(title) : title
-  const gap =
-    width - 4 - stringWidth(title) - (type ? stringWidth(type) : 0) - 1
+  const gap = width - 4 - stringWidth(title) - (type ? stringWidth(type) : 0) - 1
   const lineOne =
-    marker +
-    star +
-    styledTitle +
-    (type && gap > 0 ? ' '.repeat(gap) + muted(type) : '')
+    marker + star + styledTitle + (type && gap > 0 ? ' '.repeat(gap) + muted(type) : '')
 
   const metaParts: string[] = []
   const host = domain(bookmark.url)
@@ -168,33 +157,22 @@ const center = (text: string, width: number) => {
   return ' '.repeat(padding) + text
 }
 
-const panel = (
-  title: string,
-  content: string[],
-  width: number,
-  bodyHeight: number,
-) => {
+const panel = (title: string, content: string[], width: number, bodyHeight: number) => {
   // Clamp to ≥0 so a very narrow terminal can't drive `.repeat()` negative.
   const innerWidth = Math.max(0, Math.min(width - 6, 76))
   const top = `╭─ ${title} ${'─'.repeat(Math.max(0, innerWidth - stringWidth(title) - 3))}╮`
   const bottom = `╰${'─'.repeat(innerWidth)}╯`
   const body = content
     .slice(0, bodyHeight - 2)
-    .map(
-      (line) =>
-        `${borderColor('│')} ${padToWidth(line, innerWidth - 2)} ${borderColor('│')}`,
-    )
+    .map((line) => `${borderColor('│')} ${padToWidth(line, innerWidth - 2)} ${borderColor('│')}`)
   const lines = [borderColor(top), ...body, borderColor(bottom)]
-  const leftPad = ' '.repeat(
-    Math.max(0, Math.floor((width - innerWidth - 2) / 2)),
-  )
+  const leftPad = ' '.repeat(Math.max(0, Math.floor((width - innerWidth - 2) / 2)))
 
   return lines.map((line) => leftPad + line)
 }
 
 const helpBody = (width: number, bodyHeight: number) => {
-  const entry = (key: string, label: string) =>
-    `${accent(key.padEnd(11))}${label}`
+  const entry = (key: string, label: string) => `${accent(key.padEnd(11))}${label}`
   const content = [
     '',
     entry('↑/↓ j/k', 'move selection'),
@@ -278,17 +256,11 @@ const detailBody = (state: AppState, width: number, bodyHeight: number) => {
 const tagsBody = (state: AppState, width: number, bodyHeight: number) => {
   const innerWidth = Math.min(width - 6, 76) - 2
   const matches = tagMatches(state.tags, state.tagInput)
-  const content: string[] = [
-    `${dim('filter:')} ${state.tagInput}${CURSOR_BLOCK}`,
-    '',
-  ]
+  const content: string[] = [`${dim('filter:')} ${state.tagInput}${CURSOR_BLOCK}`, '']
   const maxRows = Math.max(1, bodyHeight - 6)
   const start = Math.max(
     0,
-    Math.min(
-      state.tagCursor - Math.floor(maxRows / 2),
-      matches.length - maxRows,
-    ),
+    Math.min(state.tagCursor - Math.floor(maxRows / 2), matches.length - maxRows),
   )
 
   for (const [index, tag] of matches.slice(start, start + maxRows).entries()) {
@@ -320,10 +292,7 @@ const statusLine = (state: AppState, width: number) => {
 
   if (state.mode === 'confirm-delete') {
     const bookmark = state.items[state.selected]
-    const title = truncate(
-      bookmark?.title || bookmark?.url || 'this bookmark',
-      width - 24,
-    )
+    const title = truncate(bookmark?.title || bookmark?.url || 'this bookmark', width - 24)
 
     return ` ${danger(`delete “${title}”? `)}${bold('y')}${dim('/')}${bold('N')}`
   }
@@ -381,9 +350,5 @@ export const renderFrame = (state: AppState, width: number, height: number) => {
     ` ${dim(truncate(FOOTER_HINTS[state.mode] ?? '', width - 2))}`,
   ]
 
-  return (
-    cursor.home +
-    lines.map((line) => line + screen.clearLine).join('\n') +
-    screen.clearDown
-  )
+  return cursor.home + lines.map((line) => line + screen.clearLine).join('\n') + screen.clearDown
 }

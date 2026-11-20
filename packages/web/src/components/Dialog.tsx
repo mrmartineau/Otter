@@ -16,8 +16,7 @@ export const Dialog = ({ children, ...props }: DialogPrimitive.DialogProps) => (
 )
 
 interface DialogContentProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof dialogContentVariants> {
+  extends HTMLAttributes<HTMLDivElement>, VariantProps<typeof dialogContentVariants> {
   title?: string
   description?: string
   children: ReactNode
@@ -66,9 +65,7 @@ export const DialogContent = ({
         </DialogPrimitive.Close>
       </div>
       {title ? (
-        <DialogPrimitive.Title className="DialogTitle">
-          {title}
-        </DialogPrimitive.Title>
+        <DialogPrimitive.Title className="DialogTitle">{title}</DialogPrimitive.Title>
       ) : null}
       {description ? (
         <DialogPrimitive.Description className="DialogDescription">

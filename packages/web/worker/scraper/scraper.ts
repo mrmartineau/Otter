@@ -1,6 +1,6 @@
 import { decode } from 'html-entities'
-import { assertSafePublicUrl, safeFetch } from '../url-guard'
 import type { ScrapeResponse } from '.'
+import { assertSafePublicUrl, safeFetch } from '../url-guard'
 import { type FollowShortUrlResponse, followShortUrl } from './follow-short-url'
 import { generateErrorJSONResponse } from './json-response'
 import { randomUserAgent } from './randomUserAgent'
@@ -61,8 +61,7 @@ class Scraper {
             'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.5',
           referrer: 'http://www.google.com/',
-          'User-Agent':
-            randomUserAgent() || 'Mozilla/5.0 (compatible; OtterBot/1.0)',
+          'User-Agent': randomUserAgent() || 'Mozilla/5.0 (compatible; OtterBot/1.0)',
         },
         signal: controller.signal,
       })
@@ -83,9 +82,7 @@ class Scraper {
     return this.response
   }
 
-  async getMetadata(
-    options: GetMetadataOptions[],
-  ): Promise<Record<string, string | string[]>> {
+  async getMetadata(options: GetMetadataOptions[]): Promise<Record<string, string | string[]>> {
     const matches: Record<string, string | string[]> = {}
     const selectedSelectors: Record<string, boolean> = {}
 

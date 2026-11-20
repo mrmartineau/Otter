@@ -15,11 +15,7 @@ export const BookmarkFeedItemSimple = (props: Bookmark) => {
       <div className="feed-item-content">
         {url && title ? (
           <div>
-            <Link
-              href={url}
-              variant="feedTitle"
-              onClick={() => handleClickRegister(id)}
-            >
+            <Link href={url} variant="feedTitle" onClick={() => handleClickRegister(id)}>
               {title}
             </Link>
           </div>

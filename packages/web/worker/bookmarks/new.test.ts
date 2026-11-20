@@ -13,13 +13,10 @@ const dbTags = [{ count: 3, tag: 'design' }]
 const context = { env: { AI: { run: aiRun } } } as unknown as Context
 
 /** The system prompt each AI call was given, in call order. */
-const systemPrompts = () =>
-  aiRun.mock.calls.map((call) => call[1].messages[0].content as string)
+const systemPrompts = () => aiRun.mock.calls.map((call) => call[1].messages[0].content as string)
 
 const promptFor = (kind: 'title' | 'description') =>
-  systemPrompts().find((content) =>
-    content.startsWith(`You are a web page ${kind} rewriter`),
-  )
+  systemPrompts().find((content) => content.startsWith(`You are a web page ${kind} rewriter`))
 
 /** Routes each call by its system prompt, the way the real models differ. */
 const stubAi = ({
@@ -92,12 +89,7 @@ describe('scrapedBookmark', () => {
       title: 'ollama/ollama – Get up and running on GitHub.',
     })
 
-    const result = await scrapedBookmark(
-      'https://github.com/ollama/ollama',
-      {},
-      dbTags,
-      context,
-    )
+    const result = await scrapedBookmark('https://github.com/ollama/ollama', {}, dbTags, context)
 
     expect(result.title).toBe('ollama/ollama – Get up and running on GitHub.')
     expect(result.description).toBe('Get up and running.')
@@ -149,12 +141,7 @@ describe('scrapedBookmark', () => {
     })
     aiRun.mockRejectedValue(new Error('AI unavailable'))
 
-    const result = await scrapedBookmark(
-      'https://example.com/',
-      {},
-      dbTags,
-      context,
-    )
+    const result = await scrapedBookmark('https://example.com/', {}, dbTags, context)
 
     expect(result.title).toBe('Scraped title')
     expect(result.description).toBe('Scraped description')
@@ -169,12 +156,7 @@ describe('scrapedBookmark', () => {
     })
     stubAi({ tags: [], type: 'recipe' })
 
-    const result = await scrapedBookmark(
-      'https://example.com/miso-ramen',
-      {},
-      dbTags,
-      context,
-    )
+    const result = await scrapedBookmark('https://example.com/miso-ramen', {}, dbTags, context)
 
     expect(result.type).toBe('recipe')
   })
@@ -188,12 +170,7 @@ describe('scrapedBookmark', () => {
     })
     aiRun.mockRejectedValue(new Error('AI unavailable'))
 
-    const result = await scrapedBookmark(
-      'https://example.com/post',
-      {},
-      dbTags,
-      context,
-    )
+    const result = await scrapedBookmark('https://example.com/post', {}, dbTags, context)
 
     expect(result.tags).toEqual(['design'])
     expect(result.type).toBe('article')
@@ -201,9 +178,7 @@ describe('scrapedBookmark', () => {
 
   it('still saves the bookmark when the site blocks the scraper', async () => {
     // cititec.com answers a server-side fetch with 403 behind its bot wall.
-    scrapeMetadata.mockRejectedValue(
-      new Error('Status 403 requesting https://cititec.com/'),
-    )
+    scrapeMetadata.mockRejectedValue(new Error('Status 403 requesting https://cititec.com/'))
     stubAi({ tags: [], title: 'Cititec', type: 'link' })
 
     const result = await scrapedBookmark(

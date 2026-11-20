@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  Link,
-  useNavigate,
-  useSearch,
-} from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { Flex } from '@/components/Flex'
@@ -87,13 +82,7 @@ function RouteComponent() {
 
   return (
     <Container variant="auth">
-      <img
-        src="/otter-logo.svg"
-        width="90"
-        height="90"
-        className="mx-auto mt-l"
-        alt="Otter logo"
-      />
+      <img src="/otter-logo.svg" width="90" height="90" className="mx-auto mt-l" alt="Otter logo" />
       <h2 className="mt-s text-center">Reset your password</h2>
 
       <form onSubmit={handleReset}>
@@ -129,14 +118,10 @@ function RouteComponent() {
           </Flex>
 
           {error ? (
-            <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">
-              {error}
-            </p>
+            <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">{error}</p>
           ) : null}
           {message ? (
-            <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">
-              {message}
-            </p>
+            <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">{message}</p>
           ) : null}
         </Flex>
       </form>

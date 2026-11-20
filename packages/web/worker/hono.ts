@@ -1,5 +1,4 @@
 import { Hono, type MiddlewareHandler } from 'hono'
-
 import { getErrorMessage } from '@/utils/get-error-message'
 import { createAuth } from '../auth/server'
 import { classifyBookmark } from './ai/classify'
@@ -40,19 +39,8 @@ import {
   updateJournal,
   updateJournalEntry,
 } from './journal/journal'
-import {
-  handleMcpDelete,
-  handleMcpGet,
-  handleMcpOptions,
-  handleMcpPost,
-} from './mcp/handler'
-import {
-  createMedia,
-  deleteMedia,
-  getMedia,
-  getMediaItem,
-  updateMedia,
-} from './media/media'
+import { handleMcpDelete, handleMcpGet, handleMcpOptions, handleMcpPost } from './mcp/handler'
+import { createMedia, deleteMedia, getMedia, getMediaItem, updateMedia } from './media/media'
 import { getMediaSearch } from './media/mediaSearch'
 import {
   deleteTag,
@@ -79,20 +67,8 @@ import {
 import { feedToJson } from './rss/rss-to-json'
 import { handleScrapeContent } from './scraper/scrape-content'
 import { getSearch } from './search/search'
-import {
-  createOrRotateShare,
-  deleteShare,
-  getPublicShare,
-  listShares,
-} from './shares'
-import {
-  getToot,
-  getToots,
-  getTweet,
-  getTweets,
-  searchToots,
-  searchTweets,
-} from './social'
+import { createOrRotateShare, deleteShare, getPublicShare, listShares } from './shares'
+import { getToot, getToots, getTweet, getTweets, searchToots, searchTweets } from './social'
 import { sendToots } from './toots/sendToots'
 import { assertSafePublicUrl } from './url-guard'
 
@@ -172,10 +148,7 @@ api.post('/ai/classify', authedWithRateLimit('ai'), async (context) => {
   // send the whole list in the right order to get a good answer — 10KB of body
   // and a contract nothing enforced. Callers may still send `tags`; it is
   // ignored.
-  const existingTags = await getTagCounts(
-    context.var.db,
-    requestContext.user?.id ?? '',
-  )
+  const existingTags = await getTagCounts(context.var.db, requestContext.user?.id ?? '')
   const result = await classifyBookmark({
     context,
     currentType: currentType ?? 'link',
@@ -260,13 +233,9 @@ api.patch('/reader/items/:id', async (c) => {
 api.delete('/reader/items/:id', async (c) => {
   return await deleteReadingItem(c)
 })
-api.post(
-  '/reader/items/:id/reextract',
-  authedWithRateLimit('scrape'),
-  async (c) => {
-    return await reextractReadingItem(c)
-  },
-)
+api.post('/reader/items/:id/reextract', authedWithRateLimit('scrape'), async (c) => {
+  return await reextractReadingItem(c)
+})
 api.get('/reader/highlights', async (c) => {
   return await listHighlights(c)
 })

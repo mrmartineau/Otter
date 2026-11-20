@@ -30,8 +30,7 @@ const iconButtonVariants = cva('icon-button-base focus', {
 })
 
 export interface IconButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof iconButtonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof iconButtonVariants> {
   asChild?: boolean
 }
 
@@ -44,12 +43,7 @@ const IconButton = ({
   ...props
 }: IconButtonProps) => {
   const Comp = asChild ? SlotPrimitive.Slot : 'button'
-  return (
-    <Comp
-      className={cn(iconButtonVariants({ className, shape, size, variant }))}
-      {...props}
-    />
-  )
+  return <Comp className={cn(iconButtonVariants({ className, shape, size, variant }))} {...props} />
 }
 IconButton.displayName = 'IconButton'
 

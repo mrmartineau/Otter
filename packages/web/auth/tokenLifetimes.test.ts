@@ -33,9 +33,7 @@ describe('getTokenLifetimes', () => {
     // on the way out.
     for (const raw of ['', '0', '-1', '0.5', 'forever', 'NaN', 'Infinity']) {
       expect(
-        getTokenLifetimes(
-          env({ OAUTH_ACCESS_TOKEN_TTL: raw, OAUTH_REFRESH_TOKEN_TTL: raw }),
-        ),
+        getTokenLifetimes(env({ OAUTH_ACCESS_TOKEN_TTL: raw, OAUTH_REFRESH_TOKEN_TTL: raw })),
       ).toEqual({
         accessTokenExpiresIn: 12 * HOUR,
         refreshTokenExpiresIn: 365 * DAY,
@@ -44,9 +42,6 @@ describe('getTokenLifetimes', () => {
   })
 
   it('truncates fractional seconds', () => {
-    expect(
-      getTokenLifetimes(env({ OAUTH_ACCESS_TOKEN_TTL: '90.7' }))
-        .accessTokenExpiresIn,
-    ).toBe(90)
+    expect(getTokenLifetimes(env({ OAUTH_ACCESS_TOKEN_TTL: '90.7' })).accessTokenExpiresIn).toBe(90)
   })
 })

@@ -22,16 +22,11 @@ export async function xtract(targetUrl: string): Promise<XtractResponse> {
   })
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch: ${response.status} ${response.statusText}`,
-    )
+    throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`)
   }
 
   const contentType = response.headers.get('content-type') || ''
-  if (
-    !contentType.includes('text/html') &&
-    !contentType.includes('application/xhtml+xml')
-  ) {
+  if (!contentType.includes('text/html') && !contentType.includes('application/xhtml+xml')) {
     throw new Error(`Not an HTML page (content-type: ${contentType})`)
   }
 
@@ -55,8 +50,7 @@ export async function xtract(targetUrl: string): Promise<XtractResponse> {
     })
   }
   if (doc.defaultView && !doc.defaultView.getComputedStyle) {
-    doc.defaultView.getComputedStyle = () =>
-      ({ display: '' }) as CSSStyleDeclaration
+    doc.defaultView.getComputedStyle = () => ({ display: '' }) as CSSStyleDeclaration
   }
 
   const finalUrl = response.url || resolvedShortUrl
@@ -104,8 +98,7 @@ export async function xtract(targetUrl: string): Promise<XtractResponse> {
  * of sites write `name="og:image"` and the like, so fall back to the bookmark
  * scraper's wider list.
  */
-const imageSelectors =
-  scraperRules.find((rule) => rule.name === 'image')?.selectors ?? []
+const imageSelectors = scraperRules.find((rule) => rule.name === 'image')?.selectors ?? []
 
 export function findImage(document: Document, baseUrl: string): string {
   for (const { attribute, selector } of imageSelectors) {

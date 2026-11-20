@@ -43,17 +43,14 @@ const getIdParam = (context: HonoContext) => {
   return id
 }
 
-const toBookmarkSet = (
-  body: Record<string, unknown>,
-): Partial<BookmarkInsert> => {
+const toBookmarkSet = (body: Record<string, unknown>): Partial<BookmarkInsert> => {
   const update: Partial<BookmarkInsert> = {}
 
   if ('bluesky_post_uri' in body) {
     update.blueskyPostUri = body.bluesky_post_uri as string | null
   }
   if ('click_count' in body) update.clickCount = body.click_count as number
-  if ('description' in body)
-    update.description = body.description as string | null
+  if ('description' in body) update.description = body.description as string | null
   if ('feed' in body) update.feed = body.feed as string | null
   if ('image' in body) update.image = body.image as string | null
   if ('note' in body) update.note = body.note as string | null
@@ -92,13 +89,10 @@ export const getBookmarkById = async (context: HonoContext) => {
       })
     }
 
-    return new Response(
-      JSON.stringify({ data: bookmarkToRow(bookmark), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: bookmarkToRow(bookmark), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse({
       error: getErrorMessage(error),
@@ -223,13 +217,10 @@ export const incrementBookmarkClickCount = async (context: HonoContext) => {
       })
     }
 
-    return new Response(
-      JSON.stringify({ data: bookmarkToRow(bookmark), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: bookmarkToRow(bookmark), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse({
       error: getErrorMessage(error),
@@ -268,13 +259,10 @@ export const deleteBookmarkById = async (context: HonoContext) => {
       })
     }
 
-    return new Response(
-      JSON.stringify({ data: bookmarkToRow(bookmark), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: bookmarkToRow(bookmark), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse({
       error: getErrorMessage(error),
@@ -309,13 +297,10 @@ export const checkBookmarkUrl = async (context: HonoContext) => {
           .orderBy(desc(bookmarks.createdAt))
       : []
 
-    return new Response(
-      JSON.stringify({ data: data.map(bookmarkToRow), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: data.map(bookmarkToRow), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse({
       error: getErrorMessage(error),

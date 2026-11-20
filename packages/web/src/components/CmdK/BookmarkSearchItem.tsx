@@ -3,7 +3,6 @@ import tinyRelativeDate from 'tiny-relative-date'
 import formatTitle from 'title'
 import type { BaseBookmark } from '@/types/db'
 import { simpleUrl } from '@/utils/simpleUrl'
-
 import { Favicon } from '../Favicon'
 import { TypeToIcon } from '../TypeToIcon'
 import { type AccessoryModel, Item } from './Item'
@@ -17,14 +16,7 @@ type BookmarkSearchItemProps = {
   isHoldingAltKeyDown: boolean
 } & Pick<
   BaseBookmark,
-  | 'id'
-  | 'title'
-  | 'description'
-  | 'note'
-  | 'url'
-  | 'type'
-  | 'tags'
-  | 'created_at'
+  'id' | 'title' | 'description' | 'note' | 'url' | 'type' | 'tags' | 'created_at'
 >
 
 export const BookmarkSearchItem = ({
@@ -81,13 +73,7 @@ export const BookmarkSearchItem = ({
 
   const tagsList = tags?.length ? tags.join(' ') : ''
   const urlHostname = url ? simpleUrl(url) : ''
-  const value = [
-    title,
-    description?.slice(0, 60),
-    note?.slice(0, 60),
-    urlHostname,
-    tagsList,
-  ]
+  const value = [title, description?.slice(0, 60), note?.slice(0, 60), urlHostname, tagsList]
     .filter(Boolean)
     .join(' ')
 

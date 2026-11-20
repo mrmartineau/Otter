@@ -12,8 +12,7 @@ const textVariants = cva('box-border', {
 })
 
 export interface TextProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof textVariants> {}
+  extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof textVariants> {}
 
 const Text = ({ className, variant, ...props }: TextProps) => {
   return (

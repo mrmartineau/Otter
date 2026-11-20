@@ -1,10 +1,4 @@
-import {
-  Action,
-  ActionPanel,
-  getPreferenceValues,
-  Icon,
-  List,
-} from '@raycast/api'
+import { Action, ActionPanel, getPreferenceValues, Icon, List } from '@raycast/api'
 import urlJoin from 'proper-url-join'
 
 const prefs = getPreferenceValues()

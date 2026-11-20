@@ -1,8 +1,4 @@
-import {
-  queryOptions,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { UserProfile } from '@/types/db'
 import { authClient } from '../auth/client'
@@ -88,23 +84,20 @@ export const updateUserMutation = () => {
 
       const previousProfile = queryClient.getQueryData(['userProfile'])
 
-      queryClient.setQueryData(
-        ['userProfile'],
-        (old: { data: UserProfile } | undefined) => {
-          if (!old?.data) {
-            return old
-          }
+      queryClient.setQueryData(['userProfile'], (old: { data: UserProfile } | undefined) => {
+        if (!old?.data) {
+          return old
+        }
 
-          return {
-            ...old,
-            data: {
-              ...old.data,
-              [column]: value,
-              updated_at: new Date().toISOString(),
-            },
-          }
-        },
-      )
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            [column]: value,
+            updated_at: new Date().toISOString(),
+          },
+        }
+      })
 
       return { previousProfile }
     },

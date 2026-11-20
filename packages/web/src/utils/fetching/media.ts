@@ -1,9 +1,4 @@
-import {
-  keepPreviousData,
-  queryOptions,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { keepPreviousData, queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { MediaSearchItem } from 'worker/media/mediaSearch'
 import type {
@@ -18,9 +13,7 @@ import { getErrorMessage } from '../get-error-message'
 
 export type GroupedMedia = Record<NonNullable<Media['status']>, Media[]>
 
-type WorkerGroupedMedia = Partial<
-  Record<MediaType, Partial<Record<MediaStatus, Media[]>>>
->
+type WorkerGroupedMedia = Partial<Record<MediaType, Partial<Record<MediaStatus, Media[]>>>>
 
 type SingleResponse<T> = {
   data: T
@@ -28,10 +21,7 @@ type SingleResponse<T> = {
 }
 
 const groupMediaByStatus = (media: Media[]) => {
-  return Object.groupBy(
-    media,
-    (item) => item.status ?? 'wishlist',
-  ) as GroupedMedia
+  return Object.groupBy(media, (item) => item.status ?? 'wishlist') as GroupedMedia
 }
 
 const parseJsonResponse = async <T>(response: Response): Promise<T> => {
@@ -186,9 +176,7 @@ export const useUpdateMediaStatus = () => {
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             method: 'PATCH',
-          }).then((response) =>
-            parseJsonResponse<SingleResponse<Media>>(response),
-          ),
+          }).then((response) => parseJsonResponse<SingleResponse<Media>>(response)),
         ),
       )
     },
@@ -229,16 +217,8 @@ export const useDeleteMedia = () => {
   })
 }
 
-const getMediaSearch = async ({
-  query,
-  type,
-}: {
-  query: string
-  type: MediaType
-}) => {
-  const response = await fetch(
-    `/api/media-search?query=${encodeURIComponent(query)}&type=${type}`,
-  )
+const getMediaSearch = async ({ query, type }: { query: string; type: MediaType }) => {
+  const response = await fetch(`/api/media-search?query=${encodeURIComponent(query)}&type=${type}`)
   const data = await response.json()
   return data as {
     count: number
@@ -256,8 +236,7 @@ export const getMediaSearchOptions = ({
   return queryOptions({
     enabled: !!query && !!type,
     placeholderData: keepPreviousData,
-    queryFn: () =>
-      getMediaSearch({ query: query as string, type: type as MediaType }),
+    queryFn: () => getMediaSearch({ query: query as string, type: type as MediaType }),
     queryKey: ['media-search', query, type],
   })
 }

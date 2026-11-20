@@ -1,8 +1,4 @@
-import {
-  CalendarBlankIcon,
-  PencilSimpleIcon,
-  TrashIcon,
-} from '@phosphor-icons/react'
+import { CalendarBlankIcon, PencilSimpleIcon, TrashIcon } from '@phosphor-icons/react'
 import { Button } from '@/components/Button'
 import { Markdown } from '@/components/Markdown'
 import type { JournalEntry } from '@/types/db'
@@ -24,11 +20,7 @@ interface JournalEntryItemProps {
   onSelectJournal?: (journal: number) => void
 }
 
-export const JournalEntryItem = ({
-  entry,
-  onEdit,
-  onSelectJournal,
-}: JournalEntryItemProps) => {
+export const JournalEntryItem = ({ entry, onEdit, onSelectJournal }: JournalEntryItemProps) => {
   const deleteJournalEntry = useDeleteJournalEntry()
 
   const handleDelete = () => {
@@ -57,12 +49,7 @@ export const JournalEntryItem = ({
             {entry.journals.name}
           </Button>
         ) : null}
-        <Button
-          variant="ghost"
-          size="2xs"
-          type="button"
-          onClick={() => onEdit(entry)}
-        >
+        <Button variant="ghost" size="2xs" type="button" onClick={() => onEdit(entry)}>
           <PencilSimpleIcon size={16} weight="duotone" />
           Edit
         </Button>

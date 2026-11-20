@@ -1,4 +1,22 @@
 {
+  "name": "@mrmartineau/otter-web",
+  "version": "1.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "cf-typegen": "wrangler types",
+    "db:generate": "drizzle-kit generate",
+    "db:import": "tsx scripts/import-legacy-data.ts",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "deploy": "pnpm run build && wrangler deploy",
+    "dev": "portless run vite",
+    "oauth:raycast": "tsx scripts/upsert-raycast-oauth-client.ts",
+    "preview": "pnpm run build && vite preview",
+    "type-check": "tsc --noEmit",
+    "test": "vitest"
+  },
   "dependencies": {
     "@atproto/api": "^0.19.3",
     "@better-auth/oauth-provider": "^1.6.9",
@@ -109,24 +127,6 @@
     "vitest": "catalog:",
     "wrangler": "catalog:"
   },
-  "name": "@mrmartineau/otter-web",
   "packageManager": "pnpm@11.1.1",
-  "portless": "otter",
-  "private": true,
-  "scripts": {
-    "build": "tsc -b && vite build",
-    "cf-typegen": "wrangler types",
-    "db:generate": "drizzle-kit generate",
-    "db:import": "tsx scripts/import-legacy-data.ts",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
-    "deploy": "pnpm run build && wrangler deploy",
-    "dev": "portless run vite",
-    "oauth:raycast": "tsx scripts/upsert-raycast-oauth-client.ts",
-    "preview": "pnpm run build && vite preview",
-    "type-check": "tsc --noEmit",
-    "test": "vitest"
-  },
-  "type": "module",
-  "version": "1.2.0"
+  "portless": "otter"
 }

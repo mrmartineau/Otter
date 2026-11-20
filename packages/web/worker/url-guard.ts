@@ -1,9 +1,4 @@
-const BLOCKED_HOSTNAME_SUFFIXES = [
-  '.localhost',
-  '.local',
-  '.internal',
-  '.home.arpa',
-]
+const BLOCKED_HOSTNAME_SUFFIXES = ['.localhost', '.local', '.internal', '.home.arpa']
 
 const isPrivateIpv4 = (hostname: string): boolean => {
   const match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/)
@@ -101,10 +96,7 @@ const dnsCache = new Map<string, { expires: number; ok: boolean }>()
 const isPrivateAddress = (address: string): boolean =>
   isPrivateIpv4(address) || isPrivateIpv6(address)
 
-const lookupAddresses = async (
-  hostname: string,
-  type: 'A' | 'AAAA',
-): Promise<string[]> => {
+const lookupAddresses = async (hostname: string, type: 'A' | 'AAAA'): Promise<string[]> => {
   const response = await fetch(
     `${DOH_ENDPOINT}?name=${encodeURIComponent(hostname)}&type=${type}`,
     { headers: { accept: 'application/dns-json' } },
@@ -147,9 +139,7 @@ export const assertResolvesPublic = async (url: URL): Promise<void> => {
       lookupAddresses(hostname, 'A'),
       lookupAddresses(hostname, 'AAAA'),
     ])
-    ok = ![...a, ...aaaa].some((address) =>
-      isPrivateAddress(address.toLowerCase()),
-    )
+    ok = ![...a, ...aaaa].some((address) => isPrivateAddress(address.toLowerCase()))
   } catch {
     // fail open — DoH unavailable or unparsable must not break scraping
     return
@@ -169,9 +159,7 @@ export const assertResolvesPublic = async (url: URL): Promise<void> => {
  * Combined guard for URLs the worker is about to fetch: syntactic checks
  * plus the best-effort DNS resolution check.
  */
-export const assertSafePublicUrlResolved = async (
-  input: string,
-): Promise<URL> => {
+export const assertSafePublicUrlResolved = async (input: string): Promise<URL> => {
   const url = assertSafePublicUrl(input)
   await assertResolvesPublic(url)
   return url
@@ -185,10 +173,7 @@ const MAX_SAFE_REDIRECTS = 10
  * `redirect: 'manual'`; a redirect response without a Location header is
  * returned as-is.
  */
-export const safeFetch = async (
-  input: string,
-  init?: RequestInit,
-): Promise<Response> => {
+export const safeFetch = async (input: string, init?: RequestInit): Promise<Response> => {
   let currentUrl = (await assertSafePublicUrlResolved(input)).toString()
 
   // `<=` is intentional: iteration 0 is the initial request, so the loop
@@ -208,9 +193,7 @@ export const safeFetch = async (
 
     await response.body?.cancel()
     currentUrl = (
-      await assertSafePublicUrlResolved(
-        new URL(location, currentUrl).toString(),
-      )
+      await assertSafePublicUrlResolved(new URL(location, currentUrl).toString())
     ).toString()
   }
 

@@ -31,10 +31,7 @@ const getScreenDimensions = async () => {
         })
         return results[0]
       } catch (err) {
-        console.warn(
-          'Could not get screen dimensions from content script:',
-          err,
-        )
+        console.warn('Could not get screen dimensions from content script:', err)
       }
     }
     // Fallback dimensions
@@ -64,8 +61,7 @@ const isOptionsSetup = async () => {
 }
 
 const openBookmarkletPage = async (url) => {
-  const { otterInstanceUrl, newBookmarkWindowBehaviour } =
-    await getStorageItems()
+  const { otterInstanceUrl, newBookmarkWindowBehaviour } = await getStorageItems()
   // create new bookmark
   if (newBookmarkWindowBehaviour === 'tab') {
     browserAPI.tabs.create({
@@ -218,9 +214,7 @@ actionAPI.onClicked?.addListener(async (tab) => {
 })
 
 browserAPI.commands?.onCommand.addListener(async (command, tab) => {
-  const active =
-    tab ??
-    (await browserAPI.tabs.query({ active: true, currentWindow: true }))[0]
+  const active = tab ?? (await browserAPI.tabs.query({ active: true, currentWindow: true }))[0]
   if (!active?.url) return
 
   if (command === 'quick-save') save('quick-save', active.url, active.title)
@@ -302,16 +296,13 @@ const contextMenuItems = [
  * as handled — without it a duplicate id logs "Unchecked runtime.lastError".
  */
 const createMenuItem = (item) =>
-  browserAPI.contextMenus.create(
-    { contexts: ['page', 'link'], ...item },
-    () => {
-      const error = browserAPI.runtime.lastError
+  browserAPI.contextMenus.create({ contexts: ['page', 'link'], ...item }, () => {
+    const error = browserAPI.runtime.lastError
 
-      if (error) {
-        console.warn(`Context menu ${item.id}: ${error.message}`)
-      }
-    },
-  )
+    if (error) {
+      console.warn(`Context menu ${item.id}: ${error.message}`)
+    }
+  })
 
 // Rebuilds are serialised: onInstalled and onStartup can both fire when the
 // browser starts just after an update, and two interleaved rebuilds would

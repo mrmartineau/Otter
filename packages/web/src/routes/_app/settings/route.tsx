@@ -1,10 +1,4 @@
-import {
-  GearIcon,
-  HashIcon,
-  PlugsIcon,
-  SwapIcon,
-  UserCircleIcon,
-} from '@phosphor-icons/react'
+import { GearIcon, HashIcon, PlugsIcon, SwapIcon, UserCircleIcon } from '@phosphor-icons/react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { Flex } from '@/components/Flex'
 import { headingVariants } from '@/components/Heading'

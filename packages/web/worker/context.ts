@@ -25,8 +25,7 @@ export type RequestContext = {
 
 type Profile = typeof profiles.$inferSelect
 
-const uuidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 export const profileToRow = (profile: Profile): UserProfile => ({
   api_key: profile.apiKey,
@@ -37,9 +36,7 @@ export const profileToRow = (profile: Profile): UserProfile => ({
   settings_pinned_tags: profile.settingsPinnedTags,
   settings_tags_visible: profile.settingsTagsVisible,
   settings_top_tags_count:
-    profile.settingsTopTagsCount === null
-      ? null
-      : Number(profile.settingsTopTagsCount),
+    profile.settingsTopTagsCount === null ? null : Number(profile.settingsTopTagsCount),
   settings_types_visible: profile.settingsTypesVisible,
   updated_at: profile.updatedAt?.toISOString() ?? null,
   username: profile.username,
@@ -56,11 +53,7 @@ const getBearerToken = (request: HonoRequest) => {
 }
 
 export const getProfileById = async (db: Db, userId: string) => {
-  const [profile] = await db
-    .select()
-    .from(profiles)
-    .where(eq(profiles.id, userId))
-    .limit(1)
+  const [profile] = await db.select().from(profiles).where(eq(profiles.id, userId)).limit(1)
 
   return profile ? profileToRow(profile) : null
 }
@@ -70,11 +63,7 @@ export const getProfileByApiKey = async (db: Db, apiKey: string) => {
     return null
   }
 
-  const [profile] = await db
-    .select()
-    .from(profiles)
-    .where(eq(profiles.apiKey, apiKey))
-    .limit(1)
+  const [profile] = await db.select().from(profiles).where(eq(profiles.apiKey, apiKey)).limit(1)
 
   return profile ? profileToRow(profile) : null
 }
@@ -106,9 +95,7 @@ const verifyOAuthAccessToken = async (
     })
 
     if (scopes.length) {
-      const tokenScopes = new Set(
-        typeof payload.scope === 'string' ? payload.scope.split(' ') : [],
-      )
+      const tokenScopes = new Set(typeof payload.scope === 'string' ? payload.scope.split(' ') : [])
       if (scopes.some((sc) => !tokenScopes.has(sc))) return null
     }
 
@@ -179,13 +166,7 @@ export const createRequestContext = async (
       }
     }
 
-    const oauth = await getProfileByOAuthToken(
-      context.env,
-      db,
-      auth,
-      bearerToken,
-      scopes,
-    )
+    const oauth = await getProfileByOAuthToken(context.env, db, auth, bearerToken, scopes)
 
     return {
       db,
@@ -208,8 +189,7 @@ export const createRequestContext = async (
 export const hasScope = (requestContext: RequestContext, scope: string) =>
   requestContext.user !== null &&
   requestContext.profile !== null &&
-  (requestContext.grantedScopes === null ||
-    requestContext.grantedScopes.includes(scope))
+  (requestContext.grantedScopes === null || requestContext.grantedScopes.includes(scope))
 
 export const requireRequestContext = async (
   context: Context<{ Bindings: WorkerEnv }>,

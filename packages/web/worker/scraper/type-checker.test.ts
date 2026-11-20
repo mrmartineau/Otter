@@ -6,9 +6,7 @@ describe('typeChecker', () => {
     expect(typeChecker('zander.mp4')).toBe('video')
     expect(typeChecker('zander.mov')).toBe('video')
     expect(typeChecker('zander-something.foo.mov')).toBe('video')
-    expect(typeChecker('https://www.youtube.com/watch?v=1Cz8_6aZ248')).toBe(
-      'video',
-    )
+    expect(typeChecker('https://www.youtube.com/watch?v=1Cz8_6aZ248')).toBe('video')
     expect(typeChecker('https://youtu.be/1Cz8_6aZ248')).toBe('video')
     expect(typeChecker('https://vimeo.com/746423508')).toBe('video')
   })

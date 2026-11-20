@@ -23,8 +23,7 @@ const linkVariants = cva(['link-base', 'focus'], {
 })
 
 export interface LinkProps
-  extends React.ComponentProps<typeof TanstackLink>,
-    VariantProps<typeof linkVariants> {
+  extends React.ComponentProps<typeof TanstackLink>, VariantProps<typeof linkVariants> {
   isActive?: boolean
 }
 

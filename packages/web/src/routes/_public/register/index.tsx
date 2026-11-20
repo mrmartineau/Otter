@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  Link,
-  useNavigate,
-  useSearch,
-} from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate, useSearch } from '@tanstack/react-router'
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { Flex } from '@/components/Flex'
@@ -79,25 +74,13 @@ function RouteComponent() {
 
   return (
     <Container variant="auth">
-      <img
-        src="/otter-logo.svg"
-        width="90"
-        height="90"
-        className="mx-auto"
-        alt="Otter logo"
-      />
+      <img src="/otter-logo.svg" width="90" height="90" className="mx-auto" alt="Otter logo" />
       <h2 className="text-center">Create an account</h2>
 
       <form onSubmit={handleRegister}>
         <Flex direction={'column'} gap="xs">
           <FormGroup label="Name" name="name">
-            <Input
-              id="name"
-              type="text"
-              name="name"
-              placeholder="Your name"
-              autoComplete="name"
-            />
+            <Input id="name" type="text" name="name" placeholder="Your name" autoComplete="name" />
           </FormGroup>
           <FormGroup label="Email" name="email">
             <Input
@@ -130,22 +113,18 @@ function RouteComponent() {
             />
           </FormGroup>
 
-            <Button type="submit" disabled={isLoading}>
-              Sign Up
-            </Button>
-            <Link to="/signin" className="self-center text-sm">
-              Already have an account? Sign in
-            </Link>
+          <Button type="submit" disabled={isLoading}>
+            Sign Up
+          </Button>
+          <Link to="/signin" className="self-center text-sm">
+            Already have an account? Sign in
+          </Link>
 
           {error ? (
-            <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">
-              {error}
-            </p>
+            <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">{error}</p>
           ) : null}
           {message ? (
-            <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">
-              {message}
-            </p>
+            <p className="mt-4 bg-neutral-900 p-4 text-center text-neutral-300">{message}</p>
           ) : null}
         </Flex>
       </form>

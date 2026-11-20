@@ -47,15 +47,14 @@ export const getBlueskyIntegration = async (context: HonoContext) => {
       return auth
     }
 
-    const integration =
-      await auth.requestContext.db.query.userIntegrations.findFirst({
-        where: eq(userIntegrations.userId, auth.userId),
-      })
+    const integration = await auth.requestContext.db.query.userIntegrations.findFirst({
+      where: eq(userIntegrations.userId, auth.userId),
+    })
 
-    return new Response(
-      JSON.stringify(integration ? toPublicIntegration(integration) : null),
-      { headers: API_HEADERS, status: 200 },
-    )
+    return new Response(JSON.stringify(integration ? toPublicIntegration(integration) : null), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse({
       error: getErrorMessage(error),
@@ -80,10 +79,9 @@ export const upsertBlueskyIntegration = async (context: HonoContext) => {
       postPrefix: string
       postSuffix: string
     }
-    const existing =
-      await auth.requestContext.db.query.userIntegrations.findFirst({
-        where: eq(userIntegrations.userId, auth.userId),
-      })
+    const existing = await auth.requestContext.db.query.userIntegrations.findFirst({
+      where: eq(userIntegrations.userId, auth.userId),
+    })
     const [integration] = await auth.requestContext.db
       .insert(userIntegrations)
       .values({
@@ -98,8 +96,7 @@ export const upsertBlueskyIntegration = async (context: HonoContext) => {
       })
       .onConflictDoUpdate({
         set: {
-          blueskyAppPassword:
-            body.appPassword || existing?.blueskyAppPassword || null,
+          blueskyAppPassword: body.appPassword || existing?.blueskyAppPassword || null,
           blueskyEnabled: body.enabled,
           blueskyHandle: body.handle,
           blueskyLastError: null,

@@ -3,8 +3,5 @@ declare module 'file-extension' {
     preserveCase?: boolean
   }
 
-  export default function fileExtension(
-    filename: string,
-    options?: FileExtensionOptions,
-  ): string
+  export default function fileExtension(filename: string, options?: FileExtensionOptions): string
 }

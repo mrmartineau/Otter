@@ -32,11 +32,9 @@ export const italic = sgr(3, 23)
 export const underline = sgr(4, 24)
 export const reverse = sgr(7, 27)
 
-export const fg = (color: number) => (text: string) =>
-  `${CSI}38;5;${color}m${text}${CSI}39m`
+export const fg = (color: number) => (text: string) => `${CSI}38;5;${color}m${text}${CSI}39m`
 
-export const bg = (color: number) => (text: string) =>
-  `${CSI}48;5;${color}m${text}${CSI}49m`
+export const bg = (color: number) => (text: string) => `${CSI}48;5;${color}m${text}${CSI}49m`
 
 // Otter's terminal palette (xterm-256 indexes)
 export const palette = {

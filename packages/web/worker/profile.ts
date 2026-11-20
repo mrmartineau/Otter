@@ -115,12 +115,7 @@ export const updateCurrentProfile = async (context: HonoContext) => {
       const [existing] = await requestContext.db
         .select({ id: profiles.id })
         .from(profiles)
-        .where(
-          and(
-            eq(profiles.username, parsed.data.value),
-            ne(profiles.id, userId),
-          ),
-        )
+        .where(and(eq(profiles.username, parsed.data.value), ne(profiles.id, userId)))
         .limit(1)
 
       if (existing) {

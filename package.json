@@ -1,22 +1,13 @@
 {
-  "devDependencies": {
-    "@mrmartineau/kit": "catalog:",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/exec": "^7.1.0",
-    "@semantic-release/git": "^10.0.1",
-    "oxfmt": "^0.79.0",
-    "oxlint": "^1.94.0",
-    "semantic-release": "^25.0.3",
-    "semantic-release-monorepo": "^8.0.2"
-  },
-  "homepage": "https://github.com/mrmartineau/otter",
   "name": "@mrmartineau/otter",
-  "packageManager": "pnpm@12.4.2",
+  "version": "0.0.0",
   "private": true,
+  "homepage": "https://github.com/mrmartineau/otter",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mrmartineau/otter.git"
   },
+  "type": "module",
   "scripts": {
     "check": "oxlint --fix && oxfmt",
     "chrome-extension:build": "pnpm --filter=@mrmartineau/otter-chrome-extension run build",
@@ -28,6 +19,15 @@
     "web:dev": "pnpm --filter=@mrmartineau/otter-web run dev",
     "web:test": "pnpm --filter=@mrmartineau/otter-web run test"
   },
-  "type": "module",
-  "version": "0.0.0"
+  "devDependencies": {
+    "@mrmartineau/kit": "catalog:",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "oxfmt": "^0.79.0",
+    "oxlint": "^1.94.0",
+    "semantic-release": "^25.0.3",
+    "semantic-release-monorepo": "^8.0.2"
+  },
+  "packageManager": "pnpm@12.4.2"
 }

@@ -1,8 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
-  "extends": [
-    "./node_modules/@mrmartineau/kit/src/oxlint/.oxlintrc.json"
-  ],
+  "extends": ["./node_modules/@mrmartineau/kit/src/oxlint/.oxlintrc.json"],
   "ignorePatterns": [
     "packages/**/dist/**",
     "packages/web/src/routeTree.gen.ts",

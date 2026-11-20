@@ -135,9 +135,7 @@ describe('parseNetscapeBookmarks', () => {
   })
 
   it('returns an empty array for content with no bookmarks', () => {
-    expect(parseNetscapeBookmarks('<html><body>hello</body></html>')).toEqual(
-      [],
-    )
+    expect(parseNetscapeBookmarks('<html><body>hello</body></html>')).toEqual([])
   })
 })
 

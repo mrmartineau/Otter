@@ -3,12 +3,7 @@ import { readFileSync } from 'node:fs'
 import { createInterface } from 'node:readline/promises'
 import { OtterClient } from './api.ts'
 import { App } from './app.ts'
-import {
-  configPath,
-  loadConfig,
-  type OtterConfig,
-  saveConfig,
-} from './config.ts'
+import { configPath, loadConfig, type OtterConfig, saveConfig } from './config.ts'
 
 const HELP = `🦦 otter-tui — a terminal UI for Otter
 
@@ -28,9 +23,9 @@ Configuration
 
 const version = () => {
   try {
-    const pkg = JSON.parse(
-      readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
-    ) as { version?: string }
+    const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
+      version?: string
+    }
 
     return pkg.version ?? '0.0.0'
   } catch {
@@ -64,9 +59,7 @@ const runLogin = async (): Promise<OtterConfig> => {
 
   try {
     console.log('🦦 Connect otter-tui to your Otter instance\n')
-    const baseUrl = (
-      await rl.question('Otter URL (e.g. https://otter.example.com): ')
-    ).trim()
+    const baseUrl = (await rl.question('Otter URL (e.g. https://otter.example.com): ')).trim()
     process.stdout.write('API key (Otter → Settings → API key): ')
     masked = true
     const apiKey = (await rl.question('')).trim()

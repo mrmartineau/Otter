@@ -99,13 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     browserAPI.runtime.openOptionsPage()
   })
 
-  document
-    .getElementById('quick-save')
-    .addEventListener('click', () => run('quick-save'))
-  document
-    .getElementById('read-later')
-    .addEventListener('click', () => run('read-later'))
-  document
-    .getElementById('bookmark')
-    .addEventListener('click', () => run('bookmark'))
+  document.getElementById('quick-save').addEventListener('click', () => run('quick-save'))
+  document.getElementById('read-later').addEventListener('click', () => run('read-later'))
+  document.getElementById('bookmark').addEventListener('click', () => run('bookmark'))
 })

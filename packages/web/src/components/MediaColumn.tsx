@@ -48,35 +48,23 @@ export const MediaColumn = ({
   return (
     <div
       ref={ref}
-      className={cn(
-        'media-column flex flex-col gap-4 h-full min-h-[500px]',
-        className,
-      )}
+      className={cn('media-column flex flex-col gap-4 h-full min-h-[500px]', className)}
       {...rest}
     >
       <div className={cn('column-header p-2 border-b', getStatusColor(status))}>
         <h3 className="font-semibold text-lg">{titleFmt(title)}</h3>
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {media.length} items
-        </span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">{media.length} items</span>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         <div className={cn('space-y-3', { 'bg-gray-400': isOverContainer })}>
           {media.map((item) => (
-            <MediaCard
-              key={item.id}
-              media={item}
-              onEdit={onEdit}
-              status={status}
-            />
+            <MediaCard key={item.id} media={item} onEdit={onEdit} status={status} />
           ))}
         </div>
 
         {media.length === 0 ? (
-          <div className="text-center text-base py-8">
-            No items in this column
-          </div>
+          <div className="text-center text-base py-8">No items in this column</div>
         ) : null}
       </div>
     </div>
