@@ -29,8 +29,8 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
 
   return (
     <li className="bookmark-compact" data-open={isOpen || undefined}>
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: a bigger target for the arrow button, which is the keyboard path */}
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: as above */}
+      {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events -- a bigger target for the arrow button, which is the keyboard path */}
+      {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- as above */}
       <div
         className="bookmark-compact-line"
         onClick={(event) => {

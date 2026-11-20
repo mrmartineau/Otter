@@ -274,7 +274,7 @@ export const BookmarkForm = ({
       })
   }, [tags])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: I only want this run once on load
+  // oxlint-disable-next-line react-hooks/exhaustive-deps -- I only want this run once on load
   useEffect(() => {
     const urlQueryParam = initialValues?.url
     if (urlQueryParam && isNew) {

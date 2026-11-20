@@ -58,7 +58,7 @@ export function getClassName(el: Element): string {
  * Strips whitespace and control characters before checking.
  */
 export function isDangerousUrl(url: string): boolean {
-  // biome-ignore lint/suspicious/noControlCharactersInRegex: ignore
+  // oxlint-disable-next-line no-control-regex -- ignore
   const normalized = url.replace(/[\s\u0000-\u001F]+/g, '').toLowerCase()
   return (
     normalized.startsWith('javascript:') ||

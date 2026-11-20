@@ -82,7 +82,7 @@ const FeedCards = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: new items mean new cards to watch and place
+  // new items mean new cards to watch and place
   useLayoutEffect(() => {
     const grid = ref.current
     if (!grid) {

@@ -110,7 +110,7 @@ export const TweetFeedItem = (props: Tweet) => {
               return (
                 <div key={item.id}>
                   {isVideoType ? (
-                    // biome-ignore lint/a11y/useMediaCaption: No captions for tweets
+                    // No captions for tweets
                     <video
                       src={getBestQualityVideoVariant(
                         item.video_info?.variants,

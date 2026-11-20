@@ -51,7 +51,7 @@ export const TootFeedItem = (props: Toot) => {
                 return (
                   <div key={item.id}>
                     {isVideoType ? (
-                      // biome-ignore lint/a11y/useMediaCaption: no need
+                      // no need
                       <video src={item.url} controls className="max-w-full" />
                     ) : isPhotoType ? (
                       <img
