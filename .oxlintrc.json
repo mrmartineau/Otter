@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "extends": [
+    "./node_modules/@mrmartineau/kit/src/oxlint/.oxlintrc.json"
+  ],
+  "ignorePatterns": [
+    "packages/**/dist/**",
+    "packages/web/src/routeTree.gen.ts",
+    "packages/web/src/types/supabase.ts",
+    "packages/web/.wrangler/**",
+    "**/drizzle",
+    "**/*.xcassets",
+    "packages/web/worker-configuration.d.ts"
+  ],
+  "rules": {
+    "no-unused-vars": "warn",
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/no-autofocus": "warn",
+    "unicorn/no-empty-file": "warn",
+    "no-unused-expressions": "warn",
+    "unicorn/prefer-string-starts-ends-with": "warn",
+    "react/set-state-in-effect": "warn",
+    "react-hooks/exhaustive-deps": "warn",
+    "jsx-a11y/media-has-caption": "warn",
+    "react/static-components": "warn",
+    "react/incompatible-library": "warn"
+  }
+}

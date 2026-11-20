@@ -135,7 +135,7 @@ To target a specific package, use a Conventional Commits scope, e.g. `feat(web):
 - **Database:** Postgres (e.g. [Neon](https://neon.tech)) via [Drizzle ORM](https://orm.drizzle.team) and Cloudflare Hyperdrive
 - **Auth:** [Better Auth](https://better-auth.com) with OAuth provider + JWT plugins
 - **Hosting:** [Cloudflare](https://cloudflare.com)
-- **Tooling:** pnpm workspaces, [Biome](https://biomejs.dev) (formatting & linting), Vite, Vitest
+- **Tooling:** pnpm workspaces, [oxlint](https://oxc.rs/docs/guide/usage/linter) and [oxfmt](https://oxc.rs/docs/guide/usage/formatter) (linting & formatting), Vite, Vitest
 
 ## License
 
