@@ -1,4 +1,4 @@
-// biome-ignore-all assist/source/useSortedKeys: order needs to be preserved
+// order needs to be preserved
 export default {
   plugins: {
     'postcss-import': {},

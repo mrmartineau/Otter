@@ -65,7 +65,7 @@
   color: var(--pop-bright);
 
   &::before {
-    content: "\2733"; /* ✳ */
+    content: '\2733'; /* ✳ */
     color: var(--pop);
   }
 }
@@ -78,8 +78,8 @@
   letter-spacing: -0.02em;
   text-wrap: balance;
   font-variation-settings:
-    "wght" 800,
-    "wdth" 112;
+    'wght' 800,
+    'wdth' 112;
 
   em {
     display: inline-block;
@@ -200,8 +200,8 @@
   font-size: clamp(1.75rem, 1rem + 3vw, 3rem);
   letter-spacing: -0.01em;
   font-variation-settings:
-    "wght" 750,
-    "wdth" 110;
+    'wght' 750,
+    'wdth' 110;
 }
 
 /* ---------- field guide ---------- */
@@ -241,8 +241,8 @@
 .landing-chapter-title {
   font-size: var(--step-2);
   font-variation-settings:
-    "wght" 700,
-    "wdth" 110;
+    'wght' 700,
+    'wdth' 110;
 }
 
 .landing-entries {
@@ -272,8 +272,8 @@
   h4 {
     font-size: var(--step-1);
     font-variation-settings:
-      "wght" 650,
-      "wdth" 108;
+      'wght' 650,
+      'wdth' 108;
   }
 
   p {
@@ -309,7 +309,7 @@
   position: relative;
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     top: -11px;
     left: 50%;
@@ -356,8 +356,8 @@
   line-height: 0.95;
   letter-spacing: -0.02em;
   font-variation-settings:
-    "wght" 800,
-    "wdth" 112;
+    'wght' 800,
+    'wdth' 112;
 }
 
 .landing-final p {

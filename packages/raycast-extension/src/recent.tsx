@@ -25,9 +25,7 @@ export const RecentBookmarks = () => {
       isLoading={isLoading}
       searchBarPlaceholder="Filter…"
       isShowingDetail={prefs.showDetailView}
-      searchBarAccessory={
-        <TagDropdown tags={metadata?.tags} onChange={setActiveTag} />
-      }
+      searchBarAccessory={<TagDropdown tags={metadata?.tags} onChange={setActiveTag} />}
     >
       <RecentTop activeTag={activeTag} />
       {recentBookmarks?.length ? (

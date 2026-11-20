@@ -21,14 +21,10 @@ interface ChangelogRelease {
 // nothing to compare against, `# tag (yyyy-MM-dd)`. Patch releases may use
 // `##` instead of `#`.
 function parseChangelog(source: string): ChangelogRelease[] {
-  const sections = source
-    .split(/^#{1,2} (?=\[|@|v?\d)/m)
-    .filter((section) => section.trim())
+  const sections = source.split(/^#{1,2} (?=\[|@|v?\d)/m).filter((section) => section.trim())
   return sections.map((section) => {
     const newlineIndex = section.indexOf('\n')
-    const header = (
-      newlineIndex === -1 ? section : section.slice(0, newlineIndex)
-    ).trim()
+    const header = (newlineIndex === -1 ? section : section.slice(0, newlineIndex)).trim()
     const body = newlineIndex === -1 ? '' : section.slice(newlineIndex + 1)
     const linked = header.match(/^\[(.+?)\]\(.+?\)\s*\((.+)\)$/)
     const plain = header.match(/^(\S+)\s*\((.+)\)$/)
@@ -75,10 +71,7 @@ function ChangelogPage() {
                 </Link>
               </h2>
               {release.date ? (
-                <time
-                  dateTime={release.date}
-                  className="text-step--1 opacity-70"
-                >
+                <time dateTime={release.date} className="text-step--1 opacity-70">
                   {format(new Date(release.date), 'd MMMM yyyy')}
                 </time>
               ) : null}

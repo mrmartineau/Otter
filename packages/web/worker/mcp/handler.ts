@@ -1,11 +1,6 @@
 import type { Context } from 'hono'
 import { hasScope, requireRequestContext } from '../context'
-import {
-  type ToolContext,
-  toolDefinitions,
-  toolHandlers,
-  toolScopes,
-} from './tools'
+import { type ToolContext, toolDefinitions, toolHandlers, toolScopes } from './tools'
 import {
   INTERNAL_ERROR,
   INVALID_PARAMS,
@@ -23,8 +18,7 @@ import {
 } from './types'
 
 const CORS_HEADERS = {
-  'Access-Control-Allow-Headers':
-    'Content-Type, Accept, Authorization, Mcp-Session-Id',
+  'Access-Control-Allow-Headers': 'Content-Type, Accept, Authorization, Mcp-Session-Id',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Origin': '*',
 }
@@ -45,22 +39,14 @@ export const handleMcpOptions = (c: Context) => {
  * GET /api/mcp — SSE not supported (stateless mode)
  */
 export const handleMcpGet = (c: Context) => {
-  return c.text(
-    'SSE not supported. Use POST for JSON-RPC requests.',
-    405,
-    CORS_HEADERS,
-  )
+  return c.text('SSE not supported. Use POST for JSON-RPC requests.', 405, CORS_HEADERS)
 }
 
 /**
  * DELETE /api/mcp — No sessions to terminate (stateless mode)
  */
 export const handleMcpDelete = (c: Context) => {
-  return c.text(
-    'Session management not supported (stateless server).',
-    405,
-    CORS_HEADERS,
-  )
+  return c.text('Session management not supported (stateless server).', 405, CORS_HEADERS)
 }
 
 /**
@@ -81,10 +67,7 @@ export const handleMcpPost = async (c: Context) => {
   const userId = authResult.user?.id
 
   if (!userId) {
-    return jsonResponse(
-      c,
-      jsonRpcError(null, INVALID_REQUEST, 'Authentication required'),
-    )
+    return jsonResponse(c, jsonRpcError(null, INVALID_REQUEST, 'Authentication required'))
   }
 
   // Parse JSON body
@@ -92,10 +75,7 @@ export const handleMcpPost = async (c: Context) => {
   try {
     body = await c.req.json()
   } catch {
-    return jsonResponse(
-      c,
-      jsonRpcError(null, PARSE_ERROR, 'Parse error: invalid JSON'),
-    )
+    return jsonResponse(c, jsonRpcError(null, PARSE_ERROR, 'Parse error: invalid JSON'))
   }
 
   // Handle batch requests
@@ -207,29 +187,19 @@ async function dispatch(
       }
       const handler = toolHandlers[toolName]
       if (!handler) {
-        throw new JsonRpcException(
-          METHOD_NOT_FOUND,
-          `Unknown tool: ${toolName}`,
-        )
+        throw new JsonRpcException(METHOD_NOT_FOUND, `Unknown tool: ${toolName}`)
       }
       // Fail closed: a tool missing from the scope map is denied rather
       // than silently public.
       const requiredScope = toolScopes[toolName]
       if (!requiredScope) {
-        return toolError(
-          `Tool "${toolName}" has no scope mapping and cannot be called.`,
-        )
+        return toolError(`Tool "${toolName}" has no scope mapping and cannot be called.`)
       }
       if (!hasScope(ctx.requestContext, requiredScope)) {
-        return toolError(
-          `Insufficient scope: this tool requires the "${requiredScope}" scope.`,
-        )
+        return toolError(`Insufficient scope: this tool requires the "${requiredScope}" scope.`)
       }
       try {
-        return await handler(
-          (params?.arguments as Record<string, unknown>) || {},
-          ctx,
-        )
+        return await handler((params?.arguments as Record<string, unknown>) || {}, ctx)
       } catch (err) {
         // Tool execution errors are returned as isError results, not JSON-RPC errors
         return toolError(
@@ -239,10 +209,7 @@ async function dispatch(
     }
 
     default:
-      throw new JsonRpcException(
-        METHOD_NOT_FOUND,
-        `Method not found: ${method}`,
-      )
+      throw new JsonRpcException(METHOD_NOT_FOUND, `Method not found: ${method}`)
   }
 }
 

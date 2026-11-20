@@ -1,6 +1,6 @@
 import TurndownService from 'turndown'
-import { isDirectTableChild, parseHTML, serializeHTML } from './utils/dom'
 import { isElement, isTextNode } from './utils.js'
+import { isDirectTableChild, parseHTML, serializeHTML } from './utils/dom'
 
 // Define a type that works for both JSDOM and browser environments
 type GenericElement = {
@@ -53,40 +53,32 @@ export function createMarkdownContent(content: string) {
       if (!isGenericElement(node)) return content
 
       // Check if it's an ArXiv equation table
-      if (
-        node.classList?.contains('ltx_equation') ||
-        node.classList?.contains('ltx_eqn_table')
-      ) {
+      if (node.classList?.contains('ltx_equation') || node.classList?.contains('ltx_eqn_table')) {
         return handleNestedEquations(node)
       }
 
       // Detect layout tables (used for styling/positioning, not data)
       const hasNestedTables = node.querySelector('table') !== null
-      const directCells = Array.from(node.querySelectorAll('td, th')).filter(
-        (el: any) => isDirectTableChild(el, node),
+      const directCells = Array.from(node.querySelectorAll('td, th')).filter((el: any) =>
+        isDirectTableChild(el, node),
       )
 
       if (hasNestedTables || directCells.length <= 1) {
-        const directRows = Array.from(node.querySelectorAll('tr')).filter(
-          (el: any) => isDirectTableChild(el, node),
+        const directRows = Array.from(node.querySelectorAll('tr')).filter((el: any) =>
+          isDirectTableChild(el, node),
         )
         const cellCounts = directRows.map(
-          (tr: any) =>
-            directCells.filter((cell: any) => cell.parentNode === tr).length,
+          (tr: any) => directCells.filter((cell: any) => cell.parentNode === tr).length,
         )
         const isSingleColumn =
-          directRows.length > 0 &&
-          new Set(cellCounts).size === 1 &&
-          cellCounts[0] <= 1
+          directRows.length > 0 && new Set(cellCounts).size === 1 && cellCounts[0] <= 1
 
         if (isSingleColumn) {
           // Layout table — extract content, don't convert to markdown table
           return (
             '\n\n' +
             turndownService.turndown(
-              directCells
-                .map((cell: any) => serializeHTML(cell as GenericElement))
-                .join(''),
+              directCells.map((cell: any) => serializeHTML(cell as GenericElement)).join(''),
             ) +
             '\n\n'
           )
@@ -126,10 +118,7 @@ export function createMarkdownContent(content: string) {
               )
         const cellContents = cellElements.map((cell: any) => {
           // Remove newlines and trim the content
-          let cellContent = turndownService
-            .turndown(serializeHTML(cell))
-            .replace(/\n/g, ' ')
-            .trim()
+          let cellContent = turndownService.turndown(serializeHTML(cell)).replace(/\n/g, ' ').trim()
           // Escape pipe characters
           cellContent = cellContent.replace(/\|/g, '\\|')
           return cellContent
@@ -178,8 +167,7 @@ export function createMarkdownContent(content: string) {
       const element = node as unknown as GenericElement
       const isTopLevel = !(
         element.parentNode &&
-        (element.parentNode.nodeName === 'UL' ||
-          element.parentNode.nodeName === 'OL')
+        (element.parentNode.nodeName === 'UL' || element.parentNode.nodeName === 'OL')
       )
       return (isTopLevel ? '\n' : '') + content + '\n'
     },
@@ -188,11 +176,7 @@ export function createMarkdownContent(content: string) {
   // Lists with tab indentation
   turndownService.addRule('listItem', {
     filter: 'li',
-    replacement: (
-      content: string,
-      node: Node,
-      options: TurndownService.Options,
-    ) => {
+    replacement: (content: string, node: Node, options: TurndownService.Options) => {
       if (!isGenericElement(node)) return content
 
       // Handle task list items
@@ -223,10 +207,7 @@ export function createMarkdownContent(content: string) {
       let level = 0
       let currentParent = node.parentNode
       while (currentParent && isGenericElement(currentParent)) {
-        if (
-          currentParent.nodeName === 'UL' ||
-          currentParent.nodeName === 'OL'
-        ) {
+        if (currentParent.nodeName === 'UL' || currentParent.nodeName === 'OL') {
           level++
         } else if (currentParent.nodeName !== 'LI') {
           break
@@ -248,10 +229,7 @@ export function createMarkdownContent(content: string) {
             break
           }
         }
-        prefix =
-          '\t'.repeat(level - 1) +
-          (start ? Number(start) + index - 1 : index) +
-          '. '
+        prefix = '\t'.repeat(level - 1) + (start ? Number(start) + index - 1 : index) + '. '
       }
 
       return (
@@ -279,10 +257,7 @@ export function createMarkdownContent(content: string) {
 
       if (figcaption && isGenericElement(figcaption)) {
         const tagSpan = figcaption.querySelector('.ltx_tag_figure')
-        const tagText =
-          tagSpan && isGenericElement(tagSpan)
-            ? tagSpan.textContent?.trim()
-            : ''
+        const tagText = tagSpan && isGenericElement(tagSpan) ? tagSpan.textContent?.trim() : ''
 
         // Process the caption content, including math elements
         let captionContent = serializeHTML(figcaption)
@@ -294,22 +269,16 @@ export function createMarkdownContent(content: string) {
             if (ownerDoc) {
               const fragment = parseHTML(ownerDoc, match)
               const mathElement = fragment.querySelector('math')
-              latex =
-                mathElement && isGenericElement(mathElement)
-                  ? extractLatex(mathElement)
-                  : ''
+              latex = mathElement && isGenericElement(mathElement) ? extractLatex(mathElement) : ''
             }
             const prevChar = string[offset - 1] || ''
             const nextChar = string[offset + match.length] || ''
 
             const isStartOfLine = offset === 0 || /\s/.test(prevChar)
-            const isEndOfLine =
-              offset + match.length === string.length || /\s/.test(nextChar)
+            const isEndOfLine = offset + match.length === string.length || /\s/.test(nextChar)
 
-            const leftSpace =
-              !isStartOfLine && !/[\s$]/.test(prevChar) ? ' ' : ''
-            const rightSpace =
-              !isEndOfLine && !/[\s$]/.test(nextChar) ? ' ' : ''
+            const leftSpace = !isStartOfLine && !/[\s$]/.test(prevChar) ? ' ' : ''
+            const rightSpace = !isEndOfLine && !/[\s$]/.test(nextChar) ? ' ' : ''
 
             return `${leftSpace}$${latex}$${rightSpace}`
           },
@@ -323,12 +292,9 @@ export function createMarkdownContent(content: string) {
       }
 
       // Handle references in the caption
-      caption = caption.replace(
-        /\[([^\]]+)\]\(([^)]+)\)/g,
-        (_match, text, href) => {
-          return `[${text}](${href})`
-        },
-      )
+      caption = caption.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, text, href) => {
+        return `[${text}](${href})`
+      })
 
       return `![${alt}](${src})\n\n${caption}\n\n`
     },
@@ -381,9 +347,7 @@ export function createMarkdownContent(content: string) {
 
   turndownService.addRule('strikethrough', {
     filter: (node: Node) =>
-      node.nodeName === 'DEL' ||
-      node.nodeName === 'S' ||
-      node.nodeName === 'STRIKE',
+      node.nodeName === 'DEL' || node.nodeName === 'S' || node.nodeName === 'STRIKE',
     replacement: (content) => '~~' + content + '~~',
   })
 
@@ -508,11 +472,7 @@ export function createMarkdownContent(content: string) {
 
           // Remove the leading sup element if its content matches the footnote id
           const supElement = li.querySelector('sup')
-          if (
-            supElement &&
-            isGenericElement(supElement) &&
-            supElement.textContent?.trim() === id
-          ) {
+          if (supElement && isGenericElement(supElement) && supElement.textContent?.trim() === id) {
             supElement.remove()
           }
 
@@ -541,9 +501,7 @@ export function createMarkdownContent(content: string) {
 
   turndownService.addRule('handleTextNodesInTables', {
     filter: (node: any): boolean =>
-      isTextNode(node) &&
-      node.parentNode !== null &&
-      node.parentNode.nodeName === 'TD',
+      isTextNode(node) && node.parentNode !== null && node.parentNode.nodeName === 'TD',
     replacement: (content: string): string => content,
   })
 
@@ -591,10 +549,7 @@ export function createMarkdownContent(content: string) {
       latex = latex.trim()
 
       // Check if the math element is within a table
-      const isInTable =
-        typeof node.closest === 'function'
-          ? node.closest('table') !== null
-          : false
+      const isInTable = typeof node.closest === 'function' ? node.closest('table') !== null : false
 
       // Check if it's an inline or block math element
       if (
@@ -614,25 +569,17 @@ export function createMarkdownContent(content: string) {
         const prevNode = node.previousSibling
         const nextNode = node.nextSibling
         const prevChar =
-          prevNode && isGenericElement(prevNode)
-            ? prevNode.textContent?.slice(-1) || ''
-            : ''
+          prevNode && isGenericElement(prevNode) ? prevNode.textContent?.slice(-1) || '' : ''
         const nextChar =
-          nextNode && isGenericElement(nextNode)
-            ? nextNode.textContent?.[0] || ''
-            : ''
+          nextNode && isGenericElement(nextNode) ? nextNode.textContent?.[0] || '' : ''
 
         const isStartOfLine =
-          !prevNode ||
-          (isTextNode(prevNode) && prevNode.textContent?.trim() === '')
+          !prevNode || (isTextNode(prevNode) && prevNode.textContent?.trim() === '')
         const isEndOfLine =
-          !nextNode ||
-          (isTextNode(nextNode) && nextNode.textContent?.trim() === '')
+          !nextNode || (isTextNode(nextNode) && nextNode.textContent?.trim() === '')
 
-        const leftSpace =
-          !isStartOfLine && prevChar && !/[\s$]/.test(prevChar) ? ' ' : ''
-        const rightSpace =
-          !isEndOfLine && nextChar && !/[\s$]/.test(nextChar) ? ' ' : ''
+        const leftSpace = !isStartOfLine && prevChar && !/[\s$]/.test(prevChar) ? ' ' : ''
+        const rightSpace = !isEndOfLine && nextChar && !/[\s$]/.test(nextChar) ? ' ' : ''
 
         return `${leftSpace}$${latex}$${rightSpace}`
       }
@@ -655,11 +602,8 @@ export function createMarkdownContent(content: string) {
 
       // 2. If no data-latex, try to get from .katex-mathml
       if (!latex) {
-        const mathml = node.querySelector(
-          '.katex-mathml annotation[encoding="application/x-tex"]',
-        )
-        latex =
-          mathml && isGenericElement(mathml) ? mathml.textContent || '' : ''
+        const mathml = node.querySelector('.katex-mathml annotation[encoding="application/x-tex"]')
+        latex = mathml && isGenericElement(mathml) ? mathml.textContent || '' : ''
       }
 
       // 3. If still no content, use text content as fallback
@@ -695,15 +639,11 @@ export function createMarkdownContent(content: string) {
       if (!isGenericElement(node)) return content
 
       // Get alert type from the class (e.g., markdown-alert-note -> NOTE)
-      const alertClasses = Array.from(
-        node.classList ? Object.keys(node.classList) : [],
-      )
+      const alertClasses = Array.from(node.classList ? Object.keys(node.classList) : [])
       const typeClass = alertClasses.find(
         (c) => c.startsWith('markdown-alert-') && c !== 'markdown-alert',
       )
-      const type = typeClass
-        ? typeClass.replace('markdown-alert-', '').toUpperCase()
-        : 'NOTE'
+      const type = typeClass ? typeClass.replace('markdown-alert-', '').toUpperCase() : 'NOTE'
 
       // Find the title element and content
       const titleElement = node.querySelector('.markdown-alert-title')
@@ -711,11 +651,7 @@ export function createMarkdownContent(content: string) {
 
       // Extract content, removing the title from it if present
       let alertContent = content
-      if (
-        titleElement &&
-        isGenericElement(titleElement) &&
-        titleElement.textContent
-      ) {
+      if (titleElement && isGenericElement(titleElement) && titleElement.textContent) {
         alertContent =
           contentElement && isGenericElement(contentElement)
             ? contentElement.textContent || ''
@@ -758,9 +694,7 @@ export function createMarkdownContent(content: string) {
         if (alttext) {
           // Check if it's an inline or block equation
           const isInline = mathElement.closest('.ltx_eqn_inline') !== null
-          return isInline
-            ? `$${alttext.trim()}$`
-            : `\n$$\n${alttext.trim()}\n$$`
+          return isInline ? `$${alttext.trim()}$` : `\n$$\n${alttext.trim()}\n$$`
         }
         return ''
       })
@@ -803,10 +737,7 @@ export function createMarkdownContent(content: string) {
     // outerHTML encodes & as &amp;, which breaks LaTeX alignment
     // characters inside math delimiters. Decode common entities since
     // the output goes into markdown, not back through an HTML parser.
-    return tableClone.outerHTML
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
+    return tableClone.outerHTML.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
   }
 
   function extractLatex(element: GenericElement): string {

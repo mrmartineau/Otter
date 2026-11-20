@@ -1,6 +1,6 @@
+import { URL } from 'url'
 import { Action, ActionPanel, Form, showToast, Toast } from '@raycast/api'
 import { useEffect, useState } from 'react'
-import { URL } from 'url'
 import { apiFetch } from './api'
 import { Authenticated } from './components/Authenticated'
 import { copy } from './utils/copy'

@@ -45,20 +45,12 @@ interface TootsFetchingOptions {
   likes: boolean
 }
 
-export const getToots = async ({
-  params,
-  likes = false,
-}: TootsFetchingOptions) => {
+export const getToots = async ({ params, likes = false }: TootsFetchingOptions) => {
   const parsed = apiParameters(params)
-  const response = await fetch(
-    `/api/toots${queryString({ ...parsed, liked: likes })}`,
-    {
-      credentials: 'include',
-    },
-  )
-  const body = await parseJsonResponse<{ data: Toot[]; count: number }>(
-    response,
-  )
+  const response = await fetch(`/api/toots${queryString({ ...parsed, liked: likes })}`, {
+    credentials: 'include',
+  })
+  const body = await parseJsonResponse<{ data: Toot[]; count: number }>(response)
 
   return {
     count: body.count,
@@ -74,15 +66,8 @@ export const getTootsOptions = ({ params, likes }: TootsFetchingOptions) => {
   })
 }
 
-export const getTootsInfiniteOptions = ({
-  params,
-  likes,
-}: TootsFetchingOptions) => {
-  const {
-    limit = DEFAULT_API_RESPONSE_LIMIT,
-    offset: _offset,
-    ...rest
-  } = apiParameters(params)
+export const getTootsInfiniteOptions = ({ params, likes }: TootsFetchingOptions) => {
+  const { limit = DEFAULT_API_RESPONSE_LIMIT, offset: _offset, ...rest } = apiParameters(params)
   return infiniteQueryOptions({
     getNextPageParam: (
       lastPage: Awaited<ReturnType<typeof getToots>>,

@@ -14,9 +14,7 @@ describe('apiParameters window', () => {
   it('drops zero, negative and invalid values', () => {
     expect(apiParameters({ window: 0 }).window).toBeUndefined()
     expect(apiParameters({ window: -1 }).window).toBeUndefined()
-    expect(
-      apiParameters({ window: 'abc' as unknown as number }).window,
-    ).toBeUndefined()
+    expect(apiParameters({ window: 'abc' as unknown as number }).window).toBeUndefined()
     expect(apiParameters({}).window).toBeUndefined()
   })
 

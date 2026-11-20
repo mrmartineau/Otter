@@ -1,8 +1,5 @@
 import { MastodonLogoIcon } from '@phosphor-icons/react'
-import {
-  useSuspenseInfiniteQuery,
-  useSuspenseQuery,
-} from '@tanstack/react-query'
+import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { Feed } from '@/components/Feed'
 import { CONTENT, createTitle } from '@/constants'
@@ -32,10 +29,9 @@ export const Route = createFileRoute('/_app/toots')({
 function Page() {
   const { liked, ...search } = useSearch({ from: '/_app/toots' })
   const { data: dbMeta } = useSuspenseQuery(getMetaOptions())
-  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useSuspenseInfiniteQuery(
-      getTootsInfiniteOptions({ likes: liked, params: search }),
-    )
+  const { data, hasNextPage, isFetchingNextPage, fetchNextPage } = useSuspenseInfiniteQuery(
+    getTootsInfiniteOptions({ likes: liked, params: search }),
+  )
 
   const items = data.pages.flatMap((page) => page.data ?? [])
   const count = data.pages[0]?.count ?? 0
@@ -52,9 +48,7 @@ function Page() {
     subNav.push({
       href: '/toots?liked=true',
       isActive: liked,
-      text: dbMeta.likedToots
-        ? `My Liked Toots (${dbMeta.likedToots})`
-        : 'My Liked Toots',
+      text: dbMeta.likedToots ? `My Liked Toots (${dbMeta.likedToots})` : 'My Liked Toots',
     })
   }
 

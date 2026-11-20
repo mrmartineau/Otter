@@ -24,10 +24,7 @@ export default function MenubarCommand() {
 
   if (error) {
     return (
-      <MenuBarExtra
-        icon={{ source: 'command-icon.png' }}
-        isLoading={authIsLoading}
-      >
+      <MenuBarExtra icon={{ source: 'command-icon.png' }} isLoading={authIsLoading}>
         <MenuBarExtra.Item
           title="Authentication failed. Click to update settings."
           icon={Icon.Alarm}
@@ -85,11 +82,7 @@ export default function MenubarCommand() {
                   <MenuBarExtra.Item
                     icon={getFavicon(bookmark.url)}
                     title={`View ${bookmark.title}`}
-                    onAction={() =>
-                      open(
-                        urlJoin(prefs.otterBasePath, 'bookmark', bookmark.id),
-                      )
-                    }
+                    onAction={() => open(urlJoin(prefs.otterBasePath, 'bookmark', bookmark.id))}
                     subtitle={type}
                   />
                 }
@@ -129,9 +122,7 @@ export default function MenubarCommand() {
                 key={type}
                 icon={Icon.Layers}
                 title={formatTitle(type)}
-                onAction={() =>
-                  open(urlJoin(prefs.otterBasePath, 'type', type))
-                }
+                onAction={() => open(urlJoin(prefs.otterBasePath, 'type', type))}
                 subtitle={count?.toString() ?? ''}
               />
             )

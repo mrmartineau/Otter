@@ -32,11 +32,9 @@ export const italic = sgr(3, 23)
 export const underline = sgr(4, 24)
 export const reverse = sgr(7, 27)
 
-export const fg = (color: number) => (text: string) =>
-  `${CSI}38;5;${color}m${text}${CSI}39m`
+export const fg = (color: number) => (text: string) => `${CSI}38;5;${color}m${text}${CSI}39m`
 
-export const bg = (color: number) => (text: string) =>
-  `${CSI}48;5;${color}m${text}${CSI}49m`
+export const bg = (color: number) => (text: string) => `${CSI}48;5;${color}m${text}${CSI}49m`
 
 // Otter's terminal palette (xterm-256 indexes)
 export const palette = {
@@ -49,7 +47,7 @@ export const palette = {
   url: 75,
 }
 
-// biome-ignore lint/suspicious/noControlCharactersInRegex: matching ANSI escape sequences is the point
+// oxlint-disable-next-line no-control-regex -- matching ANSI escape sequences is the point
 const ansiPattern = /\x1b\[[0-9;?]*[A-Za-z]/g
 
 export const stripAnsi = (text: string) => text.replace(ansiPattern, '')
@@ -57,7 +55,7 @@ export const stripAnsi = (text: string) => text.replace(ansiPattern, '')
 // C0/C1 control characters minus TAB, LF and CR — anything that could move the
 // cursor, change colours or otherwise hijack the terminal. ESC (0x1b) is in
 // the 0x0e–0x1f range, so escape sequences in untrusted text get neutralised.
-// biome-ignore lint/suspicious/noControlCharactersInRegex: stripping terminal control chars from untrusted API text is the point
+// oxlint-disable-next-line no-control-regex -- stripping terminal control chars from untrusted API text is the point
 const controlPattern = /[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]/g
 
 /** Strip terminal control characters from untrusted text (escape injection). */

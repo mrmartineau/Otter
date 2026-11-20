@@ -18,9 +18,7 @@ export const Route = createFileRoute('/_app/dashboard')({
     ],
   }),
   loader: async (opts) => {
-    const dashboard = await opts.context.queryClient.ensureQueryData(
-      getDashboardOptions(),
-    )
+    const dashboard = await opts.context.queryClient.ensureQueryData(getDashboardOptions())
     const followUpBookmarks = await opts.context.queryClient.ensureQueryData(
       getBookmarksOptions({
         limit: 4,
@@ -61,9 +59,7 @@ function Index() {
 
   return (
     <div className="flex flex-col gap-l">
-      {dashboard?.recent?.length ? (
-        <FeedSimple items={dashboard.recent} title="Recent" />
-      ) : null}
+      {dashboard?.recent?.length ? <FeedSimple items={dashboard.recent} title="Recent" /> : null}
       {dashboard?.oneWeekAgo?.length ? (
         <FeedSimple
           items={randomElements<Bookmark>(dashboard.oneWeekAgo, 2)}
@@ -95,14 +91,9 @@ function Index() {
         />
       ) : null}
       {followUpBookmarks?.data?.length ? (
-        <FeedSimple
-          items={followUpBookmarks?.data as Bookmark[]}
-          title="#follow-up"
-        />
+        <FeedSimple items={followUpBookmarks?.data as Bookmark[]} title="#follow-up" />
       ) : null}
-      {toots?.data?.length ? (
-        <FeedSimple items={toots.data as Toot[]} title="Liked toots" />
-      ) : null}
+      {toots?.data?.length ? <FeedSimple items={toots.data as Toot[]} title="Liked toots" /> : null}
     </div>
   )
 }

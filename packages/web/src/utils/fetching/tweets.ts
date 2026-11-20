@@ -47,15 +47,10 @@ interface TweetsFetchingOptions {
 
 export const getTweets = async ({ params, likes }: TweetsFetchingOptions) => {
   const parsed = apiParameters(params)
-  const response = await fetch(
-    `/api/tweets${queryString({ ...parsed, liked: likes })}`,
-    {
-      credentials: 'include',
-    },
-  )
-  const body = await parseJsonResponse<{ data: Tweet[]; count: number }>(
-    response,
-  )
+  const response = await fetch(`/api/tweets${queryString({ ...parsed, liked: likes })}`, {
+    credentials: 'include',
+  })
+  const body = await parseJsonResponse<{ data: Tweet[]; count: number }>(response)
 
   return {
     count: body.count,
@@ -64,15 +59,8 @@ export const getTweets = async ({ params, likes }: TweetsFetchingOptions) => {
   } satisfies ApiListResponse<Tweet[]>
 }
 
-export const getTweetsInfiniteOptions = ({
-  params,
-  likes,
-}: TweetsFetchingOptions) => {
-  const {
-    limit = DEFAULT_API_RESPONSE_LIMIT,
-    offset: _offset,
-    ...rest
-  } = apiParameters(params)
+export const getTweetsInfiniteOptions = ({ params, likes }: TweetsFetchingOptions) => {
+  const { limit = DEFAULT_API_RESPONSE_LIMIT, offset: _offset, ...rest } = apiParameters(params)
   return infiniteQueryOptions({
     getNextPageParam: (
       lastPage: Awaited<ReturnType<typeof getTweets>>,

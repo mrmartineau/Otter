@@ -15,9 +15,7 @@ export const comboboxStyles: StylesConfig<
     borderColor: state.isFocused ? 'var(--theme6)' : 'var(--theme3)',
     borderRadius: 'var(--radii-l)',
     borderWidth: '1px',
-    boxShadow: state.isFocused
-      ? '0 0 0 2px var(--focus)'
-      : '0 0 0 2px transparent',
+    boxShadow: state.isFocused ? '0 0 0 2px var(--focus)' : '0 0 0 2px transparent',
   }),
   // @ts-ignore
   multiValue: (provided) => ({

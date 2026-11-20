@@ -70,10 +70,7 @@ const isNarrowerThan = (a: Set<string>, b: Set<string>) =>
  */
 const usableTags = (tags: MetaTag[]) => {
   const ranked = tags
-    .filter(
-      (item) =>
-        item.tag && item.tag !== 'Untagged' && !item.tag.startsWith('like:'),
-    )
+    .filter((item) => item.tag && item.tag !== 'Untagged' && !item.tag.startsWith('like:'))
     .map((item) => ({
       count: item.count ?? 0,
       name: item.tag as string,
@@ -114,10 +111,7 @@ const usableTags = (tags: MetaTag[]) => {
  * from what is in front of it.
  */
 const buildShortlist = (tagNames: string[], text: string) => [
-  ...new Set([
-    ...matchTagNames(text, tagNames),
-    ...tagNames.slice(0, POPULAR_TAG_COUNT),
-  ]),
+  ...new Set([...matchTagNames(text, tagNames), ...tagNames.slice(0, POPULAR_TAG_COUNT)]),
 ]
 
 const classifySystemPrompt = (
@@ -145,9 +139,7 @@ const responseSchema = (candidates: string[]) => ({
   properties: {
     newTags: { items: { type: 'string' }, maxItems: 1, type: 'array' },
     tags: {
-      items: candidates.length
-        ? { enum: candidates, type: 'string' }
-        : { type: 'string' },
+      items: candidates.length ? { enum: candidates, type: 'string' } : { type: 'string' },
       maxItems: MAX_TAGS,
       type: 'array',
     },
@@ -172,9 +164,7 @@ export const classifyBookmark = async ({
   existingTags: MetaTag[]
   currentType: string
 }): Promise<AiClassifyResponse> => {
-  const normalizedCurrentType = isBookmarkType(currentType)
-    ? currentType
-    : 'link'
+  const normalizedCurrentType = isBookmarkType(currentType) ? currentType : 'link'
   const tagNames = usableTags(existingTags)
   const candidates = buildShortlist(tagNames, `${title} ${description}`)
 
@@ -219,12 +209,7 @@ export const classifyBookmark = async ({
     const name = typeof raw === 'string' ? raw.trim() : ''
     const key = name.toLowerCase()
 
-    if (
-      !name ||
-      seen.has(key) ||
-      key.startsWith('like:') ||
-      BOOKMARK_TYPE_SET.has(key)
-    ) {
+    if (!name || seen.has(key) || key.startsWith('like:') || BOOKMARK_TYPE_SET.has(key)) {
       continue
     }
 
@@ -236,9 +221,7 @@ export const classifyBookmark = async ({
     }
   }
 
-  const type = isBookmarkType(response?.type)
-    ? response.type
-    : normalizedCurrentType
+  const type = isBookmarkType(response?.type) ? response.type : normalizedCurrentType
 
   return { tags, type }
 }

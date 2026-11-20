@@ -1,16 +1,4 @@
-import {
-  and,
-  arrayContains,
-  asc,
-  count,
-  desc,
-  eq,
-  gte,
-  isNull,
-  lt,
-  or,
-  sql,
-} from 'drizzle-orm'
+import { and, arrayContains, asc, count, desc, eq, gte, isNull, lt, or, sql } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { API_HEADERS, DEFAULT_API_RESPONSE_LIMIT } from '@/constants'
 import type { BookmarkType } from '@/types/db'
@@ -45,9 +33,7 @@ const parseBoolean = (value: unknown) => {
 export const getAllBookmarks = async (context: HonoContext) => {
   try {
     const searchParams = searchParamsToObject(context.req.url)
-    const requestContext = await requireRequestContext(context, [
-      'bookmarks:read',
-    ])
+    const requestContext = await requireRequestContext(context, ['bookmarks:read'])
 
     if (requestContext instanceof Response) {
       return requestContext
@@ -78,23 +64,15 @@ export const getAllBookmarks = async (context: HonoContext) => {
       publicItems === undefined ? undefined : eq(bookmarks.public, publicItems),
       type ? eq(bookmarks.type, type as BookmarkType) : undefined,
       top ? gte(bookmarks.clickCount, 1) : undefined,
-      tag && tag !== 'Untagged'
-        ? arrayContains(bookmarks.tags, [tag])
-        : undefined,
+      tag && tag !== 'Untagged' ? arrayContains(bookmarks.tags, [tag]) : undefined,
       tag === 'Untagged'
         ? or(isNull(bookmarks.tags), sql`cardinality(${bookmarks.tags}) = 0`)
         : undefined,
       dateWindow
-        ? gte(
-            bookmarks.createdAt,
-            sql`now() - ${dateWindow * 7} * interval '1 day'`,
-          )
+        ? gte(bookmarks.createdAt, sql`now() - ${dateWindow * 7} * interval '1 day'`)
         : undefined,
       dateWindow && dateWindow > 1
-        ? lt(
-            bookmarks.createdAt,
-            sql`now() - ${(dateWindow - 1) * 7} * interval '1 day'`,
-          )
+        ? lt(bookmarks.createdAt, sql`now() - ${(dateWindow - 1) * 7} * interval '1 day'`)
         : undefined,
     ].filter(Boolean)
     const where = and(...conditions)
@@ -109,11 +87,7 @@ export const getAllBookmarks = async (context: HonoContext) => {
       .orderBy(
         ...(top
           ? [desc(bookmarks.clickCount), desc(bookmarks.createdAt)]
-          : [
-              order === 'asc'
-                ? asc(bookmarks.createdAt)
-                : desc(bookmarks.createdAt),
-            ]),
+          : [order === 'asc' ? asc(bookmarks.createdAt) : desc(bookmarks.createdAt)]),
       )
       .limit(limit)
       .offset(offset)

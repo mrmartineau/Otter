@@ -23,9 +23,7 @@ export const Route = createFileRoute('/_public/recent')({
     meta: [{ title: `Recent — ${CONTENT.appName}` }],
   }),
   loader: async ({ context, deps }) => {
-    return context.queryClient.ensureQueryData(
-      getRecentPublicBookmarksOptions(deps),
-    )
+    return context.queryClient.ensureQueryData(getRecentPublicBookmarksOptions(deps))
   },
   loaderDeps: ({ search }): RecentSearch => search,
   validateSearch: (search: Record<string, unknown>): RecentSearch => ({
@@ -36,9 +34,7 @@ export const Route = createFileRoute('/_public/recent')({
 
 function RecentPage() {
   const { limit, offset } = Route.useSearch()
-  const { data } = useSuspenseQuery(
-    getRecentPublicBookmarksOptions({ limit, offset }),
-  )
+  const { data } = useSuspenseQuery(getRecentPublicBookmarksOptions({ limit, offset }))
 
   const count = data.count ?? 0
   const hasNewItems = offset > 0
@@ -49,10 +45,7 @@ function RecentPage() {
       <div className="feed">
         <Flex gap="xs" justify="between" align="center">
           <h3
-            className={cn(
-              headingVariants({ variant: 'feedTitle' }),
-              'flex items-center gap-2xs',
-            )}
+            className={cn(headingVariants({ variant: 'feedTitle' }), 'flex items-center gap-2xs')}
           >
             <ClockIcon weight="fill" size={24} />
             Recent public bookmarks from the Otter community
@@ -61,9 +54,7 @@ function RecentPage() {
 
         <div className="mt-m grid gap-m">
           {data.data?.length ? (
-            data.data.map((item: Bookmark) => (
-              <PublicBookmarkItem {...item} key={item.id} />
-            ))
+            data.data.map((item: Bookmark) => <PublicBookmarkItem {...item} key={item.id} />)
           ) : (
             <div>{CONTENT.noItems}</div>
           )}
@@ -73,18 +64,14 @@ function RecentPage() {
           <Flex align="center" justify="center" gap="s" className="mt-m">
             {hasNewItems ? (
               <Button asChild>
-                <a
-                  href={`/recent?limit=${limit}&offset=${Math.max(0, offset - limit)}`}
-                >
+                <a href={`/recent?limit=${limit}&offset=${Math.max(0, offset - limit)}`}>
                   {CONTENT.newerBtn}
                 </a>
               </Button>
             ) : null}
             {hasOldItems ? (
               <Button asChild>
-                <a href={`/recent?limit=${limit}&offset=${offset + limit}`}>
-                  {CONTENT.olderBtn}
-                </a>
+                <a href={`/recent?limit=${limit}&offset=${offset + limit}`}>{CONTENT.olderBtn}</a>
               </Button>
             ) : null}
           </Flex>

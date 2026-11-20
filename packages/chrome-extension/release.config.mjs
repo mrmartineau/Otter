@@ -20,8 +20,7 @@ export default {
       '@semantic-release/git',
       {
         assets: ['package.json', 'CHANGELOG.md'],
-        message:
-          'chore(release): ${nextRelease.name}\n\n${nextRelease.notes}',
+        message: 'chore(release): ${nextRelease.name}\n\n${nextRelease.notes}',
       },
     ],
     [

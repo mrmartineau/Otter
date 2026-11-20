@@ -1,8 +1,4 @@
-import {
-  getSearchBookmarks,
-  getSearchToots,
-  getSearchTweets,
-} from '@/utils/fetching/search'
+import { getSearchBookmarks, getSearchToots, getSearchTweets } from '@/utils/fetching/search'
 
 export const fetchSearch = async (searchTerm: string) => {
   const [bookmarksSearch, tweetsSearch, tootsSearch] = await Promise.all([

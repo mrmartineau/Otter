@@ -42,11 +42,7 @@ describe('formatCount', () => {
 
 describe('wrapText', () => {
   it('wraps on word boundaries', () => {
-    expect(wrapText('the quick brown fox jumps', 10)).toEqual([
-      'the quick',
-      'brown fox',
-      'jumps',
-    ])
+    expect(wrapText('the quick brown fox jumps', 10)).toEqual(['the quick', 'brown fox', 'jumps'])
   })
 
   it('hard-breaks words longer than the width', () => {

@@ -1,6 +1,5 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { cn } from '@/utils/classnames'
-
 import './CodeBlock.css'
 
 interface CodeBlockProps extends ComponentProps<'pre'> {

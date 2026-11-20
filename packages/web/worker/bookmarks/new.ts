@@ -46,10 +46,7 @@ const getTagMetadata = async (requestContext: RequestContext) => {
   })) satisfies MetaTag[]
 }
 
-const toBookmarkInsert = (
-  bookmark: Partial<Bookmark>,
-  userId: string,
-): BookmarkInsert => ({
+const toBookmarkInsert = (bookmark: Partial<Bookmark>, userId: string): BookmarkInsert => ({
   blueskyPostUri: bookmark.bluesky_post_uri,
   clickCount: bookmark.click_count,
   description: bookmark.description,
@@ -70,9 +67,7 @@ const toBookmarkInsert = (
 })
 
 const getRequestContext = async (context: HonoContext) => {
-  const requestContext = await requireRequestContext(context, [
-    'bookmarks:write',
-  ])
+  const requestContext = await requireRequestContext(context, ['bookmarks:write'])
 
   if (requestContext instanceof Response) {
     return requestContext
@@ -258,19 +253,13 @@ export const postNewBookmark = async (context: HonoContext) => {
     const dbTags = await getTagMetadata(auth.requestContext)
     const mapper = async ({ scrape, url, ...rest }: NewBookmark) => {
       if (url && scrape) {
-        return toBookmarkInsert(
-          await scrapedBookmark(url, rest, dbTags, context),
-          auth.userId,
-        )
+        return toBookmarkInsert(await scrapedBookmark(url, rest, dbTags, context), auth.userId)
       }
 
       return toBookmarkInsert({ url, ...rest }, auth.userId)
     }
     const payload = await pMap(requestBody, mapper, { concurrency: 2 })
-    const data = await auth.requestContext.db
-      .insert(bookmarks)
-      .values(payload)
-      .returning()
+    const data = await auth.requestContext.db.insert(bookmarks).values(payload).returning()
     const rows = data.map(bookmarkToRow)
 
     for (const row of rows) {
@@ -325,12 +314,7 @@ export const getNewBookmark = async (context: HonoContext) => {
     const dbTags = await getTagMetadata(auth.requestContext)
     const data = await auth.requestContext.db
       .insert(bookmarks)
-      .values([
-        toBookmarkInsert(
-          await scrapedBookmark(url, {}, dbTags, context),
-          auth.userId,
-        ),
-      ])
+      .values([toBookmarkInsert(await scrapedBookmark(url, {}, dbTags, context), auth.userId)])
       .returning()
     const rows = data.map(bookmarkToRow)
 

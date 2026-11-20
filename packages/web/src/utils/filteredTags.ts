@@ -10,11 +10,7 @@ import { pascalCase } from 'change-case'
 export const filteredTags = (tags: string[]) => {
   return tags
     .filter((item) => {
-      if (
-        ['public', 'IFTTT', 'TwitterLike', 'OtterBot', 'instapaper'].includes(
-          item,
-        )
-      ) {
+      if (['public', 'IFTTT', 'TwitterLike', 'OtterBot', 'instapaper'].includes(item)) {
         return false
       }
       return true

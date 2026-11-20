@@ -1,12 +1,4 @@
-import {
-  Action,
-  ActionPanel,
-  Detail,
-  getPreferenceValues,
-  Icon,
-  Image,
-  List,
-} from '@raycast/api'
+import { Action, ActionPanel, Detail, getPreferenceValues, Icon, Image, List } from '@raycast/api'
 import { getFavicon } from '@raycast/utils'
 import urlJoin from 'proper-url-join'
 import tinyRelativeDate from 'tiny-relative-date'
@@ -142,11 +134,7 @@ export const LinkItem = ({
           markdown={detailViewContent}
           metadata={
             <List.Item.Detail.Metadata>
-              <List.Item.Detail.Metadata.Link
-                title="URL"
-                target={url}
-                text={url}
-              />
+              <List.Item.Detail.Metadata.Link title="URL" target={url} text={url} />
               {tags?.length ? (
                 <List.Item.Detail.Metadata.TagList title="Tags">
                   {tags?.map((tag) => (
@@ -178,18 +166,8 @@ export const LinkItem = ({
                   icon={Icon.Calendar}
                 />
               ) : null}
-              {star ? (
-                <List.Item.Detail.Metadata.Label
-                  title="Starred"
-                  icon={Icon.Star}
-                />
-              ) : null}
-              {isPublic ? (
-                <List.Item.Detail.Metadata.Label
-                  title="Public"
-                  icon={Icon.Eye}
-                />
-              ) : null}
+              {star ? <List.Item.Detail.Metadata.Label title="Starred" icon={Icon.Star} /> : null}
+              {isPublic ? <List.Item.Detail.Metadata.Label title="Public" icon={Icon.Eye} /> : null}
             </List.Item.Detail.Metadata>
           }
         />

@@ -1,10 +1,4 @@
-import {
-  Action,
-  ActionPanel,
-  Detail,
-  Icon,
-  openExtensionPreferences,
-} from '@raycast/api'
+import { Action, ActionPanel, Detail, Icon, openExtensionPreferences } from '@raycast/api'
 import type { ReactNode } from 'react'
 import { useAuth } from '../use-auth'
 

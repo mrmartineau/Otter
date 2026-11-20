@@ -37,9 +37,7 @@ function RouteComponent() {
     <Container variant="auth">
       <Flex direction="column" gap="m" className="mt-l">
         <h2 className="text-center">Authorize access</h2>
-        {clientId ? (
-          <p className="text-center text-sm opacity-70">{clientId}</p>
-        ) : null}
+        {clientId ? <p className="text-center text-sm opacity-70">{clientId}</p> : null}
         <p>This application is requesting access to:</p>
         <ul className="list-disc pl-m">
           {scopes.map((scope) => (
@@ -47,17 +45,10 @@ function RouteComponent() {
           ))}
         </ul>
         <Flex gap="m" justify="center">
-          <Button
-            onClick={() => handleConsent(true)}
-            disabled={isLoading}
-          >
+          <Button onClick={() => handleConsent(true)} disabled={isLoading}>
             Authorize
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => handleConsent(false)}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={() => handleConsent(false)} disabled={isLoading}>
             Deny
           </Button>
         </Flex>

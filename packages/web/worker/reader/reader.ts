@@ -1,16 +1,4 @@
-import {
-  and,
-  desc,
-  eq,
-  gt,
-  inArray,
-  isNotNull,
-  isNull,
-  ne,
-  notInArray,
-  or,
-  sql,
-} from 'drizzle-orm'
+import { and, desc, eq, gt, inArray, isNotNull, isNull, ne, notInArray, or, sql } from 'drizzle-orm'
 import type { Context } from 'hono'
 import { API_HEADERS } from '@/constants'
 import type { Highlight, ReadingItem, ReadingState } from '@/types/db'
@@ -28,12 +16,7 @@ type ReadingRow = typeof readingItems.$inferSelect
 type BookmarkRow = typeof bookmarks.$inferSelect
 type HighlightRow = typeof highlights.$inferSelect
 
-const READING_STATES: ReadingState[] = [
-  'pending',
-  'ready',
-  'failed',
-  'archived',
-]
+const READING_STATES: ReadingState[] = ['pending', 'ready', 'failed', 'archived']
 
 const WORDS_PER_MINUTE = 200
 
@@ -101,11 +84,7 @@ const highlightToRow = (row: HighlightRow): Highlight => ({
   updated_at: row.updatedAt.toISOString(),
 })
 
-const itemToRow = (
-  item: ReadingRow,
-  bookmark: BookmarkRow,
-  withContent = false,
-): ReadingItem => ({
+const itemToRow = (item: ReadingRow, bookmark: BookmarkRow, withContent = false): ReadingItem => ({
   author: item.author,
   bookmark_id: item.bookmarkId,
   content_hash: item.contentHash,
@@ -143,13 +122,8 @@ const findItem = async (db: Db, id: string, userId: string) => {
 }
 
 const sha256 = async (text: string) => {
-  const digest = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder().encode(text),
-  )
-  return Array.from(new Uint8Array(digest), (b) =>
-    b.toString(16).padStart(2, '0'),
-  ).join('')
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 /**
@@ -227,11 +201,7 @@ const ensureReadingRows = async (db: Db, userId: string) => {
     .where(
       and(
         eq(bookmarks.user, userId),
-        or(
-          isNull(bookmarks.type),
-          ne(bookmarks.type, 'article'),
-          ne(bookmarks.status, 'active'),
-        ),
+        or(isNull(bookmarks.type), ne(bookmarks.type, 'article'), ne(bookmarks.status, 'active')),
       ),
     )
   const articleAgain = db
@@ -330,11 +300,7 @@ export const createReadingItem = async (context: HonoContext) => {
       .select()
       .from(bookmarks)
       .where(
-        and(
-          eq(bookmarks.user, userId),
-          eq(bookmarks.url, url),
-          eq(bookmarks.status, 'active'),
-        ),
+        and(eq(bookmarks.user, userId), eq(bookmarks.url, url), eq(bookmarks.status, 'active')),
       )
       .limit(1)
 
@@ -424,9 +390,7 @@ export const listReadingItems = async (context: HonoContext) => {
       conditions.push(isNull(readingItems.deletedAt))
       conditions.push(eq(bookmarks.status, 'active'))
       if (state === 'unread') {
-        conditions.push(
-          inArray(readingItems.state, ['pending', 'ready', 'failed']),
-        )
+        conditions.push(inArray(readingItems.state, ['pending', 'ready', 'failed']))
       } else if (state !== 'all') {
         if (!READING_STATES.includes(state as ReadingState)) {
           return errorResponse({ reason: 'Unknown state', status: 400 })
@@ -481,12 +445,7 @@ export const getReadingItem = async (context: HonoContext) => {
     const itemHighlights = await auth.db
       .select()
       .from(highlights)
-      .where(
-        and(
-          eq(highlights.readingItemId, found.item.id),
-          isNull(highlights.deletedAt),
-        ),
-      )
+      .where(and(eq(highlights.readingItemId, found.item.id), isNull(highlights.deletedAt)))
       .orderBy(highlights.createdAt)
 
     return ok({
@@ -540,12 +499,7 @@ export const deleteReadingItem = async (context: HonoContext) => {
     const [item] = await auth.db
       .update(readingItems)
       .set({ deletedAt: now, removedAt: now, updatedAt: now })
-      .where(
-        and(
-          eq(readingItems.id, idParam(context)),
-          eq(readingItems.userId, auth.userId),
-        ),
-      )
+      .where(and(eq(readingItems.id, idParam(context)), eq(readingItems.userId, auth.userId)))
       .returning({ id: readingItems.id })
 
     if (!item) {
@@ -619,9 +573,7 @@ export const listHighlights = async (context: HonoContext) => {
       .where(
         and(
           eq(highlights.userId, auth.userId),
-          since
-            ? gt(highlights.updatedAt, since)
-            : isNull(highlights.deletedAt),
+          since ? gt(highlights.updatedAt, since) : isNull(highlights.deletedAt),
         ),
       )
       .orderBy(desc(highlights.updatedAt))
@@ -733,12 +685,7 @@ export const deleteHighlight = async (context: HonoContext) => {
     const [row] = await auth.db
       .update(highlights)
       .set({ deletedAt: now, updatedAt: now })
-      .where(
-        and(
-          eq(highlights.id, idParam(context)),
-          eq(highlights.userId, auth.userId),
-        ),
-      )
+      .where(and(eq(highlights.id, idParam(context)), eq(highlights.userId, auth.userId)))
       .returning({ id: highlights.id })
 
     if (!row) {

@@ -16,20 +16,20 @@
   will-change: transform, opacity;
   z-index: var(--z-max);
 }
-.DropdownMenuContent[data-side="top"],
-.DropdownMenuSubContent[data-side="top"] {
+.DropdownMenuContent[data-side='top'],
+.DropdownMenuSubContent[data-side='top'] {
   animation-name: slideDownAndFade;
 }
-.DropdownMenuContent[data-side="right"],
-.DropdownMenuSubContent[data-side="right"] {
+.DropdownMenuContent[data-side='right'],
+.DropdownMenuSubContent[data-side='right'] {
   animation-name: slideLeftAndFade;
 }
-.DropdownMenuContent[data-side="bottom"],
-.DropdownMenuSubContent[data-side="bottom"] {
+.DropdownMenuContent[data-side='bottom'],
+.DropdownMenuSubContent[data-side='bottom'] {
   animation-name: slideUpAndFade;
 }
-.DropdownMenuContent[data-side="left"],
-.DropdownMenuSubContent[data-side="left"] {
+.DropdownMenuContent[data-side='left'],
+.DropdownMenuSubContent[data-side='left'] {
   animation-name: slideRightAndFade;
 }
 
@@ -59,7 +59,7 @@
     color: var(--theme12);
   }
 }
-.DropdownMenuSubTrigger[data-state="open"] {
+.DropdownMenuSubTrigger[data-state='open'] {
   background-color: var(--theme8);
   color: var(--theme12);
 }

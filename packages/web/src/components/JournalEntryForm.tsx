@@ -43,8 +43,7 @@ export const JournalEntryForm = ({
       date: todayLocal(),
       entry: '',
       ...initialValues,
-      journal:
-        initialValues?.journal != null ? String(initialValues.journal) : '',
+      journal: initialValues?.journal != null ? String(initialValues.journal) : '',
     },
   })
 
@@ -58,10 +57,7 @@ export const JournalEntryForm = ({
   return (
     <div className={cn('journal-entry-form', className)} {...rest}>
       <h2 className="mb-s">{isNew ? 'New journal entry' : 'Edit entry'}</h2>
-      <form
-        onSubmit={handleSubmit(handleSubmitForm)}
-        className="flex flex-col gap-s"
-      >
+      <form onSubmit={handleSubmit(handleSubmitForm)} className="flex flex-col gap-s">
         {/* ENTRY */}
         <FormGroup label="Entry" name="entry" labelIsVisible={false}>
           <Textarea
@@ -82,12 +78,7 @@ export const JournalEntryForm = ({
         {journals.length ? (
           <FormGroup label="Journal" name="journal">
             <div className="flex items-center gap-xs flex-wrap">
-              <IconControl
-                type="radio"
-                value=""
-                label="None"
-                {...register('journal')}
-              >
+              <IconControl type="radio" value="" label="None" {...register('journal')}>
                 <CircleIcon size={18} weight="duotone" />
               </IconControl>
               {journals.map((journalItem) => (

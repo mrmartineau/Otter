@@ -19,9 +19,7 @@ interface ScrapeContentResult {
   domain: string
 }
 
-const isScrapeContentResult = (
-  value: unknown,
-): value is ScrapeContentResult => {
+const isScrapeContentResult = (value: unknown): value is ScrapeContentResult => {
   if (!value || typeof value !== 'object') return false
   const candidate = value as Record<string, unknown>
   return (
@@ -35,9 +33,7 @@ const isScrapeContentResult = (
 const getContentOptions = (url: string) =>
   queryOptions({
     queryFn: async (): Promise<ScrapeContentResult> => {
-      const response = await fetch(
-        urlJoin('/api/scrape-content', { query: { url } }),
-      )
+      const response = await fetch(urlJoin('/api/scrape-content', { query: { url } }))
       const data = (await response.json()) as
         | ScrapeContentResult
         | { error?: string; message?: string }
@@ -122,12 +118,7 @@ function RouteComponent() {
   return (
     <div className="card feed-item">
       <div className="feed-item-content">
-        <Flex
-          align="center"
-          gap="2xs"
-          wrap="wrap"
-          className="bookmark-read-links"
-        >
+        <Flex align="center" gap="2xs" wrap="wrap" className="bookmark-read-links">
           <Link href={`/bookmark/${id}`} variant="subtle">
             <Flex align="center" gap="3xs">
               <ArrowLeftIcon size={14} />
@@ -183,9 +174,7 @@ function RouteComponent() {
               {content.content}
             </Markdown>
           ) : (
-            <p className="text-theme11">
-              No readable content available for this page.
-            </p>
+            <p className="text-theme11">No readable content available for this page.</p>
           )
         ) : (
           <>
@@ -195,9 +184,7 @@ function RouteComponent() {
                 <span className="text-theme11">Generating summary…</span>
               </Flex>
             ) : summaryQuery.error ? (
-              <p className="text-theme11 mt-m">
-                Failed to generate summary. Please try again.
-              </p>
+              <p className="text-theme11 mt-m">Failed to generate summary. Please try again.</p>
             ) : summaryQuery.data ? (
               <Markdown preventClamping textSize={0}>
                 {summaryQuery.data}

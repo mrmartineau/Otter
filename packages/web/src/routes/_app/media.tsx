@@ -13,11 +13,7 @@ import { MediaForm } from '@/components/MediaForm'
 import { MediaTypeToIcon } from '@/components/TypeToIcon'
 import { createTitle, ROUTE_NEW_MEDIA } from '@/constants'
 import type { Media, MediaFilters, MediaStatus, MediaUpdate } from '@/types/db'
-import {
-  getMediaOptions,
-  useUpdateMedia,
-  useUpdateMediaStatus,
-} from '@/utils/fetching/media'
+import { getMediaOptions, useUpdateMedia, useUpdateMediaStatus } from '@/utils/fetching/media'
 
 const columns = [
   { status: 'wishlist' as const, title: 'Wishlist' },
@@ -35,9 +31,7 @@ export const Route = createFileRoute('/_app/media')({
     ],
   }),
   loader: async (opts) => {
-    const media = await opts.context.queryClient.ensureQueryData(
-      getMediaOptions(),
-    )
+    const media = await opts.context.queryClient.ensureQueryData(getMediaOptions())
     return media
   },
 })
@@ -140,9 +134,7 @@ function RouteComponent() {
               <Input
                 placeholder="Search by name, platform, or type..."
                 value={filters.search || ''}
-                onChange={(e) =>
-                  setFilters({ ...filters, search: e.target.value })
-                }
+                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               />
             </div>
           </div>
@@ -163,34 +155,26 @@ function RouteComponent() {
               >
                 <CircleIcon size={18} weight="duotone" />
               </IconControl>
-              {(
-                [
-                  'tv',
-                  'film',
-                  'game',
-                  'book',
-                  'podcast',
-                  'music',
-                  'other',
-                ] as const
-              ).map((type) => (
-                <IconControl
-                  key={type}
-                  type="radio"
-                  value={type}
-                  label={type}
-                  name="types"
-                  onChange={(e) =>
-                    setFilters({
-                      ...filters,
-                      type: e.currentTarget.checked ? type : undefined,
-                    })
-                  }
-                  checked={filters.type === type}
-                >
-                  <MediaTypeToIcon type={type} />
-                </IconControl>
-              ))}
+              {(['tv', 'film', 'game', 'book', 'podcast', 'music', 'other'] as const).map(
+                (type) => (
+                  <IconControl
+                    key={type}
+                    type="radio"
+                    value={type}
+                    label={type}
+                    name="types"
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        type: e.currentTarget.checked ? type : undefined,
+                      })
+                    }
+                    checked={filters.type === type}
+                  >
+                    <MediaTypeToIcon type={type} />
+                  </IconControl>
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -289,8 +273,7 @@ function RouteComponent() {
 
               // Detect whether this column changed (length, order, or content)
               const changed =
-                prevIds.length !== nextIds.length ||
-                prevIds.some((id, idx) => id !== nextIds[idx])
+                prevIds.length !== nextIds.length || prevIds.some((id, idx) => id !== nextIds[idx])
 
               if (!changed) return
 

@@ -9,12 +9,7 @@ import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useCallback, useMemo, useState } from 'react'
 import { IconButton } from '@/components/IconButton'
 import { Input } from '@/components/Input'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/Tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip'
 import type { MetaTag } from '@/utils/fetching/meta'
 
 export const Route = createFileRoute('/_app/settings/tags')({
@@ -62,9 +57,7 @@ function RouteComponent() {
     return sort === 'alpha'
       ? matching
       : matching.toSorted(
-          (a, b) =>
-            (b.count ?? 0) - (a.count ?? 0) ||
-            (a.tag ?? '').localeCompare(b.tag ?? ''),
+          (a, b) => (b.count ?? 0) - (a.count ?? 0) || (a.tag ?? '').localeCompare(b.tag ?? ''),
         )
   }, [filter, sort, tags])
 
@@ -199,10 +192,7 @@ function RouteComponent() {
 
             return (
               <li key={tag}>
-                <form
-                  onSubmit={handleRenameTag}
-                  className="flex items-center gap-2xs"
-                >
+                <form onSubmit={handleRenameTag} className="flex items-center gap-2xs">
                   <input type="hidden" name="old_tag" value={tag} />
                   <Input
                     name="new_tag"

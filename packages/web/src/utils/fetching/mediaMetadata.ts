@@ -10,9 +10,7 @@ type MediaMetadataItem = {
 
 const getTvMetadata = async (query: string): Promise<MediaMetadataItem[]> => {
   try {
-    const response = await fetch(
-      `https://api.tvmaze.com/search/shows?q=${query}`,
-    )
+    const response = await fetch(`https://api.tvmaze.com/search/shows?q=${query}`)
     const data = (await response.json()) as {
       id: string
       image: { medium: string }
@@ -108,10 +106,7 @@ const getPodcastMetadata = async (query: string) => {
   }
 }
 
-export const getMediaMetadata = async ({
-  type,
-  query,
-}: MediaMetadataFetchingOptions) => {
+export const getMediaMetadata = async ({ type, query }: MediaMetadataFetchingOptions) => {
   if (!query) {
     return []
   }
@@ -133,10 +128,7 @@ interface MediaMetadataFetchingOptions {
   query: string
 }
 
-export const getMediaMetadataOptions = ({
-  type,
-  query,
-}: MediaMetadataFetchingOptions) => {
+export const getMediaMetadataOptions = ({ type, query }: MediaMetadataFetchingOptions) => {
   return queryOptions({
     queryFn: () => getMediaMetadata({ query, type }),
     queryKey: ['media', type, query],

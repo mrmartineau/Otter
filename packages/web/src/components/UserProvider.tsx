@@ -1,16 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import {
-  createContext,
-  type ReactNode,
-  useCallback,
-  useContext,
-  useMemo,
-} from 'react'
+import { createContext, type ReactNode, useCallback, useContext, useMemo } from 'react'
 import type { UserProfile } from '@/types/db'
-import {
-  getUserProfileOptions,
-  updateUserMutation,
-} from '@/utils/fetching/user'
+import { getUserProfileOptions, updateUserMutation } from '@/utils/fetching/user'
 
 export type UseUpdateReturn = (action: UIStateAction) => void
 export type UIStateAction =
@@ -68,9 +59,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       } else if (action.type === 'pinnedTagRemove') {
         column = 'settings_pinned_tags'
         value = profileData?.settings_pinned_tags?.length
-          ? profileData?.settings_pinned_tags.filter(
-              (item) => item !== action.payload,
-            )
+          ? profileData?.settings_pinned_tags.filter((item) => item !== action.payload)
           : []
       }
 

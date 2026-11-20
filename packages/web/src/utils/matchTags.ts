@@ -1,6 +1,5 @@
 import matchWords from 'match-words'
 import memoizeOne from 'memoize-one'
-
 import type { MetadataResponse } from '../types/api'
 import type { MetaTag } from './fetching/meta'
 
@@ -53,9 +52,7 @@ export const matchTagNames = (text: string, tagNames: string[]) => {
 }
 
 export const matchTagsSource = (data: MatchTagsProps, tags?: MetaTag[]) => {
-  const text = [data?.title, data?.description, data?.note]
-    .filter(Boolean)
-    .join(' ')
+  const text = [data?.title, data?.description, data?.note].filter(Boolean).join(' ')
   const tagNames = tags?.map((item) => item.tag).filter(Boolean) as string[]
 
   if (!text || !tagNames?.length) {

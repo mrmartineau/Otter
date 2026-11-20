@@ -1,10 +1,7 @@
 import type { HonoRequest } from 'hono'
 import { assertSafePublicUrl } from '../url-guard'
 import { xtract } from '../xtractr/index'
-import {
-  generateErrorJSONResponse,
-  generateJSONResponse,
-} from './json-response'
+import { generateErrorJSONResponse, generateJSONResponse } from './json-response'
 
 export const handleScrapeContent = async (request: HonoRequest) => {
   const searchParams = new URL(request.url).searchParams
@@ -12,9 +9,7 @@ export const handleScrapeContent = async (request: HonoRequest) => {
 
   if (!url) {
     return generateErrorJSONResponse(
-      new Error(
-        'Please provide a `url` query parameter, e.g. ?url=https://example.com',
-      ),
+      new Error('Please provide a `url` query parameter, e.g. ?url=https://example.com'),
     )
   }
 

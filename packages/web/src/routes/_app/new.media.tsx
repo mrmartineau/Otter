@@ -16,9 +16,7 @@ export const Route = createFileRoute('/_app/new/media')({
     ],
   }),
   loader: async (opts) => {
-    const media = await opts.context.queryClient.ensureQueryData(
-      getMediaOptions(),
-    )
+    const media = await opts.context.queryClient.ensureQueryData(getMediaOptions())
     return media
   },
 })

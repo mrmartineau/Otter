@@ -40,13 +40,7 @@ const countBookmarks = async (
   const [{ value }] = await auth.requestContext.db
     .select({ value: count() })
     .from(bookmarks)
-    .where(
-      and(
-        eq(bookmarks.user, auth.userId),
-        eq(bookmarks.status, 'active'),
-        extraCondition,
-      ),
-    )
+    .where(and(eq(bookmarks.user, auth.userId), eq(bookmarks.status, 'active'), extraCondition))
 
   return value ?? 0
 }
@@ -82,12 +76,7 @@ export const getMeta = async (context: HonoContext) => {
         const [{ value }] = await db
           .select({ value: count() })
           .from(bookmarks)
-          .where(
-            and(
-              eq(bookmarks.user, auth.userId),
-              eq(bookmarks.status, 'inactive'),
-            ),
-          )
+          .where(and(eq(bookmarks.user, auth.userId), eq(bookmarks.status, 'inactive')))
         return value ?? 0
       })(),
       getTagCounts(db, auth.userId, { includeUntagged: true }),
@@ -97,36 +86,28 @@ export const getMeta = async (context: HonoContext) => {
         const [{ value }] = await db
           .select({ value: count() })
           .from(toots)
-          .where(
-            and(eq(toots.dbUserId, auth.userId), eq(toots.likedToot, false)),
-          )
+          .where(and(eq(toots.dbUserId, auth.userId), eq(toots.likedToot, false)))
         return value ?? 0
       })(),
       (async () => {
         const [{ value }] = await db
           .select({ value: count() })
           .from(toots)
-          .where(
-            and(eq(toots.dbUserId, auth.userId), eq(toots.likedToot, true)),
-          )
+          .where(and(eq(toots.dbUserId, auth.userId), eq(toots.likedToot, true)))
         return value ?? 0
       })(),
       (async () => {
         const [{ value }] = await db
           .select({ value: count() })
           .from(tweets)
-          .where(
-            and(eq(tweets.dbUserId, auth.userId), eq(tweets.likedTweet, false)),
-          )
+          .where(and(eq(tweets.dbUserId, auth.userId), eq(tweets.likedTweet, false)))
         return value ?? 0
       })(),
       (async () => {
         const [{ value }] = await db
           .select({ value: count() })
           .from(tweets)
-          .where(
-            and(eq(tweets.dbUserId, auth.userId), eq(tweets.likedTweet, true)),
-          )
+          .where(and(eq(tweets.dbUserId, auth.userId), eq(tweets.likedTweet, true)))
         return value ?? 0
       })(),
     ])
@@ -199,9 +180,7 @@ export const deleteTag = async (context: HonoContext) => {
   try {
     // Removing a tag edits bookmarks, so this needs the write scope rather
     // than the profile:read the read-only meta routes share.
-    const requestContext = await requireRequestContext(context, [
-      'bookmarks:write',
-    ])
+    const requestContext = await requireRequestContext(context, ['bookmarks:write'])
 
     if (requestContext instanceof Response) {
       return requestContext
@@ -327,13 +306,10 @@ export const getCollectionsTags = async (context: HonoContext) => {
       return auth
     }
 
-    return new Response(
-      JSON.stringify(await getCollections(auth.requestContext.db, auth.userId)),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify(await getCollections(auth.requestContext.db, auth.userId)), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse({
       error: getErrorMessage(error),
@@ -359,9 +335,7 @@ export const getCollectionBookmarks = async (context: HonoContext) => {
       })
     }
 
-    const searchParams = Object.fromEntries(
-      new URL(context.req.url).searchParams,
-    )
+    const searchParams = Object.fromEntries(new URL(context.req.url).searchParams)
     const params = apiParameters(searchParams)
     const limit = params.limit ?? DEFAULT_API_RESPONSE_LIMIT
     const offset = params.offset ?? 0
@@ -378,16 +352,10 @@ export const getCollectionBookmarks = async (context: HonoContext) => {
       star === undefined ? undefined : eq(bookmarks.star, star),
       publicItems === undefined ? undefined : eq(bookmarks.public, publicItems),
       dateWindow
-        ? gte(
-            bookmarks.createdAt,
-            sql`now() - ${dateWindow * 7} * interval '1 day'`,
-          )
+        ? gte(bookmarks.createdAt, sql`now() - ${dateWindow * 7} * interval '1 day'`)
         : undefined,
       dateWindow && dateWindow > 1
-        ? lt(
-            bookmarks.createdAt,
-            sql`now() - ${(dateWindow - 1) * 7} * interval '1 day'`,
-          )
+        ? lt(bookmarks.createdAt, sql`now() - ${(dateWindow - 1) * 7} * interval '1 day'`)
         : undefined,
     )
     const [[{ value: total }], rows] = await Promise.all([

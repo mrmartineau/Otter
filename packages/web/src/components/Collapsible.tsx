@@ -5,20 +5,14 @@ import { CaretUpDownIcon } from '@phosphor-icons/react'
 import { Collapsible as CollapsiblePrimitive } from 'radix-ui'
 import { type ComponentProps, useCallback } from 'react'
 import { Button } from '@/components/Button'
-
 import { Flex } from './Flex'
 import { useUser } from './UserProvider'
 
-interface CollapsibleProps1
-  extends ComponentProps<typeof CollapsiblePrimitive.Root> {
+interface CollapsibleProps1 extends ComponentProps<typeof CollapsiblePrimitive.Root> {
   stateKey: 'tags' | 'types' | 'collections'
 }
 
-export const Collapsible = ({
-  children,
-  stateKey,
-  ...props
-}: CollapsibleProps1) => {
+export const Collapsible = ({ children, stateKey, ...props }: CollapsibleProps1) => {
   const { profile, handleUpdateUISettings } = useUser()
   const [playSwitchOn] = useSound(switchOnSfx, { volume: 0.3 })
   const [playSwitchOff] = useSound(switchOffSfx, { volume: 0.3 })
@@ -46,9 +40,7 @@ export const Collapsible = ({
 
 Collapsible.displayName = 'Collapsible'
 
-export const CollapsibleContent = (
-  props: ComponentProps<typeof CollapsiblePrimitive.Content>,
-) => (
+export const CollapsibleContent = (props: ComponentProps<typeof CollapsiblePrimitive.Content>) => (
   <CollapsiblePrimitive.Content {...props} className="overflow-hidden pt-3xs" />
 )
 

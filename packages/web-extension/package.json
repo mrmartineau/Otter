@@ -1,9 +1,21 @@
 {
+  "name": "@mrmartineau/otter-web-extension",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Universal browser extension for Otter bookmarks",
+  "scripts": {
+    "build": "node config/build.js",
+    "build:chrome": "TARGET=chrome webpack --mode=production --config config/webpack.config.js",
+    "build:firefox": "TARGET=firefox webpack --mode=production --config config/webpack.config.js",
+    "dev:chrome": "TARGET=chrome webpack --mode=development --watch --config config/webpack.config.js",
+    "dev:firefox": "TARGET=firefox webpack --mode=development --watch --config config/webpack.config.js",
+    "format": "prettier --write --ignore-unknown \"{config,public,src}/**/*.{html,css,js,ts,json}\"",
+    "test": "node config/build.js && node test/context-menus.check.mjs"
+  },
   "dependencies": {
     "proper-url-join": "^2.1.1",
     "webextension-polyfill": "^0.10.0"
   },
-  "description": "Universal browser extension for Otter bookmarks",
   "devDependencies": {
     "@types/chrome": "^0.0.193",
     "copy-webpack-plugin": "^10.2.4",
@@ -14,17 +26,5 @@
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0",
     "webpack-merge": "^5.8.0"
-  },
-  "name": "@mrmartineau/otter-web-extension",
-  "private": true,
-  "scripts": {
-    "build": "node config/build.js",
-    "build:chrome": "TARGET=chrome webpack --mode=production --config config/webpack.config.js",
-    "build:firefox": "TARGET=firefox webpack --mode=production --config config/webpack.config.js",
-    "dev:chrome": "TARGET=chrome webpack --mode=development --watch --config config/webpack.config.js",
-    "dev:firefox": "TARGET=firefox webpack --mode=development --watch --config config/webpack.config.js",
-    "format": "prettier --write --ignore-unknown \"{config,public,src}/**/*.{html,css,js,ts,json}\"",
-    "test": "node config/build.js && node test/context-menus.check.mjs"
-  },
-  "version": "0.3.0"
+  }
 }

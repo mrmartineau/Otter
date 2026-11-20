@@ -28,8 +28,7 @@ export function ensurePolyfills() {
     }
   }
   if (!g.getComputedStyle) {
-    mutableGlobal.getComputedStyle = () =>
-      ({ display: '' }) as CSSStyleDeclaration
+    mutableGlobal.getComputedStyle = () => ({ display: '' }) as CSSStyleDeclaration
   }
 }
 

@@ -2,11 +2,7 @@ import title from 'title'
 import { CONTENT } from '../constants'
 import type { BookmarkType } from '../types/db'
 import type { MetaType } from '../utils/fetching/meta'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from './Collapsible'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './Collapsible'
 import { Flex } from './Flex'
 import { SidebarLink } from './SidebarLink'
 import { TypeToIcon } from './TypeToIcon'

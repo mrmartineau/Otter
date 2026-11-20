@@ -1,5 +1,4 @@
 import urlJoin from 'proper-url-join'
-
 import type { RequestOrder } from './types/api'
 
 export const REPO_URL = 'https://github.com/mrmartineau/Otter'
@@ -70,9 +69,7 @@ export const CONTENT = {
 } as const
 
 export const createTitle = (pageName?: keyof typeof CONTENT | string) => {
-  const theTitle = pageName
-    ? CONTENT[pageName as keyof typeof CONTENT] || pageName
-    : ''
+  const theTitle = pageName ? CONTENT[pageName as keyof typeof CONTENT] || pageName : ''
   return `${theTitle ? `${theTitle}${TITLE_SEPARATOR}` : ''}${CONTENT.appName}`
 }
 

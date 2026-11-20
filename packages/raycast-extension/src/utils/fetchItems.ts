@@ -7,13 +7,8 @@ type ListResponse<T> = {
   error?: string | null
 }
 
-export const useFetchSearchItems = async (
-  searchTerm: string = '',
-  tag?: string,
-) => {
-  return await apiFetch<ListResponse<Bookmark>>(
-    `/api/search${queryString({ q: searchTerm, tag })}`,
-  )
+export const useFetchSearchItems = async (searchTerm: string = '', tag?: string) => {
+  return await apiFetch<ListResponse<Bookmark>>(`/api/search${queryString({ q: searchTerm, tag })}`)
 }
 
 export const useFetchRecentItems = async (tag?: string, limit: number = 60) => {

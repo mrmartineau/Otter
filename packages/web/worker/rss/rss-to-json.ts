@@ -27,9 +27,7 @@ const options = {
 }
 const parser = new XMLParser(options)
 
-export const feedToJson = async (
-  feedUrl: string,
-): Promise<Feed | undefined> => {
+export const feedToJson = async (feedUrl: string): Promise<Feed | undefined> => {
   const req = await safeFetch(feedUrl)
   const xmlData = await req.text()
   const data = parser.parse(xmlData)
@@ -90,28 +88,26 @@ function reformatData(d: any): Feed {
       }
     }
 
-    result.entries = d.entry?.map(
-      ({ title, link, updated, content, ...rest }: any) => {
-        if (link) {
-          link = fixLink(link)
-        }
+    result.entries = d.entry?.map(({ title, link, updated, content, ...rest }: any) => {
+      if (link) {
+        link = fixLink(link)
+      }
 
-        if (content) {
-          const newContent: any = {}
-          newContent.text = content['#text']
-          newContent.type = content['@_type']
-          content = newContent
-        }
+      if (content) {
+        const newContent: any = {}
+        newContent.text = content['#text']
+        newContent.type = content['@_type']
+        content = newContent
+      }
 
-        return {
-          content: content.text,
-          link: link.href,
-          published: updated,
-          title: title,
-          ...rest,
-        }
-      },
-    )
+      return {
+        content: content.text,
+        link: link.href,
+        published: updated,
+        title: title,
+        ...rest,
+      }
+    })
   }
 
   return result

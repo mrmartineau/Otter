@@ -31,17 +31,14 @@ const getBestQualityVideoVariant = (variants?: TweetMediaVariant[]) => {
 }
 
 export const TweetFeedItem = (props: Tweet) => {
-  const { text, user_avatar, user_id, user_name, urls, tweet_url, media } =
-    props
+  const { text, user_avatar, user_id, user_name, urls, tweet_url, media } = props
   const tweetUrls = urls as TweetUrls
   const tweetMedia = media as any[]
 
   return (
     <div className="card feed-item">
       <div className="flex items-center gap-xs">
-        {user_avatar ? (
-          <img src={user_avatar} alt="" className="feed-avatar" />
-        ) : null}
+        {user_avatar ? <img src={user_avatar} alt="" className="feed-avatar" /> : null}
         <Flex direction="column">
           <div className="text-step--1">{user_name}</div>
           <div className="text-step--2">@{user_id}</div>
@@ -52,11 +49,7 @@ export const TweetFeedItem = (props: Tweet) => {
 
       {tweet_url ? (
         <div>
-          <Link
-            rel="external"
-            href={tweet_url}
-            className="flex items-center gap-2xs text-step--1"
-          >
+          <Link rel="external" href={tweet_url} className="flex items-center gap-2xs text-step--1">
             <LinkSimpleHorizontalIcon weight="duotone" size="14" /> Tweet
           </Link>
         </div>
@@ -64,9 +57,7 @@ export const TweetFeedItem = (props: Tweet) => {
 
       {tweetUrls?.length ? (
         <div>
-          <h3 className={cn(headingVariants({ variant: 'date' }), 'mt-0!')}>
-            URLs
-          </h3>
+          <h3 className={cn(headingVariants({ variant: 'date' }), 'mt-0!')}>URLs</h3>
           <ul className="flex flex-col gap-2xs">
             {tweetUrls.map((item) => {
               return (
@@ -86,9 +77,7 @@ export const TweetFeedItem = (props: Tweet) => {
                   </Link>
                   <Favicon url={item.expanded_url} />
                   <div className="truncate">
-                    <Link href={item.expanded_url}>
-                      {simpleUrl(item.expanded_url)}
-                    </Link>
+                    <Link href={item.expanded_url}>{simpleUrl(item.expanded_url)}</Link>
                   </div>
                 </li>
               )
@@ -99,31 +88,22 @@ export const TweetFeedItem = (props: Tweet) => {
 
       {tweetMedia?.length ? (
         <div>
-          <h3 className={cn(headingVariants({ variant: 'date' }), 'mt-0!')}>
-            Media
-          </h3>
+          <h3 className={cn(headingVariants({ variant: 'date' }), 'mt-0!')}>Media</h3>
           <div className="toot-media-grid">
             {tweetMedia.map((item) => {
-              const isVideoType =
-                item.type === 'animated_gif' || item.type === 'video'
+              const isVideoType = item.type === 'animated_gif' || item.type === 'video'
               const isPhotoType = item.type === 'photo'
               return (
                 <div key={item.id}>
                   {isVideoType ? (
-                    // biome-ignore lint/a11y/useMediaCaption: No captions for tweets
+                    // No captions for tweets
                     <video
-                      src={getBestQualityVideoVariant(
-                        item.video_info?.variants,
-                      )}
+                      src={getBestQualityVideoVariant(item.video_info?.variants)}
                       controls
                       className="max-w-full"
                     />
                   ) : isPhotoType ? (
-                    <img
-                      src={item.url}
-                      alt={item?.description}
-                      className="max-w-full rounded-md"
-                    />
+                    <img src={item.url} alt={item?.description} className="max-w-full rounded-md" />
                   ) : null}
                 </div>
               )

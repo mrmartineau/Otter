@@ -35,10 +35,7 @@ const parseJsonResponse = async <T>(response: Response): Promise<T> => {
   return body as T
 }
 
-export const getCollections = async ({
-  params,
-  name,
-}: CollectionsFetchingOptions) => {
+export const getCollections = async ({ params, name }: CollectionsFetchingOptions) => {
   const parsed = apiParameters(params)
   const response = await fetch(
     `/api/collections/${encodeURIComponent(name)}${queryString(parsed)}`,
@@ -53,25 +50,15 @@ export const getCollections = async ({
   return body
 }
 
-export const getCollectionsOptions = ({
-  name,
-  params,
-}: CollectionsFetchingOptions) => {
+export const getCollectionsOptions = ({ name, params }: CollectionsFetchingOptions) => {
   return queryOptions({
     queryFn: () => getCollections({ name, params }),
     queryKey: ['collections', name, params],
   })
 }
 
-export const getCollectionsInfiniteOptions = ({
-  name,
-  params,
-}: CollectionsFetchingOptions) => {
-  const {
-    limit = DEFAULT_API_RESPONSE_LIMIT,
-    offset: _offset,
-    ...rest
-  } = apiParameters(params)
+export const getCollectionsInfiniteOptions = ({ name, params }: CollectionsFetchingOptions) => {
+  const { limit = DEFAULT_API_RESPONSE_LIMIT, offset: _offset, ...rest } = apiParameters(params)
   return infiniteQueryOptions({
     getNextPageParam: (
       lastPage: Awaited<ReturnType<typeof getCollections>>,

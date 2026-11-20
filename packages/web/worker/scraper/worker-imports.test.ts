@@ -33,8 +33,7 @@ describe('worker imports', () => {
       .filter((path) => !path.endsWith('.test.ts'))
       .flatMap((path) => {
         const source = readFileSync(path, 'utf8')
-        const lines =
-          source.match(/^import(?! type).*utils\/fetching\/.*$/gm) ?? []
+        const lines = source.match(/^import(?! type).*utils\/fetching\/.*$/gm) ?? []
 
         return lines
           .map((line) => line.match(/utils\/fetching\/([\w-]+)/)?.[1])

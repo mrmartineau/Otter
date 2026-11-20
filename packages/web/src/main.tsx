@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Router } from './router'
 
-// biome-ignore lint/style/noNonNullAssertion: we can be sure that the root element exists
+// we can be sure that the root element exists
 const rootElement = document.getElementById('root')!
 
 if (rootElement) {

@@ -40,9 +40,7 @@ const parseJsonResponse = async <T>(response: Response): Promise<T> => {
   return body as T
 }
 
-export const getBookmarks = async (
-  params: Partial<ApiParametersQuery> = {},
-) => {
+export const getBookmarks = async (params: Partial<ApiParametersQuery> = {}) => {
   const parsed = apiParameters(params)
   const response = await fetch(`/api/bookmarks${queryString(parsed)}`, {
     credentials: 'include',
@@ -67,14 +65,8 @@ export const getBookmarksOptions = (params: Partial<ApiParametersQuery>) => {
   })
 }
 
-export const getBookmarksInfiniteOptions = (
-  params: Partial<ApiParametersQuery>,
-) => {
-  const {
-    limit = DEFAULT_API_RESPONSE_LIMIT,
-    offset: _offset,
-    ...rest
-  } = apiParameters(params)
+export const getBookmarksInfiniteOptions = (params: Partial<ApiParametersQuery>) => {
+  const { limit = DEFAULT_API_RESPONSE_LIMIT, offset: _offset, ...rest } = apiParameters(params)
   return infiniteQueryOptions({
     getNextPageParam: (
       lastPage: Awaited<ReturnType<typeof getBookmarks>>,
@@ -86,8 +78,7 @@ export const getBookmarksInfiniteOptions = (
       return nextOffset < total ? nextOffset : undefined
     },
     initialPageParam: 0,
-    queryFn: ({ pageParam = 0 }) =>
-      getBookmarks({ ...rest, limit, offset: pageParam }),
+    queryFn: ({ pageParam = 0 }) => getBookmarks({ ...rest, limit, offset: pageParam }),
     queryKey: ['bookmarks', 'infinite', rest, limit],
     staleTime: 5 * 1000,
   })
@@ -138,10 +129,7 @@ export const updateBookmark = async (
   return await parseJsonResponse<SingleResponse<Bookmark>>(response)
 }
 
-export const deleteBookmark = async (
-  id: string,
-  options?: { permanent?: boolean },
-) => {
+export const deleteBookmark = async (id: string, options?: { permanent?: boolean }) => {
   const response = await fetch(
     `/api/bookmarks/${id}${options?.permanent ? '?permanent=true' : ''}`,
     {
@@ -182,10 +170,9 @@ export const importBookmarksFile = async (file: File) => {
 }
 
 export const checkBookmarkUrl = async (urlInput: string) => {
-  const response = await fetch(
-    `/api/check-url${queryString({ url_input: urlInput })}`,
-    { credentials: 'include' },
-  )
+  const response = await fetch(`/api/check-url${queryString({ url_input: urlInput })}`, {
+    credentials: 'include',
+  })
 
   return await parseJsonResponse<SingleResponse<Bookmark[]>>(response)
 }

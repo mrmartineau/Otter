@@ -75,8 +75,7 @@ const flexVariants = cva('', {
 })
 
 export interface FlexProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof flexVariants> {}
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof flexVariants> {}
 
 const Flex = ({
   className,

@@ -58,15 +58,12 @@ const decodeCodePoint = (codePoint: number, fallback: string) => {
 }
 
 export const decodeEntities = (value: string) =>
-  value.replace(
-    /&(?:#x([0-9a-f]+)|#(\d+)|([a-z]+));/gi,
-    (match, hex, dec, named) => {
-      if (hex) return decodeCodePoint(Number.parseInt(hex, 16), match)
-      if (dec) return decodeCodePoint(Number.parseInt(dec, 10), match)
-      const entity = NAMED_ENTITIES[(named as string).toLowerCase()]
-      return entity ?? match
-    },
-  )
+  value.replace(/&(?:#x([0-9a-f]+)|#(\d+)|([a-z]+));/gi, (match, hex, dec, named) => {
+    if (hex) return decodeCodePoint(Number.parseInt(hex, 16), match)
+    if (dec) return decodeCodePoint(Number.parseInt(dec, 10), match)
+    const entity = NAMED_ENTITIES[(named as string).toLowerCase()]
+    return entity ?? match
+  })
 
 export const escapeHtml = (value: string) =>
   value
@@ -110,9 +107,7 @@ const SKIPPED_PROTOCOLS = /^(?:javascript|place|data|about|chrome|file):/i
 const TOKEN_PATTERN =
   /<DT[^>]*>\s*<H3([^>]*)>([\s\S]*?)<\/H3>|<DT[^>]*>\s*<A([^>]*)>([\s\S]*?)<\/A>|<DL[^>]*>|<\/DL>|<DD[^>]*>([\s\S]*?)(?=<DT|<DL|<\/DL|<DD|<HR|$)/gi
 
-export const parseNetscapeBookmarks = (
-  html: string,
-): ParsedNetscapeBookmark[] => {
+export const parseNetscapeBookmarks = (html: string): ParsedNetscapeBookmark[] => {
   const items: ParsedNetscapeBookmark[] = []
   const seenUrls = new Set<string>()
   const folderStack: string[] = []
@@ -194,9 +189,7 @@ export const parseNetscapeBookmarks = (
 
 const toUnixSeconds = (date: Date) => Math.floor(date.getTime() / 1000)
 
-export const serializeNetscapeBookmarks = (
-  items: ExportableBookmark[],
-): string => {
+export const serializeNetscapeBookmarks = (items: ExportableBookmark[]): string => {
   const lines = [
     '<!DOCTYPE NETSCAPE-Bookmark-file-1>',
     '<!-- This is an automatically generated file.',
@@ -220,9 +213,7 @@ export const serializeNetscapeBookmarks = (
       attributes.push(`TAGS="${escapeHtml(item.tags.join(','))}"`)
     }
 
-    lines.push(
-      `    <DT><A ${attributes.join(' ')}>${escapeHtml(item.title || item.url)}</A>`,
-    )
+    lines.push(`    <DT><A ${attributes.join(' ')}>${escapeHtml(item.title || item.url)}</A>`)
 
     if (item.description) {
       lines.push(`    <DD>${escapeHtml(item.description)}`)

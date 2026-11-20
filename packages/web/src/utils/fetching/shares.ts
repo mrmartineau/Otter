@@ -113,9 +113,7 @@ const fetchPublicShare = async ({
     limit: String(limit),
     offset: String(offset),
   })
-  const response = await fetch(
-    `/api/share/${encodeURIComponent(token)}?${params.toString()}`,
-  )
+  const response = await fetch(`/api/share/${encodeURIComponent(token)}?${params.toString()}`)
   return parseJsonResponse<PublicShareResponse>(response)
 }
 
@@ -134,8 +132,7 @@ export const getPublicShareInfiniteOptions = (token: string) => {
       return nextOffset < total ? nextOffset : undefined
     },
     initialPageParam: 0,
-    queryFn: ({ pageParam = 0 }) =>
-      fetchPublicShare({ limit, offset: pageParam, token }),
+    queryFn: ({ pageParam = 0 }) => fetchPublicShare({ limit, offset: pageParam, token }),
     queryKey: ['public-share', token],
   })
 }

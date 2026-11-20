@@ -13,24 +13,21 @@ export type MediaSearchItem = {
 
 const getTvSearch = async (query: string): Promise<MediaSearchItem[]> => {
   try {
-    const response = await fetch(
-      `https://api.tvmaze.com/search/shows?q=${query}`,
-    )
-    const data =
-      await response.json<
-        {
-          show: {
-            id: string
-            image: { medium: string }
-            name: string
-            externals: {
-              tvrage: string
-              thetvdb: string
-              imdb: string
-            }
+    const response = await fetch(`https://api.tvmaze.com/search/shows?q=${query}`)
+    const data = await response.json<
+      {
+        show: {
+          id: string
+          image: { medium: string }
+          name: string
+          externals: {
+            tvrage: string
+            thetvdb: string
+            imdb: string
           }
-        }[]
-      >()
+        }
+      }[]
+    >()
     return data?.map((item) => {
       return {
         id: item.show.externals.thetvdb,
@@ -61,9 +58,7 @@ const getBookSearch = async (query: string): Promise<MediaSearchItem[]> => {
     return data?.docs?.map((item) => {
       const image = item?.cover_i
         ? `https://covers.openlibrary.org/b/id/${item?.cover_i}-M.jpg`
-        : `https://placehold.co/600x600?font=Poppins&text=${encodeURI(
-            item.title,
-          )}`
+        : `https://placehold.co/600x600?font=Poppins&text=${encodeURI(item.title)}`
       return {
         id: item?.cover_i,
         image,
@@ -135,9 +130,7 @@ const getPodcastSearch = async (query: string): Promise<MediaSearchItem[]> => {
   }
 }
 
-export const getMediaSearch = async (
-  request: HonoRequest<'/api/media-search'>,
-) => {
+export const getMediaSearch = async (request: HonoRequest<'/api/media-search'>) => {
   const searchParams = new URL(request.url).searchParams
   const type = searchParams.get('type')
   const query = searchParams.get('query')

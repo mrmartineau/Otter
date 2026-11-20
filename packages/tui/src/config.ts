@@ -8,11 +8,7 @@ export interface OtterConfig {
 }
 
 export const configPath = () =>
-  join(
-    process.env.XDG_CONFIG_HOME || join(homedir(), '.config'),
-    'otter',
-    'config.json',
-  )
+  join(process.env.XDG_CONFIG_HOME || join(homedir(), '.config'), 'otter', 'config.json')
 
 const normaliseBaseUrl = (baseUrl: string) => baseUrl.trim().replace(/\/+$/, '')
 

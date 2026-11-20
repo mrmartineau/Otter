@@ -117,11 +117,7 @@ assert.equal(second.menus.size, 3, 'a racing rebuild should leave three menus')
 assert.deepEqual(second.unchecked, [], 'no unchecked error during a race')
 assert.deepEqual(
   [...second.menus.keys()].sort(),
-  [
-    'otter-context-quick-save',
-    'otter-context-read-later',
-    'otter-context-save',
-  ],
+  ['otter-context-quick-save', 'otter-context-read-later', 'otter-context-save'],
   'all three actions are present',
 )
 

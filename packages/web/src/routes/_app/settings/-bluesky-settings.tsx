@@ -24,9 +24,7 @@ interface BlueskySettingsProps {
 }
 
 export const BlueskySettings = ({ userId }: BlueskySettingsProps) => {
-  const { data: integration, isLoading } = useQuery(
-    getIntegrationOptions(userId),
-  )
+  const { data: integration, isLoading } = useQuery(getIntegrationOptions(userId))
   const upsertMutation = useUpsertBlueskyMutation()
   const toggleMutation = useToggleBlueskyMutation()
   const [showPassword, setShowPassword] = useState(false)
@@ -70,8 +68,7 @@ export const BlueskySettings = ({ userId }: BlueskySettingsProps) => {
   return (
     <div className="flex flex-col gap-s">
       <Text>
-        Automatically post to Bluesky when a bookmark is made public. Requires
-        an{' '}
+        Automatically post to Bluesky when a bookmark is made public. Requires an{' '}
         <Link href="https://bsky.app/settings/app-passwords" variant="accent">
           App Password
         </Link>
@@ -84,11 +81,7 @@ export const BlueskySettings = ({ userId }: BlueskySettingsProps) => {
         </div>
       ) : null}
 
-      <form
-        onSubmit={handleSubmit(handleSave)}
-        noValidate
-        className="flex flex-col gap-s"
-      >
+      <form onSubmit={handleSubmit(handleSave)} noValidate className="flex flex-col gap-s">
         <FormGroup
           label="Bluesky handle"
           name="handle"
@@ -117,12 +110,7 @@ export const BlueskySettings = ({ userId }: BlueskySettingsProps) => {
         >
           {isConfigured && !showPassword ? (
             <div className="flex items-center gap-s">
-              <Input
-                id="appPassword"
-                type="password"
-                value="••••••••••••"
-                disabled
-              />
+              <Input id="appPassword" type="password" value="••••••••••••" disabled />
               <Button
                 type="button"
                 variant="outline"
@@ -145,24 +133,11 @@ export const BlueskySettings = ({ userId }: BlueskySettingsProps) => {
           )}
         </FormGroup>
 
-        <FormGroup
-          label="Post prefix"
-          name="postPrefix"
-          note="Text added before each post"
-        >
-          <Input
-            id="postPrefix"
-            type="text"
-            placeholder="e.g. 🔖"
-            {...register('postPrefix')}
-          />
+        <FormGroup label="Post prefix" name="postPrefix" note="Text added before each post">
+          <Input id="postPrefix" type="text" placeholder="e.g. 🔖" {...register('postPrefix')} />
         </FormGroup>
 
-        <FormGroup
-          label="Post suffix"
-          name="postSuffix"
-          note="Text added after each post"
-        >
+        <FormGroup label="Post suffix" name="postSuffix" note="Text added after each post">
           <Input
             id="postSuffix"
             type="text"

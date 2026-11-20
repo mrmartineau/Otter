@@ -1,10 +1,4 @@
-import {
-  Action,
-  ActionPanel,
-  getPreferenceValues,
-  Icon,
-  List,
-} from '@raycast/api'
+import { Action, ActionPanel, getPreferenceValues, Icon, List } from '@raycast/api'
 import urlJoin from 'proper-url-join'
 import { useState } from 'react'
 import { Authenticated } from './components/Authenticated'
@@ -22,8 +16,7 @@ const prefs = getPreferenceValues()
 const SearchBookmarks = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTag, setActiveTag] = useState<string>(DEFAULT_TAG)
-  const { data: recentBookmarks, isLoading: recentIsLoading } =
-    useRecents(activeTag)
+  const { data: recentBookmarks, isLoading: recentIsLoading } = useRecents(activeTag)
   const { data: searchResults, isLoading } = useSearch(searchTerm, activeTag)
   const { data: metadata } = useMeta()
   const bookmarksLoading = recentIsLoading || isLoading
@@ -41,9 +34,7 @@ const SearchBookmarks = () => {
       onSearchTextChange={setSearchTerm}
       throttle
       isShowingDetail={prefs.showDetailView}
-      searchBarAccessory={
-        <TagDropdown tags={metadata?.tags} onChange={setActiveTag} />
-      }
+      searchBarAccessory={<TagDropdown tags={metadata?.tags} onChange={setActiveTag} />}
     >
       {searchTerm ? (
         <>

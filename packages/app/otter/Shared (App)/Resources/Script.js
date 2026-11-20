@@ -8,9 +8,8 @@ function show(platform, enabled, useSettingsInsteadOfPreferences) {
       'otter’s extension is currently off. You can turn it on in the Extensions section of Safari Settings.'
     document.getElementsByClassName('platform-mac state-unknown')[0].innerText =
       'You can turn on otter’s extension in the Extensions section of Safari Settings.'
-    document.getElementsByClassName(
-      'platform-mac open-preferences',
-    )[0].innerText = 'Quit and Open Safari Settings…'
+    document.getElementsByClassName('platform-mac open-preferences')[0].innerText =
+      'Quit and Open Safari Settings…'
   }
 
   if (typeof enabled === 'boolean') {
@@ -26,6 +25,4 @@ function openPreferences() {
   webkit.messageHandlers.controller.postMessage('open-preferences')
 }
 
-document
-  .querySelector('button.open-preferences')
-  .addEventListener('click', openPreferences)
+document.querySelector('button.open-preferences').addEventListener('click', openPreferences)

@@ -1,13 +1,4 @@
-import {
-  and,
-  arrayContains,
-  count,
-  desc,
-  eq,
-  ilike,
-  or,
-  sql,
-} from 'drizzle-orm'
+import { and, arrayContains, count, desc, eq, ilike, or, sql } from 'drizzle-orm'
 import type { Context } from 'hono'
 import type { BookmarkStatus, BookmarkType } from '@/types/db'
 import { bookmarks } from '../../db/schema'
@@ -19,12 +10,7 @@ import {
 import { bookmarkToRow } from '../bookmarks/mapper'
 import { scrapedBookmark } from '../bookmarks/new'
 import type { RequestContext } from '../context'
-import {
-  type CallToolResult,
-  type McpToolDefinition,
-  toolError,
-  toolResult,
-} from './types'
+import { type CallToolResult, type McpToolDefinition, toolError, toolResult } from './types'
 
 type Bookmark = ReturnType<typeof bookmarkToRow>
 
@@ -60,10 +46,7 @@ export interface ToolContext {
   userId: string
 }
 
-type ToolHandler = (
-  args: Record<string, unknown>,
-  ctx: ToolContext,
-) => Promise<CallToolResult>
+type ToolHandler = (args: Record<string, unknown>, ctx: ToolContext) => Promise<CallToolResult>
 
 interface McpTool {
   definition: McpToolDefinition
@@ -88,10 +71,7 @@ function formatBookmark(b: Bookmark, index?: number): string {
   return lines.join('\n')
 }
 
-function formatBookmarkList(
-  bookmarks: Bookmark[],
-  total: number | null,
-): string {
+function formatBookmarkList(bookmarks: Bookmark[], total: number | null): string {
   if (!bookmarks.length) return 'No bookmarks found.'
   const countLabel = total ?? bookmarks.length
   const header = `Found ${countLabel} bookmark${countLabel !== 1 ? 's' : ''}:\n`
@@ -103,19 +83,13 @@ function clampLimit(val: unknown): number {
   return Math.min(Math.max(1, n), MAX_LIMIT)
 }
 
-const bookmarkFilters = (
-  userId: string,
-  args: Record<string, unknown>,
-  searchTerm?: string,
-) =>
+const bookmarkFilters = (userId: string, args: Record<string, unknown>, searchTerm?: string) =>
   and(
     eq(bookmarks.user, userId),
     eq(bookmarks.status, (args.status as BookmarkStatus) || 'active'),
     args.type ? eq(bookmarks.type, args.type as BookmarkType) : undefined,
     typeof args.star === 'boolean' ? eq(bookmarks.star, args.star) : undefined,
-    typeof args.public === 'boolean'
-      ? eq(bookmarks.public, args.public)
-      : undefined,
+    typeof args.public === 'boolean' ? eq(bookmarks.public, args.public) : undefined,
     args.tag ? arrayContains(bookmarks.tags, [args.tag as string]) : undefined,
     searchTerm
       ? or(
@@ -173,8 +147,7 @@ const getTypeCounts = async (ctx: ToolContext) => {
 
 const searchBookmarks: McpTool = {
   definition: {
-    description:
-      'Search bookmarks by text across title, URL, description, note, and tags.',
+    description: 'Search bookmarks by text across title, URL, description, note, and tags.',
     inputSchema: {
       properties: {
         limit: {
@@ -198,16 +171,10 @@ const searchBookmarks: McpTool = {
   },
   handler: async (args, ctx) => {
     try {
-      const { data, total } = await listBookmarkRows(
-        ctx,
-        args,
-        args.query as string,
-      )
+      const { data, total } = await listBookmarkRows(ctx, args, args.query as string)
       return toolResult(formatBookmarkList(data, total))
     } catch (err) {
-      return toolError(
-        `Search failed: ${err instanceof Error ? err.message : String(err)}`,
-      )
+      return toolError(`Search failed: ${err instanceof Error ? err.message : String(err)}`)
     }
   },
 }
@@ -249,9 +216,7 @@ const listBookmarks: McpTool = {
       const { data, total } = await listBookmarkRows(ctx, args)
       return toolResult(formatBookmarkList(data, total))
     } catch (err) {
-      return toolError(
-        `List failed: ${err instanceof Error ? err.message : String(err)}`,
-      )
+      return toolError(`List failed: ${err instanceof Error ? err.message : String(err)}`)
     }
   },
 }
@@ -279,21 +244,20 @@ const getStats: McpTool = {
   },
   handler: async (_args, ctx) => {
     try {
-      const [all, top, publicItems, stars, trash, types, tags, collectionRows] =
-        await Promise.all([
-          listBookmarkRows(ctx, { limit: 1, status: 'active' }),
-          listBookmarkRows(ctx, { limit: 1, status: 'active', top: true }),
-          listBookmarkRows(ctx, {
-            limit: 1,
-            public: true,
-            status: 'active',
-          }),
-          listBookmarkRows(ctx, { limit: 1, star: true, status: 'active' }),
-          listBookmarkRows(ctx, { limit: 1, status: 'inactive' }),
-          getTypeCounts(ctx),
-          getTagCounts(ctx),
-          getCollectionCounts(ctx),
-        ])
+      const [all, top, publicItems, stars, trash, types, tags, collectionRows] = await Promise.all([
+        listBookmarkRows(ctx, { limit: 1, status: 'active' }),
+        listBookmarkRows(ctx, { limit: 1, status: 'active', top: true }),
+        listBookmarkRows(ctx, {
+          limit: 1,
+          public: true,
+          status: 'active',
+        }),
+        listBookmarkRows(ctx, { limit: 1, star: true, status: 'active' }),
+        listBookmarkRows(ctx, { limit: 1, status: 'inactive' }),
+        getTypeCounts(ctx),
+        getTagCounts(ctx),
+        getCollectionCounts(ctx),
+      ])
       const collections = collectionRows.map(
         (entry) => `  ${entry.collection}: ${entry.bookmark_count}`,
       )
@@ -310,9 +274,7 @@ const getStats: McpTool = {
       ]
       return toolResult(lines.join('\n'))
     } catch (err) {
-      return toolError(
-        `Stats failed: ${err instanceof Error ? err.message : String(err)}`,
-      )
+      return toolError(`Stats failed: ${err instanceof Error ? err.message : String(err)}`)
     }
   },
 }
@@ -334,10 +296,7 @@ const randomBookmark: McpTool = {
     name: 'random_bookmark',
   },
   handler: async (args, ctx) => {
-    const requestedCount = Math.min(
-      Math.max(1, Number(args.count) || 1),
-      MAX_RANDOM,
-    )
+    const requestedCount = Math.min(Math.max(1, Number(args.count) || 1), MAX_RANDOM)
     const where = bookmarkFilters(ctx.userId, args)
     const [{ value: total }] = await ctx.requestContext.db
       .select({ value: count() })
@@ -386,8 +345,7 @@ const createBookmark: McpTool = {
         note: { description: 'Personal note', type: 'string' },
         public: { description: 'Make publicly visible', type: 'boolean' },
         scrape: {
-          description:
-            'Auto-fetch metadata from URL (default: true). Set false to skip.',
+          description: 'Auto-fetch metadata from URL (default: true). Set false to skip.',
           type: 'boolean',
         },
         star: { description: 'Star the bookmark', type: 'boolean' },
@@ -427,8 +385,7 @@ const createBookmark: McpTool = {
     const [bookmark] = await ctx.requestContext.db
       .insert(bookmarks)
       .values({
-        description:
-          (args.description as string) ?? scraped.description ?? null,
+        description: (args.description as string) ?? scraped.description ?? null,
         feed: (scraped.feed as string | null) ?? null,
         image: scraped.image ?? null,
         note: (args.note as string) || null,
@@ -436,19 +393,14 @@ const createBookmark: McpTool = {
         star: (args.star as boolean) || false,
         tags: mergedTags.length ? mergedTags : null,
         title: (args.title as string) ?? scraped.title ?? null,
-        type:
-          (args.type as BookmarkType) ??
-          (scraped.type as BookmarkType | null) ??
-          null,
+        type: (args.type as BookmarkType) ?? (scraped.type as BookmarkType | null) ?? null,
         url: scraped.url || url,
         user: ctx.userId,
       })
       .returning()
 
     if (!bookmark) return toolError('Create succeeded but no data returned.')
-    return toolResult(
-      `Bookmark created:\n\n${formatBookmark(bookmarkToRow(bookmark))}`,
-    )
+    return toolResult(`Bookmark created:\n\n${formatBookmark(bookmarkToRow(bookmark))}`)
   },
 }
 
@@ -485,46 +437,33 @@ const updateBookmark: McpTool = {
       modifiedAt: new Date(),
     }
 
-    if (typeof args.description === 'string')
-      updateData.description = args.description
+    if (typeof args.description === 'string') updateData.description = args.description
     if (typeof args.note === 'string') updateData.note = args.note
     if (typeof args.public === 'boolean') updateData.public = args.public
     if (typeof args.star === 'boolean') updateData.star = args.star
-    if (typeof args.status === 'string')
-      updateData.status = args.status as BookmarkStatus
+    if (typeof args.status === 'string') updateData.status = args.status as BookmarkStatus
     if (Array.isArray(args.tags)) updateData.tags = args.tags as string[]
     if (typeof args.title === 'string') updateData.title = args.title
-    if (typeof args.type === 'string')
-      updateData.type = args.type as BookmarkType
+    if (typeof args.type === 'string') updateData.type = args.type as BookmarkType
 
     if (Object.keys(updateData).length <= 1) {
-      return toolError(
-        'No fields to update. Provide at least one field to change.',
-      )
+      return toolError('No fields to update. Provide at least one field to change.')
     }
 
     const [bookmark] = await ctx.requestContext.db
       .update(bookmarks)
       .set(updateData)
-      .where(
-        and(
-          eq(bookmarks.id, args.id as string),
-          eq(bookmarks.user, ctx.userId),
-        ),
-      )
+      .where(and(eq(bookmarks.id, args.id as string), eq(bookmarks.user, ctx.userId)))
       .returning()
 
     if (!bookmark) return toolError('Bookmark not found or access denied.')
-    return toolResult(
-      `Bookmark updated:\n\n${formatBookmark(bookmarkToRow(bookmark))}`,
-    )
+    return toolResult(`Bookmark updated:\n\n${formatBookmark(bookmarkToRow(bookmark))}`)
   },
 }
 
 const deleteBookmark: McpTool = {
   definition: {
-    description:
-      'Soft-delete a bookmark by moving it to trash (sets status to inactive).',
+    description: 'Soft-delete a bookmark by moving it to trash (sets status to inactive).',
     inputSchema: {
       properties: {
         id: { description: 'Bookmark UUID', type: 'string' },
@@ -541,18 +480,11 @@ const deleteBookmark: McpTool = {
         modifiedAt: new Date(),
         status: 'inactive',
       })
-      .where(
-        and(
-          eq(bookmarks.id, args.id as string),
-          eq(bookmarks.user, ctx.userId),
-        ),
-      )
+      .where(and(eq(bookmarks.id, args.id as string), eq(bookmarks.user, ctx.userId)))
       .returning()
 
     if (!bookmark) return toolError('Bookmark not found or access denied.')
-    return toolResult(
-      `Bookmark moved to trash:\n\n${formatBookmark(bookmarkToRow(bookmark))}`,
-    )
+    return toolResult(`Bookmark moved to trash:\n\n${formatBookmark(bookmarkToRow(bookmark))}`)
   },
 }
 
@@ -567,9 +499,7 @@ export const tools: McpTool[] = [
   deleteBookmark,
 ]
 
-export const toolDefinitions: McpToolDefinition[] = tools.map(
-  (t) => t.definition,
-)
+export const toolDefinitions: McpToolDefinition[] = tools.map((t) => t.definition)
 
 export const toolHandlers: Record<string, ToolHandler> = Object.fromEntries(
   tools.map((t) => [t.definition.name, t.handler]),

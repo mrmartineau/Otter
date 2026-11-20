@@ -26,8 +26,7 @@ const openInBrowser = (url: string) => {
     .unref()
 }
 
-const clean = (value: string | null) =>
-  value === null ? null : sanitize(value)
+const clean = (value: string | null) => (value === null ? null : sanitize(value))
 
 /**
  * Strip terminal control characters from bookmark text before it ever reaches
@@ -86,13 +85,7 @@ export class App {
   }
 
   render() {
-    this.output.write(
-      renderFrame(
-        this.state,
-        this.output.columns || 80,
-        this.output.rows || 24,
-      ),
-    )
+    this.output.write(renderFrame(this.state, this.output.columns || 80, this.output.rows || 24))
   }
 
   private setStatus(status: string, kind: 'error' | 'info' = 'info') {
@@ -137,10 +130,7 @@ export class App {
       state.count = response.count
       state.items = response.data.map(sanitizeBookmark)
       state.offset = offset
-      state.selected = Math.max(
-        0,
-        Math.min(state.selected, response.data.length - 1),
-      )
+      state.selected = Math.max(0, Math.min(state.selected, response.data.length - 1))
       state.loading = false
     } catch (error) {
       if (seq !== this.requestSeq) {
@@ -148,10 +138,7 @@ export class App {
       }
 
       state.loading = false
-      this.setStatus(
-        error instanceof Error ? error.message : String(error),
-        'error',
-      )
+      this.setStatus(error instanceof Error ? error.message : String(error), 'error')
     }
 
     this.render()
@@ -212,11 +199,7 @@ export class App {
       state.selected = 0
     } else if (key.name === 'end' || char === 'G') {
       state.selected = Math.max(0, state.items.length - 1)
-    } else if (
-      key.name === 'right' ||
-      key.name === 'pagedown' ||
-      char === 'l'
-    ) {
+    } else if (key.name === 'right' || key.name === 'pagedown' || char === 'l') {
       this.nextPage()
       return
     } else if (key.name === 'left' || key.name === 'pageup' || char === 'h') {
@@ -294,8 +277,7 @@ export class App {
   }
 
   private handleConfirmKey(key: Key) {
-    const confirmed =
-      key.name === 'char' && (key.char === 'y' || key.char === 'Y')
+    const confirmed = key.name === 'char' && (key.char === 'y' || key.char === 'Y')
     this.state.mode = 'list'
 
     if (confirmed) {
@@ -377,9 +359,7 @@ export class App {
 
   private cycleTypeFilter() {
     const { state } = this
-    const index = TYPE_CYCLE.indexOf(
-      state.typeFilter as (typeof TYPE_CYCLE)[number],
-    )
+    const index = TYPE_CYCLE.indexOf(state.typeFilter as (typeof TYPE_CYCLE)[number])
     state.typeFilter = TYPE_CYCLE[(index + 1) % TYPE_CYCLE.length] ?? null
     void this.fetchPage(0)
   }
@@ -398,10 +378,7 @@ export class App {
       }))
     } catch (error) {
       state.mode = 'list'
-      this.setStatus(
-        error instanceof Error ? error.message : String(error),
-        'error',
-      )
+      this.setStatus(error instanceof Error ? error.message : String(error), 'error')
     }
 
     this.render()
@@ -444,10 +421,7 @@ export class App {
       }
     } catch (error) {
       bookmark.star = !bookmark.star
-      this.setStatus(
-        error instanceof Error ? error.message : String(error),
-        'error',
-      )
+      this.setStatus(error instanceof Error ? error.message : String(error), 'error')
     }
 
     this.render()
@@ -466,19 +440,14 @@ export class App {
 
     try {
       await this.client.deleteBookmark(bookmark.id)
-      this.setStatus(
-        `deleted “${bookmark.title || bookmark.url || bookmark.id}”`,
-      )
+      this.setStatus(`deleted “${bookmark.title || bookmark.url || bookmark.id}”`)
       const offset =
         state.items.length === 1 && state.offset > 0
           ? Math.max(0, state.offset - state.pageSize)
           : state.offset
       await this.fetchPage(offset)
     } catch (error) {
-      this.setStatus(
-        error instanceof Error ? error.message : String(error),
-        'error',
-      )
+      this.setStatus(error instanceof Error ? error.message : String(error), 'error')
       this.render()
     }
   }
@@ -506,10 +475,7 @@ export class App {
       await this.fetchPage(0)
     } catch (error) {
       state.loading = false
-      this.setStatus(
-        error instanceof Error ? error.message : String(error),
-        'error',
-      )
+      this.setStatus(error instanceof Error ? error.message : String(error), 'error')
       this.render()
     }
   }

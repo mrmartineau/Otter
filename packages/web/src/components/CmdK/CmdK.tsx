@@ -18,19 +18,12 @@ import {
 } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { Command } from 'cmdk'
-import {
-  createContext,
-  type DispatchWithoutAction,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react'
+import { createContext, type DispatchWithoutAction, useCallback, useEffect, useState } from 'react'
 import formatTitle from 'title'
 import { Button } from '@/components/Button'
 import { useToggle } from '@/hooks/useToggle'
 import type { Tweet } from '@/types/db'
 import { getMetaOptions } from '@/utils/fetching/meta'
-
 import {
   ROUTE_DASHBOARD,
   ROUTE_FEED,
@@ -53,9 +46,7 @@ export type TweetSearchResponse = ApiResponse<Tweet[]>
 export interface CmdKContextInterface {
   toggleOpen: DispatchWithoutAction
 }
-export const CmdKContext = createContext<CmdKContextInterface>(
-  {} as CmdKContextInterface,
-)
+export const CmdKContext = createContext<CmdKContextInterface>({} as CmdKContextInterface)
 
 const sharedAccessories: AccessoryModel[] = [
   {
@@ -179,9 +170,7 @@ export const CmdK = () => {
                   key="full-site-search"
                   to={`/search?q=${searchTerm}`}
                   value={`search-${searchTerm}`}
-                  image={
-                    <MagnifyingGlassIcon weight="duotone" aria-label="Search" />
-                  }
+                  image={<MagnifyingGlassIcon weight="duotone" aria-label="Search" />}
                   accessories={sharedAccessories}
                 >
                   Full site search
@@ -189,27 +178,14 @@ export const CmdK = () => {
               </Command.Group>
             ) : null}
 
-            <Command.Empty className="cmdk-empty">
-              🙁 No results found.
-            </Command.Empty>
+            <Command.Empty className="cmdk-empty">🙁 No results found.</Command.Empty>
 
-            {isLoading ? (
-              <Command.Loading>Searching Otter…</Command.Loading>
-            ) : null}
+            {isLoading ? <Command.Loading>Searching Otter…</Command.Loading> : null}
 
             {enableIfSearchTermHasValue && data?.bookmarksSearch?.length ? (
               <Command.Group heading="Bookmarks">
                 {data?.bookmarksSearch?.map(
-                  ({
-                    id,
-                    title,
-                    description,
-                    note,
-                    url,
-                    type,
-                    tags,
-                    created_at,
-                  }) => (
+                  ({ id, title, description, note, url, type, tags, created_at }) => (
                     <BookmarkSearchItem
                       key={`bookmark-${id}`}
                       id={id}
@@ -236,9 +212,7 @@ export const CmdK = () => {
                       key={`tag-all-${tag}`}
                       to={`/tag/${tag}`}
                       value={`tag-${tag}`}
-                      image={
-                        <HashIcon weight="duotone" aria-label={`Tag: ${tag}`} />
-                      }
+                      image={<HashIcon weight="duotone" aria-label={`Tag: ${tag}`} />}
                       accessories={sharedAccessories}
                     >
                       {tag}
@@ -254,12 +228,7 @@ export const CmdK = () => {
                       key={`tag-pinned-${item}`}
                       to={`/tag/${item}`}
                       value={`tag-pinned-${item}`}
-                      image={
-                        <HashIcon
-                          weight="duotone"
-                          aria-label={`Tag: ${item}`}
-                        />
-                      }
+                      image={<HashIcon weight="duotone" aria-label={`Tag: ${item}`} />}
                       accessories={sharedAccessories}
                     >
                       {item}
@@ -279,10 +248,7 @@ export const CmdK = () => {
                       to={`/collection/${collection}`}
                       value={`collection-${collection}`}
                       image={
-                        <CardsIcon
-                          weight="duotone"
-                          aria-label={`Collection: ${collection}`}
-                        />
+                        <CardsIcon weight="duotone" aria-label={`Collection: ${collection}`} />
                       }
                       accessories={sharedAccessories}
                     >
@@ -330,12 +296,7 @@ export const CmdK = () => {
               <Item
                 to={ROUTE_STATS}
                 value="Top links"
-                image={
-                  <ArrowFatLinesUpIcon
-                    weight="duotone"
-                    aria-label="Top links"
-                  />
-                }
+                image={<ArrowFatLinesUpIcon weight="duotone" aria-label="Top links" />}
                 accessories={sharedAccessories}
               >
                 Top links
@@ -413,11 +374,7 @@ export const CmdK = () => {
 
                   const value = [text].filter(Boolean).join(' ')
                   return (
-                    <Item
-                      key={`tweet-${id}`}
-                      value={value}
-                      to={`/tweets/${id}`}
-                    >
+                    <Item key={`tweet-${id}`} value={value} to={`/tweets/${id}`}>
                       <div>
                         <Flex align="center" gap="xs" className="mb-2xs">
                           {user_avatar ? (
@@ -447,22 +404,16 @@ export const CmdK = () => {
                 accessories={sharedAccessories}
               >
                 Display flat feed{' '}
-                {!groupByDate && (
-                  <CheckCircleIcon aria-label="Flat feed" weight="fill" />
-                )}
+                {!groupByDate && <CheckCircleIcon aria-label="Flat feed" weight="fill" />}
               </Item>
               <Item
                 action={() => handleSetGroupByDate(true)}
                 value="Group feed by day"
-                image={
-                  <ListDashesIcon weight="duotone" aria-label="Grouped feed" />
-                }
+                image={<ListDashesIcon weight="duotone" aria-label="Grouped feed" />}
                 accessories={sharedAccessories}
               >
                 Display feed grouped by day{' '}
-                {groupByDate && (
-                  <CheckCircleIcon aria-label="Flat feed" weight="fill" />
-                )}
+                {groupByDate && <CheckCircleIcon aria-label="Flat feed" weight="fill" />}
               </Item>
             </Command.Group>
           </Command.List>

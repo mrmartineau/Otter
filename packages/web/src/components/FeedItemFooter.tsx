@@ -13,12 +13,7 @@ import urlJoin from 'proper-url-join'
 import { Suspense, useMemo } from 'react'
 import { toast } from 'sonner'
 import title from 'title'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/Tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/Tooltip'
 import { MINIMUM_CLICK_COUNT } from '@/constants'
 import { useToggleBookmarkState } from '@/hooks/useToggleBookmarkState'
 import { useClickBookmark } from '../hooks/useClickBookmark'
@@ -37,8 +32,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './Popover'
 import { RssFeed } from './RssFeed'
 import { TypeToIcon } from './TypeToIcon'
 
-export interface FeedItemFooterProps
-  extends Omit<BookmarkFeedItemProps, 'isClamped'> {
+export interface FeedItemFooterProps extends Omit<BookmarkFeedItemProps, 'isClamped'> {
   id: string
   isInFeed?: boolean
 }
@@ -93,10 +87,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
                   </li>
                   {matchingCollections.map(({ collection }) => (
                     <li key={collection}>
-                      <Link
-                        href={urlJoin('/collection', collection)}
-                        variant="tag"
-                      >
+                      <Link href={urlJoin('/collection', collection)} variant="tag">
                         {collection}
                       </Link>
                     </li>
@@ -125,11 +116,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
             {url ? (
               <>
                 <Favicon url={url} />
-                <Link
-                  rel="external"
-                  href={url}
-                  onClick={() => handleClickRegister(id)}
-                >
+                <Link rel="external" href={url} onClick={() => handleClickRegister(id)}>
                   {simpleUrl(url)}
                 </Link>
               </>
@@ -139,25 +126,17 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   {isPublic ? (
-                    <IconButton
-                      onClick={() => handleToggleState('public')}
-                      size="s"
-                    >
+                    <IconButton onClick={() => handleToggleState('public')} size="s">
                       <EyeIcon size={16} weight="fill" />
                     </IconButton>
                   ) : (
-                    <IconButton
-                      onClick={() => handleToggleState('public')}
-                      size="s"
-                    >
+                    <IconButton onClick={() => handleToggleState('public')} size="s">
                       <EyeIcon size={16} weight="duotone" />
                     </IconButton>
                   )}
                 </TooltipTrigger>
                 <TooltipContent>
-                  {isPublic
-                    ? 'Make this item private'
-                    : 'Make this item public'}
+                  {isPublic ? 'Make this item private' : 'Make this item public'}
                 </TooltipContent>
               </Tooltip>
             ) : null}
@@ -166,17 +145,11 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   {star ? (
-                    <IconButton
-                      onClick={() => handleToggleState('star')}
-                      size="s"
-                    >
+                    <IconButton onClick={() => handleToggleState('star')} size="s">
                       <StarIcon size={16} weight="fill" />
                     </IconButton>
                   ) : (
-                    <IconButton
-                      onClick={() => handleToggleState('star')}
-                      size="s"
-                    >
+                    <IconButton onClick={() => handleToggleState('star')} size="s">
                       <StarIcon size={16} weight="duotone" />
                     </IconButton>
                   )}
@@ -214,11 +187,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
               <Tooltip>
                 <TooltipTrigger>
                   <Flex align="center" gap="3xs">
-                    <CalendarIcon
-                      weight="duotone"
-                      size="16"
-                      className="shrink-0"
-                    />
+                    <CalendarIcon weight="duotone" size="16" className="shrink-0" />
                     <time dateTime={created_at}>{createdDate.short}</time>
                   </Flex>
                 </TooltipTrigger>
@@ -248,11 +217,7 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <IconButton size="m" onClick={handleCopyUrl}>
-                  <CopyIcon
-                    aria-label="Copy URL to clipboard"
-                    size={18}
-                    weight="duotone"
-                  />
+                  <CopyIcon aria-label="Copy URL to clipboard" size={18} weight="duotone" />
                 </IconButton>
               </TooltipTrigger>
               <TooltipContent>Copy URL to clipboard</TooltipContent>
@@ -261,22 +226,14 @@ export const FeedItemFooter = (props: FeedItemFooterProps) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link href={`/bookmark/${id}/read`}>
-                  <ArticleIcon
-                    aria-label="Read article"
-                    size={18}
-                    weight="duotone"
-                  />
+                  <ArticleIcon aria-label="Read article" size={18} weight="duotone" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Read article</TooltipContent>
             </Tooltip>
           </Flex>
 
-          <FeedItemActions
-            {...props}
-            key={`actions-${id}`}
-            isInFeed={isInFeed}
-          />
+          <FeedItemActions {...props} key={`actions-${id}`} isInFeed={isInFeed} />
         </Flex>
       </div>
     </TooltipProvider>

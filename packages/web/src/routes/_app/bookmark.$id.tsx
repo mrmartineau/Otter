@@ -21,9 +21,7 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
     )
     return bookmark.data
   },
-  validateSearch: (search: {
-    bookmarklet?: string
-  }): { bookmarklet?: string } => {
+  validateSearch: (search: { bookmarklet?: string }): { bookmarklet?: string } => {
     return {
       bookmarklet: search.bookmarklet,
     }
@@ -31,13 +29,10 @@ export const Route = createFileRoute('/_app/bookmark/$id')({
 })
 
 function RouteComponent() {
-  const { data: bookmark } = useSuspenseQuery(
-    getBookmarkOptions({ id: Route.useParams().id }),
-  )
+  const { data: bookmark } = useSuspenseQuery(getBookmarkOptions({ id: Route.useParams().id }))
   const matchRoute = useMatchRoute()
   const isChildRoute =
-    matchRoute({ to: '/bookmark/$id/edit' }) ||
-    matchRoute({ to: '/bookmark/$id/read' })
+    matchRoute({ to: '/bookmark/$id/edit' }) || matchRoute({ to: '/bookmark/$id/read' })
 
   return (
     <>

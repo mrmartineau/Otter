@@ -1,9 +1,22 @@
 {
+  "name": "@mrmartineau/otter-tui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Terminal UI for Otter — browse, search and save bookmarks without leaving your shell",
+  "license": "MIT",
   "bin": {
     "otter": "dist/index.js",
     "otter-tui": "dist/index.js"
   },
-  "description": "Terminal UI for Otter — browse, search and save bookmarks without leaving your shell",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "node src/index.ts",
+    "start": "node dist/index.js"
+  },
   "devDependencies": {
     "@types/node": "^20.19.0",
     "typescript": "^5.9.3",
@@ -11,18 +24,5 @@
   },
   "engines": {
     "node": ">=20"
-  },
-  "files": [
-    "dist"
-  ],
-  "license": "MIT",
-  "name": "@mrmartineau/otter-tui",
-  "private": true,
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "node src/index.ts",
-    "start": "node dist/index.js"
-  },
-  "type": "module",
-  "version": "0.0.0"
+  }
 }

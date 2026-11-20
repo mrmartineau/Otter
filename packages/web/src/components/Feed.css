@@ -100,7 +100,7 @@
       color: var(--theme12);
     }
 
-    &[aria-pressed="true"] {
+    &[aria-pressed='true'] {
       background-color: var(--theme1);
       color: var(--theme12);
       box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
@@ -132,7 +132,7 @@
     transform: scale(0.92);
   }
 
-  &[aria-pressed="true"] {
+  &[aria-pressed='true'] {
     background-color: transparent;
     color: var(--accent10);
 

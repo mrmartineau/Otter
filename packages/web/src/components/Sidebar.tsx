@@ -65,12 +65,7 @@ export const Sidebar = ({ version }: SidebarProps) => {
       <div>
         <div className="sidebar-top">
           <Link href={ROUTE_HOME} variant="logo">
-            <img
-              src="/otter-logo.svg"
-              width="33"
-              height="33"
-              alt="Otter logo"
-            />
+            <img src="/otter-logo.svg" width="33" height="33" alt="Otter logo" />
             <div>Otter</div>
           </Link>
           <Spinner show={isLoading} />

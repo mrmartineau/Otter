@@ -16,14 +16,7 @@ describe('getCardShape', () => {
   })
 
   it('gives things with a picture the object shape', () => {
-    for (const type of [
-      'book',
-      'event',
-      'game',
-      'place',
-      'product',
-      'recipe',
-    ] as const) {
+    for (const type of ['book', 'event', 'game', 'place', 'product', 'recipe'] as const) {
       expect(shape(type)).toBe('object')
     }
   })

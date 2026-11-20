@@ -1,9 +1,4 @@
-import {
-  ClockCounterClockwiseIcon,
-  EyeIcon,
-  StarIcon,
-  XIcon,
-} from '@phosphor-icons/react'
+import { ClockCounterClockwiseIcon, EyeIcon, StarIcon, XIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import type { FileRouteTypes } from '@tanstack/react-router'
 import { memo, type ReactNode, useLayoutEffect, useRef } from 'react'
@@ -82,7 +77,7 @@ const FeedCards = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: new items mean new cards to watch and place
+  // new items mean new cards to watch and place
   useLayoutEffect(() => {
     const grid = ref.current
     if (!grid) {
@@ -94,10 +89,7 @@ const FeedCards = ({
       const gap = Number.parseFloat(getComputedStyle(grid).columnGap) || 0
       const columnCount = Math.min(
         MAX_CARD_COLUMNS,
-        Math.max(
-          1,
-          Math.floor((grid.clientWidth + gap) / (CARD_MIN_WIDTH + gap)),
-        ),
+        Math.max(1, Math.floor((grid.clientWidth + gap) / (CARD_MIN_WIDTH + gap))),
       )
       // Set first: it changes the cards' width, so the heights below are right
       grid.style.setProperty('--columns', String(columnCount))
@@ -145,12 +137,7 @@ interface FeedItemsProps {
   collections: Collection[]
 }
 
-const FeedItems = ({
-  items,
-  view,
-  allowDeletion,
-  collections,
-}: FeedItemsProps) => {
+const FeedItems = ({ items, view, allowDeletion, collections }: FeedItemsProps) => {
   if (view === 'compact') {
     return (
       <ul className="feed-compact">
@@ -219,23 +206,15 @@ export const Feed = memo(
     shareConfig,
     feedType,
   }: FeedProps) => {
-    const {
-      starQuery,
-      publicQuery,
-      windowQuery,
-      setStarQuery,
-      setPublicQuery,
-      setWindowQuery,
-    } = useFeedOptions()
+    const { starQuery, publicQuery, windowQuery, setStarQuery, setPublicQuery, setWindowQuery } =
+      useFeedOptions()
     const { groupByDate, groupedItems } = useGroupByDate(items)
     const { sentinelRef } = useInfiniteScroll({
       fetchNextPage: fetchNextPage ?? (() => {}),
       hasNextPage,
       isFetchingNextPage,
     })
-    const { data: collectionsTags } = useSuspenseQuery(
-      getCollectionsTagsOptions(),
-    )
+    const { data: collectionsTags } = useSuspenseQuery(getCollectionsTagsOptions())
     const [savedView, setView] = useFeedView()
     // Tweets and toots only have the list layout
     const canSwitchView = feedType !== 'tweets' && feedType !== 'toots'
@@ -243,9 +222,7 @@ export const Feed = memo(
     // Date headings split the cards' columns apart, so cards ignore the setting
     const showDateGroups = allowGroupByDate && groupByDate && view !== 'cards'
 
-    const handleToggleState = async (
-      column: 'public' | 'star',
-    ): Promise<void> => {
+    const handleToggleState = async (column: 'public' | 'star'): Promise<void> => {
       if (column === 'public') {
         setPublicQuery((prev) => !prev)
       }
@@ -259,10 +236,7 @@ export const Feed = memo(
         <Flex gap="xs" direction="column" justify="between">
           <Flex gap="xs" justify="between" wrap="wrap" align="center">
             <h3
-              className={cn(
-                headingVariants({ variant: 'feedTitle' }),
-                'flex items-center gap-2xs',
-              )}
+              className={cn(headingVariants({ variant: 'feedTitle' }), 'flex items-center gap-2xs')}
             >
               {icon}
               {title}
@@ -278,11 +252,7 @@ export const Feed = memo(
                         variant="ghost"
                         aria-pressed={starQuery}
                       >
-                        <StarIcon
-                          size={16}
-                          weight={starQuery ? 'fill' : 'duotone'}
-                        />{' '}
-                        Stars
+                        <StarIcon size={16} weight={starQuery ? 'fill' : 'duotone'} /> Stars
                       </Button>
                       <Button
                         onClick={() => handleToggleState('public')}
@@ -290,11 +260,7 @@ export const Feed = memo(
                         variant="ghost"
                         aria-pressed={publicQuery}
                       >
-                        <EyeIcon
-                          size={16}
-                          weight={publicQuery ? 'fill' : 'duotone'}
-                        />{' '}
-                        Public
+                        <EyeIcon size={16} weight={publicQuery ? 'fill' : 'duotone'} /> Public
                       </Button>
                       <Button
                         onClick={() => setWindowQuery((prev) => prev + 1)}
@@ -324,16 +290,11 @@ export const Feed = memo(
                     </>
                   ) : null}
                   {shareConfig ? (
-                    <ShareDialog
-                      kind={shareConfig.kind}
-                      name={shareConfig.name}
-                    />
+                    <ShareDialog kind={shareConfig.kind} name={shareConfig.name} />
                   ) : null}
                 </Flex>
               ) : null}
-              {canSwitchView ? (
-                <FeedViewSwitch view={view} onChange={setView} />
-              ) : null}
+              {canSwitchView ? <FeedViewSwitch view={view} onChange={setView} /> : null}
             </Flex>
           </Flex>
           {subNav ? (
@@ -358,9 +319,7 @@ export const Feed = memo(
           <div className="bp2:gap-m grid gap-s" key={view}>
             {groupedItems.map((groupedItem) => (
               <div key={groupedItem.date}>
-                <h3 className={headingVariants({ variant: 'date' })}>
-                  {groupedItem.date}
-                </h3>
+                <h3 className={headingVariants({ variant: 'date' })}>{groupedItem.date}</h3>
                 <ErrorBoundary fallback={<div>Something went wrong</div>}>
                   <FeedItems
                     items={groupedItem.items}

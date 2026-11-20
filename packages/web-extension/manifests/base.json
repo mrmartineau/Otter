@@ -36,13 +36,6 @@
   "manifest_version": 3,
   "name": "Otter",
   "options_page": "options.html",
-  "permissions": [
-    "storage",
-    "activeTab",
-    "scripting",
-    "tabs",
-    "webNavigation",
-    "contextMenus"
-  ],
+  "permissions": ["storage", "activeTab", "scripting", "tabs", "webNavigation", "contextMenus"],
   "version": "0.3.0"
 }

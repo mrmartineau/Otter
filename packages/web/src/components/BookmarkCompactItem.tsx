@@ -18,8 +18,7 @@ const VISIBLE_TAGS = 2
 
 /** One line per bookmark. Click the row (or the arrow) to see the rest. */
 export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
-  const { id, title, url, description, note, image, tags, type, created_at } =
-    props
+  const { id, title, url, description, note, image, tags, type, created_at } = props
   const [isOpen, setIsOpen] = useState(false)
   const detailId = useId()
   const handleClickRegister = useClickBookmark()
@@ -29,8 +28,8 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
 
   return (
     <li className="bookmark-compact" data-open={isOpen || undefined}>
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: a bigger target for the arrow button, which is the keyboard path */}
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: as above */}
+      {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events -- a bigger target for the arrow button, which is the keyboard path */}
+      {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- as above */}
       <div
         className="bookmark-compact-line"
         onClick={(event) => {
@@ -82,9 +81,7 @@ export const BookmarkCompactItem = (props: BookmarkFeedItemProps) => {
       {isOpen ? (
         <div className="bookmark-compact-detail" id={detailId}>
           <div className="bookmark-compact-detail-text">
-            {description ? (
-              <Markdown preventClamping>{description}</Markdown>
-            ) : null}
+            {description ? <Markdown preventClamping>{description}</Markdown> : null}
             {note ? (
               <div className="bookmark-compact-note">
                 <NoteIcon size={14} weight="duotone" aria-label="Note" />

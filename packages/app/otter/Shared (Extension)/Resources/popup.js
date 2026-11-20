@@ -8,13 +8,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (result && typeof result.then === 'function') {
         return (await result)[0]
       }
-      return await new Promise((resolve) =>
-        api.tabs.query(query, (tabs) => resolve(tabs[0])),
-      )
+      return await new Promise((resolve) => api.tabs.query(query, (tabs) => resolve(tabs[0])))
     } catch (_) {
-      return await new Promise((resolve) =>
-        api.tabs.query(query, (tabs) => resolve(tabs[0])),
-      )
+      return await new Promise((resolve) => api.tabs.query(query, (tabs) => resolve(tabs[0])))
     }
   }
 

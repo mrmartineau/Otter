@@ -9,28 +9,15 @@ type SidebarLinkProps = LinkProps & {
   activePath?: string
   children: ReactNode
 }
-export const SidebarLink = ({
-  count,
-  href,
-  children,
-  activePath,
-  ...rest
-}: SidebarLinkProps) => {
+export const SidebarLink = ({ count, href, children, activePath, ...rest }: SidebarLinkProps) => {
   const location = useLocation()
   const isActive =
-    location.pathname === href ||
-    (activePath ? location.pathname.includes(activePath) : false)
+    location.pathname === href || (activePath ? location.pathname.includes(activePath) : false)
 
   const { handleCloseSidebar } = useSidebar()
 
   return (
-    <Link
-      to={href}
-      variant="sidebar"
-      {...rest}
-      isActive={isActive}
-      onClick={handleCloseSidebar}
-    >
+    <Link to={href} variant="sidebar" {...rest} isActive={isActive} onClick={handleCloseSidebar}>
       <div className="link-sidebar-inner">{children}</div>
       {count ? <Text variant="count">{count}</Text> : null}
     </Link>

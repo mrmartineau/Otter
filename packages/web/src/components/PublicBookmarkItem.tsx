@@ -76,9 +76,7 @@ export const PublicBookmarkItem = (props: Bookmark) => {
             <Flex align="center" gap="3xs">
               <CalendarIcon weight="duotone" size="16" className="shrink-0" />
               <time dateTime={created_at}>
-                {createdDate.ago < 8
-                  ? createdDate.relative
-                  : createdDate.formatted}
+                {createdDate.ago < 8 ? createdDate.relative : createdDate.formatted}
               </time>
             </Flex>
           ) : null}

@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-
 import { CONTENT, createTitle } from './constants'
 
 describe('createTitle', () => {

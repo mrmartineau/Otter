@@ -25,14 +25,7 @@ export type ItemProps = ComponentProps<typeof Command.Item> &
     action?: () => void
   }
 
-export const Item = ({
-  to,
-  accessories,
-  children,
-  image,
-  action,
-  ...rest
-}: ItemProps) => {
+export const Item = ({ to, accessories, children, image, action, ...rest }: ItemProps) => {
   const { toggleOpen } = useContext(CmdKContext)
   const navigate = useNavigate()
   const handleNavigate = (to: string): void => {

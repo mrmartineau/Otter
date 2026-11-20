@@ -73,17 +73,13 @@ export const FeedItemActions = ({
     }
   }
 
-  const handleShare = async (
-    platform?: 'twitter' | 'mastodon',
-  ): Promise<void> => {
+  const handleShare = async (platform?: 'twitter' | 'mastodon'): Promise<void> => {
     if (!url || !title) {
       return
     }
     const filteredTagsString = filteredTags(tags || [])
-    const tagsString =
-      filteredTagsString.length > 0 ? `${filteredTagsString}` : ''
-    const descriptionString =
-      description && description.length > 0 ? ` - ${description}` : ''
+    const tagsString = filteredTagsString.length > 0 ? `${filteredTagsString}` : ''
+    const descriptionString = description && description.length > 0 ? ` - ${description}` : ''
     const shareContent = `"${title}"${descriptionString}\n${url}\n${tagsString}`
 
     const openFallback = (sharePlatform?: 'twitter' | 'mastodon') => {
@@ -166,10 +162,7 @@ export const FeedItemActions = ({
               </Button>
             </DropdownMenu.Trigger>
 
-            <DropdownMenu.Content
-              className="DropdownMenuContent"
-              sideOffset={0}
-            >
+            <DropdownMenu.Content className="DropdownMenuContent" sideOffset={0}>
               {url ? (
                 <DropdownMenu.Item
                   className="DropdownMenuItem"

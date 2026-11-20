@@ -1,8 +1,4 @@
-import {
-  ListBulletsIcon,
-  RowsIcon,
-  SquaresFourIcon,
-} from '@phosphor-icons/react'
+import { ListBulletsIcon, RowsIcon, SquaresFourIcon } from '@phosphor-icons/react'
 import type { FeedView } from '@/hooks/useFeedView'
 
 const VIEWS = [

@@ -2,11 +2,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/Button'
 import { CONTENT } from '@/constants'
 import type { MetaTag } from '@/utils/fetching/meta'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '../Collapsible'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../Collapsible'
 import { Flex } from '../Flex'
 import { Text } from '../Text'
 import { useUser } from '../UserProvider'
@@ -101,12 +97,7 @@ export const AllTags = ({ tags }: AllTagsProps) => {
           {pinnedTags?.length ? (
             <div className="mb-3xs">
               {pinnedTags.map(({ tag, count }) => (
-                <TagListItem
-                  tag={tag}
-                  count={count}
-                  key={`pinned-tag-${tag}`}
-                  pinned={true}
-                />
+                <TagListItem tag={tag} count={count} key={`pinned-tag-${tag}`} pinned={true} />
               ))}
             </div>
           ) : null}
@@ -121,14 +112,7 @@ export const AllTags = ({ tags }: AllTagsProps) => {
                 profile?.settings_pinned_tags !== null &&
                 profile?.settings_pinned_tags?.indexOf(tag) === -1
               ) {
-                return (
-                  <TagListItem
-                    tag={tag}
-                    count={count}
-                    key={tag}
-                    pinned={false}
-                  />
-                )
+                return <TagListItem tag={tag} count={count} key={tag} pinned={false} />
               }
               return null
             })

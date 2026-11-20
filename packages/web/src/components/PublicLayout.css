@@ -16,7 +16,7 @@
 
   /* paper grain */
   &::after {
-    content: "";
+    content: '';
     position: fixed;
     inset: 0;
     z-index: 10;
@@ -53,8 +53,8 @@
   color: var(--ink);
   font-size: var(--step-1);
   font-variation-settings:
-    "wght" 700,
-    "wdth" 110;
+    'wght' 700,
+    'wdth' 110;
 
   &:hover {
     color: var(--pop-bright);

@@ -85,8 +85,7 @@ export class OtterClient {
 
     try {
       response = await fetch(url, {
-        body:
-          options.body === undefined ? undefined : JSON.stringify(options.body),
+        body: options.body === undefined ? undefined : JSON.stringify(options.body),
         headers,
         method: options.method ?? 'GET',
       })
@@ -107,9 +106,7 @@ export class OtterClient {
 
     if (!response.ok) {
       const body = (parsed ?? {}) as { error?: string; reason?: string }
-      throw new Error(
-        body.reason || body.error || `HTTP ${response.status} from ${path}`,
-      )
+      throw new Error(body.reason || body.error || `HTTP ${response.status} from ${path}`)
     }
 
     return parsed as T

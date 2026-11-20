@@ -4,10 +4,7 @@ import { type FormEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/Button'
 import { Label } from '@/components/Label'
-import {
-  type BookmarkImportResult,
-  importBookmarksFile,
-} from '@/utils/fetching/bookmarks'
+import { type BookmarkImportResult, importBookmarksFile } from '@/utils/fetching/bookmarks'
 import { getErrorMessage } from '@/utils/get-error-message'
 
 export const Route = createFileRoute('/_app/settings/data')({
@@ -42,9 +39,7 @@ function RouteComponent() {
     try {
       const { data } = await importBookmarksFile(file)
       setResult(data)
-      toast.success(
-        `Imported ${data.imported} bookmark${data.imported === 1 ? '' : 's'}`,
-      )
+      toast.success(`Imported ${data.imported} bookmark${data.imported === 1 ? '' : 's'}`)
 
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
@@ -63,10 +58,10 @@ function RouteComponent() {
     <article className="flow">
       <h3>Import bookmarks</h3>
       <p>
-        Import bookmarks from a <code>bookmarks.html</code> file — the standard
-        export format of Chrome, Firefox, Safari, Edge, Pinboard and most other
-        bookmark managers. Folder names and tags in the file become Otter tags,
-        and bookmarks with a URL you have already saved are skipped.
+        Import bookmarks from a <code>bookmarks.html</code> file — the standard export format of
+        Chrome, Firefox, Safari, Edge, Pinboard and most other bookmark managers. Folder names and
+        tags in the file become Otter tags, and bookmarks with a URL you have already saved are
+        skipped.
       </p>
       <form onSubmit={handleImport} className="flex flex-col gap-s">
         <div className="form-group">
@@ -89,16 +84,15 @@ function RouteComponent() {
       </form>
       {result ? (
         <output className="block">
-          Found {result.found} bookmark{result.found === 1 ? '' : 's'} in the
-          file: {result.imported} imported, {result.skipped} skipped as already
-          saved.
+          Found {result.found} bookmark{result.found === 1 ? '' : 's'} in the file:{' '}
+          {result.imported} imported, {result.skipped} skipped as already saved.
         </output>
       ) : null}
 
       <h3>Export bookmarks</h3>
       <p>
-        Download all your active bookmarks as a <code>bookmarks.html</code> file
-        that can be imported into any browser or bookmark manager.
+        Download all your active bookmarks as a <code>bookmarks.html</code> file that can be
+        imported into any browser or bookmark manager.
       </p>
       <div>
         <Button asChild>

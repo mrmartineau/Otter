@@ -44,8 +44,7 @@ beforeEach(() => {
 
 describe('classifyBookmark', () => {
   const shortlist = () =>
-    aiRun.mock.calls[0][1].response_format.json_schema.properties.tags.items
-      .enum as string[]
+    aiRun.mock.calls[0][1].response_format.json_schema.properties.tags.items.enum as string[]
 
   it('shows the model a shortlist, not the whole vocabulary', async () => {
     await classify([])

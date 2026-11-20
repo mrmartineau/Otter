@@ -45,9 +45,7 @@ export const getDashboard = async (context: HonoContext) => {
       const rows = await auth.requestContext.db
         .select()
         .from(bookmarks)
-        .where(
-          and(eq(bookmarks.user, auth.userId), eq(bookmarks.status, 'active')),
-        )
+        .where(and(eq(bookmarks.user, auth.userId), eq(bookmarks.status, 'active')))
         .orderBy(desc(bookmarks.createdAt))
         .limit(4)
 
@@ -73,21 +71,15 @@ export const getDashboard = async (context: HonoContext) => {
       return rows.map(bookmarkToRow)
     }
 
-    const [
-      recent,
-      oneWeekAgo,
-      oneMonthAgo,
-      twoMonthsAgo,
-      sixMonthsAgo,
-      oneYearAgo,
-    ] = await Promise.all([
-      getRecent(),
-      getBucket(8, 6),
-      getBucket(31, 29),
-      getBucket(61, 59),
-      getBucket(181, 179),
-      getBucket(366, 364),
-    ])
+    const [recent, oneWeekAgo, oneMonthAgo, twoMonthsAgo, sixMonthsAgo, oneYearAgo] =
+      await Promise.all([
+        getRecent(),
+        getBucket(8, 6),
+        getBucket(31, 29),
+        getBucket(61, 59),
+        getBucket(181, 179),
+        getBucket(366, 364),
+      ])
 
     return new Response(
       JSON.stringify({

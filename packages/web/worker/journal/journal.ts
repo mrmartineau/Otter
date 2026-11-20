@@ -21,10 +21,7 @@ const journalToRow = (item: JournalRow): Journal => ({
   status: item.status,
 })
 
-const journalEntryToRow = (
-  item: JournalEntryRow,
-  journal?: JournalRow | null,
-): JournalEntry => ({
+const journalEntryToRow = (item: JournalEntryRow, journal?: JournalRow | null): JournalEntry => ({
   created_at: item.createdAt?.toISOString() ?? null,
   date: item.date,
   end_date: item.endDate,
@@ -95,8 +92,7 @@ const notFoundResponse = (reason: string) => {
 const toJournalSet = (body: Record<string, unknown>) => {
   const values: Partial<typeof journals.$inferInsert> = {}
 
-  if ('description' in body)
-    values.description = body.description as string | null
+  if ('description' in body) values.description = body.description as string | null
   if ('name' in body) values.name = body.name as string
   if ('status' in body) values.status = body.status as typeof values.status
 
@@ -109,8 +105,7 @@ const toJournalEntrySet = (body: Record<string, unknown>) => {
   if ('date' in body) values.date = body.date as string | null
   if ('end_date' in body) values.endDate = body.end_date as string | null
   if ('entry' in body) values.entry = body.entry as string | null
-  if ('journal' in body)
-    values.journal = body.journal != null ? Number(body.journal) : null
+  if ('journal' in body) values.journal = body.journal != null ? Number(body.journal) : null
   if ('media' in body) values.media = body.media as string[] | null
   if ('status' in body) values.status = body.status as typeof values.status
   if ('time' in body) values.time = body.time as string | null
@@ -140,8 +135,7 @@ export const getJournals = async (context: HonoContext) => {
       return auth
     }
 
-    const status =
-      (context.req.query('status') as JournalStatus | undefined) ?? 'active'
+    const status = (context.req.query('status') as JournalStatus | undefined) ?? 'active'
     const data = await auth.requestContext.db
       .select()
       .from(journals)
@@ -182,13 +176,10 @@ export const createJournal = async (context: HonoContext) => {
       })
       .returning()
 
-    return new Response(
-      JSON.stringify({ data: journalToRow(item), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: journalToRow(item), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse(error, 'Problem creating journal')
   }
@@ -206,25 +197,17 @@ export const updateJournal = async (context: HonoContext) => {
     const [item] = await auth.requestContext.db
       .update(journals)
       .set(toJournalSet(body))
-      .where(
-        and(
-          eq(journals.id, Number(context.req.param('id'))),
-          eq(journals.owner, auth.userId),
-        ),
-      )
+      .where(and(eq(journals.id, Number(context.req.param('id'))), eq(journals.owner, auth.userId)))
       .returning()
 
     if (!item) {
       return notFoundResponse('Journal not found or access denied')
     }
 
-    return new Response(
-      JSON.stringify({ data: journalToRow(item), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: journalToRow(item), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse(error, 'Problem updating journal')
   }
@@ -245,25 +228,17 @@ export const deleteJournal = async (context: HonoContext) => {
     const [item] = await auth.requestContext.db
       .update(journals)
       .set({ status: 'deleted' })
-      .where(
-        and(
-          eq(journals.id, Number(context.req.param('id'))),
-          eq(journals.owner, auth.userId),
-        ),
-      )
+      .where(and(eq(journals.id, Number(context.req.param('id'))), eq(journals.owner, auth.userId)))
       .returning()
 
     if (!item) {
       return notFoundResponse('Journal not found or access denied')
     }
 
-    return new Response(
-      JSON.stringify({ data: journalToRow(item), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: journalToRow(item), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse(error, 'Problem deleting journal')
   }
@@ -283,12 +258,8 @@ export const getJournalEntries = async (context: HonoContext) => {
     }
 
     const journalParam = context.req.query('journal')
-    const status =
-      (context.req.query('status') as JournalStatus | undefined) ?? 'active'
-    const conditions = [
-      eq(journalEntries.owner, auth.userId),
-      eq(journalEntries.status, status),
-    ]
+    const status = (context.req.query('status') as JournalStatus | undefined) ?? 'active'
+    const conditions = [eq(journalEntries.owner, auth.userId), eq(journalEntries.status, status)]
 
     if (journalParam) {
       conditions.push(eq(journalEntries.journal, Number(journalParam)))
@@ -299,23 +270,15 @@ export const getJournalEntries = async (context: HonoContext) => {
       .from(journalEntries)
       .leftJoin(
         journals,
-        and(
-          eq(journalEntries.journal, journals.id),
-          eq(journals.owner, auth.userId),
-        ),
+        and(eq(journalEntries.journal, journals.id), eq(journals.owner, auth.userId)),
       )
       .where(and(...conditions))
-      .orderBy(
-        sql`${journalEntries.date} desc nulls last`,
-        desc(journalEntries.createdAt),
-      )
+      .orderBy(sql`${journalEntries.date} desc nulls last`, desc(journalEntries.createdAt))
 
     return new Response(
       JSON.stringify({
         count: data.length,
-        data: data.map((item) =>
-          journalEntryToRow(item.journal_entries, item.journals),
-        ),
+        data: data.map((item) => journalEntryToRow(item.journal_entries, item.journals)),
         error: null,
       }),
       {
@@ -341,10 +304,7 @@ export const getJournalEntry = async (context: HonoContext) => {
       .from(journalEntries)
       .leftJoin(
         journals,
-        and(
-          eq(journalEntries.journal, journals.id),
-          eq(journals.owner, auth.userId),
-        ),
+        and(eq(journalEntries.journal, journals.id), eq(journals.owner, auth.userId)),
       )
       .where(
         and(
@@ -387,11 +347,7 @@ export const createJournalEntry = async (context: HonoContext) => {
 
     if (
       values.journal != null &&
-      !(await userOwnsJournal(
-        auth.requestContext.db,
-        values.journal,
-        auth.userId,
-      ))
+      !(await userOwnsJournal(auth.requestContext.db, values.journal, auth.userId))
     ) {
       return notFoundResponse('Journal not found or access denied')
     }
@@ -404,13 +360,10 @@ export const createJournalEntry = async (context: HonoContext) => {
       })
       .returning()
 
-    return new Response(
-      JSON.stringify({ data: journalEntryToRow(item), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: journalEntryToRow(item), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse(error, 'Problem creating journal entry')
   }
@@ -429,11 +382,7 @@ export const updateJournalEntry = async (context: HonoContext) => {
 
     if (
       values.journal != null &&
-      !(await userOwnsJournal(
-        auth.requestContext.db,
-        values.journal,
-        auth.userId,
-      ))
+      !(await userOwnsJournal(auth.requestContext.db, values.journal, auth.userId))
     ) {
       return notFoundResponse('Journal not found or access denied')
     }
@@ -453,13 +402,10 @@ export const updateJournalEntry = async (context: HonoContext) => {
       return notFoundResponse('Journal entry not found or access denied')
     }
 
-    return new Response(
-      JSON.stringify({ data: journalEntryToRow(item), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: journalEntryToRow(item), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse(error, 'Problem updating journal entry')
   }
@@ -492,13 +438,10 @@ export const deleteJournalEntry = async (context: HonoContext) => {
       return notFoundResponse('Journal entry not found or access denied')
     }
 
-    return new Response(
-      JSON.stringify({ data: journalEntryToRow(item), error: null }),
-      {
-        headers: API_HEADERS,
-        status: 200,
-      },
-    )
+    return new Response(JSON.stringify({ data: journalEntryToRow(item), error: null }), {
+      headers: API_HEADERS,
+      status: 200,
+    })
   } catch (error) {
     return errorResponse(error, 'Problem deleting journal entry')
   }

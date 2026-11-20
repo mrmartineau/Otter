@@ -37,83 +37,31 @@ export const TypeToIcon = ({ type, color, ...rest }: TypeToIconProps) => {
       )
     case 'video':
       return (
-        <VideoCameraIcon
-          aria-label="Video"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <VideoCameraIcon aria-label="Video" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'audio':
       return (
-        <HeadphonesIcon
-          aria-label="Video"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <HeadphonesIcon aria-label="Video" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'image':
       return (
-        <ImageSquareIcon
-          aria-label="Video"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <ImageSquareIcon aria-label="Video" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'recipe':
       return (
-        <HamburgerIcon
-          aria-label="Recipe"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <HamburgerIcon aria-label="Recipe" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'document':
-      return (
-        <FilesIcon
-          aria-label="Document"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
-      )
+      return <FilesIcon aria-label="Document" weight="duotone" size={18} color={color} {...rest} />
     case 'product':
-      return (
-        <BarbellIcon
-          aria-label="Product"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
-      )
+      return <BarbellIcon aria-label="Product" weight="duotone" size={18} color={color} {...rest} />
     case 'book':
       return (
-        <BookOpenTextIcon
-          aria-label="Book"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <BookOpenTextIcon aria-label="Book" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'game':
       return (
-        <GameControllerIcon
-          aria-label="Game"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <GameControllerIcon aria-label="Game" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'link':
       return (
@@ -126,35 +74,13 @@ export const TypeToIcon = ({ type, color, ...rest }: TypeToIconProps) => {
         />
       )
     case 'note':
-      return (
-        <NotepadIcon
-          aria-label="Note"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
-      )
+      return <NotepadIcon aria-label="Note" weight="duotone" size={18} color={color} {...rest} />
     case 'event':
       return (
-        <CalendarXIcon
-          aria-label="Product"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <CalendarXIcon aria-label="Product" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'place':
-      return (
-        <MapPinIcon
-          aria-label="Place"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
-      )
+      return <MapPinIcon aria-label="Place" weight="duotone" size={18} color={color} {...rest} />
     default:
       return null
   }
@@ -163,82 +89,30 @@ export const TypeToIcon = ({ type, color, ...rest }: TypeToIconProps) => {
 export interface MediaTypeToIconProps extends IconProps {
   type: MediaType
 }
-export const MediaTypeToIcon = ({
-  type,
-  color,
-  ...rest
-}: MediaTypeToIconProps) => {
+export const MediaTypeToIcon = ({ type, color, ...rest }: MediaTypeToIconProps) => {
   switch (type) {
     case 'tv':
-      return (
-        <TelevisionIcon
-          aria-label="TV"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
-      )
+      return <TelevisionIcon aria-label="TV" weight="duotone" size={18} color={color} {...rest} />
     case 'game':
       return (
-        <GameControllerIcon
-          aria-label="Game"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <GameControllerIcon aria-label="Game" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'book':
       return (
-        <BookOpenTextIcon
-          aria-label="Book"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <BookOpenTextIcon aria-label="Book" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'film':
-      return (
-        <FilmReelIcon
-          aria-label="Film"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
-      )
+      return <FilmReelIcon aria-label="Film" weight="duotone" size={18} color={color} {...rest} />
     case 'podcast':
       return (
-        <MicrophoneIcon
-          aria-label="Podcast"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <MicrophoneIcon aria-label="Podcast" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'music':
       return (
-        <HeadphonesIcon
-          aria-label="Music"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
+        <HeadphonesIcon aria-label="Music" weight="duotone" size={18} color={color} {...rest} />
       )
     case 'other':
-      return (
-        <QuestionIcon
-          aria-label="Other"
-          weight="duotone"
-          size={18}
-          color={color}
-          {...rest}
-        />
-      )
+      return <QuestionIcon aria-label="Other" weight="duotone" size={18} color={color} {...rest} />
     default:
       return null
   }

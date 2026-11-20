@@ -78,16 +78,8 @@ export const UpdateInfoForm = ({ user }: UpdateInfoProps) => {
 
   return (
     <div>
-      <form
-        onSubmit={handleSubmit(onFormSubmit)}
-        noValidate
-        className="flex flex-col gap-s"
-      >
-        <FormGroup
-          label="Email"
-          name="email"
-          error={errors.email?.message as string}
-        >
+      <form onSubmit={handleSubmit(onFormSubmit)} noValidate className="flex flex-col gap-s">
+        <FormGroup label="Email" name="email" error={errors.email?.message as string}>
           <Input
             id="email"
             type="email"
@@ -96,9 +88,7 @@ export const UpdateInfoForm = ({ user }: UpdateInfoProps) => {
             // state={errors.email?.message ? 'error' : 'normal'}
             {...register('email', {
               validate: (value) =>
-                emailValidator.validate(value as string)
-                  ? undefined
-                  : 'Invalid email',
+                emailValidator.validate(value as string) ? undefined : 'Invalid email',
             })}
             autoComplete="email"
           />
@@ -119,11 +109,7 @@ export const UpdateInfoForm = ({ user }: UpdateInfoProps) => {
           />
         </FormGroup>
 
-        <FormGroup
-          label="New password"
-          name="password"
-          error={errors.password?.message as string}
-        >
+        <FormGroup label="New password" name="password" error={errors.password?.message as string}>
           <Input
             id="password"
             type="password"

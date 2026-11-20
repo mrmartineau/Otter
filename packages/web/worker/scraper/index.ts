@@ -1,21 +1,12 @@
 import type { HonoRequest } from 'hono'
 import { TidyURL } from 'tidy-url'
 import type { MetadataResponse } from '@/types/api'
-import {
-  generateErrorJSONResponse,
-  generateJSONResponse,
-} from './json-response'
+import { generateErrorJSONResponse, generateJSONResponse } from './json-response'
 import { linkType } from './link-type'
 import Scraper from './scraper'
 import { scraperRules } from './scraper-rules'
 
-type JSONValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JSONValue[]
-  | { [key: string]: JSONValue }
+type JSONValue = string | number | boolean | null | JSONValue[] | { [key: string]: JSONValue }
 
 interface JSONObject {
   [k: string]: JSONValue
@@ -53,8 +44,7 @@ export const scrapeMetadata = async (
   await scraper.fetch(url)
 
   // Get metadata using the rules defined in `src/scraper-rules.ts`
-  const response: Record<string, ScrapeResponse> =
-    await scraper.getMetadata(scraperRules)
+  const response: Record<string, ScrapeResponse> = await scraper.getMetadata(scraperRules)
 
   const unshortenedUrl = scraper.response.url
 

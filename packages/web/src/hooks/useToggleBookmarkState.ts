@@ -31,8 +31,7 @@ export const useToggleBookmarkState = ({
       return
     }
     pending.current.add(column)
-    const updateData =
-      column === 'public' ? { public: !isPublic } : { star: !star }
+    const updateData = column === 'public' ? { public: !isPublic } : { star: !star }
     try {
       await updateBookmark(id, updateData)
       await queryClient.invalidateQueries({ queryKey: ['bookmarks'] })

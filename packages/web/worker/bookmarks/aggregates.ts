@@ -42,10 +42,7 @@ export const getTagCounts = async (
   return tags
 }
 
-export const getTypeCounts = async (
-  db: Db,
-  userId: string,
-): Promise<MetaType[]> => {
+export const getTypeCounts = async (db: Db, userId: string): Promise<MetaType[]> => {
   const result = await db.execute<{
     count: number
     type: MetaType['type']
@@ -66,10 +63,7 @@ export const getTypeCounts = async (
 // (`ai:openai` → `ai`). Tags without a colon are not collections, but a
 // bookmark tagged with a bare `name` still counts towards collection `name`
 // if that collection exists.
-export const getCollections = async (
-  db: Db,
-  userId: string,
-): Promise<CollectionType[]> => {
+export const getCollections = async (db: Db, userId: string): Promise<CollectionType[]> => {
   const result = await db.execute<{
     bookmark_count: number
     collection: string

@@ -11,8 +11,7 @@ export const FabAdd = () => {
   const location = useLocation()
   const [playSwitchOn] = useSound(switchOnSfx)
 
-  const disableFab =
-    location.pathname === `/new/bookmark` || location.pathname.includes('edit')
+  const disableFab = location.pathname === `/new/bookmark` || location.pathname.includes('edit')
 
   return (
     <Tooltip>

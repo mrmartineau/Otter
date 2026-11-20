@@ -1,7 +1,7 @@
 import { ALLOW_SIGNUP, CONTENT, REPO_URL, ROUTE_SIGNIN } from '@/constants'
-import { Link } from './Link'
-import './PublicLayout.css'
 import { Container } from './Container'
+import './PublicLayout.css'
+import { Link } from './Link'
 
 export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -25,11 +25,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
       <Container className="public-footer">
         <span>
           Made by{' '}
-          <a
-            href="https://zander.wtf"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://zander.wtf" target="_blank" rel="noopener noreferrer">
             Zander Martineau
           </a>
         </span>

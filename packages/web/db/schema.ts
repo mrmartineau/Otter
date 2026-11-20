@@ -43,12 +43,7 @@ export const mediaRatingEnum = pgEnum('media_rating', [
   '5',
 ])
 
-export const mediaStatusEnum = pgEnum('media_status', [
-  'now',
-  'skipped',
-  'done',
-  'wishlist',
-])
+export const mediaStatusEnum = pgEnum('media_status', ['now', 'skipped', 'done', 'wishlist'])
 
 export const mediaTypeEnum = pgEnum('media_type', [
   'tv',
@@ -92,17 +87,13 @@ export const bookmarkTypeEnum = pgEnum('type', [
 export const authUsers = pgTable(
   'user',
   {
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     email: text('email').notNull(),
     emailVerified: boolean('email_verified').notNull().default(false),
     id: uuid('id').primaryKey().defaultRandom(),
     image: text('image'),
     name: text('name').notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [uniqueIndex('user_email_key').on(table.email)],
 )
@@ -110,16 +101,14 @@ export const authUsers = pgTable(
 export const authSessions = pgTable(
   'session',
   {
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-    id: text('id').primaryKey().default(sql`gen_random_uuid()::text`),
+    id: text('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()::text`),
     ipAddress: text('ip_address'),
     token: text('token').notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
     userAgent: text('user_agent'),
     userId: uuid('user_id')
       .notNull()
@@ -139,10 +128,10 @@ export const authAccounts = pgTable(
       withTimezone: true,
     }),
     accountId: text('account_id').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    id: text('id').primaryKey().default(sql`gen_random_uuid()::text`),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    id: text('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()::text`),
     idToken: text('id_token'),
     password: text('password'),
     providerId: text('provider_id').notNull(),
@@ -151,9 +140,7 @@ export const authAccounts = pgTable(
       withTimezone: true,
     }),
     scope: text('scope'),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
     userId: uuid('user_id')
       .notNull()
       .references(() => authUsers.id, { onDelete: 'cascade' }),
@@ -164,18 +151,20 @@ export const authAccounts = pgTable(
 export const authVerifications = pgTable('verification', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-  id: text('id').primaryKey().default(sql`gen_random_uuid()::text`),
+  id: text('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()::text`),
   identifier: text('identifier').notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
   value: text('value').notNull(),
 })
 
 export const authJwks = pgTable('jwks', {
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   expiresAt: timestamp('expires_at', { withTimezone: true }),
-  id: text('id').primaryKey().default(sql`gen_random_uuid()::text`),
+  id: text('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()::text`),
   privateKey: text('private_key').notNull(),
   publicKey: text('public_key').notNull(),
 })
@@ -191,7 +180,9 @@ export const oauthClients = pgTable(
     enableEndSession: boolean('enable_end_session'),
     grantTypes: text('grant_types').array(),
     icon: text('icon'),
-    id: text('id').primaryKey().default(sql`gen_random_uuid()::text`),
+    id: text('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()::text`),
     metadata: json('metadata'),
     name: text('name'),
     policy: text('policy'),
@@ -229,7 +220,9 @@ export const oauthRefreshTokens = pgTable(
       .references(() => oauthClients.clientId),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-    id: text('id').primaryKey().default(sql`gen_random_uuid()::text`),
+    id: text('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()::text`),
     referenceId: text('reference_id'),
     revoked: timestamp('revoked', { withTimezone: true }),
     scopes: text('scopes').array().notNull(),
@@ -256,7 +249,9 @@ export const oauthAccessTokens = pgTable(
       .references(() => oauthClients.clientId),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-    id: text('id').primaryKey().default(sql`gen_random_uuid()::text`),
+    id: text('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()::text`),
     referenceId: text('reference_id'),
     refreshId: text('refresh_id').references(() => oauthRefreshTokens.id),
     scopes: text('scopes').array().notNull(),
@@ -281,7 +276,9 @@ export const oauthConsents = pgTable(
       .notNull()
       .references(() => oauthClients.clientId),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
-    id: text('id').primaryKey().default(sql`gen_random_uuid()::text`),
+    id: text('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()::text`),
     referenceId: text('reference_id'),
     scopes: text('scopes').array().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
@@ -301,23 +298,17 @@ export const profiles = pgTable(
     id: uuid('id')
       .primaryKey()
       .references(() => authUsers.id, { onDelete: 'cascade' }),
-    settingsCollectionsVisible: boolean('settings_collections_visible')
-      .notNull()
-      .default(false),
+    settingsCollectionsVisible: boolean('settings_collections_visible').notNull().default(false),
     settingsGroupByDate: boolean('settings_group_by_date').default(false),
     settingsPinnedTags: text('settings_pinned_tags')
       .array()
       .notNull()
       .default(sql`ARRAY[]::text[]`),
-    settingsTagsVisible: boolean('settings_tags_visible')
-      .notNull()
-      .default(false),
+    settingsTagsVisible: boolean('settings_tags_visible').notNull().default(false),
     settingsTopTagsCount: numeric('settings_top_tags_count', {
       mode: 'number',
     }),
-    settingsTypesVisible: boolean('settings_types_visible')
-      .notNull()
-      .default(false),
+    settingsTypesVisible: boolean('settings_types_visible').notNull().default(false),
     updatedAt: timestamp('updated_at', { withTimezone: true }),
     username: text('username'),
   },
@@ -367,10 +358,7 @@ export const bookmarks = pgTable(
     user: uuid('user').references(() => authUsers.id),
   },
   (table) => [
-    index('bookmarks_user_created_at_idx').on(
-      table.user,
-      table.createdAt.desc(),
-    ),
+    index('bookmarks_user_created_at_idx').on(table.user, table.createdAt.desc()),
     index('bookmarks_user_status_idx').on(table.user, table.status),
     // Serves the cross-user public feed (getRecentPublicBookmarks):
     // WHERE public AND status='active' ORDER BY created_at DESC. `public`
@@ -388,14 +376,10 @@ export const bookmarks = pgTable(
 )
 
 export const feeds = pgTable('feeds', {
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  id: bigint('id', { mode: 'number' })
-    .primaryKey()
-    .generatedByDefaultAsIdentity({
-      name: 'Feeds_id_seq',
-    }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity({
+    name: 'Feeds_id_seq',
+  }),
   name: text('name').notNull(),
   properties: json('properties'),
   type: feedsTypeEnum('type').notNull(),
@@ -432,14 +416,10 @@ export const bookmarkTags = pgTable(
 export const media = pgTable(
   'media',
   {
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    id: bigint('id', { mode: 'number' })
-      .primaryKey()
-      .generatedByDefaultAsIdentity({
-        name: 'media_id_seq',
-      }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity({
+      name: 'media_id_seq',
+    }),
     image: text('image'),
     mediaId: text('media_id'),
     modifiedAt: timestamp('modified_at', { withTimezone: true }),
@@ -459,11 +439,9 @@ export const journals = pgTable(
   {
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
     description: text('description'),
-    id: bigint('id', { mode: 'number' })
-      .primaryKey()
-      .generatedByDefaultAsIdentity({
-        name: 'journals_id_seq',
-      }),
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity({
+      name: 'journals_id_seq',
+    }),
     name: text('name').notNull(),
     owner: uuid('owner').references(() => authUsers.id),
     status: journalStatusEnum('status').notNull().default('active'),
@@ -478,14 +456,10 @@ export const journalEntries = pgTable(
     date: date('date'),
     endDate: date('end_date'),
     entry: text('entry'),
-    id: bigint('id', { mode: 'number' })
-      .primaryKey()
-      .generatedByDefaultAsIdentity({
-        name: 'journal_entries_id_seq',
-      }),
-    journal: bigint('journal', { mode: 'number' }).references(
-      () => journals.id,
-    ),
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity({
+      name: 'journal_entries_id_seq',
+    }),
+    journal: bigint('journal', { mode: 'number' }).references(() => journals.id),
     media: text('media').array(),
     owner: uuid('owner').references(() => authUsers.id),
     status: journalStatusEnum('status').notNull().default('active'),
@@ -500,11 +474,9 @@ export const journalEntries = pgTable(
 export const checklists = pgTable(
   'checklists',
   {
-    id: bigint('id', { mode: 'number' })
-      .primaryKey()
-      .generatedByDefaultAsIdentity({
-        name: 'checklists_id_seq',
-      }),
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity({
+      name: 'checklists_id_seq',
+    }),
     name: text('name').notNull(),
     owner: uuid('owner').references(() => authUsers.id),
     status: journalStatusEnum('status').notNull().default('active'),
@@ -519,11 +491,9 @@ export const checklistEntries = pgTable(
       .notNull()
       .references(() => checklists.id),
     count: bigint('count', { mode: 'number' }),
-    id: bigint('id', { mode: 'number' })
-      .primaryKey()
-      .generatedByDefaultAsIdentity({
-        name: 'checklist_entries_id_seq',
-      }),
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedByDefaultAsIdentity({
+      name: 'checklist_entries_id_seq',
+    }),
     journalEntryId: bigint('journal_entry_id', { mode: 'number' })
       .notNull()
       .references(() => journalEntries.id),
@@ -585,27 +555,19 @@ export const tweets = pgTable(
 export const shares = pgTable(
   'shares',
   {
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     id: uuid('id').primaryKey().defaultRandom(),
     kind: shareKindEnum('kind').notNull(),
     name: text('name').notNull(),
     token: text('token').notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
     userId: uuid('user_id')
       .notNull()
       .references(() => authUsers.id, { onDelete: 'cascade' }),
   },
   (table) => [
     uniqueIndex('shares_token_key').on(table.token),
-    uniqueIndex('shares_user_kind_name_key').on(
-      table.userId,
-      table.kind,
-      table.name,
-    ),
+    uniqueIndex('shares_user_kind_name_key').on(table.userId, table.kind, table.name),
     index('shares_user_id_idx').on(table.userId),
   ],
 )
@@ -617,9 +579,7 @@ export const userIntegrations = pgTable('user_integrations', {
   blueskyLastError: text('bluesky_last_error'),
   blueskyPostPrefix: text('bluesky_post_prefix'),
   blueskyPostSuffix: text('bluesky_post_suffix'),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }),
   userId: uuid('user_id')
     .primaryKey()
@@ -630,12 +590,7 @@ export const userIntegrations = pgTable('user_integrations', {
 // A reading item is a bookmark (type = article) plus this row. Soft deletes
 // everywhere so the iOS app can sync tombstones with `?since=`.
 
-export const readingStateEnum = pgEnum('reading_state', [
-  'pending',
-  'ready',
-  'failed',
-  'archived',
-])
+export const readingStateEnum = pgEnum('reading_state', ['pending', 'ready', 'failed', 'archived'])
 
 export const readingItems = pgTable(
   'reading_items',
@@ -646,9 +601,7 @@ export const readingItems = pgTable(
       .references(() => bookmarks.id, { onDelete: 'cascade' }),
     contentHash: text('content_hash'),
     contentMd: text('content_md'),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
     id: uuid('id').primaryKey().defaultRandom(),
     lastPosition: text('last_position'),
@@ -661,9 +614,7 @@ export const readingItems = pgTable(
     removedAt: timestamp('removed_at', { withTimezone: true }),
     siteName: text('site_name'),
     state: readingStateEnum('state').notNull().default('pending'),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
     userId: uuid('user_id')
       .notNull()
       .references(() => authUsers.id, { onDelete: 'cascade' }),
@@ -671,10 +622,7 @@ export const readingItems = pgTable(
   },
   (table) => [
     uniqueIndex('reading_items_bookmark_id_key').on(table.bookmarkId),
-    index('reading_items_user_updated_at_idx').on(
-      table.userId,
-      table.updatedAt.desc(),
-    ),
+    index('reading_items_user_updated_at_idx').on(table.userId, table.updatedAt.desc()),
   ],
 )
 
@@ -682,9 +630,7 @@ export const highlights = pgTable(
   'highlights',
   {
     color: text('color'),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
     // W3C TextQuoteSelector: survives re-extraction.
     exact: text('exact').notNull(),
@@ -695,18 +641,13 @@ export const highlights = pgTable(
       .notNull()
       .references(() => readingItems.id, { onDelete: 'cascade' }),
     suffix: text('suffix'),
-    updatedAt: timestamp('updated_at', { withTimezone: true })
-      .notNull()
-      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
     userId: uuid('user_id')
       .notNull()
       .references(() => authUsers.id, { onDelete: 'cascade' }),
   },
   (table) => [
-    index('highlights_user_updated_at_idx').on(
-      table.userId,
-      table.updatedAt.desc(),
-    ),
+    index('highlights_user_updated_at_idx').on(table.userId, table.updatedAt.desc()),
     index('highlights_reading_item_id_idx').on(table.readingItemId),
   ],
 )

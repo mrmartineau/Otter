@@ -38,11 +38,7 @@ type ParsedTable = {
   rows: Record<string, string | null>[]
 }
 
-function parseCopyBlock(
-  content: string,
-  schema: string,
-  table: string,
-): ParsedTable {
+function parseCopyBlock(content: string, schema: string, table: string): ParsedTable {
   const schemaPattern = `(?:"${schema}"|${schema})`
   const tablePattern = `(?:"${table}"|${table})`
   const copyPattern = new RegExp(
@@ -234,9 +230,7 @@ async function importUsers(
 
     const accountId = randomUUID()
     const password =
-      COPY_PASSWORDS && encryptedPassword
-        ? encryptedPassword.replace(/^\$2a\$/, '$2b$')
-        : null
+      COPY_PASSWORDS && encryptedPassword ? encryptedPassword.replace(/^\$2a\$/, '$2b$') : null
     accountRows.push([
       accountId,
       id,
@@ -258,15 +252,7 @@ async function importUsers(
     await batchInsert(
       pool,
       'account',
-      [
-        'id',
-        'user_id',
-        'provider_id',
-        'account_id',
-        'password',
-        'created_at',
-        'updated_at',
-      ],
+      ['id', 'user_id', 'provider_id', 'account_id', 'password', 'created_at', 'updated_at'],
       accountRows,
     )
   }
@@ -534,10 +520,7 @@ async function importTweets(pool: Pool, dump: string): Promise<number> {
   return insertRows.length
 }
 
-async function importUserIntegrations(
-  pool: Pool,
-  dump: string,
-): Promise<number> {
+async function importUserIntegrations(pool: Pool, dump: string): Promise<number> {
   const { rows } = parseCopyBlock(dump, 'public', 'user_integrations')
   const insertRows = rows.map((r) => [
     r['user_id'],
@@ -577,12 +560,7 @@ async function importBookmarkTags(pool: Pool, dump: string): Promise<number> {
   const insertRows = rows.map((r) => [r['bookmark_id'], r['tag_id']])
 
   if (!DRY_RUN) {
-    await batchInsert(
-      pool,
-      'bookmark_tags',
-      ['bookmark_id', 'tag_id'],
-      insertRows,
-    )
+    await batchInsert(pool, 'bookmark_tags', ['bookmark_id', 'tag_id'], insertRows)
   }
   return insertRows.length
 }
@@ -596,9 +574,7 @@ async function resetSequences(pool: Pool): Promise<void> {
   ]
 
   for (const { seq, table, col } of sequences) {
-    const { rows } = await pool.query(
-      `SELECT COALESCE(MAX(${col}), 0) AS max_id FROM ${table}`,
-    )
+    const { rows } = await pool.query(`SELECT COALESCE(MAX(${col}), 0) AS max_id FROM ${table}`)
     const maxId = rows[0]?.max_id ?? 0
     await pool.query(`SELECT setval('${seq}', $1, true)`, [maxId])
     console.log(`  Sequence ${seq} reset to ${maxId}`)
@@ -854,15 +830,10 @@ async function main() {
     warnings,
   }
 
-  const reportPath = resolve(
-    process.cwd(),
-    `migration-report-${Date.now()}.json`,
-  )
+  const reportPath = resolve(process.cwd(), `migration-report-${Date.now()}.json`)
   writeFileSync(reportPath, JSON.stringify(report, null, 2))
   console.log(`\nReport written to: ${reportPath}`)
-  console.log(
-    `\nDone in ${Math.round((Date.now() - new Date(startedAt).getTime()) / 1000)}s`,
-  )
+  console.log(`\nDone in ${Math.round((Date.now() - new Date(startedAt).getTime()) / 1000)}s`)
 
   await pool.end()
 }
